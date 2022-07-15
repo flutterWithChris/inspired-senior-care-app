@@ -15,6 +15,8 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       title: 'Inspired Senior Care App',
       theme: ThemeData(
+        bottomSheetTheme:
+            const BottomSheetThemeData(backgroundColor: Colors.white),
         textTheme: GoogleFonts.breeSerifTextTheme(),
         useMaterial3: true,
         primarySwatch: Colors.blue,
@@ -52,61 +54,9 @@ class _MyHomePageState extends State<MyHomePage> {
                     style: TextStyle(fontSize: 30),
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 12.0),
-                  child: InkWell(
-                    splashColor: Colors.lightBlueAccent.withOpacity(0.8),
-                    onTap: (() {}),
-                    child: Card(
-                      child: LayoutBuilder(
-                        builder: (context, constraints) {
-                          return ConstrainedBox(
-                            constraints: BoxConstraints(
-                                maxWidth:
-                                    constraints.maxWidth > 700 ? 400 : 250),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey.withOpacity(0.35),
-                                    offset: const Offset(0, 3),
-                                    spreadRadius: 5,
-                                    blurRadius: 7,
-                                  )
-                                ],
-                              ),
-                              child: Stack(
-                                clipBehavior: Clip.none,
-                                alignment: AlignmentDirectional.topEnd,
-                                children: [
-                                  SizedBox(
-                                    child: Image.asset(
-                                        'lib/assets/Supportive_Environment.png'),
-                                  ),
-                                  const Positioned(
-                                    top: -20,
-                                    right: -20,
-                                    child: CircleAvatar(
-                                      radius: 30,
-                                      backgroundColor: Colors.white,
-                                      child: CircleAvatar(
-                                        radius: 25,
-                                        backgroundColor: Colors.lightBlue,
-                                        child: Text(
-                                          '8/11',
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 12.0),
+                  child: FeaturedCategory(),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
@@ -114,13 +64,78 @@ class _MyHomePageState extends State<MyHomePage> {
                     onPressed: (() {}),
                     style: ElevatedButton.styleFrom(
                         fixedSize: const Size(200, 42)),
-                    child: const Text('See More'),
+                    child: const Text(
+                      'See More',
+                      style: TextStyle(fontSize: 18),
+                    ),
                   ),
                 ),
                 const Icon(FontAwesomeIcons.chevronDown),
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class FeaturedCategory extends StatelessWidget {
+  const FeaturedCategory({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      splashColor: Colors.lightBlueAccent.withOpacity(0.8),
+      onTap: (() {}),
+      child: Card(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return ConstrainedBox(
+              constraints: BoxConstraints(
+                  maxWidth: constraints.maxWidth > 700 ? 400 : 250),
+              child: Container(
+                decoration: BoxDecoration(
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.35),
+                      offset: const Offset(0, 3),
+                      spreadRadius: 5,
+                      blurRadius: 7,
+                    )
+                  ],
+                ),
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  alignment: AlignmentDirectional.topEnd,
+                  children: [
+                    SizedBox(
+                      child:
+                          Image.asset('lib/assets/Supportive_Environment.png'),
+                    ),
+                    const Positioned(
+                      top: -25,
+                      right: -25,
+                      child: CircleAvatar(
+                        radius: 40,
+                        backgroundColor: Colors.white,
+                        child: CircleAvatar(
+                          radius: 35,
+                          backgroundColor: Colors.lightBlue,
+                          child: Text(
+                            '8/11',
+                            style: TextStyle(color: Colors.white, fontSize: 22),
+                          ),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            );
+          },
         ),
       ),
     );

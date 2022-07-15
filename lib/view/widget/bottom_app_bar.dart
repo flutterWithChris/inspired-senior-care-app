@@ -25,19 +25,19 @@ class _BottomAppBarState extends State<MainBottomAppBar> {
           switch (index) {
             case 0:
               {
-                Get.to(const Categories());
+                Get.to(() => const Categories());
               }
               break;
 
             case 1:
               {
-                Get.to(const MyHomePage());
+                Get.to(() => const MyHomePage());
               }
               break;
 
             case 2:
               {
-                Get.to(const Profile());
+                Get.to(() => const Profile());
               }
               break;
           }

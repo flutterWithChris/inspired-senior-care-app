@@ -40,6 +40,7 @@ dependencies:
   flutter_layout_grid: ^2.0.1
   swipe_deck: ^1.1.0
   appinio_swiper: ^1.0.3
+  swipe_cards: ^1.0.0
 
 dev_dependencies:
   flutter_test:

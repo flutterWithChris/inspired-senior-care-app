@@ -108,17 +108,17 @@ class CategoryCard extends StatelessWidget {
                   )),
               Positioned(
                 top: 5,
-                right: 10,
+                right: 2,
                 child: CircleAvatar(
-                  radius: 30,
+                  radius: 25,
                   backgroundColor: Colors.white,
                   child: CircleAvatar(
-                    radius: 25,
+                    radius: 20,
                     backgroundColor: progressColor,
                     child: Text(
                       progress,
                       style: TextStyle(
-                          color: textColor ?? Colors.white, fontSize: 16),
+                          color: textColor ?? Colors.white, fontSize: 14),
                     ),
                   ),
                 ),

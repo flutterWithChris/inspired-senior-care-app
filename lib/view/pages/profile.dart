@@ -15,7 +15,7 @@ class Profile extends StatelessWidget {
             title: const Text('Inspired Senior Care'),
           )),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
         child: ListView(
           shrinkWrap: true,
           children: const [
@@ -48,6 +48,11 @@ class ProgressSection extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 24.0),
           child: Column(
             children: [
+              const Text(
+                'Your Progress',
+                textAlign: TextAlign.left,
+                style: TextStyle(fontSize: 20),
+              ),
               ProgressCategory(
                   title: 'Communication',
                   progressColor: Colors.deepOrange,
@@ -55,14 +60,29 @@ class ProgressSection extends StatelessWidget {
                   message: 'All Done. Good Job!'),
               ProgressCategory(
                   title: 'Positive Interactions',
-                  progressColor: Colors.red,
+                  progressColor: Colors.redAccent,
                   progress: 33,
                   message: '8 more to go.'),
               ProgressCategory(
                   title: 'Supportive Environment',
                   progressColor: Colors.lightGreen,
                   progress: 70,
-                  message: 'Only 3 More!')
+                  message: 'Only 3 More!'),
+              ProgressCategory(
+                  title: 'Brain Change',
+                  progressColor: Colors.lightGreen,
+                  progress: 40,
+                  message: 'Only 3 More!'),
+              ProgressCategory(
+                  title: 'Damaging Interactions',
+                  progressColor: Colors.grey,
+                  progress: 10,
+                  message: 'Only 3 More!'),
+              ProgressCategory(
+                  title: 'Genuine Relationships',
+                  progressColor: Colors.red,
+                  progress: 70,
+                  message: 'Only 3 More!'),
             ],
           ),
         ),
@@ -131,7 +151,7 @@ class ProgressCategory extends StatelessWidget {
                 child: LinearProgressIndicator(
                   minHeight: 12,
                   value: progress / 100,
-                  backgroundColor: Colors.grey.shade400,
+                  backgroundColor: Colors.grey.shade300,
                   color: progressColor,
                 ),
               ),
@@ -158,9 +178,8 @@ class NamePlate extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const ListTile(
-      minVerticalPadding: 10,
       leading: CircleAvatar(
-        radius: 40,
+        radius: 30,
         child: Text(
           'RS',
           style: TextStyle(fontSize: 24),
@@ -208,6 +227,7 @@ class Badges extends StatelessWidget {
               children: const [
                 Icon(
                   FontAwesomeIcons.fire,
+                  color: Colors.deepOrangeAccent,
                   size: 28,
                 ),
                 Text('On Fire!')
