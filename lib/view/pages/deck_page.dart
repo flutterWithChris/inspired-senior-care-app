@@ -10,7 +10,23 @@ class DeckPage extends StatefulWidget {
 }
 
 class _DeckPageState extends State<DeckPage> {
+  bool zoomCard = false;
   bool isSwipeDisabled = true;
+
+  bool _zoomCard() {
+    setState(() {
+      zoomCard = true;
+    });
+    return zoomCard;
+  }
+
+  bool _unZoomCard() {
+    setState(() {
+      zoomCard = false;
+    });
+    return zoomCard;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,22 +38,37 @@ class _DeckPageState extends State<DeckPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            SizedBox(
-              height: 500,
-              child: AppinioSwiper(
-                  isDisabled: isSwipeDisabled,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 50, vertical: 35),
-                  cards: [
-                    for (var i = 12; i > 0; i--)
-                      InfoCard(
-                        cardNumber: i,
-                      ),
-                  ]),
+            AnimatedScale(
+              duration: const Duration(milliseconds: 350),
+              scale: zoomCard == true ? 1.2 : 1.0,
+              child: AnimatedSlide(
+                duration: const Duration(milliseconds: 350),
+                offset: zoomCard == true
+                    ? const Offset(0, -0.4)
+                    : const Offset(0, 0),
+                child: SizedBox(
+                  height: 500,
+                  child: AppinioSwiper(
+                      isDisabled: isSwipeDisabled,
+                      padding: const EdgeInsets.symmetric(horizontal: 30),
+                      cards: [
+                        for (var i = 12; i > 0; i--)
+                          InfoCard(
+                            cardNumber: i,
+                          ),
+                      ]),
+                ),
+              ),
             ),
-            const Padding(
-              padding: EdgeInsets.only(bottom: 25),
-              child: ShareButton(),
+            Visibility(
+              visible: zoomCard ? false : true,
+              child: Padding(
+                padding: const EdgeInsets.only(top: 35),
+                child: ShareButton(
+                  zoomCard: _zoomCard,
+                  unZoomCard: _unZoomCard,
+                ),
+              ),
             ),
           ],
         ),
@@ -47,7 +78,11 @@ class _DeckPageState extends State<DeckPage> {
 }
 
 class ShareButton extends StatefulWidget {
+  final bool Function() zoomCard;
+  final bool Function() unZoomCard;
   const ShareButton({
+    required this.unZoomCard,
+    required this.zoomCard,
     Key? key,
   }) : super(key: key);
 
@@ -60,27 +95,33 @@ class _ShareButtonState extends State<ShareButton> {
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: () {
-        showBottomSheet(
+        var zoom = widget.zoomCard;
+        var unZoom = widget.unZoomCard;
+        zoom();
+        var bottomSheet = showBottomSheet(
           context: context,
           builder: (context) {
             return ClipRRect(
               borderRadius: BorderRadius.circular(25),
               child: Container(
                 margin: const EdgeInsets.only(left: 15, right: 15),
-                //width: MediaQuery.of(context).size.width,
                 height: 240,
-                // color: Colors.white.withOpacity(0),
                 child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     mainAxisSize: MainAxisSize.max,
-                    children: const [
-                      ShareTextField(),
-                      SendButton(),
+                    children: [
+                      Icon(
+                        Icons.drag_handle_rounded,
+                        color: Colors.grey.shade500,
+                      ),
+                      const ShareTextField(),
+                      const SendButton(),
                     ]),
               ),
             );
           },
         );
+        bottomSheet.closed.then((value) => unZoom());
       },
       child: const Text('Share'),
     );
