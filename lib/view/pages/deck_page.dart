@@ -39,12 +39,12 @@ class _DeckPageState extends State<DeckPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             AnimatedScale(
-              duration: const Duration(milliseconds: 350),
+              duration: const Duration(milliseconds: 200),
               scale: zoomCard == true ? 1.2 : 1.0,
               child: AnimatedSlide(
-                duration: const Duration(milliseconds: 350),
+                duration: const Duration(milliseconds: 200),
                 offset: zoomCard == true
-                    ? const Offset(0, -0.4)
+                    ? const Offset(0, -0.3)
                     : const Offset(0, 0),
                 child: SizedBox(
                   height: 500,
@@ -110,9 +110,13 @@ class _ShareButtonState extends State<ShareButton> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     mainAxisSize: MainAxisSize.max,
                     children: [
-                      Icon(
-                        Icons.drag_handle_rounded,
-                        color: Colors.grey.shade500,
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(25),
+                        child: Container(
+                          height: 5,
+                          width: 30,
+                          color: Colors.grey.shade400,
+                        ),
                       ),
                       const ShareTextField(),
                       const SendButton(),
@@ -154,10 +158,12 @@ class ShareTextField extends StatelessWidget {
           borderRadius: BorderRadius.circular(10),
         ),
         child: const TextField(
-          minLines: 1,
+          textAlignVertical: TextAlignVertical.top,
+          textAlign: TextAlign.start,
+          minLines: 4,
           maxLines: 4,
           decoration:
-              InputDecoration.collapsed(hintText: 'Share your response'),
+              InputDecoration.collapsed(hintText: 'Share your response..'),
         ),
       ),
     );
