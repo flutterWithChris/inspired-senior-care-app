@@ -46,17 +46,39 @@ class _DeckPageState extends State<DeckPage> {
                 offset: zoomCard == true
                     ? const Offset(0, -0.3)
                     : const Offset(0, 0),
-                child: SizedBox(
-                  height: 500,
-                  child: AppinioSwiper(
-                      isDisabled: isSwipeDisabled,
-                      padding: const EdgeInsets.symmetric(horizontal: 30),
-                      cards: [
-                        for (var i = 12; i > 0; i--)
-                          InfoCard(
-                            cardNumber: i,
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  alignment: AlignmentDirectional.topEnd,
+                  children: [
+                    SizedBox(
+                      height: 500,
+                      child: AppinioSwiper(
+                          isDisabled: isSwipeDisabled,
+                          padding: const EdgeInsets.symmetric(horizontal: 30),
+                          cards: [
+                            for (var i = 12; i > 0; i--)
+                              InfoCard(
+                                cardNumber: i,
+                              ),
+                          ]),
+                    ),
+                    const Positioned(
+                      right: 15,
+                      top: -20,
+                      child: CircleAvatar(
+                        radius: 35,
+                        backgroundColor: Colors.white,
+                        child: CircleAvatar(
+                          backgroundColor: Colors.blueAccent,
+                          radius: 30,
+                          child: Text(
+                            '4/12',
+                            style: TextStyle(fontSize: 20, color: Colors.white),
                           ),
-                      ]),
+                        ),
+                      ),
+                    )
+                  ],
                 ),
               ),
             ),
@@ -158,6 +180,7 @@ class ShareTextField extends StatelessWidget {
           borderRadius: BorderRadius.circular(10),
         ),
         child: const TextField(
+          autofocus: true,
           textAlignVertical: TextAlignVertical.top,
           textAlign: TextAlign.start,
           minLines: 4,

@@ -15,11 +15,17 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       title: 'Inspired Senior Care App',
       theme: ThemeData(
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            minimumSize: const Size(35, 30),
+          ),
+        ),
         bottomSheetTheme:
             const BottomSheetThemeData(backgroundColor: Colors.white),
         textTheme: GoogleFonts.breeSerifTextTheme(),
         useMaterial3: true,
-        primarySwatch: Colors.blue,
+        colorSchemeSeed: Colors.lightBlue,
+        // primarySwatch: Colors.blue,
       ),
       home: const MyHomePage(),
     );
@@ -43,36 +49,31 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Center(
         child: SafeArea(
-          child: FittedBox(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                const Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text(
-                    'Featured Category',
-                    style: TextStyle(fontSize: 30),
+          child: Column(
+            //   mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              const Padding(
+                padding: EdgeInsets.all(24.0),
+                child: Text(
+                  'Featured Category',
+                  style: TextStyle(fontSize: 28),
+                ),
+              ),
+              const FeaturedCategory(),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: ElevatedButton(
+                  onPressed: (() {}),
+                  style:
+                      ElevatedButton.styleFrom(fixedSize: const Size(200, 30)),
+                  child: const Text(
+                    'See More',
+                    style: TextStyle(fontSize: 16),
                   ),
                 ),
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 12.0),
-                  child: FeaturedCategory(),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: ElevatedButton(
-                    onPressed: (() {}),
-                    style: ElevatedButton.styleFrom(
-                        fixedSize: const Size(200, 42)),
-                    child: const Text(
-                      'See More',
-                      style: TextStyle(fontSize: 18),
-                    ),
-                  ),
-                ),
-                const Icon(FontAwesomeIcons.chevronDown),
-              ],
-            ),
+              ),
+              const Icon(FontAwesomeIcons.chevronDown),
+            ],
           ),
         ),
       ),
@@ -95,43 +96,40 @@ class FeaturedCategory extends StatelessWidget {
           builder: (context, constraints) {
             return ConstrainedBox(
               constraints: BoxConstraints(
-                  maxWidth: constraints.maxWidth > 700 ? 400 : 250),
+                  maxWidth: constraints.maxWidth > 700 ? 400 : 300),
               child: Container(
-                decoration: BoxDecoration(
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.35),
-                      offset: const Offset(0, 3),
-                      spreadRadius: 5,
-                      blurRadius: 7,
-                    )
-                  ],
-                ),
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  alignment: AlignmentDirectional.topEnd,
-                  children: [
-                    SizedBox(
-                      child:
-                          Image.asset('lib/assets/Supportive_Environment.png'),
-                    ),
-                    const Positioned(
-                      top: -25,
-                      right: -25,
-                      child: CircleAvatar(
-                        radius: 40,
-                        backgroundColor: Colors.white,
+                color: Colors.white,
+                child: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    alignment: AlignmentDirectional.topEnd,
+                    children: [
+                      SizedBox(
+                        child: Image.asset(
+                            'lib/assets/Supportive_Environment.png'),
+                      ),
+                      const Positioned(
+                        top: -30,
+                        right: -25,
                         child: CircleAvatar(
-                          radius: 35,
-                          backgroundColor: Colors.lightBlue,
-                          child: Text(
-                            '8/11',
-                            style: TextStyle(color: Colors.white, fontSize: 22),
+                          radius: 32,
+                          backgroundColor: Colors.white,
+                          child: CircleAvatar(
+                            radius: 25,
+                            backgroundColor: Colors.lightBlue,
+                            child: Text(
+                              '8/11',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold),
+                            ),
                           ),
                         ),
-                      ),
-                    )
-                  ],
+                      )
+                    ],
+                  ),
                 ),
               ),
             );

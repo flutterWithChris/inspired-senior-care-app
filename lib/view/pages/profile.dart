@@ -48,10 +48,13 @@ class ProgressSection extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 24.0),
           child: Column(
             children: [
-              const Text(
-                'Your Progress',
-                textAlign: TextAlign.left,
-                style: TextStyle(fontSize: 20),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: Text(
+                  'Your Progress',
+                  textAlign: TextAlign.left,
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
               ),
               ProgressCategory(
                   title: 'Communication',
@@ -117,7 +120,7 @@ class ProgressCategory extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(fontSize: 16),
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
                 progress == 100
                     ? Wrap(
@@ -126,7 +129,6 @@ class ProgressCategory extends StatelessWidget {
                         children: [
                           Text(
                             '${progress.toString()}%',
-                            style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                           const Icon(
                             Icons.check_circle,
@@ -137,7 +139,6 @@ class ProgressCategory extends StatelessWidget {
                       )
                     : Text(
                         '${progress.toString()}%',
-                        style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
               ],
             ),
@@ -177,16 +178,20 @@ class NamePlate extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const ListTile(
-      leading: CircleAvatar(
+    return ListTile(
+      minLeadingWidth: 70,
+      leading: const CircleAvatar(
         radius: 30,
         child: Text(
           'RS',
           style: TextStyle(fontSize: 24),
         ),
       ),
-      title: Text('Rebecca Simpson'),
-      subtitle: Text('Nurse'),
+      title: Text(
+        'Rebecca Simpson',
+        style: Theme.of(context).textTheme.titleLarge,
+      ),
+      subtitle: const Text('Nurse'),
     );
   }
 }

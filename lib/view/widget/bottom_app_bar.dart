@@ -3,7 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:inspired_senior_care_app/main.dart';
 import 'package:inspired_senior_care_app/view/pages/categories.dart';
-import 'package:inspired_senior_care_app/view/pages/profile.dart';
+import 'package:inspired_senior_care_app/view/pages/dashboard.dart';
 
 class MainBottomAppBar extends StatefulWidget {
   const MainBottomAppBar({Key? key}) : super(key: key);
@@ -13,7 +13,7 @@ class MainBottomAppBar extends StatefulWidget {
 }
 
 class _BottomAppBarState extends State<MainBottomAppBar> {
-  int currentIndex = 1;
+  static int currentIndex = 1;
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +37,7 @@ class _BottomAppBarState extends State<MainBottomAppBar> {
 
             case 2:
               {
-                Get.to(() => const Profile());
+                Get.to(() => const Dashboard());
               }
               break;
           }
@@ -47,8 +47,10 @@ class _BottomAppBarState extends State<MainBottomAppBar> {
           BottomNavigationBarItem(
               label: 'Categories', icon: Icon(FontAwesomeIcons.layerGroup)),
           BottomNavigationBarItem(label: 'Home', icon: Icon(Icons.home)),
+          /*   BottomNavigationBarItem(
+              label: 'Profile', icon: Icon(Icons.person_outline_rounded)),*/
           BottomNavigationBarItem(
-              label: 'Profile', icon: Icon(Icons.person_outline_rounded)),
+              label: 'Dashboard', icon: Icon(Icons.dashboard_rounded)),
         ]);
   }
 }
