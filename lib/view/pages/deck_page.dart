@@ -1,5 +1,7 @@
 import 'package:appinio_swiper/appinio_swiper.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:inspired_senior_care_app/bloc/share_bloc/bloc/share_bloc.dart';
 import 'package:inspired_senior_care_app/view/widget/bottom_app_bar.dart';
 
 class DeckPage extends StatefulWidget {
@@ -12,6 +14,16 @@ class DeckPage extends StatefulWidget {
 class _DeckPageState extends State<DeckPage> {
   bool zoomCard = false;
   bool isSwipeDisabled = true;
+  int currentCardIndex = 1;
+
+  final AppinioSwiperController controller = AppinioSwiperController();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    controller.addListener(() {});
+    super.initState();
+  }
 
   bool _zoomCard() {
     setState(() {
@@ -29,71 +41,84 @@ class _DeckPageState extends State<DeckPage> {
 
   @override
   Widget build(BuildContext context) {
+    int _incrementCounter() {
+      setState(() {
+        currentCardIndex++;
+      });
+      return currentCardIndex;
+    }
+
+    _decrementCounter() {
+      currentCardIndex--;
+    }
+
     return Scaffold(
       backgroundColor: Colors.red,
       appBar: AppBar(title: const Text('Inspired Senior Care')),
       bottomNavigationBar: const MainBottomAppBar(),
-      body: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            AnimatedScale(
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          AnimatedScale(
+            duration: const Duration(milliseconds: 200),
+            scale: zoomCard == true ? 1.2 : 1.0,
+            child: AnimatedSlide(
               duration: const Duration(milliseconds: 200),
-              scale: zoomCard == true ? 1.2 : 1.0,
-              child: AnimatedSlide(
-                duration: const Duration(milliseconds: 200),
-                offset: zoomCard == true
-                    ? const Offset(0, -0.3)
-                    : const Offset(0, 0),
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  alignment: AlignmentDirectional.topEnd,
-                  children: [
-                    SizedBox(
-                      height: 500,
-                      child: AppinioSwiper(
-                          isDisabled: isSwipeDisabled,
-                          padding: const EdgeInsets.symmetric(horizontal: 30),
-                          cards: [
-                            for (var i = 12; i > 0; i--)
-                              InfoCard(
-                                cardNumber: i,
-                              ),
-                          ]),
-                    ),
-                    const Positioned(
-                      right: 15,
-                      top: -20,
+              offset:
+                  zoomCard == true ? const Offset(0, -0.3) : const Offset(0, 0),
+              child: Stack(
+                clipBehavior: Clip.none,
+                alignment: AlignmentDirectional.topEnd,
+                children: [
+                  SizedBox(
+                    height: 500,
+                    child: AppinioSwiper(
+                        controller: controller,
+                        onSwipe: (int index) {
+                          controller.swipe();
+                        },
+                        // isDisabled: isSwipeDisabled,
+                        padding: const EdgeInsets.symmetric(horizontal: 30),
+                        cards: [
+                          for (var i = 12; i > 0; i--)
+                            InfoCard(
+                              cardNumber: i,
+                            ),
+                        ]),
+                  ),
+                  Positioned(
+                    right: 15,
+                    top: -20,
+                    child: CircleAvatar(
+                      radius: 35,
+                      backgroundColor: Colors.white,
                       child: CircleAvatar(
-                        radius: 35,
-                        backgroundColor: Colors.white,
-                        child: CircleAvatar(
-                          backgroundColor: Colors.blueAccent,
-                          radius: 30,
-                          child: Text(
-                            '4/12',
-                            style: TextStyle(fontSize: 20, color: Colors.white),
-                          ),
+                        backgroundColor: Colors.blueAccent,
+                        radius: 30,
+                        child: Text(
+                          '$currentCardIndex/12',
+                          style: const TextStyle(
+                              fontSize: 20, color: Colors.white),
                         ),
                       ),
-                    )
-                  ],
-                ),
+                    ),
+                  )
+                ],
               ),
             ),
-            Visibility(
-              visible: zoomCard ? false : true,
-              child: Padding(
-                padding: const EdgeInsets.only(top: 35),
-                child: ShareButton(
-                  zoomCard: _zoomCard,
-                  unZoomCard: _unZoomCard,
-                ),
+          ),
+          Visibility(
+            visible: zoomCard ? false : true,
+            child: Padding(
+              padding: const EdgeInsets.only(top: 35),
+              child: ShareButton(
+                zoomCard: _zoomCard,
+                unZoomCard: _unZoomCard,
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -141,7 +166,10 @@ class _ShareButtonState extends State<ShareButton> {
                         ),
                       ),
                       const ShareTextField(),
-                      const SendButton(),
+                      BlocProvider(
+                        create: (context) => ShareBloc(),
+                        child: const SendButton(),
+                      ),
                     ]),
               ),
             );
@@ -205,11 +233,36 @@ class _SendButtonState extends State<SendButton> {
   Widget build(BuildContext context) {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(fixedSize: const Size(240, 42)),
-      onPressed: () {},
-      //color: Colors.grey.shade800,
-      child: const Text(
-        'Submit',
-        //style: TextStyle(color: Colors.white),
+      onPressed: () {
+        context.read<ShareBloc>().add(SubmitPressed());
+      },
+      child: BlocBuilder<ShareBloc, ShareState>(
+        buildWhen: (previous, current) => previous.status != current.status,
+        builder: (context, state) {
+          if (state.status == Status.failed) {
+            return const Dialog();
+          }
+          if (state.status == Status.initial) {
+            return const Text(
+              'Submit',
+              //style: TextStyle(color: Colors.white),
+            );
+          }
+          if (state.status == Status.submitted) {
+            return const Icon(
+              Icons.check,
+              color: Colors.lime,
+            );
+          }
+          if (state.status == Status.submitting) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+          return const Center(
+            child: Text('Something Went Wrong..'),
+          );
+        },
       ),
     );
   }

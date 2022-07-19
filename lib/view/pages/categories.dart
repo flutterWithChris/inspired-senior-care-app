@@ -117,15 +117,16 @@ class CategoryCard extends StatelessWidget {
     return InkWell(
       onTap: () => Get.to(() => const DeckPage()),
       child: Card(
-        child: SizedBox(
+        child: Container(
+          color: Colors.white,
           height: 300,
           child: Stack(
             alignment: AlignmentDirectional.center,
             children: [
               Positioned(
-                  top: 25,
+                  top: 15,
                   child: SizedBox(
-                    height: 250,
+                    height: 275,
                     child: Image.asset('lib/assets/$assetName'),
                   )),
               Positioned(

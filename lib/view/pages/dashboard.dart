@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:inspired_senior_care_app/view/pages/profile.dart';
+import 'package:get/get.dart';
+import 'package:inspired_senior_care_app/view/pages/view_member.dart';
 import 'package:inspired_senior_care_app/view/widget/bottom_app_bar.dart';
+import 'package:inspired_senior_care_app/view/widget/name_plate.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({Key? key}) : super(key: key);
@@ -25,7 +27,10 @@ class _DashboardState extends State<Dashboard> {
           children: [
             const Padding(
               padding: EdgeInsets.symmetric(vertical: 12.0),
-              child: NamePlate(),
+              child: NamePlate(
+                memberName: 'Jennifer Sample',
+                memberTitle: 'Director',
+              ),
             ),
             Card(
               child: Padding(
@@ -145,6 +150,7 @@ class GroupMemberTile extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: ListTile(
+                onTap: () => Get.to(() => const ViewMember()),
                 dense: true,
                 minLeadingWidth: 50,
                 minVerticalPadding: 12.0,
