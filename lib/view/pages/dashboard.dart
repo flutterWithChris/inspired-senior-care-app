@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
+import 'package:inspired_senior_care_app/bloc/invite/invite_bloc.dart';
 import 'package:inspired_senior_care_app/view/pages/view_member.dart';
 import 'package:inspired_senior_care_app/view/widget/bottom_app_bar.dart';
 import 'package:inspired_senior_care_app/view/widget/name_plate.dart';
@@ -12,6 +14,7 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
+  TextEditingController inviteTextFieldController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,7 +35,39 @@ class _DashboardState extends State<Dashboard> {
                 memberTitle: 'Director',
               ),
             ),
+            Column(
+              children: [
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 8),
+                  child: Text(
+                    'Current Featured Category:',
+                    textAlign: TextAlign.start,
+                    style: TextStyle(fontSize: 18),
+                  ),
+                ),
+                Card(
+                  elevation: 1.5,
+                  child: ListTile(
+                    title: const Text('Supportive Environment'),
+                    subtitle: const Text('Creating a healthy environment.'),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    leading: SizedBox(
+                      height: 100,
+                      child:
+                          Image.asset('lib/assets/Supportive_Environment.png'),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(
+              height: 15,
+            ),
             Card(
+              color: Colors.grey.shade100,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(25)),
+              elevation: 2.0,
               child: Padding(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 8.0, vertical: 12.0),
@@ -55,7 +90,129 @@ class _DashboardState extends State<Dashboard> {
                             primary: Colors.lightGreen,
                             onPrimary: Colors.white,
                           ),
-                          onPressed: () {},
+                          onPressed: () {
+                            showDialog(
+                                context: context,
+                                builder: (_) => AlertDialog(
+                                      actionsPadding:
+                                          const EdgeInsets.only(bottom: 12.0),
+                                      alignment: AlignmentDirectional.center,
+                                      actionsAlignment:
+                                          MainAxisAlignment.center,
+                                      title: const Text(
+                                        'Add a Member',
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      content: const Text(
+                                        'Enter their email to send an invite!',
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      actions: [
+                                        Center(
+                                          child: FractionallySizedBox(
+                                            widthFactor: 0.9,
+                                            child: TextField(
+                                              controller:
+                                                  inviteTextFieldController,
+                                              style: const TextStyle(
+                                                  color: Colors.black),
+                                              keyboardType:
+                                                  TextInputType.emailAddress,
+                                              decoration: InputDecoration(
+                                                suffixIcon: BlocBuilder<
+                                                    InviteBloc, InviteState>(
+                                                  builder: (context, state) {
+                                                    if (state.inviteStatus ==
+                                                        InviteStatus.sent) {
+                                                      return const Icon(
+                                                        Icons.check,
+                                                        color: Colors.lime,
+                                                      );
+                                                    }
+                                                    return Container(
+                                                      width: 1,
+                                                    );
+                                                  },
+                                                ),
+                                                filled: true,
+                                                fillColor: Colors.white,
+                                                border: OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(25),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          height: 15,
+                                        ),
+                                        Center(
+                                          child: ElevatedButton.icon(
+                                              style: ElevatedButton.styleFrom(
+                                                  primary: Colors.lightGreen,
+                                                  fixedSize:
+                                                      const Size(250, 40)),
+                                              onPressed: () {
+                                                context
+                                                    .read<InviteBloc>()
+                                                    .add(InviteSent());
+                                              },
+                                              icon: BlocConsumer<InviteBloc,
+                                                  InviteState>(
+                                                listenWhen:
+                                                    (previous, current) =>
+                                                        previous.inviteStatus !=
+                                                        current.inviteStatus,
+                                                listener: (context, state) {
+                                                  if (state.inviteStatus ==
+                                                      InviteStatus.initial) {
+                                                    inviteTextFieldController
+                                                        .clear();
+                                                    Navigator.of(context).pop();
+                                                  }
+                                                },
+                                                builder: (context, state) {
+                                                  if (state.inviteStatus ==
+                                                      InviteStatus.sending) {
+                                                    return const CircularProgressIndicator();
+                                                  }
+                                                  if (state.inviteStatus ==
+                                                      InviteStatus.sent) {
+                                                    return const Icon(
+                                                      Icons.check,
+                                                      color: Colors.lime,
+                                                    );
+                                                  } else {
+                                                    return const Icon(
+                                                      Icons.send,
+                                                      size: 18,
+                                                    );
+                                                  }
+                                                },
+                                              ),
+                                              label: BlocBuilder<InviteBloc,
+                                                  InviteState>(
+                                                builder: (context, state) {
+                                                  if (state.inviteStatus ==
+                                                      InviteStatus.sending) {
+                                                    return const Text(
+                                                        'Sending...');
+                                                  }
+                                                  if (state.inviteStatus ==
+                                                      InviteStatus.sent) {
+                                                    return const Text(
+                                                        'Invite Sent!');
+                                                  } else {
+                                                    return const Text(
+                                                        'Send Invite');
+                                                  }
+                                                },
+                                              )),
+                                        ),
+                                      ],
+                                    ));
+                          },
                           icon: const Icon(
                             Icons.add_circle_rounded,
                             size: 18,

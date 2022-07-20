@@ -1,7 +1,8 @@
 import 'package:appinio_swiper/appinio_swiper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:inspired_senior_care_app/bloc/share_bloc/bloc/share_bloc.dart';
+import 'package:inspired_senior_care_app/bloc/share_bloc/share_bloc.dart';
+
 import 'package:inspired_senior_care_app/view/widget/bottom_app_bar.dart';
 
 class DeckPage extends StatefulWidget {
@@ -56,78 +57,83 @@ class _DeckPageState extends State<DeckPage> {
       backgroundColor: Colors.red,
       appBar: AppBar(title: const Text('Inspired Senior Care')),
       bottomNavigationBar: const MainBottomAppBar(),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          AnimatedScale(
-            duration: const Duration(milliseconds: 200),
-            scale: zoomCard == true ? 1.2 : 1.0,
-            child: AnimatedSlide(
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.only(top: 50),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            AnimatedScale(
               duration: const Duration(milliseconds: 200),
-              offset:
-                  zoomCard == true ? const Offset(0, -0.3) : const Offset(0, 0),
-              child: Stack(
-                clipBehavior: Clip.none,
-                alignment: AlignmentDirectional.topEnd,
-                children: [
-                  SizedBox(
-                    height: 500,
-                    child: AppinioSwiper(
-                        controller: controller,
-                        onSwipe: (int index) {
-                          controller.swipe();
-                        },
-                        // isDisabled: isSwipeDisabled,
-                        padding: const EdgeInsets.symmetric(horizontal: 30),
-                        cards: [
-                          for (var i = 12; i > 0; i--)
-                            InfoCard(
-                              cardNumber: i,
-                            ),
-                        ]),
-                  ),
-                  Positioned(
-                    right: 15,
-                    top: -20,
-                    child: CircleAvatar(
-                      radius: 35,
-                      backgroundColor: Colors.white,
+              scale: zoomCard == true ? 1.1 : 1.0,
+              child: AnimatedSlide(
+                duration: const Duration(milliseconds: 200),
+                offset: zoomCard == true
+                    ? const Offset(0, -0.3)
+                    : const Offset(0, 0),
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  alignment: AlignmentDirectional.topEnd,
+                  children: [
+                    SizedBox(
+                      height: 500,
+                      child: AppinioSwiper(
+                          controller: controller,
+                          onSwipe: (int index) {
+                            controller.swipe();
+                            _incrementCounter();
+                          },
+                          isDisabled: isSwipeDisabled,
+                          padding: const EdgeInsets.symmetric(horizontal: 30),
+                          cards: [
+                            for (var i = 12; i > 0; i--)
+                              InfoCard(
+                                cardNumber: i,
+                              ),
+                          ]),
+                    ),
+                    Positioned(
+                      right: 15,
+                      top: -20,
                       child: CircleAvatar(
-                        backgroundColor: Colors.blueAccent,
-                        radius: 30,
-                        child: Text(
-                          '$currentCardIndex/12',
-                          style: const TextStyle(
-                              fontSize: 20, color: Colors.white),
+                        radius: 35,
+                        backgroundColor: Colors.white,
+                        child: CircleAvatar(
+                          backgroundColor: Colors.blueAccent,
+                          radius: 30,
+                          child: Text(
+                            '$currentCardIndex/12',
+                            style: const TextStyle(
+                                fontSize: 20, color: Colors.white),
+                          ),
                         ),
                       ),
-                    ),
-                  )
-                ],
+                    )
+                  ],
+                ),
               ),
             ),
-          ),
-          Visibility(
-            visible: zoomCard ? false : true,
-            child: Padding(
+            Padding(
               padding: const EdgeInsets.only(top: 35),
               child: ShareButton(
+                swipeController: controller,
                 zoomCard: _zoomCard,
                 unZoomCard: _unZoomCard,
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 }
 
 class ShareButton extends StatefulWidget {
+  final AppinioSwiperController swipeController;
   final bool Function() zoomCard;
   final bool Function() unZoomCard;
   const ShareButton({
+    required this.swipeController,
     required this.unZoomCard,
     required this.zoomCard,
     Key? key,
@@ -138,6 +144,8 @@ class ShareButton extends StatefulWidget {
 }
 
 class _ShareButtonState extends State<ShareButton> {
+  TextEditingController shareFieldController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
@@ -145,6 +153,7 @@ class _ShareButtonState extends State<ShareButton> {
         var zoom = widget.zoomCard;
         var unZoom = widget.unZoomCard;
         zoom();
+
         var bottomSheet = showBottomSheet(
           context: context,
           builder: (context) {
@@ -165,11 +174,12 @@ class _ShareButtonState extends State<ShareButton> {
                           color: Colors.grey.shade400,
                         ),
                       ),
-                      const ShareTextField(),
-                      BlocProvider(
-                        create: (context) => ShareBloc(),
-                        child: const SendButton(),
+                      ShareTextField(
+                        shareFieldController: shareFieldController,
                       ),
+                      SendButton(
+                          shareFieldController: shareFieldController,
+                          swipeController: widget.swipeController),
                     ]),
               ),
             );
@@ -177,13 +187,15 @@ class _ShareButtonState extends State<ShareButton> {
         );
         bottomSheet.closed.then((value) => unZoom());
       },
-      child: const Text('Share'),
+      child: const Text('Share Response'),
     );
   }
 }
 
 class ShareTextField extends StatelessWidget {
+  final TextEditingController shareFieldController;
   const ShareTextField({
+    required this.shareFieldController,
     Key? key,
   }) : super(key: key);
 
@@ -207,14 +219,15 @@ class ShareTextField extends StatelessWidget {
           color: Colors.grey.shade300,
           borderRadius: BorderRadius.circular(10),
         ),
-        child: const TextField(
+        child: TextField(
+          controller: shareFieldController,
           autofocus: true,
           textAlignVertical: TextAlignVertical.top,
           textAlign: TextAlign.start,
           minLines: 4,
           maxLines: 4,
-          decoration:
-              InputDecoration.collapsed(hintText: 'Share your response..'),
+          decoration: const InputDecoration.collapsed(
+              hintText: 'Share your response..'),
         ),
       ),
     );
@@ -222,7 +235,13 @@ class ShareTextField extends StatelessWidget {
 }
 
 class SendButton extends StatefulWidget {
-  const SendButton({Key? key}) : super(key: key);
+  final AppinioSwiperController swipeController;
+  final TextEditingController shareFieldController;
+  const SendButton(
+      {required this.swipeController,
+      required this.shareFieldController,
+      Key? key})
+      : super(key: key);
 
   @override
   State<SendButton> createState() => _SendButtonState();
@@ -236,7 +255,15 @@ class _SendButtonState extends State<SendButton> {
       onPressed: () {
         context.read<ShareBloc>().add(SubmitPressed());
       },
-      child: BlocBuilder<ShareBloc, ShareState>(
+      child: BlocConsumer<ShareBloc, ShareState>(
+        listenWhen: (previous, current) => previous.status != current.status,
+        listener: (context, state) {
+          if (state.status == Status.initial) {
+            widget.shareFieldController.clear();
+            Navigator.of(context).pop();
+            widget.swipeController.swipe();
+          }
+        },
         buildWhen: (previous, current) => previous.status != current.status,
         builder: (context, state) {
           if (state.status == Status.failed) {

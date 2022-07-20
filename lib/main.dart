@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:inspired_senior_care_app/bloc/invite/invite_bloc.dart';
+import 'package:inspired_senior_care_app/bloc/share_bloc/share_bloc.dart';
 import 'package:inspired_senior_care_app/view/widget/bottom_app_bar.dart';
 
 void main() {
@@ -12,22 +15,32 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
-      title: 'Inspired Senior Care App',
-      theme: ThemeData(
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            minimumSize: const Size(35, 30),
-          ),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => InviteBloc(),
         ),
-        bottomSheetTheme:
-            const BottomSheetThemeData(backgroundColor: Colors.white),
-        textTheme: GoogleFonts.breeSerifTextTheme(),
-        useMaterial3: true,
-        colorSchemeSeed: Colors.lightBlue,
-        // primarySwatch: Colors.blue,
+        BlocProvider(
+          create: (context) => ShareBloc(),
+        ),
+      ],
+      child: GetMaterialApp(
+        title: 'Inspired Senior Care App',
+        theme: ThemeData(
+          elevatedButtonTheme: ElevatedButtonThemeData(
+            style: ElevatedButton.styleFrom(
+              minimumSize: const Size(35, 30),
+            ),
+          ),
+          bottomSheetTheme: BottomSheetThemeData(
+              backgroundColor: Colors.white.withOpacity(0.9)),
+          textTheme: GoogleFonts.breeSerifTextTheme(),
+          // useMaterial3: true,
+          colorSchemeSeed: Colors.purpleAccent,
+          // primarySwatch: Colors.blue,
+        ),
+        home: const MyHomePage(),
       ),
-      home: const MyHomePage(),
     );
   }
 }
@@ -89,7 +102,7 @@ class FeaturedCategory extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      splashColor: Colors.lightBlueAccent.withOpacity(0.8),
+      splashColor: Colors.lightBlueAccent,
       onTap: (() {}),
       child: Card(
         child: LayoutBuilder(
