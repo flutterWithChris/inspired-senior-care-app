@@ -2,7 +2,6 @@ import 'package:appinio_swiper/appinio_swiper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/share_bloc/share_bloc.dart';
-
 import 'package:inspired_senior_care_app/view/widget/bottom_app_bar.dart';
 
 class DeckPage extends StatefulWidget {
@@ -64,12 +63,14 @@ class _DeckPageState extends State<DeckPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             AnimatedScale(
+              curve: Curves.easeInOut,
               duration: const Duration(milliseconds: 200),
               scale: zoomCard == true ? 1.1 : 1.0,
               child: AnimatedSlide(
+                curve: Curves.easeInOut,
                 duration: const Duration(milliseconds: 200),
                 offset: zoomCard == true
-                    ? const Offset(0, -0.3)
+                    ? const Offset(0, -0.4)
                     : const Offset(0, 0),
                 child: Stack(
                   clipBehavior: Clip.none,
@@ -250,12 +251,39 @@ class SendButton extends StatefulWidget {
 class _SendButtonState extends State<SendButton> {
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
+    return ElevatedButton.icon(
       style: ElevatedButton.styleFrom(fixedSize: const Size(240, 42)),
       onPressed: () {
         context.read<ShareBloc>().add(SubmitPressed());
       },
-      child: BlocConsumer<ShareBloc, ShareState>(
+      icon: BlocBuilder<ShareBloc, ShareState>(
+        builder: (context, state) {
+          if (state.status == Status.failed) {
+            return const Dialog();
+          }
+          if (state.status == Status.initial) {
+            return const Icon(
+              Icons.send_rounded,
+              size: 18,
+            );
+          }
+          if (state.status == Status.submitted) {
+            return const Icon(
+              Icons.check,
+              color: Colors.lime,
+            );
+          }
+          if (state.status == Status.submitting) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+          return const Center(
+            child: Text('Something Went Wrong..'),
+          );
+        },
+      ),
+      label: BlocConsumer<ShareBloc, ShareState>(
         listenWhen: (previous, current) => previous.status != current.status,
         listener: (context, state) {
           if (state.status == Status.initial) {
@@ -276,15 +304,10 @@ class _SendButtonState extends State<SendButton> {
             );
           }
           if (state.status == Status.submitted) {
-            return const Icon(
-              Icons.check,
-              color: Colors.lime,
-            );
+            return const Text('Submitted!');
           }
           if (state.status == Status.submitting) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
+            return const Text('Submitting...');
           }
           return const Center(
             child: Text('Something Went Wrong..'),

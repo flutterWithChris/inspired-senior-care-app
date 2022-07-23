@@ -160,6 +160,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.1"
+  flutter_randomcolor:
+    dependency: "direct main"
+    description:
+      name: flutter_randomcolor
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.12"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -177,13 +184,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "10.1.0"
-  get:
+  go_router:
     dependency: "direct main"
     description:
-      name: get
+      name: go_router
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "4.6.5"
+    version: "4.1.1"
   google_fonts:
     dependency: "direct main"
     description:
@@ -219,6 +226,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.0"
+  logging:
+    dependency: transitive
+    description:
+      name: logging
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.2"
   matcher:
     dependency: transitive
     description:

@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:get/get.dart';
-import 'package:inspired_senior_care_app/main.dart';
-import 'package:inspired_senior_care_app/view/pages/categories.dart';
-import 'package:inspired_senior_care_app/view/pages/dashboard.dart';
+import 'package:go_router/go_router.dart';
 
 class MainBottomAppBar extends StatefulWidget {
   const MainBottomAppBar({Key? key}) : super(key: key);
@@ -25,19 +22,19 @@ class _BottomAppBarState extends State<MainBottomAppBar> {
           switch (index) {
             case 0:
               {
-                Get.to(() => const Categories());
+                context.goNamed('categories');
               }
               break;
 
             case 1:
               {
-                Get.to(() => const MyHomePage());
+                context.goNamed('home');
               }
               break;
 
             case 2:
               {
-                Get.to(() => const Dashboard());
+                context.goNamed('dashboard');
               }
               break;
           }

@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:inspired_senior_care_app/bloc/invite/invite_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/share_bloc/share_bloc.dart';
+import 'package:inspired_senior_care_app/router/routes.dart';
 import 'package:inspired_senior_care_app/view/widget/bottom_app_bar.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  MyRouter myRouter = MyRouter();
+  MyApp({super.key});
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
@@ -24,9 +25,14 @@ class MyApp extends StatelessWidget {
           create: (context) => ShareBloc(),
         ),
       ],
-      child: GetMaterialApp(
+      child: MaterialApp.router(
+        routeInformationParser: myRouter.router.routeInformationParser,
+        routerDelegate: myRouter.router.routerDelegate,
+        routeInformationProvider: myRouter.router.routeInformationProvider,
         title: 'Inspired Senior Care App',
         theme: ThemeData(
+          progressIndicatorTheme: ProgressIndicatorThemeData(
+              circularTrackColor: Colors.grey.shade400),
           elevatedButtonTheme: ElevatedButtonThemeData(
             style: ElevatedButton.styleFrom(
               minimumSize: const Size(35, 30),
@@ -35,11 +41,10 @@ class MyApp extends StatelessWidget {
           bottomSheetTheme: BottomSheetThemeData(
               backgroundColor: Colors.white.withOpacity(0.9)),
           textTheme: GoogleFonts.breeSerifTextTheme(),
-          // useMaterial3: true,
-          colorSchemeSeed: Colors.purpleAccent,
+          useMaterial3: true,
+          colorSchemeSeed: Colors.blue,
           // primarySwatch: Colors.blue,
         ),
-        home: const MyHomePage(),
       ),
     );
   }

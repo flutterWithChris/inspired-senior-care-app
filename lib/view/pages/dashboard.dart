@@ -1,8 +1,8 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
 import 'package:inspired_senior_care_app/bloc/invite/invite_bloc.dart';
-import 'package:inspired_senior_care_app/view/pages/view_member.dart';
 import 'package:inspired_senior_care_app/view/widget/bottom_app_bar.dart';
 import 'package:inspired_senior_care_app/view/widget/name_plate.dart';
 
@@ -40,7 +40,7 @@ class _DashboardState extends State<Dashboard> {
                 const Padding(
                   padding: EdgeInsets.symmetric(vertical: 8),
                   child: Text(
-                    'Current Featured Category:',
+                    'Currently Featured Category:',
                     textAlign: TextAlign.start,
                     style: TextStyle(fontSize: 18),
                   ),
@@ -64,7 +64,6 @@ class _DashboardState extends State<Dashboard> {
               height: 15,
             ),
             Card(
-              color: Colors.grey.shade100,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(25)),
               elevation: 2.0,
@@ -112,6 +111,7 @@ class _DashboardState extends State<Dashboard> {
                                           child: FractionallySizedBox(
                                             widthFactor: 0.9,
                                             child: TextField(
+                                              autofocus: true,
                                               controller:
                                                   inviteTextFieldController,
                                               style: const TextStyle(
@@ -119,9 +119,14 @@ class _DashboardState extends State<Dashboard> {
                                               keyboardType:
                                                   TextInputType.emailAddress,
                                               decoration: InputDecoration(
+                                                hintText: 'example@email.com',
                                                 suffixIcon: BlocBuilder<
                                                     InviteBloc, InviteState>(
                                                   builder: (context, state) {
+                                                    if (state.inviteStatus ==
+                                                        InviteStatus.sending) {
+                                                      return const CircularProgressIndicator();
+                                                    }
                                                     if (state.inviteStatus ==
                                                         InviteStatus.sent) {
                                                       return const Icon(
@@ -235,31 +240,31 @@ class _DashboardState extends State<Dashboard> {
                           )),
                     ],
                   ),
-                  const GroupMemberTile(
+                  GroupMemberTile(
                     memberName: 'Julia Test',
                     memberTitle: 'Nurse',
                     memberProgress: 0.3,
                     memberColor: Colors.pink,
                   ),
-                  const GroupMemberTile(
+                  GroupMemberTile(
                     memberName: 'Amanda Sample',
                     memberTitle: 'Nurse',
                     memberProgress: 0.7,
                     memberColor: Colors.indigo,
                   ),
-                  const GroupMemberTile(
+                  GroupMemberTile(
                     memberName: 'Tracy Chapman',
                     memberTitle: 'Nurse',
                     memberProgress: 0.9,
                     memberColor: Colors.amber,
                   ),
-                  const GroupMemberTile(
+                  GroupMemberTile(
                     memberName: 'George Costanza',
                     memberTitle: 'Nurse',
                     memberProgress: 0.6,
                     memberColor: Colors.cyanAccent,
                   ),
-                  const GroupMemberTile(
+                  GroupMemberTile(
                     memberName: 'Ralph Maccio',
                     memberTitle: 'Nurse',
                     memberProgress: 0.2,
@@ -280,8 +285,8 @@ class GroupMemberTile extends StatelessWidget {
   final Color memberColor;
   final String memberTitle;
   final double memberProgress;
-
-  const GroupMemberTile({
+  final Random random = Random();
+  GroupMemberTile({
     Key? key,
     required this.memberName,
     required this.memberTitle,
@@ -291,6 +296,8 @@ class GroupMemberTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Color randomColor = Color.fromRGBO(
+        random.nextInt(255), random.nextInt(255), random.nextInt(255), 1);
     String getInitials(String name) => name.isNotEmpty
         ? name.trim().split(' ').map((l) => l[0]).take(2).join()
         : '';
@@ -307,12 +314,12 @@ class GroupMemberTile extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: ListTile(
-                onTap: () => Get.to(() => const ViewMember()),
+                onTap: () => context.goNamed('view-member'),
                 dense: true,
                 minLeadingWidth: 50,
                 minVerticalPadding: 12.0,
                 leading: CircleAvatar(
-                  backgroundColor: memberColor,
+                  backgroundColor: randomColor,
                   radius: 24.0,
                   child: Text(
                     getInitials(memberName),

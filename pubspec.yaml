@@ -36,7 +36,6 @@ dependencies:
   cupertino_icons: ^1.0.2
   font_awesome_flutter: ^10.1.0
   google_fonts: ^3.0.1
-  get: ^4.6.5
   flutter_layout_grid: ^2.0.1
   swipe_deck: ^1.1.0
   appinio_swiper: ^1.0.3
@@ -48,6 +47,8 @@ dependencies:
   bloc: ^8.0.3
   flutter_bloc: ^8.0.1
   equatable: ^2.0.3
+  go_router: ^4.1.1
+  flutter_randomcolor: ^1.0.12
 
 
 dev_dependencies:
@@ -79,6 +80,7 @@ flutter:
 
   assets:
     - lib/assets/
+    - lib/assets/card_covers/
     - lib/assets/card_contents/positive_interactions/
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
