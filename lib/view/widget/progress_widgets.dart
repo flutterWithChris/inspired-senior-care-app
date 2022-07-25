@@ -9,8 +9,10 @@ class ProgressSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       child: Card(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+        color: Colors.grey.shade100,
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 24.0),
+          padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 24.0),
           child: Column(
             children: [
               Padding(
@@ -88,22 +90,42 @@ class ProgressCategory extends StatelessWidget {
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
                 progress == 100
-                    ? Wrap(
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        spacing: 5,
-                        children: [
-                          Text(
-                            '${progress.toString()}%',
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(25),
+                        child: Container(
+                          color: Colors.white,
+                          child: Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 10.0),
+                            child: Wrap(
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              spacing: 5,
+                              children: [
+                                Text(
+                                  '${progress.toString()}%',
+                                ),
+                                const Icon(
+                                  Icons.check_circle,
+                                  color: Colors.lightBlueAccent,
+                                  size: 12,
+                                ),
+                              ],
+                            ),
                           ),
-                          const Icon(
-                            Icons.check_circle,
-                            color: Colors.lightBlueAccent,
-                            size: 14,
-                          ),
-                        ],
+                        ),
                       )
-                    : Text(
-                        '${progress.toString()}%',
+                    : ClipRRect(
+                        borderRadius: BorderRadius.circular(25),
+                        child: Container(
+                          color: Colors.white,
+                          child: Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 10.0),
+                            child: Text(
+                              '${progress.toString()}%',
+                            ),
+                          ),
+                        ),
                       ),
               ],
             ),

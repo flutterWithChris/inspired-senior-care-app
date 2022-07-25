@@ -52,77 +52,80 @@ class _DeckPageState extends State<DeckPage> {
       currentCardIndex--;
     }
 
-    return Scaffold(
-      backgroundColor: Colors.red,
-      appBar: AppBar(title: const Text('Inspired Senior Care')),
-      bottomNavigationBar: const MainBottomAppBar(),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.only(top: 50),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            AnimatedScale(
-              curve: Curves.easeInOut,
-              duration: const Duration(milliseconds: 200),
-              scale: zoomCard == true ? 1.1 : 1.0,
-              child: AnimatedSlide(
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: Colors.red,
+        appBar: AppBar(
+            toolbarHeight: 50, title: const Text('Inspired Senior Care')),
+        bottomNavigationBar: const MainBottomAppBar(),
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.only(top: 30),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              AnimatedScale(
                 curve: Curves.easeInOut,
                 duration: const Duration(milliseconds: 200),
-                offset: zoomCard == true
-                    ? const Offset(0, -0.4)
-                    : const Offset(0, 0),
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  alignment: AlignmentDirectional.topEnd,
-                  children: [
-                    SizedBox(
-                      height: 500,
-                      child: AppinioSwiper(
-                          controller: controller,
-                          onSwipe: (int index) {
-                            controller.swipe();
-                            _incrementCounter();
-                          },
-                          isDisabled: isSwipeDisabled,
-                          padding: const EdgeInsets.symmetric(horizontal: 30),
-                          cards: [
-                            for (var i = 12; i > 0; i--)
-                              InfoCard(
-                                cardNumber: i,
-                              ),
-                          ]),
-                    ),
-                    Positioned(
-                      right: 15,
-                      top: -20,
-                      child: CircleAvatar(
-                        radius: 35,
-                        backgroundColor: Colors.white,
+                scale: zoomCard == true ? 1.1 : 1.0,
+                child: AnimatedSlide(
+                  curve: Curves.easeInOut,
+                  duration: const Duration(milliseconds: 200),
+                  offset: zoomCard == true
+                      ? const Offset(0, -0.4)
+                      : const Offset(0, 0),
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    alignment: AlignmentDirectional.topEnd,
+                    children: [
+                      SizedBox(
+                        height: 475,
+                        child: AppinioSwiper(
+                            controller: controller,
+                            onSwipe: (int index) {
+                              controller.swipe();
+                              _incrementCounter();
+                            },
+                            isDisabled: isSwipeDisabled,
+                            padding: const EdgeInsets.symmetric(horizontal: 40),
+                            cards: [
+                              for (var i = 12; i > 0; i--)
+                                InfoCard(
+                                  cardNumber: i,
+                                ),
+                            ]),
+                      ),
+                      Positioned(
+                        right: 15,
+                        top: -20,
                         child: CircleAvatar(
-                          backgroundColor: Colors.blueAccent,
-                          radius: 30,
-                          child: Text(
-                            '$currentCardIndex/12',
-                            style: const TextStyle(
-                                fontSize: 20, color: Colors.white),
+                          radius: 35,
+                          backgroundColor: Colors.white,
+                          child: CircleAvatar(
+                            backgroundColor: Colors.blueAccent,
+                            radius: 30,
+                            child: Text(
+                              '$currentCardIndex/12',
+                              style: const TextStyle(
+                                  fontSize: 20, color: Colors.white),
+                            ),
                           ),
                         ),
-                      ),
-                    )
-                  ],
+                      )
+                    ],
+                  ),
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 35),
-              child: ShareButton(
-                swipeController: controller,
-                zoomCard: _zoomCard,
-                unZoomCard: _unZoomCard,
+              Padding(
+                padding: const EdgeInsets.only(top: 30),
+                child: ShareButton(
+                  swipeController: controller,
+                  zoomCard: _zoomCard,
+                  unZoomCard: _unZoomCard,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -274,8 +277,9 @@ class _SendButtonState extends State<SendButton> {
             );
           }
           if (state.status == Status.submitting) {
-            return const Center(
-              child: CircularProgressIndicator(),
+            return const SizedBox(
+              height: 18,
+              child: FittedBox(child: CircularProgressIndicator()),
             );
           }
           return const Center(

@@ -16,15 +16,21 @@ class ViewMember extends StatelessWidget {
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12.0),
-        child: ListView(
-          shrinkWrap: true,
-          children: const [
-            NamePlate(
-              memberName: 'Chelsea Ranchford',
-              memberTitle: 'Home Attendant',
-            ),
-            ProgressSection(),
-          ],
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12.0),
+          child: ListView(
+            shrinkWrap: true,
+            children: const [
+              NamePlate(
+                memberName: 'Chelsea Ranchford',
+                memberTitle: 'Home Attendant',
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 12.0),
+                child: ProgressSection(),
+              ),
+            ],
+          ),
         ),
       ),
     );
