@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:inspired_senior_care_app/bloc/group/group_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/invite/invite_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/share_bloc/share_bloc.dart';
 import 'package:inspired_senior_care_app/router/routes.dart';
@@ -24,6 +25,9 @@ class MyApp extends StatelessWidget {
         BlocProvider(
           create: (context) => ShareBloc(),
         ),
+        BlocProvider(
+          create: (context) => GroupBloc(),
+        ),
       ],
       child: MaterialApp.router(
         routeInformationParser: myRouter.router.routeInformationParser,
@@ -31,18 +35,25 @@ class MyApp extends StatelessWidget {
         routeInformationProvider: myRouter.router.routeInformationProvider,
         title: 'Inspired Senior Care App',
         theme: ThemeData(
+          inputDecorationTheme: InputDecorationTheme(
+            filled: true,
+            fillColor: Colors.white,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(25)),
+          ),
           progressIndicatorTheme: ProgressIndicatorThemeData(
               circularTrackColor: Colors.grey.shade400),
           elevatedButtonTheme: ElevatedButtonThemeData(
             style: ElevatedButton.styleFrom(
+              shape: const StadiumBorder(),
               minimumSize: const Size(35, 30),
             ),
           ),
           bottomSheetTheme: BottomSheetThemeData(
-              backgroundColor: Colors.white.withOpacity(0.9)),
+              backgroundColor: Colors.white.withOpacity(0.85)),
           textTheme: GoogleFonts.breeSerifTextTheme(),
-          useMaterial3: true,
-          colorSchemeSeed: Colors.blue,
+          // useMaterial3: true,
+
+          colorSchemeSeed: Colors.purple,
           // primarySwatch: Colors.blue,
         ),
       ),
@@ -60,38 +71,56 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      bottomNavigationBar: const MainBottomAppBar(),
-      appBar: AppBar(
-        title: const Text('Inspired Senior Care'),
-      ),
-      body: Center(
-        child: SafeArea(
-          child: Column(
-            //   mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              const Padding(
-                padding: EdgeInsets.all(24.0),
-                child: Text(
-                  'Featured Category',
-                  style: TextStyle(fontSize: 28),
-                ),
+    return SafeArea(
+      child: Scaffold(
+        drawer: Drawer(
+          child: Center(
+            child:
+                Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Text(
+                'Settings',
+                style: Theme.of(context).textTheme.titleMedium,
               ),
-              const FeaturedCategory(),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                child: ElevatedButton(
-                  onPressed: (() {}),
-                  style:
-                      ElevatedButton.styleFrom(fixedSize: const Size(200, 30)),
-                  child: const Text(
-                    'See More',
-                    style: TextStyle(fontSize: 16),
+              Text(
+                'Profile',
+                style: Theme.of(context).textTheme.titleMedium,
+              )
+            ]),
+          ),
+        ),
+        bottomNavigationBar: const MainBottomAppBar(),
+        appBar: AppBar(
+          toolbarHeight: 50,
+          title: const Text('Inspired Senior Care'),
+        ),
+        body: Center(
+          child: SafeArea(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                const Padding(
+                  padding: EdgeInsets.only(top: 8.0, bottom: 16.0),
+                  child: Text(
+                    'Featured Category',
+                    style: TextStyle(fontSize: 30),
                   ),
                 ),
-              ),
-              const Icon(FontAwesomeIcons.chevronDown),
-            ],
+                const FeaturedCategory(),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: ElevatedButton(
+                    onPressed: (() {}),
+                    style: ElevatedButton.styleFrom(
+                        fixedSize: const Size(200, 30)),
+                    child: const Text(
+                      'See More',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ),
+                ),
+                const Icon(FontAwesomeIcons.chevronDown),
+              ],
+            ),
           ),
         ),
       ),
@@ -114,7 +143,7 @@ class FeaturedCategory extends StatelessWidget {
           builder: (context, constraints) {
             return ConstrainedBox(
               constraints: BoxConstraints(
-                  maxWidth: constraints.maxWidth > 700 ? 400 : 300),
+                  maxWidth: constraints.maxWidth > 700 ? 350 : 275),
               child: Container(
                 color: Colors.white,
                 child: Padding(
@@ -128,10 +157,10 @@ class FeaturedCategory extends StatelessWidget {
                             'lib/assets/Supportive_Environment.png'),
                       ),
                       const Positioned(
-                        top: -30,
-                        right: -25,
+                        top: -25,
+                        right: -20,
                         child: CircleAvatar(
-                          radius: 32,
+                          radius: 30,
                           backgroundColor: Colors.white,
                           child: CircleAvatar(
                             radius: 25,
