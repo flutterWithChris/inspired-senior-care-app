@@ -64,7 +64,7 @@ class _DeckPageState extends State<DeckPage> {
                   return AnimatedScale(
                     curve: Curves.easeInOut,
                     duration: const Duration(milliseconds: 200),
-                    scale: 1.1,
+                    scale: 1.2,
                     child: AnimatedSlide(
                       curve: Curves.easeInOut,
                       duration: const Duration(milliseconds: 200),
