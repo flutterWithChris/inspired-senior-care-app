@@ -139,6 +139,7 @@ class _GroupSectionState extends State<GroupSection> {
   @override
   Widget build(BuildContext context) {
     return Card(
+      color: Colors.grey.shade100,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
       elevation: 2.0,
       child: Padding(

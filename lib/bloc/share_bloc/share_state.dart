@@ -1,6 +1,6 @@
 part of 'share_bloc.dart';
 
-enum Status { initial, submitting, submitted, failed }
+enum Status { initial, started, cancelled, submitting, submitted, failed }
 
 @immutable
 class ShareState extends Equatable {
@@ -14,6 +14,14 @@ class ShareState extends Equatable {
 
   factory ShareState.initial() {
     return const ShareState(status: Status.initial);
+  }
+
+  factory ShareState.started() {
+    return const ShareState(status: Status.started);
+  }
+
+  factory ShareState.cancelled() {
+    return const ShareState(status: Status.started);
   }
 
   factory ShareState.submitting() {

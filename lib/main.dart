@@ -49,10 +49,10 @@ class MyApp extends StatelessWidget {
               minimumSize: const Size(35, 30),
             ),
           ),
-          bottomSheetTheme: BottomSheetThemeData(
-              backgroundColor: Colors.white.withOpacity(0.85)),
+          bottomSheetTheme:
+              const BottomSheetThemeData(backgroundColor: Colors.white),
           textTheme: GoogleFonts.breeSerifTextTheme(),
-          // useMaterial3: true,
+          //  useMaterial3: true,
 
           colorSchemeSeed: Colors.purple,
           // primarySwatch: Colors.blue,

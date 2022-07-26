@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:inspired_senior_care_app/bloc/deck/deck_cubit.dart';
 import 'package:inspired_senior_care_app/main.dart';
 import 'package:inspired_senior_care_app/view/pages/categories.dart';
 import 'package:inspired_senior_care_app/view/pages/dashboard/choose_category.dart';
@@ -62,8 +64,12 @@ class MyRouter {
               GoRoute(
                 name: 'deck-page',
                 path: 'deck-page',
-                pageBuilder: (context, state) =>
-                    MaterialPage(key: state.pageKey, child: const DeckPage()),
+                pageBuilder: (context, state) => MaterialPage(
+                    key: state.pageKey,
+                    child: BlocProvider(
+                      create: (context) => DeckCubit(),
+                      child: DeckPage(),
+                    )),
               ),
             ]),
         GoRoute(

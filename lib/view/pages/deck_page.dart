@@ -1,6 +1,7 @@
-import 'package:appinio_swiper/appinio_swiper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:infinite_carousel/infinite_carousel.dart';
+import 'package:inspired_senior_care_app/bloc/deck/deck_cubit.dart';
 import 'package:inspired_senior_care_app/bloc/share_bloc/share_bloc.dart';
 import 'package:inspired_senior_care_app/view/widget/bottom_app_bar.dart';
 
@@ -12,117 +13,157 @@ class DeckPage extends StatefulWidget {
 }
 
 class _DeckPageState extends State<DeckPage> {
-  bool zoomCard = false;
-  bool isSwipeDisabled = true;
+  // bool isSwipeDisabled = true;
   int currentCardIndex = 1;
-
-  final AppinioSwiperController controller = AppinioSwiperController();
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    controller.addListener(() {});
-    super.initState();
-  }
-
-  bool _zoomCard() {
-    setState(() {
-      zoomCard = true;
-    });
-    return zoomCard;
-  }
-
-  bool _unZoomCard() {
-    setState(() {
-      zoomCard = false;
-    });
-    return zoomCard;
-  }
-
+  final InfiniteScrollController deckScrollController =
+      InfiniteScrollController();
   @override
   Widget build(BuildContext context) {
-    int _incrementCounter() {
-      setState(() {
-        currentCardIndex++;
-      });
-      return currentCardIndex;
-    }
-
-    _decrementCounter() {
-      currentCardIndex--;
-    }
-
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: Colors.red,
-        appBar: AppBar(
-            toolbarHeight: 50, title: const Text('Inspired Senior Care')),
-        bottomNavigationBar: const MainBottomAppBar(),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.only(top: 30),
+    return Scaffold(
+      resizeToAvoidBottomInset: true,
+      backgroundColor: Colors.redAccent,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(50),
+        child: BlocConsumer<DeckCubit, DeckState>(
+          listener: (context, state) {
+            if (state.status == DeckStatus.swiped) {
+              currentCardIndex++;
+              deckScrollController.animateToItem(currentCardIndex - 1);
+              context.read<DeckCubit>().resetDeck();
+            }
+          },
+          builder: (context, state) {
+            if (state.status == DeckStatus.zoomed) {
+              return Visibility(
+                visible: false,
+                child: AppBar(
+                    toolbarHeight: 50,
+                    title: const Text('Inspired Senior Care')),
+              );
+            }
+            return AnimatedOpacity(
+              opacity: 1.0,
+              duration: const Duration(milliseconds: 1000),
+              child: AppBar(
+                  toolbarHeight: 50, title: const Text('Inspired Senior Care')),
+            );
+          },
+        ),
+      ),
+      bottomNavigationBar: const MainBottomAppBar(),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          physics: const NeverScrollableScrollPhysics(),
+          padding: const EdgeInsets.only(top: 8.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              AnimatedScale(
-                curve: Curves.easeInOut,
-                duration: const Duration(milliseconds: 200),
-                scale: zoomCard == true ? 1.1 : 1.0,
-                child: AnimatedSlide(
+              BlocBuilder<DeckCubit, DeckState>(builder: (context, state) {
+                var deckCubit = context.read<DeckCubit>();
+                if (state.status == DeckStatus.zoomed) {
+                  return AnimatedScale(
+                    curve: Curves.easeInOut,
+                    duration: const Duration(milliseconds: 200),
+                    scale: 1.1,
+                    child: AnimatedSlide(
+                      curve: Curves.easeInOut,
+                      duration: const Duration(milliseconds: 200),
+                      offset: const Offset(0, -0.20),
+                      child: IgnorePointer(
+                        child: Stack(
+                          clipBehavior: Clip.none,
+                          alignment: AlignmentDirectional.topEnd,
+                          children: [
+                            SizedBox(
+                              height: 450,
+                              child: InfiniteCarousel.builder(
+                                controller: deckScrollController,
+                                velocityFactor: 0.5,
+                                itemCount: 12,
+                                itemExtent: 300,
+                                itemBuilder: (context, itemIndex, realIndex) {
+                                  return InfoCard(
+                                    cardNumber: itemIndex + 1,
+                                  );
+                                },
+                              ),
+                            ),
+                            Positioned(
+                              right: 35,
+                              top: -0,
+                              child: CircleAvatar(
+                                radius: 35,
+                                backgroundColor: Colors.white,
+                                child: CircleAvatar(
+                                  backgroundColor: Colors.blueAccent,
+                                  radius: 30,
+                                  child: Text(
+                                    '$currentCardIndex/12',
+                                    style: const TextStyle(
+                                        fontSize: 20, color: Colors.white),
+                                  ),
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                }
+                return AnimatedScale(
                   curve: Curves.easeInOut,
                   duration: const Duration(milliseconds: 200),
-                  offset: zoomCard == true
-                      ? const Offset(0, -0.4)
-                      : const Offset(0, 0),
-                  child: Stack(
-                    clipBehavior: Clip.none,
-                    alignment: AlignmentDirectional.topEnd,
-                    children: [
-                      SizedBox(
-                        height: 475,
-                        child: AppinioSwiper(
-                            controller: controller,
-                            onSwipe: (int index) {
-                              controller.swipe();
-                              _incrementCounter();
-                            },
-                            isDisabled: isSwipeDisabled,
-                            padding: const EdgeInsets.symmetric(horizontal: 40),
-                            cards: [
-                              for (var i = 12; i > 0; i--)
-                                InfoCard(
-                                  cardNumber: i,
-                                ),
-                            ]),
-                      ),
-                      Positioned(
-                        right: 15,
-                        top: -20,
-                        child: CircleAvatar(
-                          radius: 35,
-                          backgroundColor: Colors.white,
-                          child: CircleAvatar(
-                            backgroundColor: Colors.blueAccent,
-                            radius: 30,
-                            child: Text(
-                              '$currentCardIndex/12',
-                              style: const TextStyle(
-                                  fontSize: 20, color: Colors.white),
+                  scale: 1.0,
+                  child: AnimatedSlide(
+                    curve: Curves.easeInOut,
+                    duration: const Duration(milliseconds: 200),
+                    offset: const Offset(0, -0.0),
+                    child: IgnorePointer(
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        alignment: AlignmentDirectional.topEnd,
+                        children: [
+                          SizedBox(
+                            height: 500,
+                            child: InfiniteCarousel.builder(
+                              controller: deckScrollController,
+                              velocityFactor: 0.5,
+                              itemCount: 12,
+                              itemExtent: 300,
+                              itemBuilder: (context, itemIndex, realIndex) {
+                                return InfoCard(
+                                  cardNumber: itemIndex + 1,
+                                );
+                              },
                             ),
                           ),
-                        ),
-                      )
-                    ],
+                          Positioned(
+                            right: 35,
+                            top: -0,
+                            child: CircleAvatar(
+                              radius: 35,
+                              backgroundColor: Colors.white,
+                              child: CircleAvatar(
+                                backgroundColor: Colors.blueAccent,
+                                radius: 30,
+                                child: Text(
+                                  '$currentCardIndex/12',
+                                  style: const TextStyle(
+                                      fontSize: 20, color: Colors.white),
+                                ),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 30),
-                child: ShareButton(
-                  swipeController: controller,
-                  zoomCard: _zoomCard,
-                  unZoomCard: _unZoomCard,
-                ),
+                );
+              }),
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 8.0),
+                child: ShareButton(),
               ),
             ],
           ),
@@ -133,13 +174,7 @@ class _DeckPageState extends State<DeckPage> {
 }
 
 class ShareButton extends StatefulWidget {
-  final AppinioSwiperController swipeController;
-  final bool Function() zoomCard;
-  final bool Function() unZoomCard;
   const ShareButton({
-    required this.swipeController,
-    required this.unZoomCard,
-    required this.zoomCard,
     Key? key,
   }) : super(key: key);
 
@@ -154,10 +189,9 @@ class _ShareButtonState extends State<ShareButton> {
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: () {
-        var zoom = widget.zoomCard;
-        var unZoom = widget.unZoomCard;
-        zoom();
+        var deckCubit = context.read<DeckCubit>();
 
+        deckCubit.zoomDeck();
         var bottomSheet = showBottomSheet(
           context: context,
           builder: (context) {
@@ -182,14 +216,17 @@ class _ShareButtonState extends State<ShareButton> {
                         shareFieldController: shareFieldController,
                       ),
                       SendButton(
-                          shareFieldController: shareFieldController,
-                          swipeController: widget.swipeController),
+                        shareFieldController: shareFieldController,
+                      ),
                     ]),
               ),
             );
           },
         );
-        bottomSheet.closed.then((value) => unZoom());
+        Container();
+        bottomSheet.closed.then((value) {
+          deckCubit.unzoomDeck();
+        });
       },
       child: const Text('Share Response'),
     );
@@ -198,6 +235,7 @@ class _ShareButtonState extends State<ShareButton> {
 
 class ShareTextField extends StatelessWidget {
   final TextEditingController shareFieldController;
+
   const ShareTextField({
     required this.shareFieldController,
     Key? key,
@@ -239,12 +277,9 @@ class ShareTextField extends StatelessWidget {
 }
 
 class SendButton extends StatefulWidget {
-  final AppinioSwiperController swipeController;
   final TextEditingController shareFieldController;
-  const SendButton(
-      {required this.swipeController,
-      required this.shareFieldController,
-      Key? key})
+
+  const SendButton({required this.shareFieldController, Key? key})
       : super(key: key);
 
   @override
@@ -292,8 +327,8 @@ class _SendButtonState extends State<SendButton> {
         listener: (context, state) {
           if (state.status == Status.initial) {
             widget.shareFieldController.clear();
-            Navigator.of(context).pop();
-            widget.swipeController.swipe();
+            Navigator.pop(context);
+            context.read<DeckCubit>().swipeDeck();
           }
         },
         buildWhen: (previous, current) => previous.status != current.status,
@@ -334,13 +369,12 @@ class InfoCard extends StatelessWidget {
     return Card(
       child: ClipRRect(
         borderRadius: BorderRadius.circular(25),
-        child: Container(
-          color: Colors.white,
-          child: Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: SizedBox(
-                child: Image.asset(
-                    'lib/assets/card_contents/positive_interactions/${cardNumber.toString()}.png')),
+        child: Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: Image.asset(
+            'lib/assets/card_contents/positive_interactions/${cardNumber.toString()}.png',
+            height: 200,
+            fit: BoxFit.fitHeight,
           ),
         ),
       ),
