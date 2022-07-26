@@ -7,6 +7,7 @@ import 'package:inspired_senior_care_app/bloc/invite/invite_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/share_bloc/share_bloc.dart';
 import 'package:inspired_senior_care_app/router/routes.dart';
 import 'package:inspired_senior_care_app/view/widget/bottom_app_bar.dart';
+import 'package:inspired_senior_care_app/view/widget/top_app_bar.dart';
 
 void main() {
   runApp(MyApp());
@@ -89,9 +90,9 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ),
         bottomNavigationBar: const MainBottomAppBar(),
-        appBar: AppBar(
-          toolbarHeight: 50,
-          title: const Text('Inspired Senior Care'),
+        appBar: const PreferredSize(
+          preferredSize: Size.fromHeight(50),
+          child: MainTopAppBar(),
         ),
         body: Center(
           child: SafeArea(

@@ -161,9 +161,10 @@ class CategoryCard extends StatelessWidget {
             children: [
               Positioned(
                   top: 15,
-                  child: SizedBox(
+                  child: Image.asset(
+                    'lib/assets/card_covers/$assetName',
                     height: 250,
-                    child: Image.asset('lib/assets/card_covers/$assetName'),
+                    fit: BoxFit.fitHeight,
                   )),
               Positioned(
                 top: 5,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:inspired_senior_care_app/main.dart';
 import 'package:inspired_senior_care_app/view/pages/categories.dart';
+import 'package:inspired_senior_care_app/view/pages/dashboard/choose_category.dart';
 import 'package:inspired_senior_care_app/view/pages/dashboard/dashboard.dart';
 import 'package:inspired_senior_care_app/view/pages/deck_page.dart';
 import 'package:inspired_senior_care_app/view/pages/login/login.dart';
@@ -82,6 +83,12 @@ class MyRouter {
                 path: 'view-member',
                 pageBuilder: (context, state) =>
                     MaterialPage(key: state.pageKey, child: const ViewMember()),
+              ),
+              GoRoute(
+                name: 'choose-category',
+                path: 'choose-category',
+                pageBuilder: (context, state) => MaterialPage(
+                    key: state.pageKey, child: const ChooseCategory()),
               ),
             ]),
       ]);

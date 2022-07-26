@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:go_router/go_router.dart';
 import 'package:inspired_senior_care_app/bloc/group/group_bloc.dart';
 import 'package:inspired_senior_care_app/data/models/group.dart';
 import 'package:inspired_senior_care_app/view/pages/dashboard/add_member.dart';
@@ -60,13 +61,13 @@ class _DashboardState extends State<Dashboard> {
         ),
         // * Main Content
         body: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 12.0),
+          padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
           child: ListView(
             shrinkWrap: true,
             children: [
               // * Name Plate
               const Padding(
-                padding: EdgeInsets.symmetric(vertical: 12.0),
+                padding: EdgeInsets.symmetric(vertical: 8.0),
                 child: NamePlate(
                   memberName: 'Jennifer Sample',
                   memberTitle: 'Director',
@@ -236,6 +237,7 @@ class CurrentCategoryCard extends StatelessWidget {
     return Card(
       elevation: 1,
       child: ListTile(
+        onTap: () => context.goNamed('choose-category'),
         title: const Text('Supportive Environment'),
         subtitle: const Text('Creating a healthy environment.'),
         trailing: const Icon(Icons.chevron_right_rounded),

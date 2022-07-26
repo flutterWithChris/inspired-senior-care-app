@@ -52,6 +52,7 @@ dependencies:
   smooth_page_indicator: ^1.0.0+2
   flex_color_picker: ^2.5.0
   flutter_speed_dial: ^6.0.0
+  infinite_carousel: ^1.0.2
 
 
 dev_dependencies:
