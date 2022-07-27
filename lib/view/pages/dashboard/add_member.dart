@@ -19,7 +19,7 @@ class AddMemberDialog extends StatelessWidget {
 
       // * Main Content
       title: const Text(
-        'Add a Member',
+        'Add Member',
         textAlign: TextAlign.center,
       ),
       content: const Text(

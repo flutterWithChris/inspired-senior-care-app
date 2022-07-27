@@ -16,22 +16,47 @@ class ViewMember extends StatelessWidget {
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12.0),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12.0),
-          child: ListView(
-            shrinkWrap: true,
-            children: const [
-              NamePlate(
+        child: ListView(
+          shrinkWrap: true,
+          children: const [
+            Padding(
+              padding: EdgeInsets.only(top: 12.0),
+              child: NamePlate(
                 memberName: 'Chelsea Ranchford',
                 memberTitle: 'Home Attendant',
               ),
-              Padding(
-                padding: EdgeInsets.symmetric(vertical: 12.0),
-                child: GroupMemberProgressSection(),
-              ),
-            ],
-          ),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 12.0),
+              child: GroupMemberProgressSection(),
+            ),
+            RemoveMemberButton(),
+          ],
         ),
+      ),
+    );
+  }
+}
+
+class RemoveMemberButton extends StatelessWidget {
+  const RemoveMemberButton({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          ElevatedButton.icon(
+              onPressed: () {},
+              style: ElevatedButton.styleFrom(
+                  fixedSize: const Size(175, 32), primary: Colors.redAccent),
+              icon: const Icon(Icons.group_remove_outlined),
+              label: const Text('Remove Member')),
+        ],
       ),
     );
   }

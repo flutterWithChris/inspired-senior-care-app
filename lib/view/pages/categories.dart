@@ -99,11 +99,11 @@ class Categories extends StatelessWidget {
             shrinkWrap: true,
             children: [
               Padding(
-                padding: const EdgeInsets.symmetric(
-                    vertical: 18.0, horizontal: 12.0),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 18.0, horizontal: 8.0),
                 child: Text(
-                  'All Categories >',
-                  style: Theme.of(context).textTheme.titleLarge,
+                  'All Categories',
+                  style: Theme.of(context).textTheme.headline5,
                 ),
               ),
               LayoutBuilder(builder: (context, constraints) {
@@ -115,7 +115,7 @@ class Categories extends StatelessWidget {
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisSpacing: 6.0,
                       mainAxisExtent: 285,
-                      mainAxisSpacing: 8.0,
+                      mainAxisSpacing: 6.0,
                       crossAxisCount: crossAxisCount),
                   itemBuilder: (context, index) {
                     return categories[index];
@@ -238,9 +238,9 @@ class LockedCategoryCard extends StatelessWidget {
                       child: CircleAvatar(
                         radius: 23,
                         backgroundColor: randomColor,
-                        child: Text(
-                          '${random.nextInt(16)}/16',
-                          style: const TextStyle(
+                        child: const Text(
+                          '0/16',
+                          style: TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 14),
                         ),
                       ),

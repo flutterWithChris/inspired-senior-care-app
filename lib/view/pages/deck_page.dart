@@ -19,63 +19,117 @@ class _DeckPageState extends State<DeckPage> {
       InfiniteScrollController();
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.red,
-      resizeToAvoidBottomInset: true,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(50),
-        child: BlocConsumer<DeckCubit, DeckState>(
-          listener: (context, state) {
-            if (state.status == DeckStatus.swiped) {
-              currentCardIndex++;
-              deckScrollController.animateToItem(currentCardIndex - 1);
-              context.read<DeckCubit>().resetDeck();
-            }
-          },
-          builder: (context, state) {
-            if (state.status == DeckStatus.zoomed) {
-              return Visibility(
-                visible: false,
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: Colors.grey.shade200,
+        resizeToAvoidBottomInset: true,
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(50),
+          child: BlocConsumer<DeckCubit, DeckState>(
+            listener: (context, state) {
+              if (state.status == DeckStatus.swiped) {
+                currentCardIndex++;
+                deckScrollController.animateToItem(currentCardIndex - 1);
+                context.read<DeckCubit>().resetDeck();
+              }
+            },
+            builder: (context, state) {
+              if (state.status == DeckStatus.zoomed) {
+                return Visibility(
+                  visible: false,
+                  child: AppBar(
+                      toolbarHeight: 50,
+                      title: const Text('Inspired Senior Care')),
+                );
+              }
+              return AnimatedOpacity(
+                opacity: 1.0,
+                duration: const Duration(milliseconds: 1000),
                 child: AppBar(
-                    toolbarHeight: 50,
-                    title: const Text('Inspired Senior Care')),
+                  toolbarHeight: 50,
+                  title: const Text('Inspired Senior Care'),
+                  backgroundColor: Colors.red,
+                ),
               );
-            }
-            return AnimatedOpacity(
-              opacity: 1.0,
-              duration: const Duration(milliseconds: 1000),
-              child: AppBar(
-                  toolbarHeight: 50, title: const Text('Inspired Senior Care')),
-            );
-          },
+            },
+          ),
         ),
-      ),
-      bottomNavigationBar: const MainBottomAppBar(),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          physics: const NeverScrollableScrollPhysics(),
-          padding: const EdgeInsets.only(top: 8.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              BlocBuilder<DeckCubit, DeckState>(builder: (context, state) {
-                var deckCubit = context.read<DeckCubit>();
-                if (state.status == DeckStatus.zoomed) {
+        bottomNavigationBar: const MainBottomAppBar(),
+        body: SafeArea(
+          child: SingleChildScrollView(
+            physics: const NeverScrollableScrollPhysics(),
+            padding: const EdgeInsets.only(top: 8.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                BlocBuilder<DeckCubit, DeckState>(builder: (context, state) {
+                  var deckCubit = context.read<DeckCubit>();
+                  if (state.status == DeckStatus.zoomed) {
+                    return AnimatedScale(
+                      curve: Curves.easeInOut,
+                      duration: const Duration(milliseconds: 200),
+                      scale: 1.2,
+                      child: AnimatedSlide(
+                        curve: Curves.easeInOut,
+                        duration: const Duration(milliseconds: 200),
+                        offset: const Offset(0, -0.25),
+                        child: IgnorePointer(
+                          child: Stack(
+                            clipBehavior: Clip.none,
+                            alignment: AlignmentDirectional.topEnd,
+                            children: [
+                              SizedBox(
+                                height: 450,
+                                child: InfiniteCarousel.builder(
+                                  controller: deckScrollController,
+                                  velocityFactor: 0.5,
+                                  itemCount: 12,
+                                  itemExtent: 300,
+                                  itemBuilder: (context, itemIndex, realIndex) {
+                                    return InfoCard(
+                                      cardNumber: itemIndex + 1,
+                                    );
+                                  },
+                                ),
+                              ),
+                              Positioned(
+                                right: 35,
+                                top: -0,
+                                child: CircleAvatar(
+                                  radius: 35,
+                                  backgroundColor: Colors.white,
+                                  child: CircleAvatar(
+                                    backgroundColor: Colors.blueAccent,
+                                    radius: 30,
+                                    child: Text(
+                                      '$currentCardIndex/12',
+                                      style: const TextStyle(
+                                          fontSize: 20, color: Colors.white),
+                                    ),
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  }
                   return AnimatedScale(
                     curve: Curves.easeInOut,
                     duration: const Duration(milliseconds: 200),
-                    scale: 1.2,
+                    scale: 1.0,
                     child: AnimatedSlide(
                       curve: Curves.easeInOut,
                       duration: const Duration(milliseconds: 200),
-                      offset: const Offset(0, -0.20),
+                      offset: const Offset(0, -0.0),
                       child: IgnorePointer(
                         child: Stack(
                           clipBehavior: Clip.none,
                           alignment: AlignmentDirectional.topEnd,
                           children: [
                             SizedBox(
-                              height: 450,
+                              height: 500,
                               child: InfiniteCarousel.builder(
                                 controller: deckScrollController,
                                 velocityFactor: 0.5,
@@ -89,14 +143,14 @@ class _DeckPageState extends State<DeckPage> {
                               ),
                             ),
                             Positioned(
-                              right: 35,
-                              top: -0,
+                              right: 25,
+                              top: -5,
                               child: CircleAvatar(
-                                radius: 35,
+                                radius: 34,
                                 backgroundColor: Colors.white,
                                 child: CircleAvatar(
-                                  backgroundColor: Colors.blueAccent,
-                                  radius: 30,
+                                  backgroundColor: Colors.red,
+                                  radius: 29,
                                   child: Text(
                                     '$currentCardIndex/12',
                                     style: const TextStyle(
@@ -110,62 +164,13 @@ class _DeckPageState extends State<DeckPage> {
                       ),
                     ),
                   );
-                }
-                return AnimatedScale(
-                  curve: Curves.easeInOut,
-                  duration: const Duration(milliseconds: 200),
-                  scale: 1.0,
-                  child: AnimatedSlide(
-                    curve: Curves.easeInOut,
-                    duration: const Duration(milliseconds: 200),
-                    offset: const Offset(0, -0.0),
-                    child: IgnorePointer(
-                      child: Stack(
-                        clipBehavior: Clip.none,
-                        alignment: AlignmentDirectional.topEnd,
-                        children: [
-                          SizedBox(
-                            height: 500,
-                            child: InfiniteCarousel.builder(
-                              controller: deckScrollController,
-                              velocityFactor: 0.5,
-                              itemCount: 12,
-                              itemExtent: 300,
-                              itemBuilder: (context, itemIndex, realIndex) {
-                                return InfoCard(
-                                  cardNumber: itemIndex + 1,
-                                );
-                              },
-                            ),
-                          ),
-                          Positioned(
-                            right: 25,
-                            top: -5,
-                            child: CircleAvatar(
-                              radius: 34,
-                              backgroundColor: Colors.white,
-                              child: CircleAvatar(
-                                backgroundColor: Colors.blueAccent,
-                                radius: 29,
-                                child: Text(
-                                  '$currentCardIndex/12',
-                                  style: const TextStyle(
-                                      fontSize: 20, color: Colors.white),
-                                ),
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-                );
-              }),
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 8.0),
-                child: ShareButton(),
-              ),
-            ],
+                }),
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 8.0),
+                  child: ShareButton(),
+                ),
+              ],
+            ),
           ),
         ),
       ),

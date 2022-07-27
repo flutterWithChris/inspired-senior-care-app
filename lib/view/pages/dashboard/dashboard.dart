@@ -61,7 +61,7 @@ class _DashboardState extends State<Dashboard> {
         ),
         // * Main Content
         body: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 10.0),
+          padding: const EdgeInsets.symmetric(horizontal: 10.0),
           child: ListView(
             shrinkWrap: true,
             children: [
@@ -73,94 +73,101 @@ class _DashboardState extends State<Dashboard> {
                   memberTitle: 'Director',
                 ),
               ),
-              // * Current Category
-              Card(
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(33)),
-                color: Colors.lightBlue.shade100,
-                elevation: 1.0,
-                child: Padding(
-                  padding: const EdgeInsets.only(
-                      top: 6.0, bottom: 24.0, left: 12.0, right: 12.0),
-                  child: Column(children: [
-                    Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 12.0, horizontal: 12.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Wrap(
-                                crossAxisAlignment: WrapCrossAlignment.center,
-                                spacing: 12.0,
-                                children: [
-                                  const Icon(
-                                    Icons.star,
-                                    color: Colors.black87,
-                                  ),
-                                  Text(
-                                    'Featured Category',
-                                    textAlign: TextAlign.start,
-                                    style:
-                                        Theme.of(context).textTheme.headline5,
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                        const CurrentCategoryCard(),
-                      ],
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 12.0, horizontal: 8.0),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
+              Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: Card(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(33)),
+                  color: Colors.lightBlue.shade100,
+                  elevation: 1.5,
+                  // * Featured Category
+                  child: Padding(
+                    padding: const EdgeInsets.only(
+                        top: 6.0, bottom: 24.0, left: 12.0, right: 12.0),
+                    child: Column(children: [
+                      Column(
                         children: [
-                          Wrap(
-                            spacing: 12.0,
-                            runAlignment: WrapAlignment.center,
-                            alignment: WrapAlignment.center,
-                            crossAxisAlignment: WrapCrossAlignment.center,
-                            // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Icon(
-                                Icons.group,
-                                color: Colors.black87,
-                              ),
-                              Text(
-                                'My Groups',
-                                style: Theme.of(context).textTheme.headline5,
-                              ),
-                            ],
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 12.0, horizontal: 12.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Wrap(
+                                  crossAxisAlignment: WrapCrossAlignment.center,
+                                  spacing: 12.0,
+                                  children: [
+                                    const Icon(
+                                      Icons.star,
+                                      color: Colors.black87,
+                                    ),
+                                    Text(
+                                      'Featured Category',
+                                      textAlign: TextAlign.start,
+                                      style:
+                                          Theme.of(context).textTheme.headline5,
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
+                          const CurrentCategoryCard(),
                         ],
                       ),
-                    ),
-                    // * Groups Section
-                    BlocBuilder<GroupBloc, GroupState>(
-                      // * Rebuild when groups updated.
-                      buildWhen: (previous, current) =>
-                          previous is GroupCreated && current is GroupInitial,
-                      builder: (context, state) {
-                        return Column(
-                          mainAxisSize: MainAxisSize.min,
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 12.0, horizontal: 8.0),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            // * Build groups
-                            for (Group group in sampleGroupList)
-                              GroupSection(
-                                  groupName: group.groupName,
-                                  sampleGroupList: sampleGroupList,
-                                  inviteTextFieldController:
-                                      inviteTextFieldController),
-                            // TODO: Handle No Groups Created State
+                            Wrap(
+                              spacing: 12.0,
+                              runAlignment: WrapAlignment.center,
+                              alignment: WrapAlignment.center,
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Icon(
+                                  Icons.group,
+                                  color: Colors.black87,
+                                ),
+                                Text(
+                                  'My Groups',
+                                  style: Theme.of(context).textTheme.headline5,
+                                ),
+                              ],
+                            ),
                           ],
-                        );
-                      },
-                    ),
-                  ]),
+                        ),
+                      ),
+                      // * Groups Section
+                      BlocBuilder<GroupBloc, GroupState>(
+                        // * Rebuild when groups updated.
+                        buildWhen: (previous, current) =>
+                            previous is GroupCreated && current is GroupInitial,
+                        builder: (context, state) {
+                          return Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              // * Build groups
+                              for (Group group in sampleGroupList)
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 8.0),
+                                  child: GroupSection(
+                                      groupName: group.groupName,
+                                      sampleGroupList: sampleGroupList,
+                                      inviteTextFieldController:
+                                          inviteTextFieldController),
+                                ),
+                              // TODO: Handle No Groups Created State
+                            ],
+                          );
+                        },
+                      ),
+                    ]),
+                  ),
                 ),
               ),
             ],
@@ -290,8 +297,9 @@ class CurrentCategoryCard extends StatelessWidget {
       shape: const StadiumBorder(),
       elevation: 1,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 8.0),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
         child: ListTile(
+          minLeadingWidth: 10,
           // dense: true,
           onTap: () => context.goNamed('choose-category'),
           title: const Text(
@@ -300,8 +308,11 @@ class CurrentCategoryCard extends StatelessWidget {
           subtitle: const Text('Creating a healthy environment.'),
           trailing: const Icon(Icons.chevron_right_rounded),
           leading: SizedBox(
-            height: 100,
-            child: Image.asset('lib/assets/Supportive_Environment.png'),
+            height: 60,
+            child: Image.asset(
+              'lib/assets/Supportive_Environment.png',
+              fit: BoxFit.fitHeight,
+            ),
           ),
         ),
       ),

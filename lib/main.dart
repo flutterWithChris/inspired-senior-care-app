@@ -36,6 +36,7 @@ class MyApp extends StatelessWidget {
         routeInformationProvider: myRouter.router.routeInformationProvider,
         title: 'Inspired Senior Care App',
         theme: ThemeData(
+          scaffoldBackgroundColor: Colors.grey.shade200,
           inputDecorationTheme: InputDecorationTheme(
             filled: true,
             fillColor: Colors.white,

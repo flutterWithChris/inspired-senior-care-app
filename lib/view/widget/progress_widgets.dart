@@ -169,7 +169,7 @@ class GroupMemberProgressSection extends StatelessWidget {
     return SizedBox(
       child: Card(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
-        color: Colors.grey.shade100,
+        color: Colors.white,
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 24.0),
           child: Column(
@@ -177,7 +177,7 @@ class GroupMemberProgressSection extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: Text(
-                  'Your Progress',
+                  'Chelsea\'s Progress',
                   textAlign: TextAlign.left,
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
@@ -252,10 +252,10 @@ class GroupMemberProgressCategory extends StatelessWidget {
                     ? ClipRRect(
                         borderRadius: BorderRadius.circular(25),
                         child: Container(
-                          color: Colors.white,
+                          color: Colors.grey.shade100,
                           child: Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 10.0),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12.0, vertical: 2.0),
                             child: Wrap(
                               crossAxisAlignment: WrapCrossAlignment.center,
                               spacing: 5,
@@ -265,7 +265,7 @@ class GroupMemberProgressCategory extends StatelessWidget {
                                 ),
                                 const Icon(
                                   Icons.check_circle,
-                                  color: Colors.lightBlueAccent,
+                                  color: Colors.lightGreen,
                                   size: 12,
                                 ),
                               ],
@@ -276,10 +276,10 @@ class GroupMemberProgressCategory extends StatelessWidget {
                     : ClipRRect(
                         borderRadius: BorderRadius.circular(25),
                         child: Container(
-                          color: Colors.white,
+                          color: Colors.grey.shade100,
                           child: Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 10.0),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10.0, vertical: 2.0),
                             child: Text(
                               '${progress.toString()}%',
                             ),
