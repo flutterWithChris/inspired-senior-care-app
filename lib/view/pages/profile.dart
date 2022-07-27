@@ -17,7 +17,7 @@ class Profile extends StatelessWidget {
             title: const Text('Inspired Senior Care'),
           )),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: ListView(
           shrinkWrap: true,
           children: const [
@@ -50,17 +50,19 @@ class Badges extends StatelessWidget {
     return SizedBox(
       height: 100,
       child: Card(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(33)),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             Wrap(
               direction: Axis.vertical,
               crossAxisAlignment: WrapCrossAlignment.center,
-              spacing: 5,
+              spacing: 8.0,
               children: const [
                 Icon(
-                  FontAwesomeIcons.star,
-                  size: 28,
+                  FontAwesomeIcons.solidStarHalfStroke,
+                  color: Colors.yellow,
+                  size: 30,
                 ),
                 Text('New Member')
               ],
@@ -72,12 +74,12 @@ class Badges extends StatelessWidget {
             Wrap(
               direction: Axis.vertical,
               crossAxisAlignment: WrapCrossAlignment.center,
-              spacing: 5,
+              spacing: 8.0,
               children: const [
                 Icon(
                   FontAwesomeIcons.fire,
                   color: Colors.deepOrangeAccent,
-                  size: 28,
+                  size: 30,
                 ),
                 Text('On Fire!')
               ],
@@ -89,12 +91,12 @@ class Badges extends StatelessWidget {
             Wrap(
               direction: Axis.vertical,
               crossAxisAlignment: WrapCrossAlignment.center,
-              spacing: 5,
+              spacing: 8.0,
               children: [
                 Icon(
                   FontAwesomeIcons.medal,
                   color: Colors.grey.shade400,
-                  size: 28,
+                  size: 30,
                 ),
                 Text(
                   'Earn More!',

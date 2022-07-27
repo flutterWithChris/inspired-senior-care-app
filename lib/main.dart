@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:inspired_senior_care_app/bloc/auth/auth_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/group/group_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/invite/invite_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/share_bloc/share_bloc.dart';
@@ -20,6 +22,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
+        BlocProvider(
+          create: (context) => AuthBloc(),
+        ),
         BlocProvider(
           create: (context) => InviteBloc(),
         ),
@@ -47,6 +52,7 @@ class MyApp extends StatelessWidget {
           elevatedButtonTheme: ElevatedButtonThemeData(
             style: ElevatedButton.styleFrom(
               shape: const StadiumBorder(),
+              fixedSize: const Size(200, 30),
               minimumSize: const Size(35, 30),
             ),
           ),
@@ -83,10 +89,12 @@ class _MyHomePageState extends State<MyHomePage> {
                 'Settings',
                 style: Theme.of(context).textTheme.titleMedium,
               ),
-              Text(
-                'Profile',
-                style: Theme.of(context).textTheme.titleMedium,
-              )
+              TextButton(
+                  onPressed: () => context.goNamed('profile'),
+                  child: Text(
+                    'Profile',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ))
             ]),
           ),
         ),

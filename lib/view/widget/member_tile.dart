@@ -29,6 +29,7 @@ class GroupMemberTile extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Card(
+        elevation: 0,
         shape: const StadiumBorder(),
         child: ListTile(
           shape: const StadiumBorder(),

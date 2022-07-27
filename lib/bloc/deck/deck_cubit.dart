@@ -11,6 +11,7 @@ class DeckCubit extends Cubit<DeckState> {
   void zoomDeck() => emit(DeckState.zoomed());
   void unzoomDeck() => emit(DeckState.unzoomed());
   void swipeDeck() => emit(DeckState.swiped());
+  void completeDeck() => emit(DeckState.completed());
   void incrementCardNumber() => currentCardNumber++;
   void derementCardNumber() => currentCardNumber--;
 }

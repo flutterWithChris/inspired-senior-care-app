@@ -1,6 +1,8 @@
 import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:inspired_senior_care_app/view/pages/upgrade_page.dart';
 import 'package:inspired_senior_care_app/view/widget/bottom_app_bar.dart';
 
 class Categories extends StatelessWidget {
@@ -212,7 +214,10 @@ class LockedCategoryCard extends StatelessWidget {
     Color randomColor = Color.fromRGBO(
         random.nextInt(255), random.nextInt(255), random.nextInt(255), 1);
     return InkWell(
-      onTap: () => context.goNamed('deck-page'),
+      onTap: () => showDialog(
+        context: context,
+        builder: (context) => const UpgradePage(),
+      ),
       child: Card(
         child: Container(
           color: Colors.white,

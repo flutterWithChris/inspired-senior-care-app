@@ -10,8 +10,8 @@ class ProgressSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       child: Card(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
-        color: Colors.grey.shade100,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(33)),
+        color: Colors.white,
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 24.0),
           child: Column(
@@ -94,10 +94,10 @@ class ProgressCategory extends StatelessWidget {
                     ? ClipRRect(
                         borderRadius: BorderRadius.circular(25),
                         child: Container(
-                          color: Colors.white,
+                          color: Colors.grey.shade100,
                           child: Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 10.0),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12.0, vertical: 2.0),
                             child: Wrap(
                               crossAxisAlignment: WrapCrossAlignment.center,
                               spacing: 5,
@@ -118,10 +118,10 @@ class ProgressCategory extends StatelessWidget {
                     : ClipRRect(
                         borderRadius: BorderRadius.circular(25),
                         child: Container(
-                          color: Colors.white,
+                          color: Colors.grey.shade100,
                           child: Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 10.0),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12.0, vertical: 2.0),
                             child: Text(
                               '${progress.toString()}%',
                             ),

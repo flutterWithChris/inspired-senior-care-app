@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:inspired_senior_care_app/bloc/auth/auth_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/deck/deck_cubit.dart';
 import 'package:inspired_senior_care_app/bloc/manage/view_response_deck_cubit.dart';
+import 'package:inspired_senior_care_app/bloc/onboarding/onboarding_bloc.dart';
 import 'package:inspired_senior_care_app/main.dart';
 import 'package:inspired_senior_care_app/view/pages/categories.dart';
 import 'package:inspired_senior_care_app/view/pages/dashboard/choose_category.dart';
@@ -15,14 +17,18 @@ import 'package:inspired_senior_care_app/view/pages/signup/signup.dart';
 import 'package:inspired_senior_care_app/view/pages/view_member.dart';
 
 class MyRouter {
+  final AuthBloc _authBloc = AuthBloc();
   late final router = GoRouter(
-      initialLocation: '/',
+      initialLocation: '/login',
       urlPathStrategy: UrlPathStrategy.path,
       debugLogDiagnostics: true,
       // errorPageBuilder: ,
+      /*    refreshListenable:
+          GoRouterRefreshStream(_authBloc.stream.asBroadcastStream()),
       redirect: (state) {
         bool isLoggingIn = state.location == '/login';
-        bool loggedIn = true;
+        bool loggedIn =
+            _authBloc.state == const AuthState.unauthenticated() ? false : true;
         bool isSigningUp = state.subloc == '/signup';
         bool hasBeenOnboarded = true;
 
@@ -32,12 +38,12 @@ class MyRouter {
           return '/login';
         }
 
-        if (hasBeenOnboarded && isLoggingIn && loggedIn) {
+        if (loggedIn) {
           return '/';
         }
 
         return null;
-      },
+      },*/
       routes: [
         GoRoute(
           name: 'login',
@@ -48,8 +54,12 @@ class MyRouter {
         GoRoute(
           name: 'signup',
           path: '/signup',
-          pageBuilder: (context, state) =>
-              MaterialPage(key: state.pageKey, child: const SignupScreen()),
+          pageBuilder: (context, state) => MaterialPage(
+              key: state.pageKey,
+              child: BlocProvider(
+                create: (context) => OnboardingBloc(),
+                child: const SignupScreen(),
+              )),
         ),
         GoRoute(
           name: 'home',
@@ -70,7 +80,7 @@ class MyRouter {
                     key: state.pageKey,
                     child: BlocProvider(
                       create: (context) => DeckCubit(),
-                      child: const DeckPage(),
+                      child: DeckPage(),
                     )),
               ),
             ]),

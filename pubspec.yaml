@@ -84,6 +84,7 @@ flutter:
 
   assets:
     - lib/assets/
+    - lib/assets/backgrounds/
     - lib/assets/card_covers/
     - lib/assets/card_contents/positive_interactions/
   # An image asset can refer to one or more resolution-specific "variants", see

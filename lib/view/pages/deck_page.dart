@@ -1,24 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:infinite_carousel/infinite_carousel.dart';
 import 'package:inspired_senior_care_app/bloc/deck/deck_cubit.dart';
 import 'package:inspired_senior_care_app/bloc/share_bloc/share_bloc.dart';
 import 'package:inspired_senior_care_app/view/widget/bottom_app_bar.dart';
 
-class DeckPage extends StatefulWidget {
-  const DeckPage({Key? key}) : super(key: key);
+class DeckPage extends StatelessWidget {
+  //const DeckPage({Key? key}) : super(key: key);
 
-  @override
-  State<DeckPage> createState() => _DeckPageState();
-}
+  //@override
+  //State<DeckPage> createState() => _DeckPageState();
+//}
 
-class _DeckPageState extends State<DeckPage> {
-  // bool isSwipeDisabled = true;
-  int currentCardIndex = 1;
+//class _DeckPageState extends State<DeckPage> {
+  bool isSwipeDisabled = true;
+  bool isCardZoomed = false;
   final InfiniteScrollController deckScrollController =
       InfiniteScrollController();
+
   @override
   Widget build(BuildContext context) {
+    int currentCardIndex = context.watch<DeckCubit>().currentCardNumber;
+
     return SafeArea(
       child: Scaffold(
         backgroundColor: Colors.grey.shade200,
@@ -28,9 +32,18 @@ class _DeckPageState extends State<DeckPage> {
           child: BlocConsumer<DeckCubit, DeckState>(
             listener: (context, state) {
               if (state.status == DeckStatus.swiped) {
-                currentCardIndex++;
-                deckScrollController.animateToItem(currentCardIndex - 1);
-                context.read<DeckCubit>().resetDeck();
+                if (currentCardIndex < 12) {
+                  //currentCardIndex++;
+                  deckScrollController.animateToItem(currentCardIndex);
+                }
+              }
+              if (state.status == DeckStatus.completed) {
+                showDialog(
+                  context: context,
+                  builder: (context) {
+                    return const DeckCompleteDialog();
+                  },
+                );
               }
             },
             builder: (context, state) {
@@ -39,7 +52,7 @@ class _DeckPageState extends State<DeckPage> {
                   visible: false,
                   child: AppBar(
                       toolbarHeight: 50,
-                      title: const Text('Inspired Senior Care')),
+                      title: const Text('Positive Interactions')),
                 );
               }
               return AnimatedOpacity(
@@ -47,7 +60,8 @@ class _DeckPageState extends State<DeckPage> {
                 duration: const Duration(milliseconds: 1000),
                 child: AppBar(
                   toolbarHeight: 50,
-                  title: const Text('Inspired Senior Care'),
+                  centerTitle: true,
+                  title: const Text('Positive Interactions'),
                   backgroundColor: Colors.red,
                 ),
               );
@@ -58,117 +72,77 @@ class _DeckPageState extends State<DeckPage> {
         body: SafeArea(
           child: SingleChildScrollView(
             physics: const NeverScrollableScrollPhysics(),
-            padding: const EdgeInsets.only(top: 8.0),
+            padding: const EdgeInsets.only(top: 24.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                BlocBuilder<DeckCubit, DeckState>(builder: (context, state) {
-                  var deckCubit = context.read<DeckCubit>();
-                  if (state.status == DeckStatus.zoomed) {
-                    return AnimatedScale(
-                      curve: Curves.easeInOut,
-                      duration: const Duration(milliseconds: 200),
-                      scale: 1.2,
-                      child: AnimatedSlide(
-                        curve: Curves.easeInOut,
-                        duration: const Duration(milliseconds: 200),
-                        offset: const Offset(0, -0.25),
-                        child: IgnorePointer(
-                          child: Stack(
-                            clipBehavior: Clip.none,
-                            alignment: AlignmentDirectional.topEnd,
-                            children: [
-                              SizedBox(
-                                height: 450,
-                                child: InfiniteCarousel.builder(
-                                  controller: deckScrollController,
-                                  velocityFactor: 0.5,
-                                  itemCount: 12,
-                                  itemExtent: 300,
-                                  itemBuilder: (context, itemIndex, realIndex) {
-                                    return InfoCard(
-                                      cardNumber: itemIndex + 1,
-                                    );
-                                  },
-                                ),
-                              ),
-                              Positioned(
-                                right: 35,
-                                top: -0,
-                                child: CircleAvatar(
-                                  radius: 35,
-                                  backgroundColor: Colors.white,
-                                  child: CircleAvatar(
-                                    backgroundColor: Colors.blueAccent,
-                                    radius: 30,
-                                    child: Text(
-                                      '$currentCardIndex/12',
-                                      style: const TextStyle(
-                                          fontSize: 20, color: Colors.white),
-                                    ),
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
+                BlocConsumer<DeckCubit, DeckState>(listener: (context, state) {
+                  if (state.status == DeckStatus.completed) {
+                    isSwipeDisabled = false;
                   }
-                  return AnimatedScale(
+                  if (state.status == DeckStatus.zoomed) {
+                    isCardZoomed = true;
+                  } else if (state.status == DeckStatus.unzoomed) {
+                    isCardZoomed = false;
+                  }
+                }, builder: (context, state) {
+                  return AnimatedSlide(
                     curve: Curves.easeInOut,
                     duration: const Duration(milliseconds: 200),
-                    scale: 1.0,
-                    child: AnimatedSlide(
-                      curve: Curves.easeInOut,
-                      duration: const Duration(milliseconds: 200),
-                      offset: const Offset(0, -0.0),
-                      child: IgnorePointer(
-                        child: Stack(
-                          clipBehavior: Clip.none,
-                          alignment: AlignmentDirectional.topEnd,
-                          children: [
-                            SizedBox(
-                              height: 500,
-                              child: InfiniteCarousel.builder(
-                                controller: deckScrollController,
-                                velocityFactor: 0.5,
-                                itemCount: 12,
-                                itemExtent: 300,
-                                itemBuilder: (context, itemIndex, realIndex) {
-                                  return InfoCard(
-                                    cardNumber: itemIndex + 1,
-                                  );
-                                },
-                              ),
+                    offset: isCardZoomed
+                        ? const Offset(0, -0.35)
+                        : const Offset(0, -0.0),
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      alignment: AlignmentDirectional.topEnd,
+                      children: [
+                        SizedBox(
+                          height: 575,
+                          child: IgnorePointer(
+                            ignoring: isSwipeDisabled,
+                            child: InfiniteCarousel.builder(
+                              controller: deckScrollController,
+                              velocityFactor: 0.5,
+                              itemCount: 12,
+                              itemExtent: 350,
+                              itemBuilder: (context, itemIndex, realIndex) {
+                                return InfoCard(
+                                  cardNumber: itemIndex + 1,
+                                );
+                              },
                             ),
-                            Positioned(
-                              right: 25,
-                              top: -5,
+                          ),
+                        ),
+                        Visibility(
+                          visible: isSwipeDisabled ? true : false,
+                          child: Positioned(
+                            right: 15,
+                            top: -10,
+                            child: CircleAvatar(
+                              radius: 34,
+                              backgroundColor: Colors.white,
                               child: CircleAvatar(
-                                radius: 34,
-                                backgroundColor: Colors.white,
-                                child: CircleAvatar(
-                                  backgroundColor: Colors.red,
-                                  radius: 29,
-                                  child: Text(
-                                    '$currentCardIndex/12',
-                                    style: const TextStyle(
-                                        fontSize: 20, color: Colors.white),
-                                  ),
+                                backgroundColor: Colors.red,
+                                radius: 29,
+                                child: Text(
+                                  '$currentCardIndex/12',
+                                  style: const TextStyle(
+                                      fontSize: 20, color: Colors.white),
                                 ),
                               ),
-                            )
-                          ],
-                        ),
-                      ),
+                            ),
+                          ),
+                        )
+                      ],
                     ),
                   );
                 }),
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 8.0),
-                  child: ShareButton(),
-                ),
+                Padding(
+                    padding: const EdgeInsets.only(top: 12.0),
+                    child: Visibility(
+                        visible: isSwipeDisabled ? true : false,
+                        child: ShareButton())),
               ],
             ),
           ),
@@ -178,25 +152,93 @@ class _DeckPageState extends State<DeckPage> {
   }
 }
 
-class ShareButton extends StatefulWidget {
-  const ShareButton({
+class DeckCompleteDialog extends StatelessWidget {
+  const DeckCompleteDialog({
     Key? key,
   }) : super(key: key);
 
   @override
-  State<ShareButton> createState() => _ShareButtonState();
+  Widget build(BuildContext context) {
+    return Dialog(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16.0),
+        child: Stack(
+          clipBehavior: Clip.none,
+          alignment: AlignmentDirectional.topEnd,
+          children: [
+            Column(mainAxisSize: MainAxisSize.min, children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 12.0),
+                child: Text(
+                  'All Done. Congrats!',
+                  style: Theme.of(context).textTheme.headline5,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12.0),
+                child: Wrap(
+                  spacing: 15,
+                  children: [
+                    for (int i = 0; i < 3; i++)
+                      const Icon(
+                        FontAwesomeIcons.rankingStar,
+                        color: Colors.yellow,
+                        size: 48,
+                      )
+                  ],
+                ),
+              ),
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 8.0),
+                child: Text(
+                  'You\'ve completed this category. Be proud of yourself!',
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text('Review Deck')),
+            ]),
+            Positioned(
+              top: -25,
+              right: -5,
+              child: SizedBox(
+                height: 40,
+                child: InkWell(
+                  onTap: () => Navigator.pop(context),
+                  child: const CircleAvatar(
+                      backgroundColor: Colors.black54, child: CloseButton()),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
-class _ShareButtonState extends State<ShareButton> {
-  TextEditingController shareFieldController = TextEditingController();
+class ShareButton extends StatelessWidget {
+  final TextEditingController shareFieldController = TextEditingController();
+
+  ShareButton({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
+    return ElevatedButton.icon(
+      style: ElevatedButton.styleFrom(fixedSize: const Size(200, 36)),
+      label: const Text('Share Response'),
+      icon: const Icon(
+        FontAwesomeIcons.solidMessage,
+        size: 16,
+      ),
       onPressed: () {
+        // * Zoom Deck on Press
         var deckCubit = context.read<DeckCubit>();
-
         deckCubit.zoomDeck();
+        // * Shows Bottom Sheet for Response
         var bottomSheet = showBottomSheet(
           context: context,
           builder: (context) {
@@ -233,7 +275,65 @@ class _ShareButtonState extends State<ShareButton> {
           deckCubit.unzoomDeck();
         });
       },
-      child: const Text('Share Response'),
+    );
+  }
+}
+
+class ViewResponsesButton extends StatelessWidget {
+  final TextEditingController shareFieldController = TextEditingController();
+
+  ViewResponsesButton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton.icon(
+      style: ElevatedButton.styleFrom(fixedSize: const Size(200, 36)),
+      label: const Text('View Response'),
+      icon: const Icon(
+        FontAwesomeIcons.eye,
+        size: 16,
+      ),
+      onPressed: () {
+        // * Zoom Deck on Press
+        var deckCubit = context.read<DeckCubit>();
+        deckCubit.zoomDeck();
+        // * Shows Bottom Sheet for Response
+        var viewResponseBottomSheet = showBottomSheet(
+          context: context,
+          builder: (context) {
+            return ClipRRect(
+              borderRadius: BorderRadius.circular(25),
+              child: Container(
+                margin: const EdgeInsets.only(left: 15, right: 15),
+                height: 240,
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(25),
+                        child: Container(
+                          height: 5,
+                          width: 30,
+                          color: Colors.grey.shade400,
+                        ),
+                      ),
+                      ShareTextField(
+                        shareFieldController: shareFieldController,
+                      ),
+                      SendButton(
+                        shareFieldController: shareFieldController,
+                      ),
+                    ]),
+              ),
+            );
+          },
+        );
+        Container();
+        viewResponseBottomSheet.closed.then((value) {
+          deckCubit.unzoomDeck();
+        });
+      },
     );
   }
 }
@@ -294,10 +394,24 @@ class SendButton extends StatefulWidget {
 class _SendButtonState extends State<SendButton> {
   @override
   Widget build(BuildContext context) {
+    int currentCardIndex = context.watch<DeckCubit>().currentCardNumber;
     return ElevatedButton.icon(
       style: ElevatedButton.styleFrom(fixedSize: const Size(240, 42)),
       onPressed: () {
         context.read<ShareBloc>().add(SubmitPressed());
+
+        if (currentCardIndex == 12) {
+          //context.read<DeckCubit>().resetDeck();
+          widget.shareFieldController.clear();
+          Navigator.pop(context);
+          context.read<DeckCubit>().completeDeck();
+        } else {
+          context.read<DeckCubit>().incrementCardNumber();
+          context.read<DeckCubit>().swipeDeck();
+          context.read<DeckCubit>().resetDeck();
+          widget.shareFieldController.clear();
+          Navigator.pop(context);
+        }
       },
       icon: BlocBuilder<ShareBloc, ShareState>(
         builder: (context, state) {
@@ -330,11 +444,7 @@ class _SendButtonState extends State<SendButton> {
       label: BlocConsumer<ShareBloc, ShareState>(
         listenWhen: (previous, current) => previous.status != current.status,
         listener: (context, state) {
-          if (state.status == Status.initial) {
-            widget.shareFieldController.clear();
-            Navigator.pop(context);
-            context.read<DeckCubit>().swipeDeck();
-          }
+          if (state.status == Status.initial) {}
         },
         buildWhen: (previous, current) => previous.status != current.status,
         builder: (context, state) {

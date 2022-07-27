@@ -198,8 +198,8 @@ class _GroupSectionState extends State<GroupSection> {
   @override
   Widget build(BuildContext context) {
     return Card(
+      color: Colors.grey.shade100,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
-      elevation: 2.0,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 12.0),
         child: Column(children: [
@@ -213,11 +213,12 @@ class _GroupSectionState extends State<GroupSection> {
           Wrap(
             runAlignment: WrapAlignment.end,
             alignment: WrapAlignment.end,
-            spacing: 12,
+            spacing: 8.0,
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
+                    fixedSize: const Size(140, 30),
                     primary: Colors.lightGreen,
                     onPrimary: Colors.white,
                   ),
@@ -237,6 +238,7 @@ class _GroupSectionState extends State<GroupSection> {
                   )),
               ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
+                    fixedSize: const Size(140, 30),
                     primary: Colors.blueAccent,
                     onPrimary: Colors.white,
                   ),
@@ -246,7 +248,7 @@ class _GroupSectionState extends State<GroupSection> {
                     size: 18,
                   ),
                   label: const Text(
-                    'Edit',
+                    'Edit Group',
                   )),
             ],
           ),

@@ -1,6 +1,6 @@
 part of 'deck_cubit.dart';
 
-enum DeckStatus { loading, loaded, zoomed, unzoomed, failed, swiped }
+enum DeckStatus { loading, loaded, zoomed, unzoomed, failed, swiped, completed }
 
 @immutable
 class DeckState extends Equatable {
@@ -27,6 +27,7 @@ class DeckState extends Equatable {
   factory DeckState.unzoomed() {
     return DeckState(status: DeckStatus.unzoomed);
   }
+
   factory DeckState.swiped() {
     return DeckState(status: DeckStatus.swiped);
   }
@@ -35,7 +36,11 @@ class DeckState extends Equatable {
     return DeckState(status: DeckStatus.failed);
   }
 
+  factory DeckState.completed() {
+    return DeckState(status: DeckStatus.completed);
+  }
+
   @override
   // TODO: implement props
-  List<Object?> get props => [status];
+  List<DeckStatus?> get props => [status];
 }
