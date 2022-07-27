@@ -20,8 +20,8 @@ class _DeckPageState extends State<DeckPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.red,
       resizeToAvoidBottomInset: true,
-      backgroundColor: Colors.redAccent,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(50),
         child: BlocConsumer<DeckCubit, DeckState>(
@@ -139,14 +139,14 @@ class _DeckPageState extends State<DeckPage> {
                             ),
                           ),
                           Positioned(
-                            right: 35,
-                            top: -0,
+                            right: 25,
+                            top: -5,
                             child: CircleAvatar(
-                              radius: 35,
+                              radius: 34,
                               backgroundColor: Colors.white,
                               child: CircleAvatar(
                                 backgroundColor: Colors.blueAccent,
-                                radius: 30,
+                                radius: 29,
                                 child: Text(
                                   '$currentCardIndex/12',
                                   style: const TextStyle(

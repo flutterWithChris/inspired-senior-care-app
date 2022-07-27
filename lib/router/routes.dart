@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:inspired_senior_care_app/bloc/deck/deck_cubit.dart';
+import 'package:inspired_senior_care_app/bloc/manage/view_response_deck_cubit.dart';
 import 'package:inspired_senior_care_app/main.dart';
 import 'package:inspired_senior_care_app/view/pages/categories.dart';
 import 'package:inspired_senior_care_app/view/pages/dashboard/choose_category.dart';
 import 'package:inspired_senior_care_app/view/pages/dashboard/dashboard.dart';
+import 'package:inspired_senior_care_app/view/pages/dashboard/members/view_responses.dart';
 import 'package:inspired_senior_care_app/view/pages/deck_page.dart';
 import 'package:inspired_senior_care_app/view/pages/login/login.dart';
 import 'package:inspired_senior_care_app/view/pages/profile.dart';
@@ -68,7 +70,7 @@ class MyRouter {
                     key: state.pageKey,
                     child: BlocProvider(
                       create: (context) => DeckCubit(),
-                      child: DeckPage(),
+                      child: const DeckPage(),
                     )),
               ),
             ]),
@@ -89,6 +91,17 @@ class MyRouter {
                 path: 'view-member',
                 pageBuilder: (context, state) =>
                     MaterialPage(key: state.pageKey, child: const ViewMember()),
+                routes: [
+                  GoRoute(
+                      name: 'view-responses',
+                      path: 'view-responses',
+                      pageBuilder: (context, state) => MaterialPage(
+                          key: state.pageKey,
+                          child: BlocProvider(
+                            create: (context) => ViewResponseDeckCubit(),
+                            child: const ViewResponses(),
+                          ))),
+                ],
               ),
               GoRoute(
                 name: 'choose-category',

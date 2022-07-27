@@ -27,7 +27,7 @@ class ViewMember extends StatelessWidget {
               ),
               Padding(
                 padding: EdgeInsets.symmetric(vertical: 12.0),
-                child: ProgressSection(),
+                child: GroupMemberProgressSection(),
               ),
             ],
           ),

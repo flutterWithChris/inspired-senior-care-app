@@ -61,55 +61,107 @@ class _DashboardState extends State<Dashboard> {
         ),
         // * Main Content
         body: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
+          padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 10.0),
           child: ListView(
             shrinkWrap: true,
             children: [
               // * Name Plate
               const Padding(
-                padding: EdgeInsets.symmetric(vertical: 8.0),
+                padding: EdgeInsets.symmetric(vertical: 6.0),
                 child: NamePlate(
                   memberName: 'Jennifer Sample',
                   memberTitle: 'Director',
                 ),
               ),
               // * Current Category
-              Column(
-                children: const [
-                  Padding(
-                    padding: EdgeInsets.symmetric(vertical: 8),
-                    child: Text(
-                      'Currently Featured Category:',
-                      textAlign: TextAlign.start,
-                      style: TextStyle(fontSize: 18),
+              Card(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(33)),
+                color: Colors.lightBlue.shade100,
+                elevation: 1.0,
+                child: Padding(
+                  padding: const EdgeInsets.only(
+                      top: 6.0, bottom: 24.0, left: 12.0, right: 12.0),
+                  child: Column(children: [
+                    Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 12.0, horizontal: 12.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Wrap(
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                spacing: 12.0,
+                                children: [
+                                  const Icon(
+                                    Icons.star,
+                                    color: Colors.black87,
+                                  ),
+                                  Text(
+                                    'Featured Category',
+                                    textAlign: TextAlign.start,
+                                    style:
+                                        Theme.of(context).textTheme.headline5,
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        const CurrentCategoryCard(),
+                      ],
                     ),
-                  ),
-                  CurrentCategoryCard(),
-                ],
-              ),
-              const SizedBox(
-                height: 15,
-              ),
-              // * Groups Section
-              BlocBuilder<GroupBloc, GroupState>(
-                // * Rebuild when groups updated.
-                buildWhen: (previous, current) =>
-                    previous is GroupCreated && current is GroupInitial,
-                builder: (context, state) {
-                  return Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // * Build groups
-                      for (Group group in sampleGroupList)
-                        GroupSection(
-                            groupName: group.groupName,
-                            sampleGroupList: sampleGroupList,
-                            inviteTextFieldController:
-                                inviteTextFieldController),
-                      // TODO: Handle No Groups Created State
-                    ],
-                  );
-                },
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 12.0, horizontal: 8.0),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Wrap(
+                            spacing: 12.0,
+                            runAlignment: WrapAlignment.center,
+                            alignment: WrapAlignment.center,
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Icon(
+                                Icons.group,
+                                color: Colors.black87,
+                              ),
+                              Text(
+                                'My Groups',
+                                style: Theme.of(context).textTheme.headline5,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    // * Groups Section
+                    BlocBuilder<GroupBloc, GroupState>(
+                      // * Rebuild when groups updated.
+                      buildWhen: (previous, current) =>
+                          previous is GroupCreated && current is GroupInitial,
+                      builder: (context, state) {
+                        return Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            // * Build groups
+                            for (Group group in sampleGroupList)
+                              GroupSection(
+                                  groupName: group.groupName,
+                                  sampleGroupList: sampleGroupList,
+                                  inviteTextFieldController:
+                                      inviteTextFieldController),
+                            // TODO: Handle No Groups Created State
+                          ],
+                        );
+                      },
+                    ),
+                  ]),
+                ),
               ),
             ],
           ),
@@ -139,7 +191,6 @@ class _GroupSectionState extends State<GroupSection> {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: Colors.grey.shade100,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
       elevation: 2.0,
       child: Padding(
@@ -149,7 +200,7 @@ class _GroupSectionState extends State<GroupSection> {
             padding: const EdgeInsets.symmetric(vertical: 5),
             child: Text(
               widget.groupName,
-              style: Theme.of(context).textTheme.titleLarge,
+              style: Theme.of(context).textTheme.headline5,
             ),
           ),
           Wrap(
@@ -236,15 +287,22 @@ class CurrentCategoryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      shape: const StadiumBorder(),
       elevation: 1,
-      child: ListTile(
-        onTap: () => context.goNamed('choose-category'),
-        title: const Text('Supportive Environment'),
-        subtitle: const Text('Creating a healthy environment.'),
-        trailing: const Icon(Icons.chevron_right_rounded),
-        leading: SizedBox(
-          height: 100,
-          child: Image.asset('lib/assets/Supportive_Environment.png'),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 8.0),
+        child: ListTile(
+          // dense: true,
+          onTap: () => context.goNamed('choose-category'),
+          title: const Text(
+            'Supportive Environment',
+          ),
+          subtitle: const Text('Creating a healthy environment.'),
+          trailing: const Icon(Icons.chevron_right_rounded),
+          leading: SizedBox(
+            height: 100,
+            child: Image.asset('lib/assets/Supportive_Environment.png'),
+          ),
         ),
       ),
     );

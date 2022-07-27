@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:infinite_carousel/infinite_carousel.dart';
+import 'package:inspired_senior_care_app/view/widget/bottom_app_bar.dart';
 import 'package:inspired_senior_care_app/view/widget/top_app_bar.dart';
 
 class ChooseCategory extends StatefulWidget {
@@ -85,6 +86,7 @@ class _ChooseCategoryState extends State<ChooseCategory> {
     ];
     return SafeArea(
       child: Scaffold(
+        bottomNavigationBar: const MainBottomAppBar(),
         appBar: const PreferredSize(
           preferredSize: Size.fromHeight(50),
           child: MainTopAppBar(),
@@ -98,7 +100,7 @@ class _ChooseCategoryState extends State<ChooseCategory> {
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 16.0),
                   child: Text(
-                    'Choose Featured Category:',
+                    'Change Featured Category:',
                     style: Theme.of(context).textTheme.headline5,
                   ),
                 ),
@@ -130,7 +132,8 @@ class _ChooseCategoryState extends State<ChooseCategory> {
                               color: Colors.transparent,
                               shape: RoundedRectangleBorder(
                                   side: const BorderSide(
-                                      color: Colors.lightBlue, width: 4.0),
+                                      color: Colors.lightBlueAccent,
+                                      width: 4.0),
                                   borderRadius: BorderRadius.circular(4.0)),
                               child: const SizedBox(
                                 width: 168,
