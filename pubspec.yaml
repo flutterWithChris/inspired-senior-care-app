@@ -53,6 +53,8 @@ dependencies:
   flex_color_picker: ^2.5.0
   flutter_speed_dial: ^6.0.0
   infinite_carousel: ^1.0.2
+  screenshots: ^0.2.1
+  linked_scroll_controller: ^0.2.0
 
 
 dev_dependencies:

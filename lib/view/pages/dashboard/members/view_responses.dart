@@ -4,7 +4,9 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:infinite_carousel/infinite_carousel.dart';
 import 'package:inspired_senior_care_app/bloc/manage/response_interaction_cubit.dart';
 import 'package:inspired_senior_care_app/bloc/manage/view_response_deck_cubit.dart';
+import 'package:inspired_senior_care_app/bloc/view_response/view_response_cubit.dart';
 import 'package:inspired_senior_care_app/view/widget/bottom_app_bar.dart';
+import 'package:linked_scroll_controller/linked_scroll_controller.dart';
 
 class ViewResponses extends StatefulWidget {
   const ViewResponses({Key? key}) : super(key: key);
@@ -16,8 +18,24 @@ class ViewResponses extends StatefulWidget {
 class _ViewResponseDeckPageState extends State<ViewResponses> {
   // bool isSwipeDisabled = true;
   int currentCardIndex = 1;
-  final InfiniteScrollController deckScrollController =
-      InfiniteScrollController();
+  late InfiniteScrollController deckScrollController;
+  late InfiniteScrollController responseFieldScrollController;
+  late LinkedScrollControllerGroup _scrollControllers;
+  final ViewResponseCubit _viewResponseCubit = ViewResponseCubit();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _scrollControllers = LinkedScrollControllerGroup();
+    deckScrollController = InfiniteScrollController();
+    responseFieldScrollController = InfiniteScrollController();
+    deckScrollController.addListener(() {
+      _viewResponseCubit.scroll(deckScrollController.selectedItem);
+      print(deckScrollController.selectedItem);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     TextEditingController responseTextFieldController = TextEditingController();
@@ -25,7 +43,8 @@ class _ViewResponseDeckPageState extends State<ViewResponses> {
     return Scaffold(
       // * Bottom Sheet
       bottomSheet: ResponseBottomSheet(
-          responseFieldController: responseTextFieldController),
+          responseFieldController: responseTextFieldController,
+          deckScrollController: deckScrollController),
       resizeToAvoidBottomInset: true,
       backgroundColor: Colors.redAccent,
       // * App Bar
@@ -38,14 +57,14 @@ class _ViewResponseDeckPageState extends State<ViewResponses> {
                 currentCardIndex > 1) {
               currentCardIndex--;
               print(currentCardIndex);
-              deckScrollController.previousItem();
+              // deckScrollController.previousItem();
               context.read<ViewResponseDeckCubit>().resetDeck();
             }
             if (state.status == ViewResponseDeckStatus.swiped &&
                 currentCardIndex < 12) {
               currentCardIndex++;
               print(currentCardIndex);
-              deckScrollController.nextItem();
+              // deckScrollController.nextItem();
               context.read<ViewResponseDeckCubit>().resetDeck();
             }
           },
@@ -81,63 +100,12 @@ class _ViewResponseDeckPageState extends State<ViewResponses> {
                       curve: Curves.easeInOut,
                       duration: const Duration(milliseconds: 200),
                       offset: const Offset(0, -0.0),
-                      child: IgnorePointer(
-                        child: Stack(
-                          clipBehavior: Clip.none,
-                          alignment: AlignmentDirectional.topEnd,
-                          children: [
-                            SizedBox(
-                              height: 500,
-                              child: InfiniteCarousel.builder(
-                                controller: deckScrollController,
-                                velocityFactor: 0.5,
-                                itemCount: 12,
-                                itemExtent: 300,
-                                itemBuilder: (context, itemIndex, realIndex) {
-                                  return InfoCard(
-                                    cardNumber: itemIndex + 1,
-                                  );
-                                },
-                              ),
-                            ),
-                            Positioned(
-                              right: 35,
-                              top: -0,
-                              child: CircleAvatar(
-                                radius: 35,
-                                backgroundColor: Colors.white,
-                                child: CircleAvatar(
-                                  backgroundColor: Colors.blueAccent,
-                                  radius: 30,
-                                  child: Text(
-                                    '$currentCardIndex/12',
-                                    style: const TextStyle(
-                                        fontSize: 20, color: Colors.white),
-                                  ),
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
-                }
-                return AnimatedScale(
-                  curve: Curves.easeInOut,
-                  duration: const Duration(milliseconds: 200),
-                  scale: 1.2,
-                  child: AnimatedSlide(
-                    curve: Curves.easeInOut,
-                    duration: const Duration(milliseconds: 200),
-                    offset: const Offset(0, -0.15),
-                    child: IgnorePointer(
                       child: Stack(
                         clipBehavior: Clip.none,
                         alignment: AlignmentDirectional.topEnd,
                         children: [
                           SizedBox(
-                            height: 450,
+                            height: 500,
                             child: InfiniteCarousel.builder(
                               controller: deckScrollController,
                               velocityFactor: 0.5,
@@ -152,7 +120,7 @@ class _ViewResponseDeckPageState extends State<ViewResponses> {
                           ),
                           Positioned(
                             right: 35,
-                            top: 100,
+                            top: -0,
                             child: CircleAvatar(
                               radius: 35,
                               backgroundColor: Colors.white,
@@ -170,6 +138,64 @@ class _ViewResponseDeckPageState extends State<ViewResponses> {
                         ],
                       ),
                     ),
+                  );
+                }
+                return AnimatedScale(
+                  curve: Curves.easeInOut,
+                  duration: const Duration(milliseconds: 200),
+                  scale: 1.2,
+                  child: AnimatedSlide(
+                    curve: Curves.easeInOut,
+                    duration: const Duration(milliseconds: 200),
+                    offset: const Offset(0, -0.15),
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      alignment: AlignmentDirectional.topEnd,
+                      children: [
+                        SizedBox(
+                          height: 450,
+                          child: InfiniteCarousel.builder(
+                            onIndexChanged: (p0) {
+                              if (currentCardIndex > p0) {
+                                context
+                                    .read<ViewResponseDeckCubit>()
+                                    .unswipeDeck();
+                              } else {
+                                context
+                                    .read<ViewResponseDeckCubit>()
+                                    .swipeDeck();
+                              }
+                            },
+                            controller: deckScrollController,
+                            velocityFactor: 0.5,
+                            itemCount: 12,
+                            itemExtent: 300,
+                            itemBuilder: (context, itemIndex, realIndex) {
+                              return InfoCard(
+                                cardNumber: itemIndex + 1,
+                              );
+                            },
+                          ),
+                        ),
+                        Positioned(
+                          right: 35,
+                          top: 100,
+                          child: CircleAvatar(
+                            radius: 35,
+                            backgroundColor: Colors.white,
+                            child: CircleAvatar(
+                              backgroundColor: Colors.blueAccent,
+                              radius: 30,
+                              child: Text(
+                                '$currentCardIndex/12',
+                                style: const TextStyle(
+                                    fontSize: 20, color: Colors.white),
+                              ),
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
                   ),
                 );
               }),
@@ -182,8 +208,10 @@ class _ViewResponseDeckPageState extends State<ViewResponses> {
 }
 
 class ResponseBottomSheet extends StatefulWidget {
+  final InfiniteScrollController deckScrollController;
   final TextEditingController responseFieldController;
   const ResponseBottomSheet({
+    required this.deckScrollController,
     required this.responseFieldController,
     Key? key,
   }) : super(key: key);
@@ -193,6 +221,18 @@ class ResponseBottomSheet extends StatefulWidget {
 }
 
 class _ShareButtonState extends State<ResponseBottomSheet> {
+  final InfiniteScrollController scrollController = InfiniteScrollController();
+  final ViewResponseCubit _viewResponseCubit = ViewResponseCubit();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    widget.deckScrollController.addListener(() {
+      scrollController.animateToItem(widget.deckScrollController.selectedItem);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     TextEditingController responseTextFieldController =
@@ -223,9 +263,38 @@ class _ShareButtonState extends State<ResponseBottomSheet> {
                         ),
                         BlocProvider(
                           create: (context) => ResponseInteractionCubit(),
-                          child: ResponseTextField(
-                            responseTextFieldController:
-                                responseTextFieldController,
+                          child: SizedBox(
+                            height: 200,
+                            child: BlocConsumer<ViewResponseCubit,
+                                ViewResponseState>(
+                              listener: (context, state) {
+                                // TODO: implement listener
+                                if (state.scrollStatus ==
+                                    ScrollStatus.scrolling) {
+                                  scrollController
+                                      .animateToItem(state.currentCardIndex);
+                                }
+                              },
+                              buildWhen: (previous, current) =>
+                                  previous.currentCardIndex !=
+                                  current.currentCardIndex,
+                              builder: (context, state) {
+                                return InfiniteCarousel.builder(
+                                    controller: scrollController,
+                                    itemCount: 12,
+                                    itemExtent: 350,
+                                    itemBuilder: (context, index, realIndex) {
+                                      return Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 4.0),
+                                        child: ResponseTextField(
+                                          responseTextFieldController:
+                                              responseTextFieldController,
+                                        ),
+                                      );
+                                    });
+                              },
+                            ),
                           ),
                         ),
                         /* PageButtons(
@@ -241,7 +310,7 @@ class _ShareButtonState extends State<ResponseBottomSheet> {
   }
 }
 
-class ResponseTextField extends StatelessWidget {
+class ResponseTextField extends StatefulWidget {
   final TextEditingController responseTextFieldController;
 
   const ResponseTextField({
@@ -250,7 +319,20 @@ class ResponseTextField extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<ResponseTextField> createState() => _ResponseTextFieldState();
+}
+
+class _ResponseTextFieldState extends State<ResponseTextField> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    widget.responseTextFieldController.text =
+        'This is a response to the cards above! Here would be something thoughtful that reflects the lesson taught via this card.';
     return Column(
       children: [
         Container(
@@ -275,7 +357,7 @@ class ResponseTextField extends StatelessWidget {
             ),
             child: TextField(
               enabled: false,
-              controller: responseTextFieldController,
+              controller: widget.responseTextFieldController,
               expands: true,
               // autofocus: true,
               textAlignVertical: TextAlignVertical.top,

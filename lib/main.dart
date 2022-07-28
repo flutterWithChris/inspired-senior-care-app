@@ -119,7 +119,9 @@ class _MyHomePageState extends State<MyHomePage> {
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8.0),
                   child: ElevatedButton(
-                    onPressed: (() {}),
+                    onPressed: (() {
+                      context.goNamed('deck-page');
+                    }),
                     style: ElevatedButton.styleFrom(
                         fixedSize: const Size(200, 30)),
                     child: const Text(
@@ -147,7 +149,9 @@ class FeaturedCategory extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       splashColor: Colors.lightBlueAccent,
-      onTap: (() {}),
+      onTap: (() {
+        context.goNamed('deck-page');
+      }),
       child: Card(
         child: LayoutBuilder(
           builder: (context, constraints) {

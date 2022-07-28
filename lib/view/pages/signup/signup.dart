@@ -2,7 +2,6 @@ import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/onboarding/onboarding_bloc.dart';
-import 'package:inspired_senior_care_app/data/models/user.dart';
 import 'package:inspired_senior_care_app/data/models/user_type.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
@@ -266,6 +265,7 @@ class BasicInfoPage extends StatelessWidget {
               SizedBox(
                 width: 325,
                 child: TextFormField(
+                  obscureText: true,
                   decoration: const InputDecoration(label: Text('Password')),
                 ),
               ),
@@ -275,7 +275,7 @@ class BasicInfoPage extends StatelessWidget {
                     onPressed: () {
                       // TODO: Implement Signup Cubit
                       // * Create Initial User Object
-                      User user = User(
+                      /*    User user = User(
                           name: '',
                           emailAddress: emailFieldController.text,
                           type: null,
@@ -284,7 +284,7 @@ class BasicInfoPage extends StatelessWidget {
                       // * Pass User to Onboarding Bloc
                       context
                           .read<OnboardingBloc>()
-                          .add(StartOnboarding(user: user));
+                          .add(StartOnboarding(user: user)); */
                       context.read<OnboardingBloc>().add(CompletedPage());
                     },
                     child: const Text('Continue')),

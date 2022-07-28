@@ -5,6 +5,7 @@ import 'package:inspired_senior_care_app/bloc/auth/auth_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/deck/deck_cubit.dart';
 import 'package:inspired_senior_care_app/bloc/manage/view_response_deck_cubit.dart';
 import 'package:inspired_senior_care_app/bloc/onboarding/onboarding_bloc.dart';
+import 'package:inspired_senior_care_app/bloc/view_response/view_response_cubit.dart';
 import 'package:inspired_senior_care_app/main.dart';
 import 'package:inspired_senior_care_app/view/pages/categories.dart';
 import 'package:inspired_senior_care_app/view/pages/dashboard/choose_category.dart';
@@ -107,8 +108,15 @@ class MyRouter {
                       path: 'view-responses',
                       pageBuilder: (context, state) => MaterialPage(
                           key: state.pageKey,
-                          child: BlocProvider(
-                            create: (context) => ViewResponseDeckCubit(),
+                          child: MultiBlocProvider(
+                            providers: [
+                              BlocProvider(
+                                create: (context) => ViewResponseDeckCubit(),
+                              ),
+                              BlocProvider(
+                                create: (context) => ViewResponseCubit(),
+                              )
+                            ],
                             child: const ViewResponses(),
                           ))),
                 ],
