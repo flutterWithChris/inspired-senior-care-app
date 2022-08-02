@@ -5,13 +5,26 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:inspired_senior_care_app/bloc/auth/auth_bloc.dart';
+import 'package:inspired_senior_care_app/bloc/deck/deck_cubit.dart';
 import 'package:inspired_senior_care_app/bloc/group/group_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/invite/invite_bloc.dart';
+import 'package:inspired_senior_care_app/bloc/manage/view_response_deck_cubit.dart';
+import 'package:inspired_senior_care_app/bloc/onboarding/onboarding_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/share_bloc/share_bloc.dart';
+import 'package:inspired_senior_care_app/bloc/view_response/view_response_cubit.dart';
 import 'package:inspired_senior_care_app/cubits/login/login_cubit.dart';
+import 'package:inspired_senior_care_app/cubits/signup/signup_cubit.dart';
 import 'package:inspired_senior_care_app/data/repositories/auth/auth_repository.dart';
 import 'package:inspired_senior_care_app/firebase_options.dart';
-import 'package:inspired_senior_care_app/router/routes.dart';
+import 'package:inspired_senior_care_app/view/pages/categories.dart';
+import 'package:inspired_senior_care_app/view/pages/dashboard/choose_category.dart';
+import 'package:inspired_senior_care_app/view/pages/dashboard/dashboard.dart';
+import 'package:inspired_senior_care_app/view/pages/dashboard/members/view_responses.dart';
+import 'package:inspired_senior_care_app/view/pages/deck_page.dart';
+import 'package:inspired_senior_care_app/view/pages/login/login.dart';
+import 'package:inspired_senior_care_app/view/pages/profile.dart';
+import 'package:inspired_senior_care_app/view/pages/signup/signup.dart';
+import 'package:inspired_senior_care_app/view/pages/view_member.dart';
 import 'package:inspired_senior_care_app/view/widget/bottom_app_bar.dart';
 import 'package:inspired_senior_care_app/view/widget/top_app_bar.dart';
 
@@ -21,8 +34,25 @@ void main() async {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class MyApp extends StatefulWidget {
+  const MyApp({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  late final AuthBloc bloc;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    //var bloc = context.read<AuthBloc>();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MultiRepositoryProvider(
@@ -52,11 +82,11 @@ class MyApp extends StatelessWidget {
         ],
         child: BlocBuilder<AuthBloc, AuthState>(
           builder: (context, state) {
-            final GoRouter router = routes(context.read<AuthBloc>());
+            //bloc = context.read<AuthBloc>();
             return MaterialApp.router(
-              routeInformationParser: router.routeInformationParser,
-              routerDelegate: router.routerDelegate,
-              routeInformationProvider: router.routeInformationProvider,
+              routeInformationParser: _router.routeInformationParser,
+              routerDelegate: _router.routerDelegate,
+              routeInformationProvider: _router.routeInformationProvider,
               title: 'Inspired Senior Care App',
               theme: ThemeData(
                 scaffoldBackgroundColor: Colors.grey.shade200,
@@ -89,6 +119,113 @@ class MyApp extends StatelessWidget {
       ),
     );
   }
+
+  late final _router = GoRouter(
+    routes: _routes,
+    //  routerNeglect: true,
+    initialLocation: '/',
+    urlPathStrategy: UrlPathStrategy.path,
+    debugLogDiagnostics: true,
+    // errorPageBuilder: ,
+    refreshListenable: GoRouterRefreshStream(bloc.stream),
+    redirect: (state) {
+      bool isLoggingIn = state.location == '/login';
+      bool loggedIn = bloc.state.authStatus == AuthStatus.authenticated;
+      bool isOnboarding = state.location == '/signup';
+
+      if (!loggedIn) {
+        return isLoggingIn
+            ? null
+            : isOnboarding
+                ? null
+                : '/login';
+      }
+
+      final isLoggedIn = state.location == '/';
+
+      if (loggedIn && isLoggingIn) return isLoggedIn ? null : '/';
+      if (loggedIn && isOnboarding) return isLoggedIn ? null : '/';
+
+      return null;
+    },
+  );
+  final List<GoRoute> _routes = [
+    GoRoute(
+      name: 'login',
+      path: '/login',
+      builder: (context, state) => const LoginScreen(),
+    ),
+    GoRoute(
+        name: 'signup',
+        path: '/signup',
+        builder: (context, state) => MultiBlocProvider(
+              providers: [
+                BlocProvider(
+                  create: (context) => OnboardingBloc(),
+                ),
+                BlocProvider(
+                  create: (context) => SignupCubit(
+                      authRepository: context.read<AuthRepository>()),
+                ),
+              ],
+              child: const SignupScreen(),
+            )),
+    GoRoute(
+      name: 'home',
+      path: '/',
+      builder: (context, state) => const MyHomePage(),
+    ),
+    GoRoute(
+        name: 'categories',
+        path: '/categories',
+        builder: (context, state) => const Categories(),
+        routes: [
+          GoRoute(
+              name: 'deck-page',
+              path: 'deck-page',
+              builder: (context, state) => BlocProvider(
+                    create: (context) => DeckCubit(),
+                    child: DeckPage(),
+                  )),
+        ]),
+    GoRoute(
+      name: 'profile',
+      path: '/profile',
+      builder: (context, state) => const Profile(),
+    ),
+    GoRoute(
+        name: 'dashboard',
+        path: '/dashboard',
+        builder: (context, state) => const Dashboard(),
+        routes: [
+          GoRoute(
+            name: 'view-member',
+            path: 'view-member',
+            builder: (context, state) => const ViewMember(),
+            routes: [
+              GoRoute(
+                  name: 'view-responses',
+                  path: 'view-responses',
+                  builder: (context, state) => MultiBlocProvider(
+                        providers: [
+                          BlocProvider(
+                            create: (context) => ViewResponseDeckCubit(),
+                          ),
+                          BlocProvider(
+                            create: (context) => ViewResponseCubit(),
+                          )
+                        ],
+                        child: const ViewResponses(),
+                      )),
+            ],
+          ),
+          GoRoute(
+            name: 'choose-category',
+            path: 'choose-category',
+            builder: (context, state) => const ChooseCategory(),
+          ),
+        ]),
+  ];
 }
 
 class MyHomePage extends StatefulWidget {
