@@ -5,7 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_pw_validator/flutter_pw_validator.dart';
 import 'package:inspired_senior_care_app/bloc/onboarding/onboarding_bloc.dart';
 import 'package:inspired_senior_care_app/cubits/signup/signup_cubit.dart';
-import 'package:inspired_senior_care_app/data/models/user_type.dart';
+import 'package:inspired_senior_care_app/data/models/user.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -112,8 +112,7 @@ class UserTypePage extends StatelessWidget {
                           // TODO: implement listener
                           if (state is OnboardingLoaded) {
                             context.read<OnboardingBloc>().add(UpdateUser(
-                                user: state.user
-                                    .copyWith(type: UserType(type: 'user'))));
+                                user: state.user.copyWith(type: 'user')));
                           }
                         },
                         child: Container(),
@@ -147,8 +146,7 @@ class UserTypePage extends StatelessWidget {
                           // TODO: implement listener
                           if (state is OnboardingLoaded) {
                             context.read<OnboardingBloc>().add(UpdateUser(
-                                user: state.user.copyWith(
-                                    type: UserType(type: 'manager'))));
+                                user: state.user.copyWith(type: 'manager')));
                           }
                         },
                         child: Container(),
@@ -228,14 +226,19 @@ class BasicInfoPage extends StatefulWidget {
 }
 
 class _BasicInfoPageState extends State<BasicInfoPage> {
+  final TextEditingController emailFieldController = TextEditingController();
+  final TextEditingController passwordFieldController = TextEditingController();
+  late bool hidePassword;
+  @override
+  void initState() {
+    hidePassword = true;
+    super.initState();
+  }
+
   final formKey = GlobalKey<FormState>();
-  bool hidePassword = true;
+
   @override
   Widget build(BuildContext context) {
-    final TextEditingController emailFieldController = TextEditingController();
-    final TextEditingController passwordFieldController =
-        TextEditingController();
-
     return BlocBuilder<SignupCubit, SignupState>(
       builder: (context, state) {
         return Stack(
@@ -261,7 +264,7 @@ class _BasicInfoPageState extends State<BasicInfoPage> {
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 16.0),
                         child: Text(
-                          'What\'s Your Email?',
+                          'Email Sign Up.',
                           style: Theme.of(context).textTheme.headline5,
                         ),
                       ),
@@ -285,12 +288,15 @@ class _BasicInfoPageState extends State<BasicInfoPage> {
                                         emailFieldController.clear(),
                                     icon: const Icon(Icons.close))),
                           )),
-                      Padding(
+                      /*  Padding(
                         padding: const EdgeInsets.symmetric(vertical: 16.0),
                         child: Text(
                           'Create a Password',
                           style: Theme.of(context).textTheme.headline5,
                         ),
+                      ),*/
+                      const SizedBox(
+                        height: 12.0,
                       ),
                       SizedBox(
                         width: 325,
@@ -299,11 +305,16 @@ class _BasicInfoPageState extends State<BasicInfoPage> {
                           obscureText: hidePassword,
                           decoration: InputDecoration(
                             label: const Text('Password'),
+                            prefixIcon: const Icon(Icons.lock),
                             suffixIcon: IconButton(
-                                onPressed: () => hidePassword == true
-                                    ? hidePassword = false
-                                    : hidePassword = true,
-                                icon: const Icon(Icons.visibility)),
+                                onPressed: () {
+                                  setState(() {
+                                    hidePassword = !hidePassword;
+                                  });
+                                },
+                                icon: hidePassword
+                                    ? const Icon(Icons.visibility_off_rounded)
+                                    : const Icon(Icons.visibility_rounded)),
                           ),
                           onChanged: (value) {
                             context.read<SignupCubit>().passwordChanged(value);
@@ -312,37 +323,46 @@ class _BasicInfoPageState extends State<BasicInfoPage> {
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: FlutterPwValidator(
-                            width: 300,
-                            height: 30,
-                            minLength: 6,
-                            uppercaseCharCount: 1,
-                            specialCharCount: 1,
-                            onSuccess: () {},
-                            controller: passwordFieldController),
+                        child: SizedBox(
+                          height: 70,
+                          child: FlutterPwValidator(
+                              width: 300,
+                              height: 50,
+                              minLength: 6,
+                              uppercaseCharCount: 1,
+                              specialCharCount: 1,
+                              onSuccess: () {},
+                              controller: passwordFieldController),
+                        ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 14.0),
+                        padding: const EdgeInsets.only(bottom: 10),
                         child: ElevatedButton(
-                            onPressed: () {
+                            onPressed: () async {
                               final form = formKey.currentState;
 
                               if (form!.validate()) {
-                                context
+                                await context
                                     .read<SignupCubit>()
                                     .signupWithCredentials();
                                 // TODO: Implement Signup Cubit
                                 // * Create Initial User Object
-                                /*    User user = User(
-                              name: '',
-                              emailAddress: emailFieldController.text,
-                              type: null,
-                              title: '',
-                              userColor: null);
-                          // * Pass User to Onboarding Bloc
-                          context
-                              .read<OnboardingBloc>()
-                              .add(StartOnboarding(user: user)); */
+                                if (!mounted) return;
+                                User user = User(
+                                    id: context
+                                        .read<SignupCubit>()
+                                        .state
+                                        .user!
+                                        .uid,
+                                    name: '',
+                                    email: emailFieldController.text,
+                                    type: '',
+                                    title: '',
+                                    userColor: '');
+                                // * Pass User to Onboarding Bloc
+                                context
+                                    .read<OnboardingBloc>()
+                                    .add(StartOnboarding(user: user));
                                 context
                                     .read<OnboardingBloc>()
                                     .add(CompletedPage());

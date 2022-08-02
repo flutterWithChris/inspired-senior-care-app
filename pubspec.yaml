@@ -59,6 +59,8 @@ dependencies:
   firebase_auth: ^3.6.1
   email_validator: ^2.1.17
   flutter_pw_validator: ^1.4.2
+  firebase_storage: ^10.3.4
+  cloud_firestore: ^3.4.3
 
 
 dev_dependencies:

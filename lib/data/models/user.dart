@@ -1,13 +1,12 @@
-import 'package:flutter/material.dart';
-import 'package:inspired_senior_care_app/data/models/user_type.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class User {
   final String? id;
   final String? name;
   final String? email;
-  final UserType? type;
+  final String? type;
   final String? title;
-  final Color? userColor;
+  final String? userColor;
 
   const User({
     this.id,
@@ -18,6 +17,28 @@ class User {
     this.userColor,
   });
 
+  static User fromSnapshot(DocumentSnapshot snap) {
+    User user = User(
+        id: snap['id'],
+        name: snap['name'],
+        email: snap['email'],
+        type: snap['type'],
+        title: snap['title'],
+        userColor: snap['userColor']);
+
+    return user;
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'name': name,
+      'email': email,
+      'type': type,
+      'title': title,
+      'userColor': userColor,
+    };
+  }
+
   static const empty = User(id: '');
 
   bool get isEmpty => this == User.empty;
@@ -27,9 +48,9 @@ class User {
     String? id,
     String? name,
     String? email,
-    UserType? type,
+    String? type,
     String? title,
-    Color? userColor,
+    String? userColor,
   }) {
     return User(
       id: id ?? this.id,

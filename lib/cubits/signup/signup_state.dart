@@ -7,8 +7,10 @@ class SignupState extends Equatable {
   final String email;
   final String password;
   final SignupStatus status;
+  final auth.User? user;
 
   const SignupState({
+    this.user,
     required this.email,
     required this.password,
     required this.status,
@@ -16,18 +18,20 @@ class SignupState extends Equatable {
 
   factory SignupState.initial() {
     return const SignupState(
-        email: '', password: '', status: SignupStatus.initial);
+        email: '', password: '', status: SignupStatus.initial, user: null);
   }
 
   SignupState copyWith({
     String? email,
     String? password,
     SignupStatus? status,
+    auth.User? user,
   }) {
     return SignupState(
       email: email ?? this.email,
       password: password ?? this.password,
       status: status ?? this.status,
+      user: user ?? this.user,
     );
   }
 
@@ -35,5 +39,5 @@ class SignupState extends Equatable {
 
   @override
   // TODO: implement props
-  List<Object?> get props => [email, password, status];
+  List<Object?> get props => [email, password, status, user];
 }

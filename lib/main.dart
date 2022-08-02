@@ -15,6 +15,9 @@ import 'package:inspired_senior_care_app/bloc/view_response/view_response_cubit.
 import 'package:inspired_senior_care_app/cubits/login/login_cubit.dart';
 import 'package:inspired_senior_care_app/cubits/signup/signup_cubit.dart';
 import 'package:inspired_senior_care_app/data/repositories/auth/auth_repository.dart';
+import 'package:inspired_senior_care_app/data/repositories/database/database_repository.dart';
+import 'package:inspired_senior_care_app/data/repositories/storage/storage_repository.dart';
+
 import 'package:inspired_senior_care_app/firebase_options.dart';
 import 'package:inspired_senior_care_app/view/pages/categories.dart';
 import 'package:inspired_senior_care_app/view/pages/dashboard/choose_category.dart';
@@ -44,17 +47,20 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  late final AuthBloc bloc;
+  late AuthBloc bloc;
+  late OnboardingBloc _onboardingBloc;
 
   @override
   void initState() {
     // TODO: implement initState
-    //var bloc = context.read<AuthBloc>();
+
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    //bloc = context.read<AuthBloc>();
+
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider(
@@ -79,10 +85,19 @@ class _MyAppState extends State<MyApp> {
           BlocProvider(
             create: (context) => GroupBloc(),
           ),
+          BlocProvider(
+            create: (context) => OnboardingBloc(
+                databaseRepository: DatabaseRepository(),
+                storageRepository: StorageRepository()),
+          ),
+          BlocProvider(
+            create: (context) =>
+                SignupCubit(authRepository: context.read<AuthRepository>()),
+          ),
         ],
         child: BlocBuilder<AuthBloc, AuthState>(
           builder: (context, state) {
-            //bloc = context.read<AuthBloc>();
+            bloc = context.read<AuthBloc>();
             return MaterialApp.router(
               routeInformationParser: _router.routeInformationParser,
               routerDelegate: _router.routerDelegate,
@@ -132,6 +147,7 @@ class _MyAppState extends State<MyApp> {
       bool isLoggingIn = state.location == '/login';
       bool loggedIn = bloc.state.authStatus == AuthStatus.authenticated;
       bool isOnboarding = state.location == '/signup';
+      bool completedOnboarding = false;
 
       if (!loggedIn) {
         return isLoggingIn
@@ -143,6 +159,7 @@ class _MyAppState extends State<MyApp> {
 
       final isLoggedIn = state.location == '/';
 
+      if (loggedIn && completedOnboarding == false) return null;
       if (loggedIn && isLoggingIn) return isLoggedIn ? null : '/';
       if (loggedIn && isOnboarding) return isLoggedIn ? null : '/';
 
@@ -156,20 +173,10 @@ class _MyAppState extends State<MyApp> {
       builder: (context, state) => const LoginScreen(),
     ),
     GoRoute(
-        name: 'signup',
-        path: '/signup',
-        builder: (context, state) => MultiBlocProvider(
-              providers: [
-                BlocProvider(
-                  create: (context) => OnboardingBloc(),
-                ),
-                BlocProvider(
-                  create: (context) => SignupCubit(
-                      authRepository: context.read<AuthRepository>()),
-                ),
-              ],
-              child: const SignupScreen(),
-            )),
+      name: 'signup',
+      path: '/signup',
+      builder: (context, state) => const SignupScreen(),
+    ),
     GoRoute(
       name: 'home',
       path: '/',

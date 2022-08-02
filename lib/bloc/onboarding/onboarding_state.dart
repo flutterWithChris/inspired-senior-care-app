@@ -1,5 +1,7 @@
 part of 'onboarding_bloc.dart';
 
+enum OnboardingStatus { initial, started, complete, failed }
+
 abstract class OnboardingState extends Equatable {
   const OnboardingState();
 
@@ -8,6 +10,8 @@ abstract class OnboardingState extends Equatable {
 }
 
 class OnboardingInitial extends OnboardingState {}
+
+class OnboarsingLoading extends OnboardingState {}
 
 class OnboardingLoaded extends OnboardingState {
   final User user;

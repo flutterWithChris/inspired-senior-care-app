@@ -16,7 +16,7 @@ class StartOnboarding extends OnboardingEvent {
 
   const StartOnboarding({
     this.user =
-        const User(name: '', email: '', type: null, title: '', userColor: null),
+        const User(name: '', email: '', type: '', title: '', userColor: ''),
   });
 
   @override
@@ -25,11 +25,11 @@ class StartOnboarding extends OnboardingEvent {
 }
 
 class UpdateUser extends OnboardingEvent {
-  final User? user;
+  final User user;
 
-  const UpdateUser({this.user});
+  const UpdateUser({required this.user});
 
   @override
   // TODO: implement props
-  List<Object> get props => [user!];
+  List<Object> get props => [user];
 }
