@@ -70,84 +70,117 @@ class DeckPage extends StatelessWidget {
         ),
         bottomNavigationBar: const MainBottomAppBar(),
         body: SafeArea(
-          child: SingleChildScrollView(
-            physics: const NeverScrollableScrollPhysics(),
-            padding: const EdgeInsets.only(top: 24.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                BlocConsumer<DeckCubit, DeckState>(listener: (context, state) {
-                  if (state.status == DeckStatus.completed) {
-                    isSwipeDisabled = false;
-                  }
-                  if (state.status == DeckStatus.zoomed) {
-                    isCardZoomed = true;
-                  } else if (state.status == DeckStatus.unzoomed) {
-                    isCardZoomed = false;
-                  }
-                }, builder: (context, state) {
-                  return AnimatedSlide(
-                    curve: Curves.easeInOut,
-                    duration: const Duration(milliseconds: 200),
-                    offset: isCardZoomed
-                        ? const Offset(0, -0.35)
-                        : const Offset(0, -0.0),
-                    child: Stack(
-                      clipBehavior: Clip.none,
-                      alignment: AlignmentDirectional.topEnd,
-                      children: [
-                        SizedBox(
-                          height: 575,
-                          child: IgnorePointer(
-                            ignoring: isSwipeDisabled,
-                            child: InfiniteCarousel.builder(
-                              controller: deckScrollController,
-                              velocityFactor: 0.5,
-                              itemCount: 12,
-                              itemExtent: 350,
-                              itemBuilder: (context, itemIndex, realIndex) {
-                                return InfoCard(
-                                  cardNumber: itemIndex + 1,
-                                );
-                              },
-                            ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 24.0),
+                child: AnimatedSlide(
+                  curve: Curves.easeInOut,
+                  duration: const Duration(milliseconds: 200),
+                  offset: isCardZoomed
+                      ? const Offset(0, -0.35)
+                      : const Offset(0, -0.0),
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    alignment: AlignmentDirectional.topEnd,
+                    children: [
+                      SizedBox(
+                        height: 500,
+                        child: IgnorePointer(
+                          ignoring: isSwipeDisabled,
+                          child: BlocListener<DeckCubit, DeckState>(
+                            listener: (context, state) {
+                              // TODO: implement listener
+                              if (state.status == DeckStatus.completed) {
+                                isSwipeDisabled = false;
+                              }
+                              if (state.status == DeckStatus.zoomed) {
+                                isCardZoomed = true;
+                              } else if (state.status == DeckStatus.unzoomed) {
+                                isCardZoomed = false;
+                              }
+                            },
+                            child: Deck(
+                                deckScrollController: deckScrollController),
                           ),
                         ),
-                        Visibility(
-                          visible: isSwipeDisabled ? true : false,
-                          child: Positioned(
-                            right: 15,
-                            top: -10,
-                            child: CircleAvatar(
-                              radius: 34,
-                              backgroundColor: Colors.white,
-                              child: CircleAvatar(
-                                backgroundColor: Colors.red,
-                                radius: 29,
-                                child: Text(
-                                  '$currentCardIndex/12',
-                                  style: const TextStyle(
-                                      fontSize: 20, color: Colors.white),
-                                ),
-                              ),
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-                  );
-                }),
-                Padding(
-                    padding: const EdgeInsets.only(top: 12.0),
-                    child: Visibility(
+                      ),
+                      Visibility(
                         visible: isSwipeDisabled ? true : false,
-                        child: ShareButton())),
-              ],
-            ),
+                        child: Positioned(
+                          right: 15,
+                          top: -10,
+                          child:
+                              CardCounter(currentCardIndex: currentCardIndex),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12.0),
+                child: Visibility(
+                  visible: isSwipeDisabled ? true : false,
+                  child: ShareButton(),
+                ),
+              ),
+            ],
           ),
         ),
       ),
+    );
+  }
+}
+
+class CardCounter extends StatelessWidget {
+  const CardCounter({
+    Key? key,
+    required this.currentCardIndex,
+  }) : super(key: key);
+
+  final int currentCardIndex;
+
+  @override
+  Widget build(BuildContext context) {
+    return CircleAvatar(
+      radius: 34,
+      backgroundColor: Colors.white,
+      child: CircleAvatar(
+        backgroundColor: Colors.red,
+        radius: 29,
+        child: Text(
+          '$currentCardIndex/12',
+          style: const TextStyle(fontSize: 20, color: Colors.white),
+        ),
+      ),
+    );
+  }
+}
+
+class Deck extends StatelessWidget {
+  const Deck({
+    Key? key,
+    required this.deckScrollController,
+  }) : super(key: key);
+
+  final InfiniteScrollController deckScrollController;
+
+  @override
+  Widget build(BuildContext context) {
+    return InfiniteCarousel.builder(
+      controller: deckScrollController,
+      velocityFactor: 0.5,
+      itemCount: 12,
+      itemExtent: 350,
+      itemBuilder: (context, itemIndex, realIndex) {
+        return InfoCard(
+          cardNumber: itemIndex + 1,
+        );
+      },
     );
   }
 }

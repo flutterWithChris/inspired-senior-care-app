@@ -55,6 +55,8 @@ dependencies:
   infinite_carousel: ^1.0.2
   screenshots: ^0.2.1
   linked_scroll_controller: ^0.2.0
+  firebase_core: ^1.20.0
+  firebase_auth: ^3.6.1
 
 
 dev_dependencies:

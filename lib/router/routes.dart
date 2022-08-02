@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:inspired_senior_care_app/bloc/auth/auth_bloc.dart';
@@ -6,6 +5,8 @@ import 'package:inspired_senior_care_app/bloc/deck/deck_cubit.dart';
 import 'package:inspired_senior_care_app/bloc/manage/view_response_deck_cubit.dart';
 import 'package:inspired_senior_care_app/bloc/onboarding/onboarding_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/view_response/view_response_cubit.dart';
+import 'package:inspired_senior_care_app/cubits/signup/signup_cubit.dart';
+import 'package:inspired_senior_care_app/data/repositories/auth/auth_repository.dart';
 import 'package:inspired_senior_care_app/main.dart';
 import 'package:inspired_senior_care_app/view/pages/categories.dart';
 import 'package:inspired_senior_care_app/view/pages/dashboard/choose_category.dart';
@@ -17,98 +18,92 @@ import 'package:inspired_senior_care_app/view/pages/profile.dart';
 import 'package:inspired_senior_care_app/view/pages/signup/signup.dart';
 import 'package:inspired_senior_care_app/view/pages/view_member.dart';
 
-class MyRouter {
-  final AuthBloc _authBloc = AuthBloc();
-  late final router = GoRouter(
-      initialLocation: '/login',
+GoRouter routes(AuthBloc bloc) {
+  return GoRouter(
+      //  routerNeglect: true,
+      initialLocation: '/',
       urlPathStrategy: UrlPathStrategy.path,
       debugLogDiagnostics: true,
       // errorPageBuilder: ,
-      /*    refreshListenable:
-          GoRouterRefreshStream(_authBloc.stream.asBroadcastStream()),
+      refreshListenable: GoRouterRefreshStream(bloc.stream),
       redirect: (state) {
         bool isLoggingIn = state.location == '/login';
-        bool loggedIn =
-            _authBloc.state == const AuthState.unauthenticated() ? false : true;
-        bool isSigningUp = state.subloc == '/signup';
-        bool hasBeenOnboarded = true;
+        bool loggedIn = bloc.state.authStatus == AuthStatus.authenticated;
+        bool isOnboarding = state.location == '/signup';
 
-        if (!hasBeenOnboarded && !isSigningUp) {
-          return '/signup';
-        } else if (hasBeenOnboarded && !isLoggingIn && !loggedIn) {
-          return '/login';
+        if (!loggedIn) {
+          return isLoggingIn
+              ? null
+              : isOnboarding
+                  ? null
+                  : '/login';
         }
 
-        if (loggedIn) {
-          return '/';
-        }
+        final isLoggedIn = state.location == '/';
+
+        if (loggedIn && isLoggingIn) return isLoggedIn ? null : '/';
+        if (loggedIn && isOnboarding) return isLoggedIn ? null : '/';
 
         return null;
-      },*/
+      },
       routes: [
         GoRoute(
           name: 'login',
           path: '/login',
-          pageBuilder: (context, state) =>
-              MaterialPage(key: state.pageKey, child: const LoginScreen()),
+          builder: (context, state) => const LoginScreen(),
         ),
         GoRoute(
-          name: 'signup',
-          path: '/signup',
-          pageBuilder: (context, state) => MaterialPage(
-              key: state.pageKey,
-              child: BlocProvider(
-                create: (context) => OnboardingBloc(),
-                child: const SignupScreen(),
-              )),
-        ),
+            name: 'signup',
+            path: '/signup',
+            builder: (context, state) => MultiBlocProvider(
+                  providers: [
+                    BlocProvider(
+                      create: (context) => OnboardingBloc(),
+                    ),
+                    BlocProvider(
+                      create: (context) => SignupCubit(
+                          authRepository: context.read<AuthRepository>()),
+                    ),
+                  ],
+                  child: const SignupScreen(),
+                )),
         GoRoute(
           name: 'home',
           path: '/',
-          pageBuilder: (context, state) =>
-              MaterialPage(key: state.pageKey, child: const MyHomePage()),
+          builder: (context, state) => const MyHomePage(),
         ),
         GoRoute(
             name: 'categories',
             path: '/categories',
-            pageBuilder: (context, state) =>
-                MaterialPage(key: state.pageKey, child: const Categories()),
+            builder: (context, state) => const Categories(),
             routes: [
               GoRoute(
-                name: 'deck-page',
-                path: 'deck-page',
-                pageBuilder: (context, state) => MaterialPage(
-                    key: state.pageKey,
-                    child: BlocProvider(
-                      create: (context) => DeckCubit(),
-                      child: DeckPage(),
-                    )),
-              ),
+                  name: 'deck-page',
+                  path: 'deck-page',
+                  builder: (context, state) => BlocProvider(
+                        create: (context) => DeckCubit(),
+                        child: DeckPage(),
+                      )),
             ]),
         GoRoute(
           name: 'profile',
           path: '/profile',
-          pageBuilder: (context, state) =>
-              MaterialPage(key: state.pageKey, child: const Profile()),
+          builder: (context, state) => const Profile(),
         ),
         GoRoute(
             name: 'dashboard',
             path: '/dashboard',
-            pageBuilder: (context, state) =>
-                MaterialPage(key: state.pageKey, child: const Dashboard()),
+            builder: (context, state) => const Dashboard(),
             routes: [
               GoRoute(
                 name: 'view-member',
                 path: 'view-member',
-                pageBuilder: (context, state) =>
-                    MaterialPage(key: state.pageKey, child: const ViewMember()),
+                builder: (context, state) => const ViewMember(),
                 routes: [
                   GoRoute(
                       name: 'view-responses',
                       path: 'view-responses',
-                      pageBuilder: (context, state) => MaterialPage(
-                          key: state.pageKey,
-                          child: MultiBlocProvider(
+                      builder: (context, state) => MultiBlocProvider(
                             providers: [
                               BlocProvider(
                                 create: (context) => ViewResponseDeckCubit(),
@@ -118,14 +113,13 @@ class MyRouter {
                               )
                             ],
                             child: const ViewResponses(),
-                          ))),
+                          )),
                 ],
               ),
               GoRoute(
                 name: 'choose-category',
                 path: 'choose-category',
-                pageBuilder: (context, state) => MaterialPage(
-                    key: state.pageKey, child: const ChooseCategory()),
+                builder: (context, state) => const ChooseCategory(),
               ),
             ]),
       ]);

@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -7,62 +8,83 @@ import 'package:inspired_senior_care_app/bloc/auth/auth_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/group/group_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/invite/invite_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/share_bloc/share_bloc.dart';
+import 'package:inspired_senior_care_app/cubits/login/login_cubit.dart';
+import 'package:inspired_senior_care_app/data/repositories/auth/auth_repository.dart';
+import 'package:inspired_senior_care_app/firebase_options.dart';
 import 'package:inspired_senior_care_app/router/routes.dart';
 import 'package:inspired_senior_care_app/view/widget/bottom_app_bar.dart';
 import 'package:inspired_senior_care_app/view/widget/top_app_bar.dart';
 
-void main() {
-  runApp(MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  MyRouter myRouter = MyRouter();
-  MyApp({super.key});
+  const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
+    return MultiRepositoryProvider(
       providers: [
-        BlocProvider(
-          create: (context) => AuthBloc(),
-        ),
-        BlocProvider(
-          create: (context) => InviteBloc(),
-        ),
-        BlocProvider(
-          create: (context) => ShareBloc(),
-        ),
-        BlocProvider(
-          create: (context) => GroupBloc(),
+        RepositoryProvider(
+          create: (_) => AuthRepository(),
         ),
       ],
-      child: MaterialApp.router(
-        routeInformationParser: myRouter.router.routeInformationParser,
-        routerDelegate: myRouter.router.routerDelegate,
-        routeInformationProvider: myRouter.router.routeInformationProvider,
-        title: 'Inspired Senior Care App',
-        theme: ThemeData(
-          scaffoldBackgroundColor: Colors.grey.shade200,
-          inputDecorationTheme: InputDecorationTheme(
-            filled: true,
-            fillColor: Colors.white,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(25)),
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (context) =>
+                AuthBloc(authRepository: context.read<AuthRepository>()),
           ),
-          progressIndicatorTheme: ProgressIndicatorThemeData(
-              circularTrackColor: Colors.grey.shade400),
-          elevatedButtonTheme: ElevatedButtonThemeData(
-            style: ElevatedButton.styleFrom(
-              shape: const StadiumBorder(),
-              fixedSize: const Size(200, 30),
-              minimumSize: const Size(35, 30),
-            ),
+          BlocProvider(
+              create: (context) =>
+                  LoginCubit(authRepository: context.read<AuthRepository>())),
+          BlocProvider(
+            create: (context) => InviteBloc(),
           ),
-          bottomSheetTheme:
-              const BottomSheetThemeData(backgroundColor: Colors.white),
-          textTheme: GoogleFonts.breeSerifTextTheme(),
-          //  useMaterial3: true,
+          BlocProvider(
+            create: (context) => ShareBloc(),
+          ),
+          BlocProvider(
+            create: (context) => GroupBloc(),
+          ),
+        ],
+        child: BlocBuilder<AuthBloc, AuthState>(
+          builder: (context, state) {
+            final GoRouter router = routes(context.read<AuthBloc>());
+            return MaterialApp.router(
+              routeInformationParser: router.routeInformationParser,
+              routerDelegate: router.routerDelegate,
+              routeInformationProvider: router.routeInformationProvider,
+              title: 'Inspired Senior Care App',
+              theme: ThemeData(
+                scaffoldBackgroundColor: Colors.grey.shade200,
+                inputDecorationTheme: InputDecorationTheme(
+                  filled: true,
+                  fillColor: Colors.white,
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(25)),
+                ),
+                progressIndicatorTheme: ProgressIndicatorThemeData(
+                    circularTrackColor: Colors.grey.shade400),
+                elevatedButtonTheme: ElevatedButtonThemeData(
+                  style: ElevatedButton.styleFrom(
+                    shape: const StadiumBorder(),
+                    fixedSize: const Size(200, 30),
+                    minimumSize: const Size(35, 30),
+                  ),
+                ),
+                bottomSheetTheme:
+                    const BottomSheetThemeData(backgroundColor: Colors.white),
+                textTheme: GoogleFonts.breeSerifTextTheme(),
+                //  useMaterial3: true,
 
-          colorSchemeSeed: Colors.purple,
-          // primarySwatch: Colors.blue,
+                colorSchemeSeed: Colors.purple,
+                // primarySwatch: Colors.blue,
+              ),
+            );
+          },
         ),
       ),
     );
@@ -94,7 +116,13 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: Text(
                     'Profile',
                     style: Theme.of(context).textTheme.titleMedium,
-                  ))
+                  )),
+              TextButton.icon(
+                  onPressed: () {
+                    context.read<LoginCubit>().signOut();
+                  },
+                  icon: const Icon(Icons.logout_rounded),
+                  label: const Text('Logout'))
             ]),
           ),
         ),

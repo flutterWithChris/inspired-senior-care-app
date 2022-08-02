@@ -2,6 +2,7 @@ import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/onboarding/onboarding_bloc.dart';
+import 'package:inspired_senior_care_app/cubits/signup/signup_cubit.dart';
 import 'package:inspired_senior_care_app/data/models/user_type.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
@@ -221,78 +222,88 @@ class BasicInfoPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TextEditingController emailFieldController = TextEditingController();
-    return Stack(
-      children: [
-        Opacity(
-            opacity: 0.05,
-            child: Image.asset(
-              'lib/assets/backgrounds/Categories_Screenshot.png',
+    return BlocBuilder<SignupCubit, SignupState>(
+      builder: (context, state) {
+        return Stack(
+          children: [
+            Opacity(
+                opacity: 0.05,
+                child: Image.asset(
+                  'lib/assets/backgrounds/Categories_Screenshot.png',
+                )),
+            Form(
+                child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 12.0),
+                    child: Text(
+                      'First the basics.',
+                      style: Theme.of(context).textTheme.headline4,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16.0),
+                    child: Text(
+                      'What\'s Your Email?',
+                      style: Theme.of(context).textTheme.headline5,
+                    ),
+                  ),
+                  SizedBox(
+                      width: 325,
+                      child: TextFormField(
+                        onChanged: (value) {
+                          context.read<SignupCubit>().emailChanged(value);
+                        },
+                        decoration:
+                            const InputDecoration(label: Text('Email Address')),
+                      )),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16.0),
+                    child: Text(
+                      'Create a Password',
+                      style: Theme.of(context).textTheme.headline5,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 325,
+                    child: TextFormField(
+                      obscureText: true,
+                      decoration:
+                          const InputDecoration(label: Text('Password')),
+                      onChanged: (value) {
+                        context.read<SignupCubit>().passwordChanged(value);
+                      },
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 14.0),
+                    child: ElevatedButton(
+                        onPressed: () {
+                          context.read<SignupCubit>().signupWithCredentials();
+                          // TODO: Implement Signup Cubit
+                          // * Create Initial User Object
+                          /*    User user = User(
+                              name: '',
+                              emailAddress: emailFieldController.text,
+                              type: null,
+                              title: '',
+                              userColor: null);
+                          // * Pass User to Onboarding Bloc
+                          context
+                              .read<OnboardingBloc>()
+                              .add(StartOnboarding(user: user)); */
+                          context.read<OnboardingBloc>().add(CompletedPage());
+                        },
+                        child: const Text('Continue')),
+                  ),
+                ],
+              ),
             )),
-        Form(
-            child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 12.0),
-                child: Text(
-                  'First the basics.',
-                  style: Theme.of(context).textTheme.headline4,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16.0),
-                child: Text(
-                  'What\'s Your Email?',
-                  style: Theme.of(context).textTheme.headline5,
-                ),
-              ),
-              SizedBox(
-                  width: 325,
-                  child: TextFormField(
-                    controller: emailFieldController,
-                    decoration:
-                        const InputDecoration(label: Text('Email Address')),
-                  )),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16.0),
-                child: Text(
-                  'Create a Password',
-                  style: Theme.of(context).textTheme.headline5,
-                ),
-              ),
-              SizedBox(
-                width: 325,
-                child: TextFormField(
-                  obscureText: true,
-                  decoration: const InputDecoration(label: Text('Password')),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 14.0),
-                child: ElevatedButton(
-                    onPressed: () {
-                      // TODO: Implement Signup Cubit
-                      // * Create Initial User Object
-                      /*    User user = User(
-                          name: '',
-                          emailAddress: emailFieldController.text,
-                          type: null,
-                          title: '',
-                          userColor: null);
-                      // * Pass User to Onboarding Bloc
-                      context
-                          .read<OnboardingBloc>()
-                          .add(StartOnboarding(user: user)); */
-                      context.read<OnboardingBloc>().add(CompletedPage());
-                    },
-                    child: const Text('Continue')),
-              ),
-            ],
-          ),
-        )),
-      ],
+          ],
+        );
+      },
     );
   }
 }

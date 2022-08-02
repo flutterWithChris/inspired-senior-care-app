@@ -1,5 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.inspired_senior_care_app">
+     <uses-permission android:name="android.permission.INTERNET" />
    <application
         android:label="inspired_senior_care_app"
         android:name="${applicationName}"

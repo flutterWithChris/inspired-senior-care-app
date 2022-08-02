@@ -15,8 +15,8 @@ class StartOnboarding extends OnboardingEvent {
   final User user;
 
   const StartOnboarding({
-    this.user = const User(
-        name: '', emailAddress: '', type: null, title: '', userColor: null),
+    this.user =
+        const User(name: '', email: '', type: null, title: '', userColor: null),
   });
 
   @override
