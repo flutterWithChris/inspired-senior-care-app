@@ -61,6 +61,7 @@ dependencies:
   flutter_pw_validator: ^1.4.2
   firebase_storage: ^10.3.4
   cloud_firestore: ^3.4.3
+  progress_state_button: ^1.0.4
 
 
 dev_dependencies:

@@ -35,24 +35,15 @@ class _SignupScreenState extends State<SignupScreen> {
       body: Container(
         child: Padding(
           padding: const EdgeInsets.only(bottom: 60),
-          child: BlocListener<OnboardingBloc, OnboardingState>(
-            listener: (context, state) {
-              if (state is PageComplete) {
-                controller.nextPage(
-                    duration: const Duration(milliseconds: 500),
-                    curve: Curves.easeInOut);
-              }
-            },
-            child: PageView(
-              controller: controller,
-              physics: const NeverScrollableScrollPhysics(),
-              children: const [
-                WelcomePage(),
-                BasicInfoPage(),
-                UserTypePage(),
-                ProfileInfo(),
-              ],
-            ),
+          child: PageView(
+            controller: controller,
+            physics: const NeverScrollableScrollPhysics(),
+            children: [
+              WelcomePage(pageController: controller),
+              BasicInfoPage(pageController: controller),
+              UserTypePage(pageController: controller),
+              ProfileInfo(pageController: controller),
+            ],
           ),
         ),
       ),
@@ -75,7 +66,11 @@ class _SignupScreenState extends State<SignupScreen> {
 }
 
 class UserTypePage extends StatelessWidget {
-  const UserTypePage({Key? key}) : super(key: key);
+  final PageController pageController;
+  const UserTypePage({
+    Key? key,
+    required this.pageController,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -104,28 +99,30 @@ class UserTypePage extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 12.0, vertical: 4.0),
-                  child: ListTile(
-                    minLeadingWidth: 30,
-                    onTap: () {
-                      BlocListener<OnboardingBloc, OnboardingState>(
-                        listener: (context, state) {
-                          // TODO: implement listener
-                          if (state is OnboardingLoaded) {
+                  child: BlocBuilder<OnboardingBloc, OnboardingState>(
+                    builder: (context, state) {
+                      if (state is OnboardingLoaded) {
+                        return ListTile(
+                          minLeadingWidth: 30,
+                          onTap: () {
                             context.read<OnboardingBloc>().add(UpdateUser(
                                 user: state.user.copyWith(type: 'user')));
-                          }
-                        },
-                        child: Container(),
-                      );
-                      context.read<OnboardingBloc>().add(CompletedPage());
+                            pageController.nextPage(
+                                duration: const Duration(milliseconds: 500),
+                                curve: Curves.easeInOut);
+                          },
+                          leading: const Icon(
+                            Icons.person,
+                            size: 28,
+                          ),
+                          title: const Text('Healthcare Worker'),
+                          subtitle: const Text('I just want to learn!'),
+                          trailing: const Icon(Icons.chevron_right_rounded),
+                        );
+                      } else {
+                        return const Text('Something went wrong!');
+                      }
                     },
-                    leading: const Icon(
-                      Icons.person,
-                      size: 28,
-                    ),
-                    title: const Text('Healthcare Worker'),
-                    subtitle: const Text('I just want to learn!'),
-                    trailing: const Icon(Icons.chevron_right_rounded),
                   ),
                 ),
               ),
@@ -138,29 +135,32 @@ class UserTypePage extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 12.0, vertical: 8.0),
-                  child: ListTile(
-                    minLeadingWidth: 30,
-                    onTap: () {
-                      BlocListener<OnboardingBloc, OnboardingState>(
-                        listener: (context, state) {
-                          // TODO: implement listener
-                          if (state is OnboardingLoaded) {
+                  child: BlocBuilder<OnboardingBloc, OnboardingState>(
+                    builder: (context, state) {
+                      if (state is OnboardingLoaded) {
+                        return ListTile(
+                          minLeadingWidth: 30,
+                          onTap: () {
+                            Container();
                             context.read<OnboardingBloc>().add(UpdateUser(
                                 user: state.user.copyWith(type: 'manager')));
-                          }
-                        },
-                        child: Container(),
-                      );
-                      context.read<OnboardingBloc>().add(CompletedPage());
+                            pageController.nextPage(
+                                duration: const Duration(milliseconds: 500),
+                                curve: Curves.easeInOut);
+                          },
+                          leading: const Icon(
+                            Icons.security,
+                            size: 28,
+                          ),
+                          title: const Text('I\'m a Manager'),
+                          subtitle: const Text(
+                              'I\'d like to create groups & view others\' progress.'),
+                          trailing: const Icon(Icons.chevron_right_rounded),
+                        );
+                      } else {
+                        return const Text('Something Went Wrong!');
+                      }
                     },
-                    leading: const Icon(
-                      Icons.security,
-                      size: 28,
-                    ),
-                    title: const Text('I\'m a Manager'),
-                    subtitle: const Text(
-                        'I\'d like to create groups & view others\' progress.'),
-                    trailing: const Icon(Icons.chevron_right_rounded),
                   ),
                 ),
               ),
@@ -173,7 +173,11 @@ class UserTypePage extends StatelessWidget {
 }
 
 class WelcomePage extends StatelessWidget {
-  const WelcomePage({Key? key}) : super(key: key);
+  final PageController pageController;
+  const WelcomePage({
+    Key? key,
+    required this.pageController,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -202,7 +206,9 @@ class WelcomePage extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 18.0),
                   child: ElevatedButton(
                     onPressed: () {
-                      context.read<OnboardingBloc>().add(CompletedPage());
+                      pageController.nextPage(
+                          duration: const Duration(milliseconds: 500),
+                          curve: Curves.easeInOut);
                     },
                     style: ElevatedButton.styleFrom(
                         fixedSize: const Size(200, 32)),
@@ -219,7 +225,11 @@ class WelcomePage extends StatelessWidget {
 }
 
 class BasicInfoPage extends StatefulWidget {
-  const BasicInfoPage({Key? key}) : super(key: key);
+  final PageController pageController;
+  const BasicInfoPage({
+    Key? key,
+    required this.pageController,
+  }) : super(key: key);
 
   @override
   State<BasicInfoPage> createState() => _BasicInfoPageState();
@@ -337,44 +347,58 @@ class _BasicInfoPageState extends State<BasicInfoPage> {
                       ),
                       Padding(
                         padding: const EdgeInsets.only(bottom: 10),
-                        child: ElevatedButton(
-                            onPressed: () async {
-                              final form = formKey.currentState;
+                        child: ElevatedButton(onPressed: () async {
+                          final form = formKey.currentState;
+                          if (form!.validate()) {
+                            await context
+                                .read<SignupCubit>()
+                                .signupWithCredentials();
 
-                              if (form!.validate()) {
-                                await context
-                                    .read<SignupCubit>()
-                                    .signupWithCredentials();
-                                // TODO: Implement Signup Cubit
-                                // * Create Initial User Object
-                                if (!mounted) return;
-                                User user = User(
-                                    id: context
-                                        .read<SignupCubit>()
-                                        .state
-                                        .user!
-                                        .uid,
-                                    name: '',
-                                    email: emailFieldController.text,
-                                    type: '',
-                                    title: '',
-                                    userColor: '');
-                                // * Pass User to Onboarding Bloc
-                                context
-                                    .read<OnboardingBloc>()
-                                    .add(StartOnboarding(user: user));
-                                context
-                                    .read<OnboardingBloc>()
-                                    .add(CompletedPage());
-                              } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                        backgroundColor: Colors.redAccent,
-                                        content:
-                                            Text('Invalid Email Entered!')));
-                              }
-                            },
-                            child: const Text('Continue')),
+                            // TODO: Implement Signup Cubit
+                            // * Create Initial User Object
+                            if (!mounted) return;
+                            User user = User(
+                                id: context.read<SignupCubit>().state.user!.uid,
+                                name: '',
+                                email: emailFieldController.text,
+                                type: '',
+                                title: '',
+                                userColor: '');
+                            // * Pass User to Onboarding Bloc
+                            context
+                                .read<OnboardingBloc>()
+                                .add(StartOnboarding(user: user));
+                            await Future.delayed(const Duration(seconds: 1));
+                            widget.pageController.nextPage(
+                                duration: const Duration(milliseconds: 500),
+                                curve: Curves.easeInOut);
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    backgroundColor: Colors.redAccent,
+                                    content: Text('Invalid Email Entered!')));
+                          }
+                        }, child: BlocBuilder<SignupCubit, SignupState>(
+                          builder: (context, state) {
+                            if (state.status == SignupStatus.submitting) {
+                              return const SizedBox(
+                                height: 20,
+                                child:
+                                    Center(child: CircularProgressIndicator()),
+                              );
+                            }
+                            if (state.status == SignupStatus.success) {
+                              return Wrap(spacing: 4.0, children: const [
+                                Icon(Icons.check_circle),
+                                Text('Logged In!')
+                              ]);
+                            }
+                            if (state.status == SignupStatus.error) {
+                              return const Text('Try Again!');
+                            }
+                            return const Text('Sign Up');
+                          },
+                        )),
                       ),
                     ],
                   ),
@@ -387,7 +411,11 @@ class _BasicInfoPageState extends State<BasicInfoPage> {
 }
 
 class ProfileInfo extends StatefulWidget {
-  const ProfileInfo({Key? key}) : super(key: key);
+  final PageController pageController;
+  const ProfileInfo({
+    Key? key,
+    required this.pageController,
+  }) : super(key: key);
 
   @override
   State<ProfileInfo> createState() => _ProfileInfoState();
@@ -440,8 +468,20 @@ class _ProfileInfoState extends State<ProfileInfo> {
               ),
               SizedBox(
                 width: 325,
-                child: TextFormField(
-                  decoration: const InputDecoration(label: Text('Your Name')),
+                child: BlocBuilder<OnboardingBloc, OnboardingState>(
+                  builder: (context, state) {
+                    if (state is OnboardingLoaded) {
+                      return TextFormField(
+                        onChanged: (value) {
+                          context.read<OnboardingBloc>().add(UpdateUser(
+                              user: state.user.copyWith(name: value)));
+                        },
+                        decoration:
+                            const InputDecoration(label: Text('Your Name')),
+                      );
+                    }
+                    return const Text("Something went wrong!");
+                  },
                 ),
               ),
               Padding(
@@ -451,28 +491,52 @@ class _ProfileInfoState extends State<ProfileInfo> {
                   style: Theme.of(context).textTheme.headline5,
                 ),
               ),
-              const SizedBox(
+              SizedBox(
                 width: 325,
-                child: TextField(
-                  decoration: InputDecoration(label: Text('Title')),
+                child: BlocBuilder<OnboardingBloc, OnboardingState>(
+                  builder: (context, state) {
+                    if (state is OnboardingLoaded) {
+                      return TextFormField(
+                        onChanged: (value) {
+                          context.read<OnboardingBloc>().add(UpdateUser(
+                              user: state.user.copyWith(title: value)));
+                        },
+                        decoration: const InputDecoration(
+                            label: Text('Your Title'),
+                            hintText: 'Nurse, Home Attendant, Manager'),
+                      );
+                    }
+                    return const Text("Something went wrong!");
+                  },
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 12.0),
                 child: Card(
-                  child: ColorPicker(
-                    color: screenPickerColor,
-                    onColorChanged: (Color selectedColor) =>
-                        setState(() => screenPickerColor = selectedColor),
-                    borderRadius: 22,
-                    heading: Text(
-                      'Choose a Color',
-                      style: Theme.of(context).textTheme.headline5,
-                    ),
-                    subheading: Text(
-                      'Pick a Shade',
-                      style: Theme.of(context).textTheme.headline5,
-                    ),
+                  child: BlocBuilder<OnboardingBloc, OnboardingState>(
+                    builder: (context, state) {
+                      if (state is OnboardingLoaded) {
+                        return ColorPicker(
+                          color: screenPickerColor,
+                          onColorChanged: (Color selectedColor) {
+                            setState(() => screenPickerColor = selectedColor);
+                            context.read<OnboardingBloc>().add(UpdateUser(
+                                user: state.user.copyWith(
+                                    userColor: selectedColor.toString())));
+                          },
+                          borderRadius: 22,
+                          heading: Text(
+                            'Choose a Color',
+                            style: Theme.of(context).textTheme.headline5,
+                          ),
+                          subheading: Text(
+                            'Pick a Shade',
+                            style: Theme.of(context).textTheme.headline5,
+                          ),
+                        );
+                      }
+                      return const Text('Something Went Wrong..');
+                    },
                   ),
                 ),
               ),
