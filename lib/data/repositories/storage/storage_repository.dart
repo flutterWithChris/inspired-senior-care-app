@@ -22,4 +22,25 @@ class StorageRepository extends BaseStorageRepository {
       throw Exception(e);
     }
   }
+
+  Future<List<String>> getCategoryCards(String categoryName) async {
+    try {
+      print('Getting Cards...');
+      var cardList = await storage.ref('card-contents/$categoryName').listAll();
+
+      int cardCount = cardList.items.length;
+      print('This manry cards: $cardCount');
+      List<String> cardImageURLs = [];
+
+      for (int i = 0; i < cardCount; i++) {
+        String cardImageURL = await cardList.items[i].getDownloadURL();
+        cardImageURLs.add(cardImageURL);
+      }
+
+      return cardImageURLs;
+    } catch (e) {
+      print('Error Loading Cards!');
+      throw Exception(e);
+    }
+  }
 }

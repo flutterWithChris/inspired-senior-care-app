@@ -5,6 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:inspired_senior_care_app/bloc/auth/auth_bloc.dart';
+import 'package:inspired_senior_care_app/bloc/cards/card_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/categories/categories_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/deck/deck_cubit.dart';
 import 'package:inspired_senior_care_app/bloc/group/group_bloc.dart';
@@ -106,6 +107,10 @@ class _MyAppState extends State<MyApp> {
           BlocProvider(
             create: (context) => GroupBloc(),
           ),
+          BlocProvider(
+              create: (context) => CardBloc(
+                  databaseRepository: context.read<DatabaseRepository>(),
+                  storageRepository: context.read<StorageRepository>())),
           BlocProvider(
             create: (context) => OnboardingBloc(
                 databaseRepository: context.read<DatabaseRepository>(),
@@ -211,8 +216,12 @@ class _MyAppState extends State<MyApp> {
           GoRoute(
               name: 'deck-page',
               path: 'deck-page',
-              builder: (context, state) => BlocProvider(
-                    create: (context) => DeckCubit(),
+              builder: (context, state) => MultiBlocProvider(
+                    providers: [
+                      BlocProvider(
+                        create: (context) => DeckCubit(),
+                      ),
+                    ],
                     child: DeckPage(),
                   )),
         ]),

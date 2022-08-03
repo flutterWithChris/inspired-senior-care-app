@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:infinite_carousel/infinite_carousel.dart';
+import 'package:inspired_senior_care_app/bloc/cards/card_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/deck/deck_cubit.dart';
 import 'package:inspired_senior_care_app/bloc/share_bloc/share_bloc.dart';
 import 'package:inspired_senior_care_app/view/widget/bottom_app_bar.dart';
@@ -14,7 +15,7 @@ class DeckPage extends StatelessWidget {
 //}
 
 //class _DeckPageState extends State<DeckPage> {
-  bool isSwipeDisabled = true;
+  bool isSwipeDisabled = false;
   bool isCardZoomed = false;
   final InfiniteScrollController deckScrollController =
       InfiniteScrollController();
@@ -58,11 +59,23 @@ class DeckPage extends StatelessWidget {
               return AnimatedOpacity(
                 opacity: 1.0,
                 duration: const Duration(milliseconds: 1000),
-                child: AppBar(
-                  toolbarHeight: 50,
-                  centerTitle: true,
-                  title: const Text('Positive Interactions'),
-                  backgroundColor: Colors.red,
+                child: BlocBuilder<CardBloc, CardState>(
+                  builder: (context, state) {
+                    if (state is CardsLoaded) {
+                      return AppBar(
+                        toolbarHeight: 50,
+                        centerTitle: true,
+                        title: Text(state.categoryName),
+                        backgroundColor: Colors.red,
+                      );
+                    }
+                    return AppBar(
+                      toolbarHeight: 50,
+                      centerTitle: true,
+                      title: const Text('Didn\'t Work'),
+                      backgroundColor: Colors.red,
+                    );
+                  },
                 ),
               );
             },
@@ -171,15 +184,30 @@ class Deck extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InfiniteCarousel.builder(
-      controller: deckScrollController,
-      velocityFactor: 0.5,
-      itemCount: 12,
-      itemExtent: 350,
-      itemBuilder: (context, itemIndex, realIndex) {
-        return InfoCard(
-          cardNumber: itemIndex + 1,
-        );
+    return BlocBuilder<CardBloc, CardState>(
+      builder: (context, state) {
+        if (state is CardsLoading) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+        if (state is CardsLoaded) {
+          return InfiniteCarousel.builder(
+            controller: deckScrollController,
+            velocityFactor: 0.5,
+            itemCount: state.cardImageUrls.length,
+            itemExtent: 350,
+            itemBuilder: (context, itemIndex, realIndex) {
+              return InfoCard(
+                cardNumber: itemIndex + 1,
+              );
+            },
+          );
+        } else {
+          return const Center(
+            child: Text('Error Loading Cards!'),
+          );
+        }
       },
     );
   }
@@ -514,18 +542,33 @@ class InfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(25),
-        child: Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Image.asset(
-            'lib/assets/card_contents/positive_interactions/${cardNumber.toString()}.png',
-            height: 200,
-            fit: BoxFit.fitHeight,
-          ),
-        ),
-      ),
+    return BlocBuilder<CardBloc, CardState>(
+      builder: (context, state) {
+        if (state is CardsLoading) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+        if (state is CardsLoaded) {
+          return Card(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(25),
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Image.network(
+                  state.cardImageUrls[cardNumber - 1],
+                  height: 200,
+                  fit: BoxFit.fitHeight,
+                ),
+              ),
+            ),
+          );
+        } else {
+          return const Center(
+            child: Text('Something Went Wrong!'),
+          );
+        }
+      },
     );
   }
 }

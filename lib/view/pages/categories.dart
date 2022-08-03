@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:inspired_senior_care_app/bloc/cards/card_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/categories/categories_bloc.dart';
 import 'package:inspired_senior_care_app/data/models/category.dart';
 import 'package:inspired_senior_care_app/view/pages/upgrade_page.dart';
@@ -17,18 +18,6 @@ class Categories extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<Category> allCategories = categoryList;
-    final List<dynamic> categories = [
-      for (int i = 0; i < categoryList.length; i++)
-        CategoryCard(
-          categoryIndex: i,
-          category: categoryList[i],
-        ),
-    ];
-    List<String> titleList = [];
-    for (int i = 0; i < categories.length; i++) {
-      titleList.add('');
-    }
     return SafeArea(
       child: Scaffold(
         bottomNavigationBar: const MainBottomAppBar(),
@@ -38,35 +27,59 @@ class Categories extends StatelessWidget {
         ),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          child: ListView(
-            physics: const ScrollPhysics(),
-            shrinkWrap: true,
-            children: [
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 18.0, horizontal: 8.0),
-                child: Text(
-                  'All Categories',
-                  style: Theme.of(context).textTheme.headline5,
-                ),
-              ),
-              LayoutBuilder(builder: (context, constraints) {
-                int crossAxisCount = constraints.maxWidth > 500 ? 4 : 2;
-                return GridView.builder(
-                  physics: const ScrollPhysics(),
-                  itemCount: categories.length,
-                  shrinkWrap: true,
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisSpacing: 6.0,
-                      mainAxisExtent: 285,
-                      mainAxisSpacing: 6.0,
-                      crossAxisCount: crossAxisCount),
-                  itemBuilder: (context, index) {
-                    return categories[index];
-                  },
+          child: BlocBuilder<CategoriesBloc, CategoriesState>(
+            builder: (context, state) {
+              if (state is CategoriesLoading) {
+                return const Center(
+                  child: CircularProgressIndicator(),
                 );
-              }),
-            ],
+              }
+              if (state is CategoriesLoaded) {
+                int categoryCount = state.categoryImageUrls.length;
+                final List<dynamic> categories = [
+                  for (int i = 0; i < categoryCount; i++)
+                    CategoryCard(
+                      categoryIndex: i,
+                      category: categoryList[i],
+                    ),
+                ];
+
+                return ListView(
+                  physics: const ScrollPhysics(),
+                  shrinkWrap: true,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 18.0, horizontal: 8.0),
+                      child: Text(
+                        'All Categories',
+                        style: Theme.of(context).textTheme.headline5,
+                      ),
+                    ),
+                    LayoutBuilder(builder: (context, constraints) {
+                      int crossAxisCount = constraints.maxWidth > 500 ? 4 : 2;
+                      return GridView.builder(
+                        physics: const ScrollPhysics(),
+                        itemCount: categoryCount,
+                        shrinkWrap: true,
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisSpacing: 6.0,
+                            mainAxisExtent: 285,
+                            mainAxisSpacing: 6.0,
+                            crossAxisCount: crossAxisCount),
+                        itemBuilder: (context, index) {
+                          return categories[index];
+                        },
+                      );
+                    }),
+                  ],
+                );
+              } else {
+                return const Center(
+                  child: Text('Something Went Wrong...'),
+                );
+              }
+            },
           ),
         ),
       ),
@@ -88,6 +101,7 @@ class CategoryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Color progressBasedColor;
+
     Color randomColor = Color.fromRGBO(
         random.nextInt(255), random.nextInt(255), random.nextInt(255), 1);
     return BlocBuilder<CategoriesBloc, CategoriesState>(
@@ -99,43 +113,54 @@ class CategoryCard extends StatelessWidget {
         }
         if (state is CategoriesLoaded) {
           var coverURL = state.categoryImageUrls.elementAt(categoryIndex);
-          return InkWell(
-            onTap: () => context.goNamed('deck-page'),
-            child: Card(
-              child: Container(
-                color: Colors.white,
-                height: 275,
-                child: Stack(
-                  alignment: AlignmentDirectional.center,
-                  children: [
-                    Positioned(
-                        top: 15,
-                        child: Image.network(
-                          coverURL,
-                          height: 250,
-                          fit: BoxFit.fitHeight,
-                        )),
-                    Positioned(
-                      top: 5,
-                      right: 2,
-                      child: CircleAvatar(
-                        radius: 26,
-                        backgroundColor: Colors.white,
-                        child: CircleAvatar(
-                          radius: 23,
-                          backgroundColor: randomColor,
-                          child: Text(
-                            '${category.completedCards}/${category.totalCards}',
-                            style: const TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 14),
+          return BlocBuilder<CardBloc, CardState>(
+            builder: (context, state) {
+              // context.read<CardBloc>().add(ResetCards());
+              return InkWell(
+                onTap: () {
+                  context
+                      .read<CardBloc>()
+                      .add(LoadCards(categoryName: category.name));
+
+                  context.goNamed('deck-page');
+                },
+                child: Card(
+                  child: Container(
+                    color: Colors.white,
+                    height: 275,
+                    child: Stack(
+                      alignment: AlignmentDirectional.center,
+                      children: [
+                        Positioned(
+                            top: 15,
+                            child: Image.network(
+                              coverURL,
+                              height: 250,
+                              fit: BoxFit.fitHeight,
+                            )),
+                        Positioned(
+                          top: 5,
+                          right: 2,
+                          child: CircleAvatar(
+                            radius: 26,
+                            backgroundColor: Colors.white,
+                            child: CircleAvatar(
+                              radius: 23,
+                              backgroundColor: randomColor,
+                              child: Text(
+                                '${category.completedCards}/${category.totalCards}',
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 14),
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                    )
-                  ],
+                        )
+                      ],
+                    ),
+                  ),
                 ),
-              ),
-            ),
+              );
+            },
           );
         } else {
           return const Center(
