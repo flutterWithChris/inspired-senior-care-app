@@ -78,11 +78,11 @@ class ProgressCategory extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12.0),
+      padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            padding: const EdgeInsets.symmetric(vertical: 4.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -132,16 +132,19 @@ class ProgressCategory extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(top: 8),
+            padding: const EdgeInsets.symmetric(vertical: 8),
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(525),
-                child: LinearProgressIndicator(
-                  minHeight: 12,
-                  value: progress / 100,
-                  backgroundColor: Colors.grey.shade300,
-                  color: progressColor,
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(525),
+                  child: LinearProgressIndicator(
+                    minHeight: 12,
+                    value: progress / 100,
+                    backgroundColor: Colors.grey.shade300,
+                    color: progressColor,
+                  ),
                 ),
               ),
               Padding(

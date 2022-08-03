@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
 import 'package:inspired_senior_care_app/view/widget/bottom_app_bar.dart';
 import 'package:inspired_senior_care_app/view/widget/name_plate.dart';
 import 'package:inspired_senior_care_app/view/widget/progress_widgets.dart';
@@ -9,33 +11,48 @@ class Profile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      bottomNavigationBar: const MainBottomAppBar(),
-      appBar: PreferredSize(
-          preferredSize: const Size.fromHeight(50),
-          child: AppBar(
-            title: const Text('Inspired Senior Care'),
-          )),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: ListView(
-          shrinkWrap: true,
-          children: const [
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 12.0),
-              child: NamePlate(
-                memberName: 'Samantha Torres',
-                memberTitle: 'Assistant',
+    return BlocBuilder<ProfileBloc, ProfileState>(
+      builder: (context, state) {
+        if (state is ProfileLoading) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+        if (state is ProfileLoaded) {
+          return Scaffold(
+            bottomNavigationBar: const MainBottomAppBar(),
+            appBar: PreferredSize(
+                preferredSize: const Size.fromHeight(50),
+                child: AppBar(
+                  title: const Text('Inspired Senior Care'),
+                )),
+            body: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: ListView(
+                shrinkWrap: true,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 12.0),
+                    child: NamePlate(
+                      memberName: state.user.name!,
+                      memberTitle: state.user.title!,
+                    ),
+                  ),
+                  const Badges(),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 16.0),
+                    child: ProgressSection(),
+                  )
+                ],
               ),
             ),
-            Badges(),
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 16.0),
-              child: ProgressSection(),
-            )
-          ],
-        ),
-      ),
+          );
+        } else {
+          return const Center(
+            child: Text('Something Went Wrong!...'),
+          );
+        }
+      },
     );
   }
 }

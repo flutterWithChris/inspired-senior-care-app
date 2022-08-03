@@ -76,7 +76,7 @@ class DeckPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Padding(
-                padding: const EdgeInsets.only(top: 24.0),
+                padding: const EdgeInsets.only(top: 48.0),
                 child: AnimatedSlide(
                   curve: Curves.easeInOut,
                   duration: const Duration(milliseconds: 200),
@@ -122,7 +122,7 @@ class DeckPage extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 12.0),
+                padding: const EdgeInsets.symmetric(vertical: 24.0),
                 child: Visibility(
                   visible: isSwipeDisabled ? true : false,
                   child: ShareButton(),

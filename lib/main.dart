@@ -10,6 +10,7 @@ import 'package:inspired_senior_care_app/bloc/group/group_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/invite/invite_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/manage/view_response_deck_cubit.dart';
 import 'package:inspired_senior_care_app/bloc/onboarding/onboarding_bloc.dart';
+import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/share_bloc/share_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/view_response/view_response_cubit.dart';
 import 'package:inspired_senior_care_app/cubits/login/login_cubit.dart';
@@ -64,7 +65,13 @@ class _MyAppState extends State<MyApp> {
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider(
-          create: (_) => AuthRepository(),
+          create: (context) => AuthRepository(),
+        ),
+        RepositoryProvider(
+          create: (context) => DatabaseRepository(),
+        ),
+        RepositoryProvider(
+          create: (context) => StorageRepository(),
         ),
       ],
       child: MultiBlocProvider(
@@ -80,6 +87,13 @@ class _MyAppState extends State<MyApp> {
             create: (context) => InviteBloc(),
           ),
           BlocProvider(
+            create: (context) => ProfileBloc(
+              authBloc: context.read<AuthBloc>(),
+              databaseRepository: context.read<DatabaseRepository>(),
+            )..add(
+                LoadProfile(userId: context.read<AuthBloc>().state.user.id!)),
+          ),
+          BlocProvider(
             create: (context) => ShareBloc(),
           ),
           BlocProvider(
@@ -87,8 +101,8 @@ class _MyAppState extends State<MyApp> {
           ),
           BlocProvider(
             create: (context) => OnboardingBloc(
-                databaseRepository: DatabaseRepository(),
-                storageRepository: StorageRepository()),
+                databaseRepository: context.read<DatabaseRepository>(),
+                storageRepository: context.read<StorageRepository>()),
           ),
           BlocProvider(
             create: (context) =>
@@ -147,7 +161,7 @@ class _MyAppState extends State<MyApp> {
       bool isLoggingIn = state.location == '/login';
       bool loggedIn = bloc.state.authStatus == AuthStatus.authenticated;
       bool isOnboarding = state.location == '/signup';
-      bool completedOnboarding = false;
+      bool completedOnboarding = true;
 
       if (!loggedIn) {
         return isLoggingIn
