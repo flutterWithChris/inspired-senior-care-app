@@ -5,6 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:inspired_senior_care_app/bloc/auth/auth_bloc.dart';
+import 'package:inspired_senior_care_app/bloc/categories/categories_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/deck/deck_cubit.dart';
 import 'package:inspired_senior_care_app/bloc/group/group_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/invite/invite_bloc.dart';
@@ -28,7 +29,7 @@ import 'package:inspired_senior_care_app/view/pages/deck_page.dart';
 import 'package:inspired_senior_care_app/view/pages/login/login.dart';
 import 'package:inspired_senior_care_app/view/pages/profile.dart';
 import 'package:inspired_senior_care_app/view/pages/signup/signup.dart';
-import 'package:inspired_senior_care_app/view/pages/view_member.dart';
+import 'package:inspired_senior_care_app/view/pages/dashboard/view_member.dart';
 import 'package:inspired_senior_care_app/view/widget/bottom_app_bar.dart';
 import 'package:inspired_senior_care_app/view/widget/top_app_bar.dart';
 
@@ -95,6 +96,12 @@ class _MyAppState extends State<MyApp> {
           ),
           BlocProvider(
             create: (context) => ShareBloc(),
+          ),
+          BlocProvider(
+            create: (context) => CategoriesBloc(
+                databaseRepository: context.read<DatabaseRepository>(),
+                storageRepository: context.read<StorageRepository>())
+              ..add(LoadCategories()),
           ),
           BlocProvider(
             create: (context) => GroupBloc(),

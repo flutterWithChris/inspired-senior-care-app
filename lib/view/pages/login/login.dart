@@ -100,7 +100,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           .style!
                           .copyWith(
                             fixedSize:
-                                const MaterialStatePropertyAll(Size(200, 30)),
+                                MaterialStateProperty.all(const Size(200, 30)),
                           ),
                       child: const Text('Login'),
                     ),

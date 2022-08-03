@@ -1,7 +1,10 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:inspired_senior_care_app/bloc/categories/categories_bloc.dart';
+import 'package:inspired_senior_care_app/data/models/category.dart';
 import 'package:inspired_senior_care_app/view/pages/upgrade_page.dart';
 import 'package:inspired_senior_care_app/view/widget/bottom_app_bar.dart';
 
@@ -14,74 +17,13 @@ class Categories extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    List<Category> allCategories = categoryList;
     final List<dynamic> categories = [
-      CategoryCard(
-        progressColor: Colors.lightBlueAccent,
-        assetName: 'Positive_Interactions.png',
-        textColor: Colors.black87,
-        progress: '4/12',
-      ),
-      CategoryCard(
-        progressColor: Colors.tealAccent,
-        progress: '14/14',
-        assetName: 'Communication.png',
-        textColor: Colors.black87,
-      ),
-      CategoryCard(
-        progressColor: Colors.grey,
-        assetName: 'Supportive_Environment.png',
-        progress: '8/11',
-      ),
-      CategoryCard(
-        progressColor: Colors.red,
-        progress: '3/18',
-        assetName: 'Brain_Change.png',
-      ),
-      CategoryCard(
-        progressColor: Colors.red,
-        progress: '3/18',
-        assetName: 'Damaging_Interactions.png',
-      ),
-      CategoryCard(
-        progressColor: Colors.red,
-        progress: '3/18',
-        assetName: 'Genuine_Relationships.png',
-      ),
-      LockedCategoryCard(
-        progressColor: Colors.red,
-        progress: '3/18',
-        assetName: 'Language_Matters.png',
-      ),
-      LockedCategoryCard(
-        progressColor: Colors.red,
-        progress: '3/18',
-        assetName: 'Strengths_Based.png',
-      ),
-      LockedCategoryCard(
-        progressColor: Colors.red,
-        progress: '3/18',
-        assetName: 'Building_Blocks_2.png',
-      ),
-      LockedCategoryCard(
-        progressColor: Colors.red,
-        progress: '3/18',
-        assetName: 'Meaningful_Engagement.png',
-      ),
-      LockedCategoryCard(
-        progressColor: Colors.red,
-        progress: '3/18',
-        assetName: 'Well_Being.png',
-      ),
-      LockedCategoryCard(
-        progressColor: Colors.red,
-        progress: '3/18',
-        assetName: 'What_if.png',
-      ),
-      LockedCategoryCard(
-        progressColor: Colors.red,
-        progress: '3/18',
-        assetName: 'Wildly_Curious.png',
-      ),
+      for (int i = 0; i < categoryList.length; i++)
+        CategoryCard(
+          categoryIndex: i,
+          category: categoryList[i],
+        ),
     ];
     List<String> titleList = [];
     for (int i = 0; i < categories.length; i++) {
@@ -133,18 +75,14 @@ class Categories extends StatelessWidget {
 }
 
 class CategoryCard extends StatelessWidget {
-  String assetName;
-  Color progressColor;
-  Color? textColor;
-  String progress;
+  final Category category;
+  final int categoryIndex;
   Random random = Random();
 
   CategoryCard({
     Key? key,
-    required this.assetName,
-    required this.progressColor,
-    required this.progress,
-    this.textColor,
+    required this.category,
+    required this.categoryIndex,
   }) : super(key: key);
 
   @override
@@ -152,43 +90,59 @@ class CategoryCard extends StatelessWidget {
     final Color progressBasedColor;
     Color randomColor = Color.fromRGBO(
         random.nextInt(255), random.nextInt(255), random.nextInt(255), 1);
-    return InkWell(
-      onTap: () => context.goNamed('deck-page'),
-      child: Card(
-        child: Container(
-          color: Colors.white,
-          height: 275,
-          child: Stack(
-            alignment: AlignmentDirectional.center,
-            children: [
-              Positioned(
-                  top: 15,
-                  child: Image.asset(
-                    'lib/assets/card_covers/$assetName',
-                    height: 250,
-                    fit: BoxFit.fitHeight,
-                  )),
-              Positioned(
-                top: 5,
-                right: 2,
-                child: CircleAvatar(
-                  radius: 26,
-                  backgroundColor: Colors.white,
-                  child: CircleAvatar(
-                    radius: 23,
-                    backgroundColor: randomColor,
-                    child: Text(
-                      '${random.nextInt(16)}/16',
-                      style: const TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 14),
-                    ),
-                  ),
+    return BlocBuilder<CategoriesBloc, CategoriesState>(
+      builder: (context, state) {
+        if (state is CategoriesLoading) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+        if (state is CategoriesLoaded) {
+          var coverURL = state.categoryImageUrls.elementAt(categoryIndex);
+          return InkWell(
+            onTap: () => context.goNamed('deck-page'),
+            child: Card(
+              child: Container(
+                color: Colors.white,
+                height: 275,
+                child: Stack(
+                  alignment: AlignmentDirectional.center,
+                  children: [
+                    Positioned(
+                        top: 15,
+                        child: Image.network(
+                          coverURL,
+                          height: 250,
+                          fit: BoxFit.fitHeight,
+                        )),
+                    Positioned(
+                      top: 5,
+                      right: 2,
+                      child: CircleAvatar(
+                        radius: 26,
+                        backgroundColor: Colors.white,
+                        child: CircleAvatar(
+                          radius: 23,
+                          backgroundColor: randomColor,
+                          child: Text(
+                            '${category.completedCards}/${category.totalCards}',
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 14),
+                          ),
+                        ),
+                      ),
+                    )
+                  ],
                 ),
-              )
-            ],
-          ),
-        ),
-      ),
+              ),
+            ),
+          );
+        } else {
+          return const Center(
+            child: Text('Something Went Wrong!'),
+          );
+        }
+      },
     );
   }
 }
