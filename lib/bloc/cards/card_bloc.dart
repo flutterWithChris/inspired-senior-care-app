@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:inspired_senior_care_app/data/repositories/database/database_repository.dart';
 import 'package:inspired_senior_care_app/data/repositories/storage/storage_repository.dart';
 
@@ -17,17 +18,19 @@ class CardBloc extends Bloc<CardEvent, CardState> {
       required StorageRepository storageRepository})
       : _databaseRepository = databaseRepository,
         _storageRepository = storageRepository,
-        super(CardsLoading()) {
+        super(CardsInitial()) {
     on<LoadCards>(_onCardsLoaded);
-    on<ResetCards>((event, emit) => emit(CardsLoading()));
+    on<ResetCards>((event, emit) => emit(CardsInitial()));
   }
   void _onCardsLoaded(LoadCards event, Emitter<CardState> emit) async {
+    emit(CardsLoading());
     _databaseSubscription?.cancel();
     var cardImageUrls =
         await _storageRepository.getCategoryCards(event.categoryName);
     emit(CardsLoaded(
       cardImageUrls: cardImageUrls,
       categoryName: event.categoryName,
+      categoryColor: event.categoryColor,
     ));
   }
 }

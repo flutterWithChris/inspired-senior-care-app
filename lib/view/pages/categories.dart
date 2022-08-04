@@ -33,8 +33,17 @@ class Categories extends StatelessWidget {
             builder: (context, state) {
               if (state is CategoriesLoading) {
                 return Center(
-                  child: LoadingAnimationWidget.inkDrop(
-                      color: Colors.blueAccent, size: 30.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      LoadingAnimationWidget.inkDrop(
+                          color: Colors.blueAccent, size: 30.0),
+                      const SizedBox(
+                        height: 8.0,
+                      ),
+                      const Text('Loading Categories...')
+                    ],
+                  ),
                 );
               }
               if (state is CategoriesLoaded) {
@@ -111,20 +120,26 @@ class CategoryCard extends StatelessWidget {
       builder: (context, state) {
         if (state is CategoriesLoading) {
           return Center(
-            child: LoadingAnimationWidget.inkDrop(
-                color: Colors.blueAccent, size: 30.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                LoadingAnimationWidget.inkDrop(
+                    color: Colors.blueAccent, size: 30.0),
+                const Text('Loading...')
+              ],
+            ),
           );
         }
         if (state is CategoriesLoaded) {
           var coverURL = state.categoryImageUrls.elementAt(categoryIndex);
           return BlocBuilder<CardBloc, CardState>(
             builder: (context, state) {
-              // context.read<CardBloc>().add(ResetCards());
+              //   context.read<CardBloc>().add(ResetCards());
               return InkWell(
                 onTap: () {
-                  context
-                      .read<CardBloc>()
-                      .add(LoadCards(categoryName: category.name));
+                  BlocProvider.of<CardBloc>(context).add(LoadCards(
+                      categoryName: category.name,
+                      categoryColor: category.categoryColor));
 
                   context.goNamed('deck-page');
                 },

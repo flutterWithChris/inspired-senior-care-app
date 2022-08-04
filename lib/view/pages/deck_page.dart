@@ -18,7 +18,7 @@ class DeckPage extends StatelessWidget {
 //}
 
 //class _DeckPageState extends State<DeckPage> {
-  bool isSwipeDisabled = false;
+  bool isSwipeDisabled = true;
   bool isCardZoomed = false;
   final InfiniteScrollController deckScrollController =
       InfiniteScrollController();
@@ -81,14 +81,15 @@ class DeckPage extends StatelessWidget {
                             toolbarHeight: 50,
                             centerTitle: true,
                             title: Text(state.categoryName),
-                            backgroundColor: Colors.red,
+                            backgroundColor: state.categoryColor,
                           );
                         }
                         return AppBar(
                           toolbarHeight: 50,
                           centerTitle: true,
-                          title: const Text('Didn\'t Work'),
-                          backgroundColor: Colors.red,
+                          title: LoadingAnimationWidget.prograssiveDots(
+                              color: Colors.white, size: 20),
+                          backgroundColor: Colors.grey,
                         );
                       },
                     ),
@@ -98,66 +99,74 @@ class DeckPage extends StatelessWidget {
             ),
             bottomNavigationBar: const MainBottomAppBar(),
             body: SafeArea(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(top: 48.0),
-                    child: AnimatedSlide(
-                      curve: Curves.easeInOut,
-                      duration: const Duration(milliseconds: 200),
-                      offset: isCardZoomed
-                          ? const Offset(0, -0.35)
-                          : const Offset(0, -0.0),
-                      child: Stack(
-                        clipBehavior: Clip.none,
-                        alignment: AlignmentDirectional.topEnd,
-                        children: [
-                          SizedBox(
-                            height: 500,
-                            child: IgnorePointer(
-                              ignoring: isSwipeDisabled,
-                              child: BlocListener<DeckCubit, DeckState>(
-                                listener: (context, state) {
-                                  // TODO: implement listener
-                                  if (state.status == DeckStatus.completed) {
-                                    isSwipeDisabled = false;
-                                  }
-                                  if (state.status == DeckStatus.zoomed) {
-                                    isCardZoomed = true;
-                                  } else if (state.status ==
-                                      DeckStatus.unzoomed) {
-                                    isCardZoomed = false;
-                                  }
-                                },
-                                child: Deck(
-                                    deckScrollController: deckScrollController),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 48.0),
+                      child: AnimatedSlide(
+                        curve: Curves.easeInOut,
+                        duration: const Duration(milliseconds: 200),
+                        offset: isCardZoomed
+                            ? const Offset(0, -0.4)
+                            : const Offset(0, -0.0),
+                        child: AnimatedScale(
+                          duration: const Duration(milliseconds: 500),
+                          scale: isCardZoomed ? 1.1 : 1.0,
+                          child: Stack(
+                            clipBehavior: Clip.none,
+                            alignment: AlignmentDirectional.topEnd,
+                            children: [
+                              SizedBox(
+                                height: 500,
+                                child: IgnorePointer(
+                                  ignoring: isSwipeDisabled,
+                                  child: BlocListener<DeckCubit, DeckState>(
+                                    listener: (context, state) {
+                                      // TODO: implement listener
+                                      if (state.status ==
+                                          DeckStatus.completed) {
+                                        isSwipeDisabled = false;
+                                      }
+                                      if (state.status == DeckStatus.zoomed) {
+                                        isCardZoomed = true;
+                                      } else if (state.status ==
+                                          DeckStatus.unzoomed) {
+                                        isCardZoomed = false;
+                                      }
+                                    },
+                                    child: Deck(
+                                        deckScrollController:
+                                            deckScrollController),
+                                  ),
+                                ),
                               ),
-                            ),
+                              Visibility(
+                                visible: isSwipeDisabled ? true : false,
+                                child: Positioned(
+                                  right: 15,
+                                  top: -10,
+                                  child: CardCounter(
+                                      currentCardIndex: currentCardIndex),
+                                ),
+                              ),
+                            ],
                           ),
-                          Visibility(
-                            visible: isSwipeDisabled ? true : false,
-                            child: Positioned(
-                              right: 15,
-                              top: -10,
-                              child: CardCounter(
-                                  currentCardIndex: currentCardIndex),
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 24.0),
-                    child: Visibility(
-                      visible: isSwipeDisabled ? true : false,
-                      child: ShareButton(),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 24.0),
+                      child: Visibility(
+                        visible: isSwipeDisabled ? true : false,
+                        child: ShareButton(),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -205,8 +214,18 @@ class Deck extends StatelessWidget {
     return BlocBuilder<CardBloc, CardState>(
       builder: (context, state) {
         if (state is CardsLoading) {
-          return const Center(
-            child: CircularProgressIndicator(),
+          return Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                LoadingAnimationWidget.inkDrop(
+                    color: Colors.blueAccent, size: 30.0),
+                const SizedBox(
+                  height: 8.0,
+                ),
+                const Text('Loading Cards...')
+              ],
+            ),
           );
         }
         if (state is CardsLoaded) {
@@ -214,7 +233,7 @@ class Deck extends StatelessWidget {
             controller: deckScrollController,
             velocityFactor: 0.5,
             itemCount: state.cardImageUrls.length,
-            itemExtent: 350,
+            itemExtent: 330,
             itemBuilder: (context, itemIndex, realIndex) {
               return InfoCard(
                 cardNumber: itemIndex + 1,
@@ -572,14 +591,14 @@ class InfoCard extends StatelessWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(25),
               child: Padding(
-                padding: const EdgeInsets.all(10.0),
+                padding: const EdgeInsets.symmetric(vertical: 16.0),
                 child: CachedNetworkImage(
                   placeholder: (context, url) => Center(
                     child: LoadingAnimationWidget.inkDrop(
                         color: Colors.blueAccent, size: 30.0),
                   ),
                   imageUrl: state.cardImageUrls[cardNumber - 1],
-                  height: 200,
+                  height: 195,
                   fit: BoxFit.fitHeight,
                 ),
               ),
