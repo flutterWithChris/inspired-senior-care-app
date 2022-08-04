@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -8,6 +9,7 @@ import 'package:inspired_senior_care_app/bloc/categories/categories_bloc.dart';
 import 'package:inspired_senior_care_app/data/models/category.dart';
 import 'package:inspired_senior_care_app/view/pages/upgrade_page.dart';
 import 'package:inspired_senior_care_app/view/widget/bottom_app_bar.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class Categories extends StatelessWidget {
   const Categories({Key? key}) : super(key: key);
@@ -30,8 +32,9 @@ class Categories extends StatelessWidget {
           child: BlocBuilder<CategoriesBloc, CategoriesState>(
             builder: (context, state) {
               if (state is CategoriesLoading) {
-                return const Center(
-                  child: CircularProgressIndicator(),
+                return Center(
+                  child: LoadingAnimationWidget.inkDrop(
+                      color: Colors.blueAccent, size: 30.0),
                 );
               }
               if (state is CategoriesLoaded) {
@@ -107,8 +110,9 @@ class CategoryCard extends StatelessWidget {
     return BlocBuilder<CategoriesBloc, CategoriesState>(
       builder: (context, state) {
         if (state is CategoriesLoading) {
-          return const Center(
-            child: CircularProgressIndicator(),
+          return Center(
+            child: LoadingAnimationWidget.inkDrop(
+                color: Colors.blueAccent, size: 30.0),
           );
         }
         if (state is CategoriesLoaded) {
@@ -133,8 +137,12 @@ class CategoryCard extends StatelessWidget {
                       children: [
                         Positioned(
                             top: 15,
-                            child: Image.network(
-                              coverURL,
+                            child: CachedNetworkImage(
+                              placeholder: (context, url) => Center(
+                                child: LoadingAnimationWidget.inkDrop(
+                                    color: Colors.blueAccent, size: 30.0),
+                              ),
+                              imageUrl: coverURL,
                               height: 250,
                               fit: BoxFit.fitHeight,
                             )),

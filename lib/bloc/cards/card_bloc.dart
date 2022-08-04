@@ -23,10 +23,10 @@ class CardBloc extends Bloc<CardEvent, CardState> {
   }
   void _onCardsLoaded(LoadCards event, Emitter<CardState> emit) async {
     _databaseSubscription?.cancel();
-
+    var cardImageUrls =
+        await _storageRepository.getCategoryCards(event.categoryName);
     emit(CardsLoaded(
-      cardImageUrls:
-          await _storageRepository.getCategoryCards(event.categoryName),
+      cardImageUrls: cardImageUrls,
       categoryName: event.categoryName,
     ));
   }
