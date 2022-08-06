@@ -67,14 +67,15 @@ class _CreateGroupDialogState extends State<CreateGroupDialog> {
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: ElevatedButton(
                   onPressed: () {
-                    BlocProvider.of<GroupBloc>(context).add(CreateGroup());
                     print('Group Created: ${groupNameController.text}');
                     // * Create a New Group
                     Group newGroup = Group(
                         groupName: groupNameController.text,
-                        groupId: '1278',
-                        groupMembers: [],
-                        groupManagers: []);
+                        groupId: '',
+                        groupMemberIds: [],
+                        groupManagerIds: []);
+                    BlocProvider.of<GroupBloc>(context)
+                        .add(CreateGroup(group: newGroup));
                     // * Add new group to list
                     sampleGroupList.add(newGroup);
                   },

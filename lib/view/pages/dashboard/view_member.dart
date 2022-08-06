@@ -24,6 +24,7 @@ class ViewMember extends StatelessWidget {
               child: NamePlate(
                 memberName: 'Chelsea Ranchford',
                 memberTitle: 'Home Attendant',
+                memberColorHex: 'ffffff',
               ),
             ),
             Padding(

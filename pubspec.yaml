@@ -67,6 +67,7 @@ dependencies:
   loading_animation_widget: ^1.2.0+2
 
 
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

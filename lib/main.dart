@@ -105,7 +105,8 @@ class _MyAppState extends State<MyApp> {
               ..add(LoadCategories()),
           ),
           BlocProvider(
-            create: (context) => GroupBloc(),
+            create: (context) => GroupBloc(
+                databaseRepository: context.read<DatabaseRepository>()),
           ),
           BlocProvider(
               create: (context) => CardBloc(
@@ -311,7 +312,7 @@ class _MyHomePageState extends State<MyHomePage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 const Padding(
-                  padding: EdgeInsets.only(top: 8.0, bottom: 16.0),
+                  padding: EdgeInsets.only(bottom: 24.0),
                   child: Text(
                     'Featured Category',
                     style: TextStyle(fontSize: 30),

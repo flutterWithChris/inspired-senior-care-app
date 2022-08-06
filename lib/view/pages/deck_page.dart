@@ -11,13 +11,6 @@ import 'package:loader_overlay/loader_overlay.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class DeckPage extends StatelessWidget {
-  //const DeckPage({Key? key}) : super(key: key);
-
-  //@override
-  //State<DeckPage> createState() => _DeckPageState();
-//}
-
-//class _DeckPageState extends State<DeckPage> {
   bool isSwipeDisabled = true;
   bool isCardZoomed = false;
   final InfiniteScrollController deckScrollController =
@@ -111,7 +104,7 @@ class DeckPage extends StatelessWidget {
                         curve: Curves.easeInOut,
                         duration: const Duration(milliseconds: 200),
                         offset: isCardZoomed
-                            ? const Offset(0, -0.4)
+                            ? const Offset(0, -0.33)
                             : const Offset(0, -0.0),
                         child: AnimatedScale(
                           duration: const Duration(milliseconds: 500),

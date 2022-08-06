@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 class NamePlate extends StatelessWidget {
   final String memberName;
   final String memberTitle;
+  final String memberColorHex;
 
   const NamePlate({
     required this.memberName,
     required this.memberTitle,
+    required this.memberColorHex,
     Key? key,
   }) : super(key: key);
 
@@ -16,9 +18,11 @@ class NamePlate extends StatelessWidget {
         ? name.trim().split(' ').map((l) => l[0]).take(2).join()
         : '';
 
+    Color userColor = hexToColor(memberColorHex);
     return ListTile(
       minLeadingWidth: 70,
       leading: CircleAvatar(
+        backgroundColor: userColor,
         radius: 30,
         child: Text(
           getInitials(memberName),
@@ -32,4 +36,9 @@ class NamePlate extends StatelessWidget {
       subtitle: Text(memberTitle),
     );
   }
+}
+
+/// Construct a color from a hex code string, of the format RRGGBB.
+Color hexToColor(String code) {
+  return Color(int.parse(code.substring(1, 6), radix: 16) + 0xFF000000);
 }

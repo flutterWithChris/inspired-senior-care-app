@@ -23,8 +23,8 @@ List<Category> categoryList = [
       totalCards: 12,
       completedCards: 0),
   Category(
-      name: 'Building Blocks 2',
-      categoryColor: Colors.white,
+      name: 'Building Blocks',
+      categoryColor: Colors.black,
       progressColor: 'lightBlue',
       totalCards: 16,
       completedCards: 0),
@@ -53,7 +53,7 @@ List<Category> categoryList = [
       totalCards: 12,
       completedCards: 0),
   Category(
-      name: 'Meaningful Engagemenet',
+      name: 'Meaningful Engagement',
       categoryColor: Colors.purple,
       progressColor: 'lightBlue',
       totalCards: 18,

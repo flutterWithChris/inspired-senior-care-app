@@ -36,6 +36,7 @@ class Profile extends StatelessWidget {
                     child: NamePlate(
                       memberName: state.user.name!,
                       memberTitle: state.user.title!,
+                      memberColorHex: state.user.userColor!,
                     ),
                   ),
                   const Badges(),

@@ -1,7 +1,11 @@
 part of 'group_bloc.dart';
 
 @immutable
-abstract class GroupState {}
+abstract class GroupState extends Equatable {
+  @override
+  // TODO: implement props
+  List<Object?> get props => throw UnimplementedError();
+}
 
 class GroupInitial extends GroupState {}
 
@@ -11,7 +15,12 @@ class GroupSubmitted extends GroupState {}
 
 class GroupFailed extends GroupState {}
 
-class GroupCreated extends GroupState {}
+class GroupCreated extends GroupState {
+  final String groupName;
+  GroupCreated({
+    required this.groupName,
+  });
+}
 
 class GroupDeleted extends GroupState {}
 
