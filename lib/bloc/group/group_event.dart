@@ -7,6 +7,13 @@ abstract class GroupEvent extends Equatable {
   List<Object?> get props => throw UnimplementedError();
 }
 
+class LoadGroups extends GroupEvent {
+  final User currentUser;
+  LoadGroups({
+    required this.currentUser,
+  });
+}
+
 class CreateGroup extends GroupEvent {
   User manager;
   Group group;

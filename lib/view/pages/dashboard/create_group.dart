@@ -93,7 +93,7 @@ class _CreateGroupDialogState extends State<CreateGroupDialog> {
                     },
                     builder: (context, state) {
                       // TODO: Error Handling
-                      if (state is GroupInitial) {
+                      if (state is GroupLoaded) {
                         return const Text('Create Group');
                       }
                       if (state is GroupSubmitting) {

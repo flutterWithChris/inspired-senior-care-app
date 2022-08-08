@@ -31,8 +31,8 @@ class Group {
     Group user = Group(
         groupName: snap['groupName'],
         groupId: snap['groupId'],
-        groupMemberIds: snap['groupMemberIds'],
-        groupManagerIds: snap['groupManagerIds']);
+        groupMemberIds: List.from(snap['groupMemberIds']),
+        groupManagerIds: List.from(snap['groupManagerIds']));
 
     return user;
   }

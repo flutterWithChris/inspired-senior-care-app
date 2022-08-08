@@ -12,6 +12,7 @@ import 'package:inspired_senior_care_app/view/pages/dashboard/create_group.dart'
 import 'package:inspired_senior_care_app/view/widget/bottom_app_bar.dart';
 import 'package:inspired_senior_care_app/view/widget/member_tile.dart';
 import 'package:inspired_senior_care_app/view/widget/name_plate.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({Key? key}) : super(key: key);
@@ -22,6 +23,7 @@ class Dashboard extends StatefulWidget {
 
 class _DashboardState extends State<Dashboard> {
   TextEditingController inviteTextFieldController = TextEditingController();
+  List<Group> myGroupList = [];
   static List<Group> sampleGroupList = [
     const Group(
         groupName: 'Cleveland Senior Care',
@@ -29,7 +31,12 @@ class _DashboardState extends State<Dashboard> {
         groupMemberIds: [''],
         groupManagerIds: ['']),
   ];
-  _showCreateGroupDialog(User manager) {}
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,6 +60,9 @@ class _DashboardState extends State<Dashboard> {
             }
             if (state is ProfileLoaded) {
               currentUser = state.user;
+              context
+                  .read<GroupBloc>()
+                  .add(LoadGroups(currentUser: currentUser));
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10.0),
                 child: ListView(
@@ -136,28 +146,42 @@ class _DashboardState extends State<Dashboard> {
                           // * Groups Section
                           BlocBuilder<GroupBloc, GroupState>(
                             // * Rebuild when groups updated.
-                            buildWhen: (previous, current) =>
-                                previous is GroupCreated &&
-                                current is GroupInitial,
+
                             builder: (context, state) {
-                              return Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  // * Build groups
-                                  for (Group group in sampleGroupList)
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 8.0),
-                                      child: GroupSection(
-                                          manager: currentUser,
-                                          groupName: group.groupName!,
-                                          sampleGroupList: sampleGroupList,
-                                          inviteTextFieldController:
-                                              inviteTextFieldController),
-                                    ),
-                                  // TODO: Handle No Groups Created State
-                                ],
-                              );
+                              if (state is GroupLoading) {
+                                return Center(
+                                  child:
+                                      LoadingAnimationWidget.fourRotatingDots(
+                                          color: Colors.blue, size: 25),
+                                );
+                              }
+                              if (state is GroupLoaded) {
+                                print(
+                                    '${state.myGroups.first.groupName} that many groups');
+                                return Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    // * Build groups
+                                    for (Group group in state.myGroups)
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 8.0),
+                                        child: GroupSection(
+                                            group: group,
+                                            manager: currentUser,
+                                            groupName: group.groupName!,
+                                            sampleGroupList: state.myGroups,
+                                            inviteTextFieldController:
+                                                inviteTextFieldController),
+                                      ),
+                                    // TODO: Handle No Groups Created State
+                                  ],
+                                );
+                              } else {
+                                return const Center(
+                                  child: Text('Something Went Wrong!'),
+                                );
+                              }
                             },
                           ),
                         ]),
@@ -197,9 +221,11 @@ class _DashboardState extends State<Dashboard> {
 }
 
 class GroupSection extends StatefulWidget {
+  final Group group;
   final User manager;
   final String groupName;
   const GroupSection({
+    required this.group,
     required this.manager,
     required this.groupName,
     Key? key,
@@ -217,6 +243,7 @@ class GroupSection extends StatefulWidget {
 class _GroupSectionState extends State<GroupSection> {
   @override
   Widget build(BuildContext context) {
+    final Group currentGroup = widget.group;
     final currentUser = widget.manager;
     return Card(
       elevation: 0,
@@ -228,7 +255,7 @@ class _GroupSectionState extends State<GroupSection> {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 5),
             child: Text(
-              widget.groupName,
+              currentGroup.groupName!,
               style: Theme.of(context).textTheme.headline5,
             ),
           ),
