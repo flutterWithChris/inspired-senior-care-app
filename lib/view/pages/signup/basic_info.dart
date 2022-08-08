@@ -152,7 +152,8 @@ class _BasicInfoPageState extends State<BasicInfoPage> {
                                 email: emailFieldController.text,
                                 type: '',
                                 title: '',
-                                userColor: '');
+                                userColor: '',
+                                groups: []);
                             // * Pass User to Onboarding Bloc
                             context
                                 .read<OnboardingBloc>()

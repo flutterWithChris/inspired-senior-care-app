@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:inspired_senior_care_app/data/models/group.dart';
+import 'package:inspired_senior_care_app/data/models/user.dart';
 import 'package:inspired_senior_care_app/data/repositories/database/database_repository.dart';
 import 'package:meta/meta.dart';
 
@@ -13,15 +14,20 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
       : _databaseRepository = databaseRepository,
         super(GroupInitial()) {
     on<CreateGroup>(_onCreateGroup);
+    on<UpdateGroup>(_onUpdateGroup);
   }
 
   void _onCreateGroup(CreateGroup event, Emitter<GroupState> emit) async {
     emit(GroupSubmitting());
     await Future.delayed(const Duration(seconds: 2));
-    _databaseRepository.addNewGroup(event.group);
+    _databaseRepository.addNewGroup(event.group, event.manager);
     emit(GroupSubmitted());
-    emit(GroupCreated(groupName: event.group.groupName!));
+    emit(GroupCreated(group: event.group));
     await Future.delayed(const Duration(seconds: 2));
     emit(GroupInitial());
+  }
+
+  void _onUpdateGroup(UpdateGroup event, Emitter<GroupState> emit) {
+    _databaseRepository.updateGroup(event.group);
   }
 }

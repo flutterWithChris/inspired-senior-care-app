@@ -8,8 +8,10 @@ abstract class GroupEvent extends Equatable {
 }
 
 class CreateGroup extends GroupEvent {
+  User manager;
   Group group;
   CreateGroup({
+    required this.manager,
     required this.group,
   });
 
@@ -22,6 +24,15 @@ class EditGroup extends GroupEvent {}
 
 class DeleteGroup extends GroupEvent {}
 
-class AddToGroup extends GroupEvent {}
+class UpdateGroup extends GroupEvent {
+  Group group;
+  UpdateGroup({
+    required this.group,
+  });
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [group];
+}
 
 class RemoveFromGroup extends GroupEvent {}

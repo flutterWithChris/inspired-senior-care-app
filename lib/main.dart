@@ -20,7 +20,6 @@ import 'package:inspired_senior_care_app/cubits/signup/signup_cubit.dart';
 import 'package:inspired_senior_care_app/data/repositories/auth/auth_repository.dart';
 import 'package:inspired_senior_care_app/data/repositories/database/database_repository.dart';
 import 'package:inspired_senior_care_app/data/repositories/storage/storage_repository.dart';
-
 import 'package:inspired_senior_care_app/firebase_options.dart';
 import 'package:inspired_senior_care_app/view/pages/categories.dart';
 import 'package:inspired_senior_care_app/view/pages/dashboard/choose_category.dart';
@@ -174,7 +173,7 @@ class _MyAppState extends State<MyApp> {
       bool isLoggingIn = state.location == '/login';
       bool loggedIn = bloc.state.authStatus == AuthStatus.authenticated;
       bool isOnboarding = state.location == '/signup';
-      bool completedOnboarding = true;
+      bool completedOnboarding = false;
 
       if (!loggedIn) {
         return isLoggingIn
@@ -278,29 +277,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        drawer: Drawer(
-          child: Center(
-            child:
-                Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-              Text(
-                'Settings',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              TextButton(
-                  onPressed: () => context.goNamed('profile'),
-                  child: Text(
-                    'Profile',
-                    style: Theme.of(context).textTheme.titleMedium,
-                  )),
-              TextButton.icon(
-                  onPressed: () {
-                    context.read<LoginCubit>().signOut();
-                  },
-                  icon: const Icon(Icons.logout_rounded),
-                  label: const Text('Logout'))
-            ]),
-          ),
-        ),
+        drawer: const ManagerAppDrawer(),
         bottomNavigationBar: const MainBottomAppBar(),
         appBar: const PreferredSize(
           preferredSize: Size.fromHeight(50),
@@ -343,6 +320,38 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
+class ManagerAppDrawer extends StatelessWidget {
+  const ManagerAppDrawer({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      child: Center(
+        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+          Text(
+            'Settings',
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+          TextButton(
+              onPressed: () => context.goNamed('profile'),
+              child: Text(
+                'Profile',
+                style: Theme.of(context).textTheme.titleMedium,
+              )),
+          TextButton.icon(
+              onPressed: () {
+                context.read<LoginCubit>().signOut();
+              },
+              icon: const Icon(Icons.logout_rounded),
+              label: const Text('Logout'))
+        ]),
+      ),
+    );
+  }
+}
+
 class FeaturedCategory extends StatelessWidget {
   const FeaturedCategory({
     Key? key,
@@ -374,8 +383,8 @@ class FeaturedCategory extends StatelessWidget {
                             'lib/assets/Supportive_Environment.png'),
                       ),
                       const Positioned(
-                        top: -25,
-                        right: -20,
+                        top: -35,
+                        right: -25,
                         child: CircleAvatar(
                           radius: 30,
                           backgroundColor: Colors.white,

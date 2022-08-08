@@ -7,6 +7,7 @@ class User {
   final String? type;
   final String? title;
   final String? userColor;
+  final List<String>? groups;
 
   const User({
     this.id,
@@ -15,16 +16,19 @@ class User {
     this.type,
     this.title,
     this.userColor,
+    this.groups,
   });
 
   static User fromSnapshot(DocumentSnapshot snap) {
     User user = User(
-        id: snap['id'],
-        name: snap['name'],
-        email: snap['email'],
-        type: snap['type'],
-        title: snap['title'],
-        userColor: snap['userColor']);
+      id: snap['id'],
+      name: snap['name'],
+      email: snap['email'],
+      type: snap['type'],
+      title: snap['title'],
+      userColor: snap['userColor'],
+      groups: List.from(snap['groups']),
+    );
 
     return user;
   }
@@ -37,6 +41,7 @@ class User {
       'type': type,
       'title': title,
       'userColor': userColor,
+      'groups': groups,
     };
   }
 
@@ -52,6 +57,7 @@ class User {
     String? type,
     String? title,
     String? userColor,
+    List<String>? groups,
   }) {
     return User(
       id: id ?? this.id,
@@ -60,6 +66,7 @@ class User {
       type: type ?? this.type,
       title: title ?? this.title,
       userColor: userColor ?? this.userColor,
+      groups: groups ?? this.groups,
     );
   }
 }

@@ -15,10 +15,12 @@ class GroupSubmitted extends GroupState {}
 
 class GroupFailed extends GroupState {}
 
+class GroupUpdated extends GroupState {}
+
 class GroupCreated extends GroupState {
-  final String groupName;
+  final Group group;
   GroupCreated({
-    required this.groupName,
+    required this.group,
   });
 }
 

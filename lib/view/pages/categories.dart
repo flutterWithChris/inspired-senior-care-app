@@ -1,5 +1,4 @@
 import 'dart:math';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -7,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:inspired_senior_care_app/bloc/cards/card_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/categories/categories_bloc.dart';
 import 'package:inspired_senior_care_app/data/models/category.dart';
+import 'package:inspired_senior_care_app/main.dart';
 import 'package:inspired_senior_care_app/view/pages/upgrade_page.dart';
 import 'package:inspired_senior_care_app/view/widget/bottom_app_bar.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -22,6 +22,7 @@ class Categories extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        drawer: const ManagerAppDrawer(),
         bottomNavigationBar: const MainBottomAppBar(),
         appBar: PreferredSize(
           preferredSize: const Size.fromHeight(50),

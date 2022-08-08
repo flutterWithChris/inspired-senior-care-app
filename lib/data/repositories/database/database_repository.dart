@@ -29,7 +29,7 @@ class DatabaseRepository extends BaseDatabaseRepository {
         .then((value) => print('User document Updated**'));
   }
 
-  void addNewGroup(Group group) async {
+  void addNewGroup(Group group, User manager) async {
     DocumentReference docRef = _firebaseFirestore.collection('groups').doc();
     await docRef.set(group.toMap());
     String docId = docRef.id;
@@ -37,6 +37,9 @@ class DatabaseRepository extends BaseDatabaseRepository {
         .collection('groups')
         .doc(docId)
         .update({'groupId': docId});
+    await _firebaseFirestore.collection('users').doc(manager.id).update({
+      'groups': [docRef.id]
+    });
   }
 
   Stream<Group> getGroup(String groupId) {
@@ -45,5 +48,13 @@ class DatabaseRepository extends BaseDatabaseRepository {
         .doc(groupId)
         .snapshots()
         .map((event) => Group.fromSnapshot(event));
+  }
+
+  Future<void> updateGroup(Group group) {
+    return _firebaseFirestore
+        .collection('groups')
+        .doc(group.groupId)
+        .update(group.toMap())
+        .then((value) => print('Group Updated!'));
   }
 }

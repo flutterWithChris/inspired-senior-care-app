@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/group/group_bloc.dart';
 import 'package:inspired_senior_care_app/data/models/group.dart';
+import 'package:inspired_senior_care_app/data/models/user.dart';
 
 class CreateGroupDialog extends StatefulWidget {
+  final User manager;
   final List<Group> groupList;
   const CreateGroupDialog({
+    required this.manager,
     required this.groupList,
     Key? key,
   }) : super(key: key);
@@ -20,6 +23,7 @@ class _CreateGroupDialogState extends State<CreateGroupDialog> {
   @override
   Widget build(BuildContext context) {
     List<Group> sampleGroupList = widget.groupList;
+    final currentUser = widget.manager;
     return Dialog(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12.0),
@@ -73,9 +77,9 @@ class _CreateGroupDialogState extends State<CreateGroupDialog> {
                         groupName: groupNameController.text,
                         groupId: '',
                         groupMemberIds: [],
-                        groupManagerIds: []);
-                    BlocProvider.of<GroupBloc>(context)
-                        .add(CreateGroup(group: newGroup));
+                        groupManagerIds: [currentUser.id!]);
+                    BlocProvider.of<GroupBloc>(context).add(
+                        CreateGroup(group: newGroup, manager: currentUser));
                     // * Add new group to list
                     sampleGroupList.add(newGroup);
                   },

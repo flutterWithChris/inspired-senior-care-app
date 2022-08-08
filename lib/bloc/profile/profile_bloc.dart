@@ -35,6 +35,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
 
   void _onUpdateProfile(UpdateProfile event, Emitter<ProfileState> emit) {
     print(event.user);
+    _databaseRepository.updateUser(event.user);
     emit(ProfileLoaded(user: event.user));
   }
 

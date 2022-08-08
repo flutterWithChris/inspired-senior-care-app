@@ -6,6 +6,7 @@ import 'package:inspired_senior_care_app/bloc/group/group_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
 import 'package:inspired_senior_care_app/data/models/group.dart';
 import 'package:inspired_senior_care_app/data/models/user.dart';
+import 'package:inspired_senior_care_app/main.dart';
 import 'package:inspired_senior_care_app/view/pages/dashboard/add_member.dart';
 import 'package:inspired_senior_care_app/view/pages/dashboard/create_group.dart';
 import 'package:inspired_senior_care_app/view/widget/bottom_app_bar.dart';
@@ -28,131 +29,71 @@ class _DashboardState extends State<Dashboard> {
         groupMemberIds: [''],
         groupManagerIds: ['']),
   ];
-  _showCreateGroupDialog() {
-    showDialog(
-        context: context,
-        builder: (context) {
-          return CreateGroupDialog(
-            groupList: sampleGroupList,
-          );
-        });
-  }
+  _showCreateGroupDialog(User manager) {}
 
   @override
   Widget build(BuildContext context) {
+    late User currentUser;
     return SafeArea(
       child: Scaffold(
-          // * FAB
-          floatingActionButton: SpeedDial(
-            overlayColor: Colors.black,
-            spacing: 12.0,
-            backgroundColor: Colors.lightGreen,
-            children: [
-              SpeedDialChild(
-                label: 'Create a Group',
-                child: const Icon(Icons.group_add),
-                onTap: () => _showCreateGroupDialog(),
-              ),
-            ],
-            child: const Icon(Icons.add),
-          ),
-          bottomNavigationBar: const MainBottomAppBar(),
-          appBar: PreferredSize(
-            preferredSize: const Size.fromHeight(50),
-            child: AppBar(title: const Text('Inspired Senior Care')),
-          ),
-          // * Main Content
-          body: BlocBuilder<ProfileBloc, ProfileState>(
-            builder: (context, state) {
-              if (state is ProfileLoading) {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              }
-              if (state is ProfileLoaded) {
-                User currentUser = state.user;
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                  child: ListView(
-                    shrinkWrap: true,
-                    children: [
-                      // * Name Plate
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 6.0),
-                        child: NamePlate(
-                          memberName: currentUser.name!,
-                          memberTitle: currentUser.title!,
-                          memberColorHex: currentUser.userColor!,
-                        ),
+        drawer: const ManagerAppDrawer(),
+
+        bottomNavigationBar: const MainBottomAppBar(),
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(50),
+          child: AppBar(title: const Text('Inspired Senior Care')),
+        ),
+        // * Main Content
+        body: BlocBuilder<ProfileBloc, ProfileState>(
+          builder: (context, state) {
+            if (state is ProfileLoading) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+            if (state is ProfileLoaded) {
+              currentUser = state.user;
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                child: ListView(
+                  shrinkWrap: true,
+                  children: [
+                    // * Name Plate
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 12.0),
+                      child: NamePlate(
+                        memberName: currentUser.name!,
+                        memberTitle: currentUser.title!,
+                        memberColorHex: currentUser.userColor!,
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 10),
-                        child: Card(
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(33)),
-                          color: Colors.lightBlue.shade100,
-                          elevation: 1.5,
-                          // * Featured Category
-                          child: Padding(
-                            padding: const EdgeInsets.only(
-                                top: 6.0,
-                                bottom: 24.0,
-                                left: 12.0,
-                                right: 12.0),
-                            child: Column(children: [
-                              Column(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 12.0, horizontal: 12.0),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Wrap(
-                                          crossAxisAlignment:
-                                              WrapCrossAlignment.center,
-                                          spacing: 12.0,
-                                          children: [
-                                            const Icon(
-                                              Icons.star,
-                                              color: Colors.black87,
-                                            ),
-                                            Text(
-                                              'Featured Category',
-                                              textAlign: TextAlign.start,
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .headline5,
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  const CurrentCategoryCard(),
-                                ],
-                              ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 10),
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                            top: 6.0, bottom: 24.0, left: 12.0, right: 12.0),
+                        child: Column(children: [
+                          Column(
+                            children: [
                               Padding(
                                 padding: const EdgeInsets.symmetric(
-                                    vertical: 12.0, horizontal: 8.0),
+                                    vertical: 12.0, horizontal: 12.0),
                                 child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Wrap(
-                                      spacing: 12.0,
-                                      runAlignment: WrapAlignment.center,
-                                      alignment: WrapAlignment.center,
                                       crossAxisAlignment:
                                           WrapCrossAlignment.center,
-                                      // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      spacing: 12.0,
                                       children: [
                                         const Icon(
-                                          Icons.group,
+                                          Icons.star,
                                           color: Colors.black87,
                                         ),
                                         Text(
-                                          'My Groups',
+                                          'Featured Category',
+                                          textAlign: TextAlign.start,
                                           style: Theme.of(context)
                                               .textTheme
                                               .headline5,
@@ -162,50 +103,104 @@ class _DashboardState extends State<Dashboard> {
                                   ],
                                 ),
                               ),
-                              // * Groups Section
-                              BlocBuilder<GroupBloc, GroupState>(
-                                // * Rebuild when groups updated.
-                                buildWhen: (previous, current) =>
-                                    previous is GroupCreated &&
-                                    current is GroupInitial,
-                                builder: (context, state) {
-                                  return Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      // * Build groups
-                                      for (Group group in sampleGroupList)
-                                        Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 8.0),
-                                          child: GroupSection(
-                                              groupName: group.groupName!,
-                                              sampleGroupList: sampleGroupList,
-                                              inviteTextFieldController:
-                                                  inviteTextFieldController),
-                                        ),
-                                      // TODO: Handle No Groups Created State
-                                    ],
-                                  );
-                                },
-                              ),
-                            ]),
+                              const CurrentCategoryCard(),
+                            ],
                           ),
-                        ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 12.0, horizontal: 8.0),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Wrap(
+                                  spacing: 12.0,
+                                  runAlignment: WrapAlignment.center,
+                                  alignment: WrapAlignment.center,
+                                  crossAxisAlignment: WrapCrossAlignment.center,
+                                  // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    const Icon(
+                                      Icons.group,
+                                      color: Colors.black87,
+                                    ),
+                                    Text(
+                                      'My Groups',
+                                      style:
+                                          Theme.of(context).textTheme.headline5,
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          // * Groups Section
+                          BlocBuilder<GroupBloc, GroupState>(
+                            // * Rebuild when groups updated.
+                            buildWhen: (previous, current) =>
+                                previous is GroupCreated &&
+                                current is GroupInitial,
+                            builder: (context, state) {
+                              return Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  // * Build groups
+                                  for (Group group in sampleGroupList)
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 8.0),
+                                      child: GroupSection(
+                                          manager: currentUser,
+                                          groupName: group.groupName!,
+                                          sampleGroupList: sampleGroupList,
+                                          inviteTextFieldController:
+                                              inviteTextFieldController),
+                                    ),
+                                  // TODO: Handle No Groups Created State
+                                ],
+                              );
+                            },
+                          ),
+                        ]),
                       ),
-                    ],
-                  ),
-                );
-              }
-              return Container();
-            },
-          )),
+                    ),
+                  ],
+                ),
+              );
+            }
+            return Container();
+          },
+        ),
+        // * FAB
+        floatingActionButton: SpeedDial(
+          overlayColor: Colors.black,
+          spacing: 12.0,
+          backgroundColor: Colors.lightGreen,
+          children: [
+            SpeedDialChild(
+              label: 'Create a Group',
+              child: const Icon(Icons.group_add),
+              onTap: () => showDialog(
+                  context: context,
+                  builder: (context) {
+                    return CreateGroupDialog(
+                      manager: currentUser,
+                      groupList: sampleGroupList,
+                    );
+                  }),
+            ),
+          ],
+          child: const Icon(Icons.add),
+        ),
+      ),
     );
   }
 }
 
 class GroupSection extends StatefulWidget {
+  final User manager;
   final String groupName;
   const GroupSection({
+    required this.manager,
     required this.groupName,
     Key? key,
     required this.sampleGroupList,
@@ -222,8 +217,10 @@ class GroupSection extends StatefulWidget {
 class _GroupSectionState extends State<GroupSection> {
   @override
   Widget build(BuildContext context) {
+    final currentUser = widget.manager;
     return Card(
-      color: Colors.grey.shade100,
+      elevation: 0,
+      //color: Colors.grey.shade100,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 12.0),
@@ -267,7 +264,9 @@ class _GroupSectionState extends State<GroupSection> {
                     primary: Colors.blueAccent,
                     onPrimary: Colors.white,
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+                    print(currentUser.name);
+                  },
                   icon: const Icon(
                     Icons.edit,
                     size: 18,
@@ -322,7 +321,7 @@ class CurrentCategoryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       shape: const StadiumBorder(),
-      elevation: 1,
+      elevation: 0.5,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
         child: ListTile(
