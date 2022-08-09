@@ -42,6 +42,19 @@ class DatabaseRepository extends BaseDatabaseRepository {
     });
   }
 
+  void deleteGroup(Group group, User manager) async {
+    DocumentReference docRef = _firebaseFirestore.collection('groups').doc();
+    await docRef.set(group.toMap());
+    String docId = docRef.id;
+    await FirebaseFirestore.instance
+        .collection('groups')
+        .doc(docId)
+        .update({'groupId': docId});
+    await _firebaseFirestore.collection('users').doc(manager.id).update({
+      'groups': FieldValue.arrayRemove([docId]),
+    });
+  }
+
   Stream<Group> getGroup(String groupId) {
     return _firebaseFirestore
         .collection('groups')
@@ -56,5 +69,12 @@ class DatabaseRepository extends BaseDatabaseRepository {
         .doc(group.groupId)
         .update(group.toMap())
         .then((value) => print('Group Updated!'));
+  }
+
+  Future<void> updateProgress(
+      User user, String categoryName, int currentCardNumber) {
+    return _firebaseFirestore.collection('users').doc(user.id).set({
+      'progress': {categoryName: currentCardNumber}
+    }, SetOptions(merge: true));
   }
 }

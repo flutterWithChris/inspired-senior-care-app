@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:infinite_carousel/infinite_carousel.dart';
+import 'package:inspired_senior_care_app/bloc/auth/auth_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/cards/card_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/deck/deck_cubit.dart';
 import 'package:inspired_senior_care_app/bloc/share_bloc/share_bloc.dart';
@@ -173,7 +174,8 @@ class DeckPage extends StatelessWidget {
                             padding: const EdgeInsets.symmetric(vertical: 30.0),
                             child: Visibility(
                               visible: isSwipeDisabled ? true : false,
-                              child: ShareButton(),
+                              child:
+                                  ShareButton(categoryName: state.categoryName),
                             ),
                           ),
                         ],
@@ -349,9 +351,10 @@ class DeckCompleteDialog extends StatelessWidget {
 }
 
 class ShareButton extends StatelessWidget {
+  final String categoryName;
   final TextEditingController shareFieldController = TextEditingController();
 
-  ShareButton({super.key});
+  ShareButton({required this.categoryName, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -391,6 +394,7 @@ class ShareButton extends StatelessWidget {
                         shareFieldController: shareFieldController,
                       ),
                       SendButton(
+                        categoryName: categoryName,
                         shareFieldController: shareFieldController,
                       ),
                     ]),
@@ -449,9 +453,10 @@ class ViewResponsesButton extends StatelessWidget {
                       ShareTextField(
                         shareFieldController: shareFieldController,
                       ),
-                      SendButton(
+                      /*   SendButton(
+                        categoryName: cat,
                         shareFieldController: shareFieldController,
-                      ),
+                      ),*/
                     ]),
               ),
             );
@@ -510,9 +515,13 @@ class ShareTextField extends StatelessWidget {
 }
 
 class SendButton extends StatefulWidget {
+  final String categoryName;
   final TextEditingController shareFieldController;
 
-  const SendButton({required this.shareFieldController, Key? key})
+  const SendButton(
+      {required this.categoryName,
+      required this.shareFieldController,
+      Key? key})
       : super(key: key);
 
   @override
@@ -534,7 +543,9 @@ class _SendButtonState extends State<SendButton> {
           Navigator.pop(context);
           context.read<DeckCubit>().completeDeck();
         } else {
-          context.read<DeckCubit>().incrementCardNumber();
+          context.read<DeckCubit>().incrementCardNumber(
+              context.read<AuthBloc>().state.user, widget.categoryName);
+
           context.read<DeckCubit>().swipeDeck();
           context.read<DeckCubit>().resetDeck();
           widget.shareFieldController.clear();

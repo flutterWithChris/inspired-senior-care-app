@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:inspired_senior_care_app/bloc/cards/card_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/categories/categories_bloc.dart';
+import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
 import 'package:inspired_senior_care_app/data/models/category.dart';
 import 'package:inspired_senior_care_app/main.dart';
 import 'package:inspired_senior_care_app/view/pages/upgrade_page.dart';
@@ -171,10 +172,30 @@ class CategoryCard extends StatelessWidget {
                             child: CircleAvatar(
                               radius: 23,
                               backgroundColor: randomColor,
-                              child: Text(
-                                '${category.completedCards}/${category.totalCards}',
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 14),
+                              child: BlocBuilder<ProfileBloc, ProfileState>(
+                                builder: (context, state) {
+                                  int currentCard = 1;
+                                  if (state is ProfileLoaded) {
+                                    bool categoryStarted = state.user.progress!
+                                        .containsKey(category.name);
+                                    if (!categoryStarted) {
+                                      currentCard = 1;
+                                    }
+                                    if (categoryStarted) {
+                                      Map<String, int> progressList =
+                                          state.user.progress!;
+                                      currentCard =
+                                          progressList[category.name]!;
+                                    }
+                                    return Text(
+                                      '$currentCard/${category.totalCards}',
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 14),
+                                    );
+                                  }
+                                  return const Text('Something Went Wrong...');
+                                },
                               ),
                             ),
                           ),

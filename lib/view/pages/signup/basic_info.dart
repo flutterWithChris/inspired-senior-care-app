@@ -153,7 +153,8 @@ class _BasicInfoPageState extends State<BasicInfoPage> {
                                 type: '',
                                 title: '',
                                 userColor: '',
-                                groups: []);
+                                groups: [],
+                                progress: {});
                             // * Pass User to Onboarding Bloc
                             context
                                 .read<OnboardingBloc>()

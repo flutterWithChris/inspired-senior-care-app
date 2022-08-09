@@ -219,7 +219,9 @@ class _MyAppState extends State<MyApp> {
               builder: (context, state) => MultiBlocProvider(
                     providers: [
                       BlocProvider(
-                        create: (context) => DeckCubit(),
+                        create: (context) => DeckCubit(
+                            databaseRepository:
+                                context.read<DatabaseRepository>()),
                       ),
                     ],
                     child: DeckPage(),
