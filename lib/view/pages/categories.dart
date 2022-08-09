@@ -141,7 +141,8 @@ class CategoryCard extends StatelessWidget {
                 onTap: () {
                   BlocProvider.of<CardBloc>(context).add(LoadCards(
                       categoryName: category.name,
-                      categoryColor: category.categoryColor));
+                      categoryColor: category.categoryColor,
+                      category: category));
 
                   context.goNamed('deck-page');
                 },

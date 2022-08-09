@@ -1,6 +1,15 @@
 part of 'deck_cubit.dart';
 
-enum DeckStatus { loading, loaded, zoomed, unzoomed, failed, swiped, completed }
+enum DeckStatus {
+  initial,
+  loading,
+  loaded,
+  zoomed,
+  unzoomed,
+  failed,
+  swiped,
+  completed
+}
 
 @immutable
 class DeckState extends Equatable {
@@ -11,6 +20,10 @@ class DeckState extends Equatable {
     this.currentCardNumber,
     this.status,
   });
+
+  factory DeckState.initial() {
+    return DeckState(status: DeckStatus.initial);
+  }
 
   factory DeckState.loading() {
     return DeckState(status: DeckStatus.loading);

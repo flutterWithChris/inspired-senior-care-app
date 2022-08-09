@@ -6,7 +6,10 @@ import 'package:infinite_carousel/infinite_carousel.dart';
 import 'package:inspired_senior_care_app/bloc/auth/auth_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/cards/card_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/deck/deck_cubit.dart';
+import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/share_bloc/share_bloc.dart';
+import 'package:inspired_senior_care_app/data/models/category.dart';
+import 'package:inspired_senior_care_app/data/models/user.dart';
 import 'package:inspired_senior_care_app/view/widget/bottom_app_bar.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -25,11 +28,9 @@ class DeckPage extends StatelessWidget {
       child: BlocListener<CardBloc, CardState>(
         listener: (context, state) {
           // TODO: implement listener
-          if (state is CardsLoading) {
-            context.loaderOverlay.show();
-          }
+          if (state is CardsLoading) {}
           if (state is CardsLoaded) {
-            context.loaderOverlay.hide();
+            final String categoryName = state.categoryName;
           }
         },
         child: LoaderOverlay(
@@ -162,7 +163,8 @@ class DeckPage extends StatelessWidget {
                                         right: 20,
                                         top: -20,
                                         child: CardCounter(
-                                            currentCardIndex: currentCardIndex),
+                                            deckScrollController:
+                                                deckScrollController),
                                       ),
                                     ),
                                   ],
@@ -197,12 +199,11 @@ class DeckPage extends StatelessWidget {
 }
 
 class CardCounter extends StatelessWidget {
+  final InfiniteScrollController deckScrollController;
   const CardCounter({
+    required this.deckScrollController,
     Key? key,
-    required this.currentCardIndex,
   }) : super(key: key);
-
-  final int currentCardIndex;
 
   @override
   Widget build(BuildContext context) {
@@ -211,13 +212,43 @@ class CardCounter extends StatelessWidget {
     return Stack(
       alignment: AlignmentDirectional.center,
       children: [
-        CircleAvatar(
-          backgroundColor: Colors.white,
-          radius: 32,
-          child: Text(
-            '$currentCardIndex/12',
-            style: const TextStyle(fontSize: 20),
-          ),
+        BlocBuilder<ProfileBloc, ProfileState>(
+          builder: (context, state) {
+            if (state is ProfileLoaded) {
+              User user = state.user;
+              return BlocBuilder<CardBloc, CardState>(
+                builder: (context, state) {
+                  if (state is CardsLoaded) {
+                    Category currentCategory = state.category;
+                    String category = state.categoryName;
+                    bool categoryStarted =
+                        user.progress!.containsKey(currentCategory.name);
+                    if (!categoryStarted) {}
+                    if (categoryStarted) {
+                      Map<String, int> progressList = user.progress!;
+                      int currentCardIndex =
+                          progressList[currentCategory.name]!;
+                      context
+                          .read<DeckCubit>()
+                          .updateCardNumber(currentCardIndex);
+                      context.read<DeckCubit>().loadDeck(currentCardIndex);
+                      deckScrollController.animateToItem(currentCardIndex - 1);
+                    }
+                    return CircleAvatar(
+                      backgroundColor: Colors.white,
+                      radius: 32,
+                      child: Text(
+                        '$currentCardIndex/${currentCategory.totalCards}',
+                        style: const TextStyle(fontSize: 20),
+                      ),
+                    );
+                  }
+                  return const Text('Something Went Wrong..');
+                },
+              );
+            }
+            return const Text('?');
+          },
         ),
         SizedBox(
           height: 64,

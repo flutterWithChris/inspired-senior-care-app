@@ -29,11 +29,13 @@ class StorageRepository extends BaseStorageRepository {
       var cardList = await storage.ref('card-contents/$categoryName').listAll();
 
       int cardCount = cardList.items.length;
-      print('This manry cards: $cardCount');
+      print('This many cards: $cardCount');
       List<String> cardImageURLs = [];
 
-      for (int i = 0; i < cardCount; i++) {
-        String cardImageURL = await cardList.items[i].getDownloadURL();
+      for (int i = 1; i < cardCount + 1; i++) {
+        String cardImageURL = await storage
+            .ref('card-contents/$categoryName/$i.png')
+            .getDownloadURL();
         cardImageURLs.add(cardImageURL);
       }
 

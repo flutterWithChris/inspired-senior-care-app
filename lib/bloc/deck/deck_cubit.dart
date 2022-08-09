@@ -11,12 +11,18 @@ class DeckCubit extends Cubit<DeckState> {
   int currentCardNumber = 1;
   DeckCubit({required DatabaseRepository databaseRepository})
       : _databaseRepository = databaseRepository,
-        super(DeckState.loaded());
+        super(DeckState.initial());
+  void loadDeck(int currentCard) {
+    currentCardNumber = currentCard;
+    emit(DeckState.loaded());
+  }
+
   void resetDeck() => emit(DeckState.loaded());
   void zoomDeck() => emit(DeckState.zoomed());
   void unzoomDeck() => emit(DeckState.unzoomed());
   void swipeDeck() => emit(DeckState.swiped());
   void completeDeck() => emit(DeckState.completed());
+  void updateCardNumber(int index) => currentCardNumber = index;
   void incrementCardNumber(User user, String categoryName) {
     currentCardNumber++;
     _databaseRepository.updateProgress(user, categoryName, currentCardNumber);
