@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
+import 'package:inspired_senior_care_app/data/models/category.dart';
 
 class ProgressSection extends StatelessWidget {
   const ProgressSection({
@@ -24,36 +27,28 @@ class ProgressSection extends StatelessWidget {
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
               ),
-              ProgressCategory(
-                  title: 'Communication',
-                  progressColor: Colors.deepOrange,
-                  progress: 100,
-                  message: 'All Done. Good Job!'),
-              ProgressCategory(
-                  title: 'Positive Interactions',
-                  progressColor: Colors.redAccent,
-                  progress: 33,
-                  message: '8 more to go.'),
-              ProgressCategory(
-                  title: 'Supportive Environment',
-                  progressColor: Colors.lightGreen,
-                  progress: 70,
-                  message: 'Only 3 More!'),
-              ProgressCategory(
-                  title: 'Brain Change',
-                  progressColor: Colors.lightGreen,
-                  progress: 40,
-                  message: 'Only 3 More!'),
-              ProgressCategory(
-                  title: 'Damaging Interactions',
-                  progressColor: Colors.grey,
-                  progress: 10,
-                  message: 'Only 3 More!'),
-              ProgressCategory(
-                  title: 'Genuine Relationships',
-                  progressColor: Colors.red,
-                  progress: 70,
-                  message: 'Only 3 More!'),
+              for (Category category in categoryList)
+                BlocBuilder<ProfileBloc, ProfileState>(
+                  builder: (context, state) {
+                    if (state is ProfileLoaded) {
+                      bool categoryStarted =
+                          state.user.progress!.containsKey(category.name);
+                      double? progress;
+                      if (categoryStarted) {
+                        progress = state.user.progress![category.name]! /
+                            category.totalCards *
+                            100;
+                      }
+
+                      return ProgressCategory(
+                          title: category.name,
+                          progressColor: Colors.deepOrange,
+                          progress: categoryStarted ? progress! : 0,
+                          message: 'All Done. Good Job!');
+                    }
+                    return const Text('Something Went Wrong...');
+                  },
+                ),
             ],
           ),
         ),
@@ -65,7 +60,7 @@ class ProgressSection extends StatelessWidget {
 class ProgressCategory extends StatelessWidget {
   final String title;
   Color progressColor;
-  int progress;
+  double progress;
   String message;
   ProgressCategory({
     Key? key,
@@ -103,7 +98,7 @@ class ProgressCategory extends StatelessWidget {
                               spacing: 5,
                               children: [
                                 Text(
-                                  '${progress.toString()}%',
+                                  '${progress.toStringAsFixed(0)}%',
                                 ),
                                 const Icon(
                                   Icons.check_circle,
@@ -123,7 +118,7 @@ class ProgressCategory extends StatelessWidget {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 12.0, vertical: 2.0),
                             child: Text(
-                              '${progress.toString()}%',
+                              '${progress.toStringAsFixed(0)}%',
                             ),
                           ),
                         ),

@@ -70,7 +70,7 @@ class _DashboardState extends State<Dashboard> {
                   children: [
                     // * Name Plate
                     Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 12.0),
+                      padding: const EdgeInsets.only(top: 12.0),
                       child: NamePlate(
                         memberName: currentUser.name!,
                         memberTitle: currentUser.title!,
