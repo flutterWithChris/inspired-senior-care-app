@@ -208,7 +208,7 @@ class CardCounter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     int currentCardIndex = context.watch<DeckCubit>().currentCardNumber;
-    double percentageComplete = currentCardIndex / 12;
+
     return Stack(
       alignment: AlignmentDirectional.center,
       children: [
@@ -221,6 +221,7 @@ class CardCounter extends StatelessWidget {
                   if (state is CardsLoaded) {
                     Category currentCategory = state.category;
                     String category = state.categoryName;
+
                     bool categoryStarted =
                         user.progress!.containsKey(currentCategory.name);
                     if (!categoryStarted) {}
@@ -250,13 +251,24 @@ class CardCounter extends StatelessWidget {
             return const Text('?');
           },
         ),
-        SizedBox(
-          height: 64,
-          width: 64,
-          child: CircularProgressIndicator(
-            backgroundColor: Colors.grey.shade300,
-            value: percentageComplete,
-          ),
+        BlocBuilder<CardBloc, CardState>(
+          builder: (context, state) {
+            if (state is CardsLoaded) {
+              double percentageComplete =
+                  currentCardIndex / state.category.totalCards;
+              return SizedBox(
+                height: 64,
+                width: 64,
+                child: CircularProgressIndicator(
+                  backgroundColor: Colors.grey.shade300,
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                      state.category.progressColor),
+                  value: percentageComplete,
+                ),
+              );
+            }
+            return const Text('Something Went Wrong..');
+          },
         )
       ],
     );

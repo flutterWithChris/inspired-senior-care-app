@@ -115,6 +115,7 @@ class CategoryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Color progressBasedColor;
+    double percentComplete = 0.0;
 
     Color randomColor = Color.fromRGBO(
         random.nextInt(255), random.nextInt(255), random.nextInt(255), 1);
@@ -167,38 +168,63 @@ class CategoryCard extends StatelessWidget {
                         Positioned(
                           top: 5,
                           right: 2,
-                          child: CircleAvatar(
-                            radius: 26,
-                            backgroundColor: Colors.white,
-                            child: CircleAvatar(
-                              radius: 23,
-                              backgroundColor: randomColor,
-                              child: BlocBuilder<ProfileBloc, ProfileState>(
+                          child: Stack(
+                            alignment: AlignmentDirectional.center,
+                            children: [
+                              CircleAvatar(
+                                radius: 23,
+                                backgroundColor: Colors.white,
+                                child: BlocBuilder<ProfileBloc, ProfileState>(
+                                  builder: (context, state) {
+                                    int currentCard = 1;
+                                    if (state is ProfileLoaded) {
+                                      bool categoryStarted = state
+                                          .user.progress!
+                                          .containsKey(category.name);
+                                      if (!categoryStarted) {
+                                        currentCard = 1;
+                                      }
+                                      if (categoryStarted) {
+                                        Map<String, int> progressList =
+                                            state.user.progress!;
+                                        currentCard =
+                                            progressList[category.name]!;
+                                        percentComplete =
+                                            currentCard / category.totalCards;
+                                      }
+                                      return Text(
+                                        '$currentCard/${category.totalCards}',
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 14),
+                                      );
+                                    }
+                                    return const Text(
+                                        'Something Went Wrong...');
+                                  },
+                                ),
+                              ),
+                              BlocBuilder<CategoriesBloc, CategoriesState>(
                                 builder: (context, state) {
-                                  int currentCard = 1;
-                                  if (state is ProfileLoaded) {
-                                    bool categoryStarted = state.user.progress!
-                                        .containsKey(category.name);
-                                    if (!categoryStarted) {
-                                      currentCard = 1;
-                                    }
-                                    if (categoryStarted) {
-                                      Map<String, int> progressList =
-                                          state.user.progress!;
-                                      currentCard =
-                                          progressList[category.name]!;
-                                    }
-                                    return Text(
-                                      '$currentCard/${category.totalCards}',
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 14),
+                                  if (state is CategoriesLoaded) {
+                                    return SizedBox(
+                                      height: 50,
+                                      width: 50,
+                                      child: CircularProgressIndicator(
+                                        backgroundColor: Colors.grey.shade300,
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                                category.progressColor),
+                                        value: percentComplete,
+                                      ),
                                     );
                                   }
-                                  return const Text('Something Went Wrong...');
+                                  return const Center(
+                                    child: Text('Something Went Wrong...'),
+                                  );
                                 },
                               ),
-                            ),
+                            ],
                           ),
                         )
                       ],

@@ -42,7 +42,7 @@ class ProgressSection extends StatelessWidget {
 
                       return ProgressCategory(
                           title: category.name,
-                          progressColor: Colors.deepOrange,
+                          progressColor: category.progressColor,
                           progress: categoryStarted ? progress! : 0,
                           message: 'All Done. Good Job!');
                     }

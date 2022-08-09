@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class Category {
   final String name;
   final Color categoryColor;
-  final String progressColor;
+  final Color progressColor;
   int totalCards;
   int completedCards;
   Category({
@@ -19,79 +19,79 @@ List<Category> categoryList = [
   Category(
       name: 'Brain Change',
       categoryColor: Colors.green,
-      progressColor: 'lightBlue',
+      progressColor: Colors.lightBlue,
       totalCards: 12,
       completedCards: 0),
   Category(
       name: 'Building Blocks',
       categoryColor: Colors.black,
-      progressColor: 'lightBlue',
+      progressColor: Colors.white,
       totalCards: 16,
       completedCards: 0),
   Category(
       name: 'Communication',
       categoryColor: Colors.deepOrange,
-      progressColor: 'lightBlue',
+      progressColor: Colors.pink,
       totalCards: 24,
       completedCards: 0),
   Category(
       name: 'Damaging Interactions',
       categoryColor: Colors.grey,
-      progressColor: 'lightBlue',
+      progressColor: Colors.blueAccent,
       totalCards: 15,
       completedCards: 0),
   Category(
       name: 'Genuine Relationships',
       categoryColor: Colors.red,
-      progressColor: 'lightBlue',
+      progressColor: Colors.blueAccent,
       totalCards: 23,
       completedCards: 0),
   Category(
       name: 'Language Matters',
       categoryColor: Colors.blue,
-      progressColor: 'lightBlue',
+      progressColor: Colors.orangeAccent,
       totalCards: 12,
       completedCards: 0),
   Category(
       name: 'Meaningful Engagement',
       categoryColor: Colors.purple,
-      progressColor: 'lightBlue',
+      progressColor: Colors.lightGreen,
       totalCards: 18,
       completedCards: 0),
   Category(
       name: 'Positive Interactions',
       categoryColor: Colors.redAccent,
-      progressColor: 'lightBlue',
+      progressColor: Colors.lightBlueAccent,
       totalCards: 21,
       completedCards: 0),
   Category(
       name: 'Strengths Based',
       categoryColor: Colors.lightGreen,
-      progressColor: 'lightBlue',
+      progressColor: Colors.purpleAccent,
       totalCards: 10,
       completedCards: 0),
   Category(
       name: 'Supportive Environment',
       categoryColor: Colors.yellow,
-      progressColor: 'lightBlue',
+      progressColor: Colors.blue,
       totalCards: 12,
       completedCards: 0),
   Category(
       name: 'Well Being',
       categoryColor: Colors.teal,
-      progressColor: 'lightBlue',
+      progressColor: Colors.pink,
       totalCards: 16,
       completedCards: 0),
   Category(
       name: 'What if',
       categoryColor: Colors.pinkAccent,
-      progressColor: 'lightBlue',
+      progressColor: Colors.green,
       totalCards: 20,
       completedCards: 0),
   Category(
       name: 'Wildly Curious',
       categoryColor: Colors.pink,
-      progressColor: 'lightBlue',
+      progressColor: Colors.cyan,
       totalCards: 12,
       completedCards: 0),
 ];
