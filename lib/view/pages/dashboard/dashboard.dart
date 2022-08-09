@@ -24,6 +24,7 @@ class Dashboard extends StatefulWidget {
 class _DashboardState extends State<Dashboard> {
   TextEditingController inviteTextFieldController = TextEditingController();
   List<Group> myGroupList = [];
+  late final User currentUser;
   static List<Group> sampleGroupList = [
     const Group(
         groupName: 'Cleveland Senior Care',
@@ -40,7 +41,6 @@ class _DashboardState extends State<Dashboard> {
 
   @override
   Widget build(BuildContext context) {
-    late final User currentUser;
     return SafeArea(
       child: Scaffold(
         drawer: const ManagerAppDrawer(),
@@ -52,8 +52,6 @@ class _DashboardState extends State<Dashboard> {
         ),
         // * Main Content
         body: BlocBuilder<ProfileBloc, ProfileState>(
-          buildWhen: (previous, current) =>
-              previous is ProfileLoading && current is ProfileLoaded,
           builder: (context, state) {
             if (state is ProfileLoading) {
               return const Center(
@@ -158,27 +156,76 @@ class _DashboardState extends State<Dashboard> {
                                 );
                               }
                               if (state is GroupLoaded) {
-                                print(
-                                    '${state.myGroups.first.groupName} that many groups');
-                                return Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    // * Build groups
-                                    for (Group group in state.myGroups)
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 8.0),
-                                        child: GroupSection(
-                                            group: group,
-                                            manager: currentUser,
-                                            groupName: group.groupName!,
-                                            sampleGroupList: state.myGroups,
-                                            inviteTextFieldController:
-                                                inviteTextFieldController),
-                                      ),
-                                    // TODO: Handle No Groups Created State
-                                  ],
-                                );
+                                if (state.myGroups.isEmpty) {
+                                  return Center(
+                                    child: Card(
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(33)),
+                                        child: SizedBox(
+                                            width: 325,
+                                            height: 150,
+                                            child: Center(
+                                                child: Wrap(
+                                              direction: Axis.vertical,
+                                              crossAxisAlignment:
+                                                  WrapCrossAlignment.center,
+                                              spacing: 8.0,
+                                              children: [
+                                                Text(
+                                                  'No Groups Yet!',
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .titleLarge!
+                                                      .copyWith(
+                                                          color: Colors.grey),
+                                                ),
+                                                ElevatedButton.icon(
+                                                    onPressed: () => showDialog(
+                                                        context: context,
+                                                        builder: (context) {
+                                                          return CreateGroupDialog(
+                                                            manager:
+                                                                currentUser,
+                                                            groupList:
+                                                                sampleGroupList,
+                                                          );
+                                                        }),
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                            fixedSize:
+                                                                const Size(
+                                                                    140, 32)),
+                                                    icon: const Icon(
+                                                      Icons.add_circle,
+                                                      size: 18,
+                                                    ),
+                                                    label:
+                                                        const Text('New Group'))
+                                              ],
+                                            )))),
+                                  );
+                                } else {
+                                  return Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      // * Build groups
+                                      for (Group group in state.myGroups)
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 8.0),
+                                          child: GroupSection(
+                                              group: group,
+                                              manager: currentUser,
+                                              groupName: group.groupName!,
+                                              sampleGroupList: state.myGroups,
+                                              inviteTextFieldController:
+                                                  inviteTextFieldController),
+                                        ),
+                                      // TODO: Handle No Groups Created State
+                                    ],
+                                  );
+                                }
                               } else {
                                 return const Center(
                                   child: Text('Something Went Wrong!'),
