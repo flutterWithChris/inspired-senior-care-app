@@ -1,16 +1,18 @@
-# inspired_senior_care_app
+# Inspired Senior Care App
 
-A new Flutter project.
+Cross-platform Android & iOS app built to help train senior healthcare workers through micro-lessons.
 
-## Getting Started
+## Features
 
-This project is a starting point for a Flutter application.
+- **13** Categories 
+- Over **200+** Cards
+- **Share** responses to lessons
+- **Create** groups 
+- **View** member progress & responses
+- Set *'Featured'* category for groups
+- **Earn** badges for progress
 
-A few resources to get you started if this is your first Flutter project:
+## Technologies
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+This project is built on **Flutter & Firebase**. Utilizing **BLoC** state management & **GoRouter**. 
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
