@@ -38,7 +38,7 @@ class DatabaseRepository extends BaseDatabaseRepository {
         .doc(docId)
         .update({'groupId': docId});
     await _firebaseFirestore.collection('users').doc(manager.id).update({
-      'groups': [docRef.id]
+      'groups': FieldValue.arrayUnion([docId]),
     });
   }
 

@@ -40,7 +40,6 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
           .getGroup(event.currentUser.groups![i])
           .listen((group) {
         groups.add(group);
-        add(UpdateGroup(group: group));
       });
 
       print('Adding ${event.currentUser.groups![i]}');

@@ -40,7 +40,7 @@ class _DashboardState extends State<Dashboard> {
 
   @override
   Widget build(BuildContext context) {
-    late User currentUser;
+    late final User currentUser;
     return SafeArea(
       child: Scaffold(
         drawer: const ManagerAppDrawer(),
@@ -52,6 +52,8 @@ class _DashboardState extends State<Dashboard> {
         ),
         // * Main Content
         body: BlocBuilder<ProfileBloc, ProfileState>(
+          buildWhen: (previous, current) =>
+              previous is ProfileLoading && current is ProfileLoaded,
           builder: (context, state) {
             if (state is ProfileLoading) {
               return const Center(
