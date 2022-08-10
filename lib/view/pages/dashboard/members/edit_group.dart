@@ -4,24 +4,19 @@ import 'package:inspired_senior_care_app/bloc/group/group_bloc.dart';
 import 'package:inspired_senior_care_app/data/models/group.dart';
 import 'package:inspired_senior_care_app/data/models/user.dart';
 
-class CreateGroupDialog extends StatefulWidget {
-  final User manager;
-
-  const CreateGroupDialog({
-    required this.manager,
+class EditGroupDialog extends StatelessWidget {
+  final User currentUser;
+  final Group currentGroup;
+  const EditGroupDialog({
     Key? key,
+    required this.currentUser,
+    required this.currentGroup,
   }) : super(key: key);
 
   @override
-  State<CreateGroupDialog> createState() => _CreateGroupDialogState();
-}
-
-class _CreateGroupDialogState extends State<CreateGroupDialog> {
-  final TextEditingController groupNameController = TextEditingController();
-
-  @override
   Widget build(BuildContext context) {
-    final currentUser = widget.manager;
+    final TextEditingController groupNameController = TextEditingController();
+    groupNameController.text = currentGroup.groupName!;
     return Dialog(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12.0),
@@ -31,16 +26,16 @@ class _CreateGroupDialogState extends State<CreateGroupDialog> {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 16.0),
               child: Text(
-                'Create New Group',
+                'Edit Group',
                 style: Theme.of(context).textTheme.titleLarge,
               ),
             ),
             TextFormField(
               style: const TextStyle(),
               textCapitalization: TextCapitalization.words,
+              controller: groupNameController,
               autofocus: true,
               keyboardType: TextInputType.text,
-              controller: groupNameController,
               decoration: InputDecoration(
                   hintText: 'ABC Senior Care',
                   label: const Text('Group Name'),
@@ -52,7 +47,7 @@ class _CreateGroupDialogState extends State<CreateGroupDialog> {
                             width: 5,
                             child: Center(child: CircularProgressIndicator()));
                       }
-                      if (state is GroupCreated) {
+                      if (state is GroupUpdated) {
                         return const Icon(
                           Icons.check_circle_outline_rounded,
                           color: Colors.lightGreen,
@@ -69,22 +64,17 @@ class _CreateGroupDialogState extends State<CreateGroupDialog> {
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: ElevatedButton(
                   onPressed: () {
-                    print('Group Created: ${groupNameController.text}');
+                    print('Group Created: ');
                     // * Create a New Group
-                    Group newGroup = Group(
-                        groupName: groupNameController.text,
-                        groupId: '',
-                        groupMemberIds: [],
-                        groupManagerIds: [currentUser.id!]);
-                    BlocProvider.of<GroupBloc>(context).add(
-                        CreateGroup(group: newGroup, manager: currentUser));
-                    // * Add new group to list
-                    //  sampleGroupList.add(newGroup);
+                    Group editedGroup = currentGroup.copyWith(
+                        groupName: groupNameController.text);
+                    BlocProvider.of<GroupBloc>(context)
+                        .add(UpdateGroup(group: editedGroup));
                   },
                   child: BlocConsumer<GroupBloc, GroupState>(
                     listenWhen: (previous, current) => previous != current,
                     listener: (context, state) {
-                      if (state is GroupInitial) {
+                      if (state is GroupLoaded) {
                         Navigator.pop(context);
                         // TODO: Dispose?
                       }
@@ -92,27 +82,28 @@ class _CreateGroupDialogState extends State<CreateGroupDialog> {
                     builder: (context, state) {
                       // TODO: Error Handling
                       if (state is GroupLoaded) {
-                        return const Text('Create Group');
+                        return const Text('Update Group');
                       }
                       if (state is GroupSubmitting) {
                         return const Text('Submitting...');
                       }
-                      if (state is GroupCreated) {
-                        return const Text('Group Created!');
+                      if (state is GroupUpdated) {
+                        return const Text('Group Updated!');
                       }
                       return const Text('Something\'s Wrong!');
                     },
                   )),
             ),
+            ElevatedButton(
+              onPressed: () {
+                context.read<GroupBloc>().add(DeleteGroup());
+              },
+              style: ElevatedButton.styleFrom(primary: Colors.redAccent),
+              child: const Text('Delete Group'),
+            ),
           ],
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    groupNameController.dispose();
-    super.dispose();
   }
 }

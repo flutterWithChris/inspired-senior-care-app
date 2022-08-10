@@ -28,13 +28,13 @@ class Group {
   }
 
   static Group fromSnapshot(DocumentSnapshot snap) {
-    Group user = Group(
+    Group group = Group(
         groupName: snap['groupName'],
         groupId: snap['groupId'],
         groupMemberIds: List.from(snap['groupMemberIds']),
         groupManagerIds: List.from(snap['groupManagerIds']));
 
-    return user;
+    return group;
   }
 
   Map<String, dynamic> toMap() {

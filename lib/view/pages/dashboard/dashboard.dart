@@ -187,8 +187,6 @@ class _DashboardState extends State<Dashboard> {
                                                           return CreateGroupDialog(
                                                             manager:
                                                                 currentUser,
-                                                            groupList:
-                                                                sampleGroupList,
                                                           );
                                                         }),
                                                     style: ElevatedButton
@@ -257,7 +255,6 @@ class _DashboardState extends State<Dashboard> {
                   builder: (context) {
                     return CreateGroupDialog(
                       manager: currentUser,
-                      groupList: sampleGroupList,
                     );
                   }),
             ),

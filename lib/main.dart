@@ -95,7 +95,8 @@ class _MyAppState extends State<MyApp> {
                 LoadProfile(userId: context.read<AuthBloc>().state.user.id!)),
           ),
           BlocProvider(
-            create: (context) => ShareBloc(),
+            create: (context) => ShareBloc(
+                databaseRepository: context.read<DatabaseRepository>()),
           ),
           BlocProvider(
             create: (context) => CategoriesBloc(

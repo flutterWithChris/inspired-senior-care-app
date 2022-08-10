@@ -67,7 +67,7 @@ class Categories extends StatelessWidget {
                           vertical: 18.0, horizontal: 8.0),
                       child: Text(
                         'All Categories',
-                        style: Theme.of(context).textTheme.headline5,
+                        style: Theme.of(context).textTheme.headlineMedium,
                       ),
                     ),
                     LayoutBuilder(builder: (context, constraints) {

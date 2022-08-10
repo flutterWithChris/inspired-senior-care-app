@@ -578,7 +578,10 @@ class _SendButtonState extends State<SendButton> {
     return ElevatedButton.icon(
       style: ElevatedButton.styleFrom(fixedSize: const Size(240, 42)),
       onPressed: () {
-        context.read<ShareBloc>().add(SubmitPressed());
+        context.read<ShareBloc>().add(SubmitPressed(
+            categoryName: widget.categoryName,
+            cardNumber: currentCardIndex,
+            response: widget.shareFieldController.text));
 
         if (currentCardIndex == 12) {
           //context.read<DeckCubit>().resetDeck();
