@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:inspired_senior_care_app/data/models/group.dart';
+import 'package:inspired_senior_care_app/data/models/response.dart';
 import 'package:inspired_senior_care_app/data/models/user.dart';
 import 'package:inspired_senior_care_app/data/repositories/database/base_database_repository.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
@@ -41,7 +42,7 @@ class DatabaseRepository extends BaseDatabaseRepository {
         .set({'$cardNumber': response}, SetOptions(merge: true));
   }
 
-  Stream<Map<String, dynamic>?> viewResponse(
+  Stream<Response> viewResponse(
       String userId, String categoryName, int cardNumber) {
     return _firebaseFirestore
         .collection('users')
@@ -49,7 +50,7 @@ class DatabaseRepository extends BaseDatabaseRepository {
         .collection('responses')
         .doc(categoryName)
         .snapshots()
-        .map((event) => event.data());
+        .map((event) => Response.fromSnapshot(event, cardNumber));
   }
 
   void addNewGroup(Group group, User manager) async {

@@ -14,6 +14,7 @@ import 'package:inspired_senior_care_app/bloc/manage/view_response_deck_cubit.da
 import 'package:inspired_senior_care_app/bloc/onboarding/onboarding_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/share_bloc/share_bloc.dart';
+import 'package:inspired_senior_care_app/bloc/view_response/response_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/view_response/view_response_cubit.dart';
 import 'package:inspired_senior_care_app/cubits/login/login_cubit.dart';
 import 'package:inspired_senior_care_app/cubits/signup/signup_cubit.dart';
@@ -120,6 +121,10 @@ class _MyAppState extends State<MyApp> {
           BlocProvider(
             create: (context) =>
                 SignupCubit(authRepository: context.read<AuthRepository>()),
+          ),
+          BlocProvider(
+            create: (context) => ResponseBloc(
+                databaseRepository: context.read<DatabaseRepository>()),
           ),
         ],
         child: BlocBuilder<AuthBloc, AuthState>(
@@ -253,7 +258,7 @@ class _MyAppState extends State<MyApp> {
                           ),
                           BlocProvider(
                             create: (context) => ViewResponseCubit(),
-                          )
+                          ),
                         ],
                         child: const ViewResponses(),
                       )),

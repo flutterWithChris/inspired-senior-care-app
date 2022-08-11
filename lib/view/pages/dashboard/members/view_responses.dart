@@ -1,12 +1,14 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:infinite_carousel/infinite_carousel.dart';
 import 'package:inspired_senior_care_app/bloc/manage/response_interaction_cubit.dart';
 import 'package:inspired_senior_care_app/bloc/manage/view_response_deck_cubit.dart';
+import 'package:inspired_senior_care_app/bloc/view_response/response_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/view_response/view_response_cubit.dart';
 import 'package:inspired_senior_care_app/view/widget/bottom_app_bar.dart';
-import 'package:linked_scroll_controller/linked_scroll_controller.dart';
 
 class ViewResponses extends StatefulWidget {
   const ViewResponses({Key? key}) : super(key: key);
@@ -20,15 +22,13 @@ class _ViewResponseDeckPageState extends State<ViewResponses> {
   int currentCardIndex = 1;
   late InfiniteScrollController deckScrollController;
   late InfiniteScrollController responseFieldScrollController;
-
-  late LinkedScrollControllerGroup _scrollControllers;
   final ViewResponseCubit _viewResponseCubit = ViewResponseCubit();
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    _scrollControllers = LinkedScrollControllerGroup();
+
     deckScrollController = InfiniteScrollController();
     responseFieldScrollController = InfiniteScrollController();
     deckScrollController.addListener(() {
@@ -307,16 +307,18 @@ class ResponseTextField extends StatefulWidget {
 }
 
 class _ResponseTextFieldState extends State<ResponseTextField> {
+  late StreamController<String> responseStream;
   @override
   void initState() {
     // TODO: implement initState
+    responseStream = context.read<ResponseBloc>().responseStream;
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    widget.responseTextFieldController.text =
-        'This is a response to the cards above! Here would be something thoughtful that reflects the lesson taught via this card.';
+    /* widget.responseTextFieldController.text =
+        'This is a response to the cards above! Here would be something thoughtful that reflects the lesson taught via this card.';*/
     return Column(
       children: [
         Container(
@@ -331,7 +333,7 @@ class _ResponseTextFieldState extends State<ResponseTextField> {
                     spreadRadius: 5),
               ]),
           child: Container(
-            height: 50,
+            height: 100,
             alignment: Alignment.center,
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
             margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
@@ -339,22 +341,39 @@ class _ResponseTextFieldState extends State<ResponseTextField> {
               color: Colors.grey.shade300,
               borderRadius: BorderRadius.circular(10),
             ),
-            child: TextField(
-              enabled: false,
-              controller: widget.responseTextFieldController,
-              expands: true,
-              // autofocus: true,
-              textAlignVertical: TextAlignVertical.top,
-              textAlign: TextAlign.start,
-              minLines: null,
-              maxLines: null,
-              decoration: const InputDecoration(
-                  floatingLabelAlignment: FloatingLabelAlignment.start,
-                  //isCollapsed: true,
-                  hintText: 'Nothing Yet!',
-                  filled: false,
-                  label: Text('Response'),
-                  border: InputBorder.none),
+            child: BlocConsumer<ResponseBloc, ResponseState>(
+              listener: (context, state) {},
+              builder: (context, state) {
+                if (state is ResponseLoading) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+                if (state is ResponseLoaded) {
+                  widget.responseTextFieldController.text = state.response;
+                  return TextField(
+                    enabled: false,
+                    controller: widget.responseTextFieldController,
+                    expands: true,
+                    // autofocus: true,
+                    textAlignVertical: TextAlignVertical.top,
+                    textAlign: TextAlign.start,
+                    minLines: null,
+                    maxLines: null,
+                    decoration: const InputDecoration(
+                        floatingLabelAlignment: FloatingLabelAlignment.start,
+                        //isCollapsed: true,
+                        hintText: 'Nothing Yet!',
+                        filled: false,
+                        label: Text('Response'),
+                        border: InputBorder.none),
+                  );
+                } else {
+                  return const Center(
+                    child: Text('Something Went Wrong...'),
+                  );
+                }
+              },
             ),
           ),
         ),

@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
 import 'package:inspired_senior_care_app/data/models/category.dart';
 
+import '../../bloc/view_response/response_bloc.dart';
+
 class ProgressSection extends StatelessWidget {
   const ProgressSection({
     Key? key,
@@ -307,6 +309,10 @@ class GroupMemberProgressCategory extends StatelessWidget {
                   children: [
                     ElevatedButton(
                         onPressed: () {
+                          context.read<ResponseBloc>().add(FetchResponse(
+                              userId: 'nzeeburQleQBVF6UekJ51OjICYI3',
+                              categoryName: title,
+                              cardNumber: 2));
                           context.goNamed('view-responses');
                         },
                         child: const Text('View Responses >')),
