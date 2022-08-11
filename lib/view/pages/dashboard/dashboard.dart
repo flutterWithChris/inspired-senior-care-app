@@ -24,7 +24,7 @@ class Dashboard extends StatefulWidget {
 class _DashboardState extends State<Dashboard> {
   TextEditingController inviteTextFieldController = TextEditingController();
   List<Group> myGroupList = [];
-  late final User currentUser;
+  User currentUser = User.empty;
   static List<Group> sampleGroupList = [
     const Group(
         groupName: 'Cleveland Senior Care',
@@ -44,7 +44,6 @@ class _DashboardState extends State<Dashboard> {
     return SafeArea(
       child: Scaffold(
         drawer: const ManagerAppDrawer(),
-
         bottomNavigationBar: const MainBottomAppBar(),
         appBar: PreferredSize(
           preferredSize: const Size.fromHeight(50),
@@ -83,38 +82,9 @@ class _DashboardState extends State<Dashboard> {
                         padding: const EdgeInsets.only(
                             top: 6.0, bottom: 24.0, left: 12.0, right: 12.0),
                         child: Column(children: [
-                          Column(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 12.0, horizontal: 12.0),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Wrap(
-                                      crossAxisAlignment:
-                                          WrapCrossAlignment.center,
-                                      spacing: 12.0,
-                                      children: [
-                                        const Icon(
-                                          Icons.star,
-                                          color: Colors.black87,
-                                        ),
-                                        Text(
-                                          'Featured Category',
-                                          textAlign: TextAlign.start,
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .headline5,
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const CurrentCategoryCard(),
-                            ],
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: const [],
                           ),
                           Padding(
                             padding: const EdgeInsets.symmetric(
@@ -146,7 +116,6 @@ class _DashboardState extends State<Dashboard> {
                           // * Groups Section
                           BlocBuilder<GroupBloc, GroupState>(
                             // * Rebuild when groups updated.
-
                             builder: (context, state) {
                               if (state is GroupLoading) {
                                 return Center(
@@ -293,7 +262,6 @@ class _GroupSectionState extends State<GroupSection> {
     final currentUser = widget.manager;
     return Card(
       elevation: 0,
-      //color: Colors.grey.shade100,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 12.0),
@@ -349,36 +317,63 @@ class _GroupSectionState extends State<GroupSection> {
                   )),
             ],
           ),
-          GroupMemberTile(
-            memberName: 'Julia Test',
-            memberTitle: 'Nurse',
-            memberProgress: 0.3,
-            memberColor: Colors.pink,
+          SizedBox(
+              width: 300,
+              height: 30,
+              child: Text(
+                'Featured Category',
+                style: Theme.of(context).textTheme.titleLarge,
+              )),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: Card(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.0)),
+              child: const CurrentCategoryCard(),
+            ),
           ),
-          GroupMemberTile(
-            memberName: 'Amanda Sample',
-            memberTitle: 'Nurse',
-            memberProgress: 0.7,
-            memberColor: Colors.indigo,
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4.0),
+            child: Card(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(24.0)),
+              child: ExpansionTile(
+                title: const Text('Group Members'),
+                children: [
+                  GroupMemberTile(
+                    memberName: 'Julia Test',
+                    memberTitle: 'Nurse',
+                    memberProgress: 0.3,
+                    memberColor: Colors.pink,
+                  ),
+                  GroupMemberTile(
+                    memberName: 'Amanda Sample',
+                    memberTitle: 'Nurse',
+                    memberProgress: 0.7,
+                    memberColor: Colors.indigo,
+                  ),
+                  GroupMemberTile(
+                    memberName: 'Tracy Chapman',
+                    memberTitle: 'Nurse',
+                    memberProgress: 0.9,
+                    memberColor: Colors.amber,
+                  ),
+                  GroupMemberTile(
+                    memberName: 'George Costanza',
+                    memberTitle: 'Nurse',
+                    memberProgress: 0.6,
+                    memberColor: Colors.cyanAccent,
+                  ),
+                  GroupMemberTile(
+                    memberName: 'Ralph Maccio',
+                    memberTitle: 'Nurse',
+                    memberProgress: 0.2,
+                    memberColor: Colors.brown,
+                  ),
+                ],
+              ),
+            ),
           ),
-          /*  GroupMemberTile(
-            memberName: 'Tracy Chapman',
-            memberTitle: 'Nurse',
-            memberProgress: 0.9,
-            memberColor: Colors.amber,
-          ),
-          GroupMemberTile(
-            memberName: 'George Costanza',
-            memberTitle: 'Nurse',
-            memberProgress: 0.6,
-            memberColor: Colors.cyanAccent,
-          ),
-          GroupMemberTile(
-            memberName: 'Ralph Maccio',
-            memberTitle: 'Nurse',
-            memberProgress: 0.2,
-            memberColor: Colors.brown,
-          ), */
         ]),
       ),
     );
@@ -392,11 +387,9 @@ class CurrentCategoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      shape: const StadiumBorder(),
-      elevation: 0.5,
+    return SizedBox(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 10.0),
         child: ListTile(
           minLeadingWidth: 10,
           // dense: true,

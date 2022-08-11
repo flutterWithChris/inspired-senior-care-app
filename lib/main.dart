@@ -26,11 +26,11 @@ import 'package:inspired_senior_care_app/view/pages/categories.dart';
 import 'package:inspired_senior_care_app/view/pages/dashboard/choose_category.dart';
 import 'package:inspired_senior_care_app/view/pages/dashboard/dashboard.dart';
 import 'package:inspired_senior_care_app/view/pages/dashboard/members/view_responses.dart';
+import 'package:inspired_senior_care_app/view/pages/dashboard/view_member.dart';
 import 'package:inspired_senior_care_app/view/pages/deck_page.dart';
 import 'package:inspired_senior_care_app/view/pages/login/login.dart';
 import 'package:inspired_senior_care_app/view/pages/profile.dart';
 import 'package:inspired_senior_care_app/view/pages/signup/signup.dart';
-import 'package:inspired_senior_care_app/view/pages/dashboard/view_member.dart';
 import 'package:inspired_senior_care_app/view/widget/bottom_app_bar.dart';
 import 'package:inspired_senior_care_app/view/widget/top_app_bar.dart';
 
@@ -62,8 +62,6 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    //bloc = context.read<AuthBloc>();
-
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider(
@@ -179,7 +177,7 @@ class _MyAppState extends State<MyApp> {
       bool isLoggingIn = state.location == '/login';
       bool loggedIn = bloc.state.authStatus == AuthStatus.authenticated;
       bool isOnboarding = state.location == '/signup';
-      bool completedOnboarding = false;
+      bool completedOnboarding = true;
 
       if (!loggedIn) {
         return isLoggingIn

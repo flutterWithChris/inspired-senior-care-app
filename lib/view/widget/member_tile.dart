@@ -27,49 +27,45 @@ class GroupMemberTile extends StatelessWidget {
         : '';
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Card(
-        elevation: 0.5,
-        shape: const StadiumBorder(),
-        child: ListTile(
-          shape: const StadiumBorder(),
-          onTap: () => context.goNamed('view-member'),
-          dense: true,
-          minLeadingWidth: 50,
-          minVerticalPadding: 12.0,
-          leading: CircleAvatar(
-            backgroundColor: randomColor,
-            radius: 24.0,
-            child: Text(
-              getInitials(memberName),
-              style: const TextStyle(fontSize: 18),
-            ),
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: ListTile(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        onTap: () => context.goNamed('view-member'),
+        dense: true,
+        minLeadingWidth: 50,
+        minVerticalPadding: 12.0,
+        leading: CircleAvatar(
+          backgroundColor: randomColor,
+          radius: 24.0,
+          child: Text(
+            getInitials(memberName),
+            style: const TextStyle(fontSize: 18),
           ),
-          title: Text(
-            memberName,
-            style: Theme.of(context).textTheme.titleSmall,
-          ),
-          subtitle: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(memberTitle),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10.0),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(25),
-                  child: LinearProgressIndicator(
-                    backgroundColor: Colors.grey.shade300,
-                    color: Colors.blueAccent,
-                    value: memberProgress,
-                  ),
+        ),
+        title: Text(
+          memberName,
+          style: Theme.of(context).textTheme.titleSmall,
+        ),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(memberTitle),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10.0),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(25),
+                child: LinearProgressIndicator(
+                  backgroundColor: Colors.grey.shade300,
+                  color: Colors.blueAccent,
+                  value: memberProgress,
                 ),
               ),
-            ],
-          ),
-          trailing: const SizedBox(
-            height: 50,
-            child: Icon(Icons.chevron_right_rounded),
-          ),
+            ),
+          ],
+        ),
+        trailing: const SizedBox(
+          height: 50,
+          child: Icon(Icons.chevron_right_rounded),
         ),
       ),
     );

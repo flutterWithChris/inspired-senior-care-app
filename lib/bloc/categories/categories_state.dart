@@ -10,11 +10,13 @@ abstract class CategoriesState extends Equatable {
 class CategoriesLoading extends CategoriesState {}
 
 class CategoriesLoaded extends CategoriesState {
+  final Category category;
   final List<dynamic> categoryImageUrls;
   CategoriesLoaded({
+    required this.category,
     this.categoryImageUrls = const [],
   });
   @override
   // TODO: implement props
-  List<Object?> get props => [categoryImageUrls];
+  List<Object?> get props => [category, categoryImageUrls];
 }

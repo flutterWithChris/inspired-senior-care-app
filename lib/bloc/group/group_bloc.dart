@@ -20,31 +20,32 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
 
   void _onCreateGroup(CreateGroup event, Emitter<GroupState> emit) async {
     emit(GroupSubmitting());
-    await Future.delayed(const Duration(seconds: 2));
+    await Future.delayed(const Duration(milliseconds: 500));
     _databaseRepository.addNewGroup(event.group, event.manager);
     emit(GroupSubmitted());
     emit(GroupCreated(group: event.group));
-    await Future.delayed(const Duration(seconds: 2));
+    await Future.delayed(const Duration(milliseconds: 500));
     emit(GroupInitial());
   }
 
-  void _onUpdateGroup(UpdateGroup event, Emitter<GroupState> emit) {
+  void _onUpdateGroup(UpdateGroup event, Emitter<GroupState> emit) async {
     _databaseRepository.updateGroup(event.group);
+    emit(GroupUpdated());
+    await Future.delayed(const Duration(milliseconds: 500));
+    emit(GroupInitial());
   }
 
   void _onGroupLoaded(LoadGroups event, Emitter<GroupState> emit) async {
     List<Group> groups = [];
-    Stream<Group>? thisGroup;
     for (int i = 0; i < event.currentUser.groups!.length; i++) {
       _databaseRepository
           .getGroup(event.currentUser.groups![i])
           .listen((group) {
         groups.add(group);
       });
-
       print('Adding ${event.currentUser.groups![i]}');
+      await Future.delayed(const Duration(milliseconds: 500));
     }
-
     emit(GroupLoaded(myGroups: groups));
   }
 }

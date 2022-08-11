@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:inspired_senior_care_app/data/models/category.dart';
 import 'package:inspired_senior_care_app/data/repositories/database/database_repository.dart';
 import 'package:inspired_senior_care_app/data/repositories/storage/storage_repository.dart';
 import 'package:meta/meta.dart';
@@ -26,9 +27,12 @@ class CategoriesBloc extends Bloc<CategoriesEvent, CategoriesState> {
   void _onCategoriesLoaded(
       LoadCategories event, Emitter<CategoriesState> emit) async {
     _databaseSubscription?.cancel();
-    emit(CategoriesLoaded(
-      categoryImageUrls: await _storageRepository.getCategoryCovers(),
-    ));
+    List<String> cardImages = await _storageRepository.getCategoryCovers();
+    await emit.forEach(_databaseRepository.getCategories(),
+        onData: (Category? category) {
+      return CategoriesLoaded(
+          categoryImageUrls: cardImages, category: category!);
+    });
   }
 
   void _onCategoriesUpdated(

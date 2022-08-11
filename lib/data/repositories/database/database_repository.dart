@@ -1,9 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart' as auth;
+import 'package:inspired_senior_care_app/data/models/category.dart';
 import 'package:inspired_senior_care_app/data/models/group.dart';
 import 'package:inspired_senior_care_app/data/models/response.dart';
 import 'package:inspired_senior_care_app/data/models/user.dart';
 import 'package:inspired_senior_care_app/data/repositories/database/base_database_repository.dart';
-import 'package:firebase_auth/firebase_auth.dart' as auth;
 
 class DatabaseRepository extends BaseDatabaseRepository {
   final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
@@ -30,6 +31,14 @@ class DatabaseRepository extends BaseDatabaseRepository {
         .doc(user.id)
         .update(user.toMap())
         .then((value) => print('User document Updated**'));
+  }
+
+  Stream<Category?> getCategories() {
+    return _firebaseFirestore.collection('categories').get().then((snap) {
+      for (int i = 0; i < snap.docs.length; i++) {
+        return Category.fromSnapshot(snap.docs[i]);
+      }
+    }).asStream();
   }
 
   Future<void> submitResponse(

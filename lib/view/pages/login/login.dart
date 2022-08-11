@@ -11,6 +11,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  bool hidePassword = true;
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<LoginCubit, LoginState>(
@@ -56,6 +57,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             context.read<LoginCubit>().emailChanged(value),
                         decoration: InputDecoration(
                           label: const Text('Email Address'),
+                          prefixIcon: const Icon(Icons.email),
                           filled: true,
                           fillColor: Colors.white,
                           border: OutlineInputBorder(
@@ -69,10 +71,21 @@ class _LoginScreenState extends State<LoginScreen> {
                     SizedBox(
                       width: 325,
                       child: TextFormField(
+                        obscureText: hidePassword,
                         onChanged: (value) =>
                             context.read<LoginCubit>().passwordChanged(value),
                         decoration: InputDecoration(
                           label: const Text('Password'),
+                          prefixIcon: const Icon(Icons.lock),
+                          suffixIcon: IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  hidePassword = !hidePassword;
+                                });
+                              },
+                              icon: hidePassword
+                                  ? const Icon(Icons.visibility_off_rounded)
+                                  : const Icon(Icons.visibility_rounded)),
                           filled: true,
                           fillColor: Colors.white,
                           border: OutlineInputBorder(

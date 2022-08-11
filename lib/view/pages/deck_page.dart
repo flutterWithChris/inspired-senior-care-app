@@ -255,7 +255,7 @@ class CardCounter extends StatelessWidget {
           builder: (context, state) {
             if (state is CardsLoaded) {
               double percentageComplete =
-                  currentCardIndex / state.category.totalCards;
+                  currentCardIndex / state.category.totalCards!;
               return SizedBox(
                 height: 64,
                 width: 64,

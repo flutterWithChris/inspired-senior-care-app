@@ -38,7 +38,7 @@ class ProgressSection extends StatelessWidget {
                       double? progress;
                       if (categoryStarted) {
                         progress = state.user.progress![category.name]! /
-                            category.totalCards *
+                            category.totalCards! *
                             100;
                       }
 
