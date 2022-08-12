@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:inspired_senior_care_app/bloc/categories/categories_bloc.dart';
+import 'package:inspired_senior_care_app/bloc/member/bloc/member_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
 import 'package:inspired_senior_care_app/data/models/category.dart';
+import 'package:inspired_senior_care_app/data/models/user.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 import '../../bloc/view_response/response_bloc.dart';
@@ -190,56 +192,73 @@ class GroupMemberProgressSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      child: Card(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
-        color: Colors.white,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 24.0),
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                child: Text(
-                  'Chelsea\'s Progress',
-                  textAlign: TextAlign.left,
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-              ),
-              GroupMemberProgressCategory(
-                  title: 'Communication',
-                  progressColor: Colors.deepOrange,
-                  progress: 100,
-                  message: 'All Done. Good Job!'),
-              GroupMemberProgressCategory(
-                  title: 'Positive Interactions',
-                  progressColor: Colors.redAccent,
-                  progress: 33,
-                  message: '8 more to go.'),
-              GroupMemberProgressCategory(
-                  title: 'Supportive Environment',
-                  progressColor: Colors.lightGreen,
-                  progress: 70,
-                  message: 'Only 3 More!'),
-              GroupMemberProgressCategory(
-                  title: 'Brain Change',
-                  progressColor: Colors.lightGreen,
-                  progress: 40,
-                  message: 'Only 3 More!'),
-              GroupMemberProgressCategory(
-                  title: 'Damaging Interactions',
-                  progressColor: Colors.grey,
-                  progress: 10,
-                  message: 'Only 3 More!'),
-              GroupMemberProgressCategory(
-                  title: 'Genuine Relationships',
-                  progressColor: Colors.red,
-                  progress: 70,
-                  message: 'Only 3 More!'),
-            ],
-          ),
-        ),
-      ),
+    double calculateProgress(int currentCardIndex, int totalCards) {
+      double progress = (currentCardIndex / totalCards * 100).roundToDouble();
+      print('Progress: $progress');
+      return progress;
+    }
+
+    return BlocBuilder<CategoriesBloc, CategoriesState>(
+      builder: (context, state) {
+        if (state is CategoriesLoaded) {
+          List<Category> categoryList = state.categories;
+          return BlocBuilder<MemberBloc, MemberState>(
+            builder: (context, state) {
+              if (state is MemberLoading) {
+                return LoadingAnimationWidget.discreteCircle(
+                    color: Colors.blue, size: 30);
+              }
+              if (state is MemberLoaded) {
+                User groupMember = state.user;
+
+                print(groupMember.progress!['Brain Change']);
+                return SizedBox(
+                  child: Card(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(25)),
+                    color: Colors.white,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 12.0, horizontal: 24.0),
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8.0),
+                            child: Text(
+                              'Chelsea\'s Progress',
+                              textAlign: TextAlign.left,
+                              style: Theme.of(context).textTheme.titleLarge,
+                            ),
+                          ),
+                          for (Category category in categoryList)
+                            GroupMemberProgressCategory(
+                                title: category.name,
+                                progressColor: category.progressColor,
+                                progress: groupMember.progress!
+                                            .containsKey(category.name) ==
+                                        true
+                                    ? calculateProgress(
+                                        groupMember.progress![category.name]!,
+                                        category.totalCards!)
+                                    : 0,
+                                message: 'All Done. Good Job!'),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              } else {
+                return const Center(
+                  child: Text('Something Went Wrong..'),
+                );
+              }
+            },
+          );
+        }
+        return const Center(
+          child: Text('Something Went Wrong..'),
+        );
+      },
     );
   }
 }
@@ -247,7 +266,7 @@ class GroupMemberProgressSection extends StatelessWidget {
 class GroupMemberProgressCategory extends StatelessWidget {
   final String title;
   Color progressColor;
-  int progress;
+  double progress;
   String message;
   GroupMemberProgressCategory({
     Key? key,
@@ -285,7 +304,7 @@ class GroupMemberProgressCategory extends StatelessWidget {
                               spacing: 5,
                               children: [
                                 Text(
-                                  '${progress.toString()}%',
+                                  '${progress.toStringAsFixed(0)}%',
                                 ),
                                 const Icon(
                                   Icons.check_circle,
@@ -305,7 +324,7 @@ class GroupMemberProgressCategory extends StatelessWidget {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 10.0, vertical: 2.0),
                             child: Text(
-                              '${progress.toString()}%',
+                              '${progress.toStringAsFixed(0)}%',
                             ),
                           ),
                         ),
