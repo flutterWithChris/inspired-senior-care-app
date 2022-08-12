@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:inspired_senior_care_app/bloc/categories/categories_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
 import 'package:inspired_senior_care_app/data/models/category.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 import '../../bloc/view_response/response_bloc.dart';
 
@@ -13,48 +15,70 @@ class ProgressSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      child: Card(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(33)),
-        color: Colors.white,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 24.0),
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                child: Text(
-                  'Your Progress',
-                  textAlign: TextAlign.left,
-                  style: Theme.of(context).textTheme.titleLarge,
+    return BlocBuilder<CategoriesBloc, CategoriesState>(
+      builder: (context, state) {
+        if (state is CategoriesLoading) {
+          return LoadingAnimationWidget.discreteCircle(
+              color: Colors.blue, size: 30);
+        }
+        if (state is CategoriesFailed) {
+          return const Center(
+            child: Text('Error Fetching Categories!'),
+          );
+        }
+        if (state is CategoriesLoaded) {
+          List<Category> categoryList = state.categories;
+          return SizedBox(
+            child: Card(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(33)),
+              color: Colors.white,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                    vertical: 12.0, horizontal: 24.0),
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: Text(
+                        'Your Progress',
+                        textAlign: TextAlign.left,
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                    ),
+                    for (Category category in categoryList)
+                      BlocBuilder<ProfileBloc, ProfileState>(
+                        builder: (context, state) {
+                          if (state is ProfileLoaded) {
+                            bool categoryStarted =
+                                state.user.progress!.containsKey(category.name);
+                            double? progress;
+                            if (categoryStarted) {
+                              progress = state.user.progress![category.name]! /
+                                  category.totalCards! *
+                                  100;
+                            }
+
+                            return ProgressCategory(
+                                title: category.name,
+                                progressColor: category.progressColor,
+                                progress: categoryStarted ? progress! : 0,
+                                message: 'All Done. Good Job!');
+                          }
+                          return const Text('Something Went Wrong...');
+                        },
+                      ),
+                  ],
                 ),
               ),
-              for (Category category in categoryList)
-                BlocBuilder<ProfileBloc, ProfileState>(
-                  builder: (context, state) {
-                    if (state is ProfileLoaded) {
-                      bool categoryStarted =
-                          state.user.progress!.containsKey(category.name);
-                      double? progress;
-                      if (categoryStarted) {
-                        progress = state.user.progress![category.name]! /
-                            category.totalCards! *
-                            100;
-                      }
-
-                      return ProgressCategory(
-                          title: category.name,
-                          progressColor: category.progressColor,
-                          progress: categoryStarted ? progress! : 0,
-                          message: 'All Done. Good Job!');
-                    }
-                    return const Text('Something Went Wrong...');
-                  },
-                ),
-            ],
-          ),
-        ),
-      ),
+            ),
+          );
+        } else {
+          return const Center(
+            child: Text('Something Went Wrong!!'),
+          );
+        }
+      },
     );
   }
 }

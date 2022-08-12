@@ -12,9 +12,11 @@ part 'categories_event.dart';
 part 'categories_state.dart';
 
 class CategoriesBloc extends Bloc<CategoriesEvent, CategoriesState> {
+  List<Category> categoryList = [];
   final DatabaseRepository _databaseRepository;
   final StorageRepository _storageRepository;
   StreamSubscription? _databaseSubscription;
+
   CategoriesBloc(
       {required DatabaseRepository databaseRepository,
       required StorageRepository storageRepository})
@@ -24,19 +26,27 @@ class CategoriesBloc extends Bloc<CategoriesEvent, CategoriesState> {
     on<LoadCategories>(_onCategoriesLoaded);
     on<UpdateCategories>(_onCategoriesUpdated);
   }
+
   void _onCategoriesLoaded(
       LoadCategories event, Emitter<CategoriesState> emit) async {
     _databaseSubscription?.cancel();
+    categoryList.clear();
     List<String> cardImages = await _storageRepository.getCategoryCovers();
-    await emit.forEach(_databaseRepository.getCategories(),
-        onData: (Category? category) {
-      return CategoriesLoaded(
-          categoryImageUrls: cardImages, category: category!);
-    });
+    await emit.forEach(
+      _databaseRepository.getCategories(),
+      onData: (List<Category>? categories) {
+        print('Got ${categories!.length} categories from Firestore***');
+        return CategoriesLoaded(
+            categories: categories, categoryImageUrls: cardImages);
+      },
+      onError: (error, stackTrace) {
+        return CategoriesFailed();
+      },
+    );
   }
 
   void _onCategoriesUpdated(
       UpdateCategories event, Emitter<CategoriesState> emit) {
-    // emit(CategoriesLoaded(categoryImageUrls: event.categoryImageUrls));
+    add(LoadCategories());
   }
 }

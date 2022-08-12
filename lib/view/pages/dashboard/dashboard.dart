@@ -302,8 +302,6 @@ class _GroupSectionState extends State<GroupSection> {
               ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
                     fixedSize: const Size(140, 30),
-                    primary: Colors.blueAccent,
-                    onPrimary: Colors.white,
                   ),
                   onPressed: () {
                     print(currentUser.name);
@@ -329,6 +327,7 @@ class _GroupSectionState extends State<GroupSection> {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: Card(
+              elevation: 0.618,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12.0)),
               child: const CurrentCategoryCard(),

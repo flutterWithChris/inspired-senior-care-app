@@ -47,11 +47,13 @@ class DatabaseRepository extends BaseDatabaseRepository {
         .then((value) => print('User document Updated**'));
   }
 
-  Stream<Category?> getCategories() {
+  Stream<List<Category>?> getCategories() {
+    final List<Category> categories = [];
     return _firebaseFirestore.collection('categories').get().then((snap) {
       for (int i = 0; i < snap.docs.length; i++) {
-        return Category.fromSnapshot(snap.docs[i]);
+        categories.add(Category.fromSnapshot(snap.docs[i]));
       }
+      return categories;
     }).asStream();
   }
 

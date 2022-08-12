@@ -1,7 +1,9 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:inspired_senior_care_app/bloc/member/bloc/member_bloc.dart';
 
 class GroupMemberTile extends StatelessWidget {
   final String memberId;
@@ -34,6 +36,7 @@ class GroupMemberTile extends StatelessWidget {
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           onTap: () {
+            context.read<MemberBloc>().add(LoadMember(userId: memberId));
             context.goNamed('view-member');
           },
           dense: true,

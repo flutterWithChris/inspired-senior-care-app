@@ -50,13 +50,11 @@ class Categories extends StatelessWidget {
                 );
               }
               if (state is CategoriesLoaded) {
+                List<Category> allCategories = state.categories;
                 int categoryCount = state.categoryImageUrls.length;
-                final List<dynamic> categories = [
-                  for (int i = 0; i < categoryCount; i++)
-                    CategoryCard(
-                      categoryIndex: i,
-                      category: categoryList[i],
-                    ),
+                final List<CategoryCard> categoryCards = [
+                  for (Category category in allCategories)
+                    CategoryCard(category: category),
                 ];
 
                 return ListView(
@@ -83,7 +81,7 @@ class Categories extends StatelessWidget {
                             mainAxisSpacing: 6.0,
                             crossAxisCount: crossAxisCount),
                         itemBuilder: (context, index) {
-                          return categories[index];
+                          return categoryCards[index];
                         },
                       );
                     }),
@@ -104,13 +102,12 @@ class Categories extends StatelessWidget {
 
 class CategoryCard extends StatelessWidget {
   final Category category;
-  final int categoryIndex;
+
   Random random = Random();
 
   CategoryCard({
     Key? key,
     required this.category,
-    required this.categoryIndex,
   }) : super(key: key);
 
   @override
@@ -135,7 +132,6 @@ class CategoryCard extends StatelessWidget {
           );
         }
         if (state is CategoriesLoaded) {
-          var coverURL = state.categoryImageUrls.elementAt(categoryIndex);
           return BlocBuilder<CardBloc, CardState>(
             builder: (context, state) {
               //   context.read<CardBloc>().add(ResetCards());
@@ -162,7 +158,7 @@ class CategoryCard extends StatelessWidget {
                                 child: LoadingAnimationWidget.inkDrop(
                                     color: Colors.blueAccent, size: 30.0),
                               ),
-                              imageUrl: coverURL,
+                              imageUrl: category.coverImageUrl,
                               height: 250,
                               fit: BoxFit.fitHeight,
                             )),

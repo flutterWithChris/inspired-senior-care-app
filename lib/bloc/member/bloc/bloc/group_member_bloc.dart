@@ -28,7 +28,7 @@ class GroupMemberBloc extends Bloc<GroupMemberEvent, GroupMemberState> {
         members.add(user);
       });
     }
-    await Future.delayed(const Duration(seconds: 1));
+    await Future.delayed(const Duration(milliseconds: 500));
     emit(GroupMembersLoaded(groupMembers: members, group: event.group));
   }
 

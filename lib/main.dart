@@ -145,30 +145,28 @@ class _MyAppState extends State<MyApp> {
               routeInformationProvider: _router.routeInformationProvider,
               title: 'Inspired Senior Care App',
               theme: ThemeData(
-                scaffoldBackgroundColor: Colors.grey.shade200,
-                inputDecorationTheme: InputDecorationTheme(
-                  filled: true,
-                  fillColor: Colors.white,
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(25)),
-                ),
-                progressIndicatorTheme: ProgressIndicatorThemeData(
-                    circularTrackColor: Colors.grey.shade400),
-                elevatedButtonTheme: ElevatedButtonThemeData(
-                  style: ElevatedButton.styleFrom(
-                    shape: const StadiumBorder(),
-                    fixedSize: const Size(200, 30),
-                    minimumSize: const Size(35, 30),
+                  scaffoldBackgroundColor: Colors.grey.shade200,
+                  inputDecorationTheme: InputDecorationTheme(
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(25)),
                   ),
-                ),
-                bottomSheetTheme:
-                    const BottomSheetThemeData(backgroundColor: Colors.white),
-                textTheme: GoogleFonts.breeSerifTextTheme(),
-                //  useMaterial3: true,
+                  progressIndicatorTheme: ProgressIndicatorThemeData(
+                      circularTrackColor: Colors.grey.shade400),
+                  elevatedButtonTheme: ElevatedButtonThemeData(
+                    style: ElevatedButton.styleFrom(
+                      shape: const StadiumBorder(),
+                      fixedSize: const Size(200, 30),
+                      minimumSize: const Size(35, 30),
+                    ),
+                  ),
+                  bottomSheetTheme:
+                      const BottomSheetThemeData(backgroundColor: Colors.white),
+                  textTheme: GoogleFonts.breeSerifTextTheme(),
+                  //  useMaterial3: true,
 
-                colorSchemeSeed: Colors.purple,
-                // primarySwatch: Colors.blue,
-              ),
+                  primaryColor: const Color(0xffC27A63)),
             );
           },
         ),
@@ -255,28 +253,30 @@ class _MyAppState extends State<MyApp> {
           GoRoute(
               name: 'view-group-members',
               path: 'view-group-members',
-              builder: ((context, state) => const ViewMembers())),
-          GoRoute(
-            name: 'view-member',
-            path: 'view-member',
-            builder: (context, state) => const ViewMember(),
-            routes: [
-              GoRoute(
-                  name: 'view-responses',
-                  path: 'view-responses',
-                  builder: (context, state) => MultiBlocProvider(
-                        providers: [
-                          BlocProvider(
-                            create: (context) => ViewResponseDeckCubit(),
-                          ),
-                          BlocProvider(
-                            create: (context) => ViewResponseCubit(),
-                          ),
-                        ],
-                        child: const ViewResponses(),
-                      )),
-            ],
-          ),
+              builder: ((context, state) => const ViewMembers()),
+              routes: [
+                GoRoute(
+                  name: 'view-member',
+                  path: 'view-member',
+                  builder: (context, state) => const ViewMember(),
+                  routes: [
+                    GoRoute(
+                        name: 'view-responses',
+                        path: 'view-responses',
+                        builder: (context, state) => MultiBlocProvider(
+                              providers: [
+                                BlocProvider(
+                                  create: (context) => ViewResponseDeckCubit(),
+                                ),
+                                BlocProvider(
+                                  create: (context) => ViewResponseCubit(),
+                                ),
+                              ],
+                              child: const ViewResponses(),
+                            )),
+                  ],
+                ),
+              ]),
           GoRoute(
             name: 'choose-category',
             path: 'choose-category',
