@@ -12,3 +12,9 @@ class LoadMember extends MemberEvent {
   // TODO: implement props
   List<Object?> get props => [userId];
 }
+
+class ResetMember extends MemberEvent {
+  @override
+  // TODO: implement props
+  List<Object?> get props => throw UnimplementedError();
+}

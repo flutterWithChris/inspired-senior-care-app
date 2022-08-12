@@ -198,20 +198,25 @@ class GroupMemberProgressSection extends StatelessWidget {
       return progress;
     }
 
-    return BlocBuilder<CategoriesBloc, CategoriesState>(
+    return BlocBuilder<MemberBloc, MemberState>(
       builder: (context, state) {
-        if (state is CategoriesLoaded) {
-          List<Category> categoryList = state.categories;
-          return BlocBuilder<MemberBloc, MemberState>(
+        if (state is MemberLoading) {
+          return LoadingAnimationWidget.discreteCircle(
+              color: Colors.blue, size: 30);
+        }
+        if (state is MemberLoaded) {
+          User groupMember = state.user;
+
+          print(groupMember.progress!['Brain Change']);
+          return BlocBuilder<CategoriesBloc, CategoriesState>(
             builder: (context, state) {
-              if (state is MemberLoading) {
-                return LoadingAnimationWidget.discreteCircle(
+              if (state is CategoriesLoading) {
+                return LoadingAnimationWidget.threeRotatingDots(
                     color: Colors.blue, size: 30);
               }
-              if (state is MemberLoaded) {
-                User groupMember = state.user;
+              if (state is CategoriesLoaded) {
+                List<Category> categoryList = state.categories;
 
-                print(groupMember.progress!['Brain Change']);
                 return SizedBox(
                   child: Card(
                     shape: RoundedRectangleBorder(
@@ -225,7 +230,7 @@ class GroupMemberProgressSection extends StatelessWidget {
                           Padding(
                             padding: const EdgeInsets.symmetric(vertical: 8.0),
                             child: Text(
-                              'Chelsea\'s Progress',
+                              '${groupMember.name!.split(" ")[0]}\'s Progress',
                               textAlign: TextAlign.left,
                               style: Theme.of(context).textTheme.titleLarge,
                             ),
@@ -254,10 +259,11 @@ class GroupMemberProgressSection extends StatelessWidget {
               }
             },
           );
+        } else {
+          return const Center(
+            child: Text('Error Fetching Member!'),
+          );
         }
-        return const Center(
-          child: Text('Something Went Wrong..'),
-        );
       },
     );
   }

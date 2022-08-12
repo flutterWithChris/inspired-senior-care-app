@@ -21,8 +21,10 @@ class ViewMember extends StatelessWidget {
       body: BlocBuilder<MemberBloc, MemberState>(
         builder: (context, state) {
           if (state is MemberLoading) {
-            return LoadingAnimationWidget.discreteCircle(
-                color: Colors.blue, size: 30);
+            return Center(
+              child: LoadingAnimationWidget.discreteCircle(
+                  color: Colors.blue, size: 30),
+            );
           }
           if (state is MemberLoaded) {
             User thisUser = state.user;

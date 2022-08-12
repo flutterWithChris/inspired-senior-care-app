@@ -11,23 +11,20 @@ class MemberBloc extends Bloc<MemberEvent, MemberState> {
   final DatabaseRepository _databaseRepository;
   MemberBloc({required DatabaseRepository databaseRepository})
       : _databaseRepository = databaseRepository,
-        super(MemberLoading()) {
+        super(MemberInitial()) {
     on<LoadMember>(_onLoadMember);
+    on<ResetMember>(
+      (event, emit) => emit(MemberInitial()),
+    );
   }
 
   void _onLoadMember(LoadMember event, Emitter<MemberState> emit) async {
-    await emit.forEach(
-      _databaseRepository.getUser(event.userId),
-      onData: (User user) {
-        print('Member Loaded ${user.name}');
-        return MemberLoaded(user: user);
-      },
-      onError: (error, stackTrace) {
-        print('Error Fetching Member ${event.userId}');
-        print(error);
-        print(stackTrace);
-        return MemberFailed();
-      },
-    );
+    emit(MemberLoading());
+    User member = User.empty;
+    _databaseRepository.getUser(event.userId).listen((user) {
+      member = user;
+    });
+    await Future.delayed(const Duration(seconds: 1));
+    emit(MemberLoaded(user: member));
   }
 }

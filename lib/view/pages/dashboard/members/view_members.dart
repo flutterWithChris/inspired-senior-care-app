@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/member/bloc/bloc/group_member_bloc.dart';
+import 'package:inspired_senior_care_app/bloc/member/bloc/member_bloc.dart';
 import 'package:inspired_senior_care_app/data/models/user.dart';
 import 'package:inspired_senior_care_app/view/widget/bottom_app_bar.dart';
 import 'package:inspired_senior_care_app/view/widget/member_tile.dart';
@@ -13,6 +14,7 @@ class ViewMembers extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    context.read<MemberBloc>().add(ResetMember());
     return Scaffold(
       appBar: const PreferredSize(
         preferredSize: Size.fromHeight(50),
