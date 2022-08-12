@@ -20,6 +20,20 @@ class DatabaseRepository extends BaseDatabaseRepository {
   }
 
   @override
+  Stream<List<User>>? getUsers(List<String> userIds) {
+    for (String userId in userIds) {
+      return _firebaseFirestore
+          .collection('users')
+          .doc(userId)
+          .snapshots()
+          .map((event) => User.fromSnapshot(event))
+          .toList()
+          .asStream();
+    }
+    return null;
+  }
+
+  @override
   Future<void> createUser(User user) async {
     await _firebaseFirestore.collection('users').doc(user.id).set(user.toMap());
   }

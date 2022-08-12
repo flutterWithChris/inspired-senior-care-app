@@ -11,6 +11,8 @@ import 'package:inspired_senior_care_app/bloc/deck/deck_cubit.dart';
 import 'package:inspired_senior_care_app/bloc/group/group_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/invite/invite_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/manage/view_response_deck_cubit.dart';
+import 'package:inspired_senior_care_app/bloc/member/bloc/bloc/group_member_bloc.dart';
+import 'package:inspired_senior_care_app/bloc/member/bloc/member_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/onboarding/onboarding_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/share_bloc/share_bloc.dart';
@@ -25,6 +27,7 @@ import 'package:inspired_senior_care_app/firebase_options.dart';
 import 'package:inspired_senior_care_app/view/pages/categories.dart';
 import 'package:inspired_senior_care_app/view/pages/dashboard/choose_category.dart';
 import 'package:inspired_senior_care_app/view/pages/dashboard/dashboard.dart';
+import 'package:inspired_senior_care_app/view/pages/dashboard/members/view_members.dart';
 import 'package:inspired_senior_care_app/view/pages/dashboard/members/view_responses.dart';
 import 'package:inspired_senior_care_app/view/pages/dashboard/view_member.dart';
 import 'package:inspired_senior_care_app/view/pages/deck_page.dart';
@@ -105,6 +108,14 @@ class _MyAppState extends State<MyApp> {
           ),
           BlocProvider(
             create: (context) => GroupBloc(
+                databaseRepository: context.read<DatabaseRepository>()),
+          ),
+          BlocProvider(
+            create: (context) => GroupMemberBloc(
+                databaseRepository: context.read<DatabaseRepository>()),
+          ),
+          BlocProvider(
+            create: (context) => MemberBloc(
                 databaseRepository: context.read<DatabaseRepository>()),
           ),
           BlocProvider(
@@ -241,6 +252,10 @@ class _MyAppState extends State<MyApp> {
         path: '/dashboard',
         builder: (context, state) => const Dashboard(),
         routes: [
+          GoRoute(
+              name: 'view-group-members',
+              path: 'view-group-members',
+              builder: ((context, state) => const ViewMembers())),
           GoRoute(
             name: 'view-member',
             path: 'view-member',

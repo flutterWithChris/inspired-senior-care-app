@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:go_router/go_router.dart';
 import 'package:inspired_senior_care_app/bloc/group/group_bloc.dart';
+import 'package:inspired_senior_care_app/bloc/member/bloc/bloc/group_member_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
 import 'package:inspired_senior_care_app/data/models/group.dart';
 import 'package:inspired_senior_care_app/data/models/user.dart';
@@ -10,7 +11,6 @@ import 'package:inspired_senior_care_app/main.dart';
 import 'package:inspired_senior_care_app/view/pages/dashboard/add_member.dart';
 import 'package:inspired_senior_care_app/view/pages/dashboard/create_group.dart';
 import 'package:inspired_senior_care_app/view/widget/bottom_app_bar.dart';
-import 'package:inspired_senior_care_app/view/widget/member_tile.dart';
 import 'package:inspired_senior_care_app/view/widget/name_plate.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
@@ -60,7 +60,7 @@ class _DashboardState extends State<Dashboard> {
             if (state is ProfileLoaded) {
               currentUser = state.user;
               context
-                  .read<GroupBloc>()
+                  .watch<GroupBloc>()
                   .add(LoadGroups(currentUser: currentUser));
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10.0),
@@ -317,13 +317,15 @@ class _GroupSectionState extends State<GroupSection> {
                   )),
             ],
           ),
-          SizedBox(
-              width: 300,
-              height: 30,
-              child: Text(
-                'Featured Category',
-                style: Theme.of(context).textTheme.titleLarge,
-              )),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4.0),
+            child: SizedBox(
+                width: 300,
+                child: Text(
+                  'Featured Category',
+                  style: Theme.of(context).textTheme.titleLarge,
+                )),
+          ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: Card(
@@ -334,44 +336,27 @@ class _GroupSectionState extends State<GroupSection> {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 4.0),
-            child: Card(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(24.0)),
-              child: ExpansionTile(
-                title: const Text('Group Members'),
-                children: [
-                  GroupMemberTile(
-                    memberName: 'Julia Test',
-                    memberTitle: 'Nurse',
-                    memberProgress: 0.3,
-                    memberColor: Colors.pink,
-                  ),
-                  GroupMemberTile(
-                    memberName: 'Amanda Sample',
-                    memberTitle: 'Nurse',
-                    memberProgress: 0.7,
-                    memberColor: Colors.indigo,
-                  ),
-                  GroupMemberTile(
-                    memberName: 'Tracy Chapman',
-                    memberTitle: 'Nurse',
-                    memberProgress: 0.9,
-                    memberColor: Colors.amber,
-                  ),
-                  GroupMemberTile(
-                    memberName: 'George Costanza',
-                    memberTitle: 'Nurse',
-                    memberProgress: 0.6,
-                    memberColor: Colors.cyanAccent,
-                  ),
-                  GroupMemberTile(
-                    memberName: 'Ralph Maccio',
-                    memberTitle: 'Nurse',
-                    memberProgress: 0.2,
-                    memberColor: Colors.brown,
-                  ),
-                ],
-              ),
+            child: BlocBuilder<GroupBloc, GroupState>(
+              builder: (context, state) {
+                if (state is GroupLoading) {
+                  return Center(
+                    child: LoadingAnimationWidget.inkDrop(
+                        color: Colors.blue, size: 30),
+                  );
+                }
+                if (state is GroupLoaded) {
+                  return ElevatedButton(
+                      onPressed: () {
+                        context.read<GroupMemberBloc>().add(LoadGroupMembers(
+                            userIds: widget.group.groupMemberIds!,
+                            group: currentGroup));
+                        context.goNamed('view-group-members');
+                      },
+                      child: const Text('View Group Members'));
+                  print('Current Group Is: ${widget.group.groupName}');
+                }
+                return const Text('Something Went Wrong!');
+              },
             ),
           ),
         ]),

@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:inspired_senior_care_app/bloc/member/bloc/member_bloc.dart';
+import 'package:inspired_senior_care_app/data/models/user.dart';
 import 'package:inspired_senior_care_app/view/widget/bottom_app_bar.dart';
 import 'package:inspired_senior_care_app/view/widget/name_plate.dart';
 import 'package:inspired_senior_care_app/view/widget/progress_widgets.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class ViewMember extends StatelessWidget {
   const ViewMember({Key? key}) : super(key: key);
@@ -14,26 +18,38 @@ class ViewMember extends StatelessWidget {
         preferredSize: const Size.fromHeight(50),
         child: AppBar(title: const Text('Inspired Senior Care')),
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12.0),
-        child: ListView(
-          shrinkWrap: true,
-          children: const [
-            Padding(
-              padding: EdgeInsets.only(top: 12.0),
-              child: NamePlate(
-                memberName: 'Chelsea Ranchford',
-                memberTitle: 'Home Attendant',
-                memberColorHex: 'ffffff',
+      body: BlocBuilder<MemberBloc, MemberState>(
+        builder: (context, state) {
+          if (state is MemberLoading) {
+            return LoadingAnimationWidget.discreteCircle(
+                color: Colors.blue, size: 30);
+          }
+          if (state is MemberLoaded) {
+            User thisUser = state.user;
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12.0),
+              child: ListView(
+                shrinkWrap: true,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12.0),
+                    child: NamePlate(
+                      memberName: thisUser.name!,
+                      memberTitle: thisUser.title!,
+                      memberColorHex: thisUser.userColor!,
+                    ),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 12.0),
+                    child: GroupMemberProgressSection(),
+                  ),
+                  const RemoveMemberButton(),
+                ],
               ),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 12.0),
-              child: GroupMemberProgressSection(),
-            ),
-            RemoveMemberButton(),
-          ],
-        ),
+            );
+          }
+          return const Text('Something Went Wrong!');
+        },
       ),
     );
   }
