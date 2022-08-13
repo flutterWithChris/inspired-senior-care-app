@@ -12,7 +12,7 @@ class ResponseInitial extends ResponseState {}
 class ResponseLoading extends ResponseState {}
 
 class ResponseLoaded extends ResponseState {
-  final String response;
+  final Response response;
   ResponseLoaded({
     required this.response,
   });

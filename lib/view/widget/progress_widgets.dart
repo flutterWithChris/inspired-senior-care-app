@@ -63,7 +63,7 @@ class ProgressSection extends StatelessWidget {
 
                             return ProgressCategory(
                                 title: category.name,
-                                progressColor: category.progressColor,
+                                progressColor: category.categoryColor,
                                 progress: categoryStarted ? progress! : 0,
                                 message: 'All Done. Good Job!');
                           }
@@ -238,7 +238,7 @@ class GroupMemberProgressSection extends StatelessWidget {
                           for (Category category in categoryList)
                             GroupMemberProgressCategory(
                                 title: category.name,
-                                progressColor: category.progressColor,
+                                progressColor: category.categoryColor,
                                 progress: groupMember.progress!
                                             .containsKey(category.name) ==
                                         true

@@ -14,17 +14,13 @@ class ResponseBloc extends Bloc<ResponseEvent, ResponseState> {
   ResponseBloc({required DatabaseRepository databaseRepository})
       : _databaseRepository = databaseRepository,
         super(ResponseLoading()) {
-    on<FetchResponse>(
-      (event, emit) {
-        String submittedResponse = 'No Response Yet!';
-        emit.forEach(
-            _databaseRepository.viewResponse(
-                event.userId, event.categoryName, event.cardNumber),
-            onError: (error, stackTrace) => ResponseFailed(),
-            onData: (Response response) =>
-                ResponseLoaded(response: response.response));
-      },
-    );
+    on<FetchResponse>((event, emit) {
+      _databaseRepository
+          .viewResponse(event.userId, event.categoryName, event.cardNumber)
+          .listen((response) {
+        emit(ResponseLoaded(response: response));
+      });
+    });
   }
 
   void _onFetchResponse(

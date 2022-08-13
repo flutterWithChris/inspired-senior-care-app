@@ -350,7 +350,8 @@ class _ResponseTextFieldState extends State<ResponseTextField> {
                   );
                 }
                 if (state is ResponseLoaded) {
-                  widget.responseTextFieldController.text = state.response;
+                  widget.responseTextFieldController.text =
+                      state.response.response;
                   return TextField(
                     enabled: false,
                     controller: widget.responseTextFieldController,
