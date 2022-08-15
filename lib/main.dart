@@ -18,6 +18,7 @@ import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/share_bloc/share_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/view_response/response_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/view_response/view_response_cubit.dart';
+import 'package:inspired_senior_care_app/cubits/groups/featured_category_cubit.dart';
 import 'package:inspired_senior_care_app/cubits/login/login_cubit.dart';
 import 'package:inspired_senior_care_app/cubits/signup/signup_cubit.dart';
 import 'package:inspired_senior_care_app/data/repositories/auth/auth_repository.dart';
@@ -138,14 +139,18 @@ class _MyAppState extends State<MyApp> {
             create: (context) => ResponseBloc(
                 databaseRepository: context.read<DatabaseRepository>()),
           ),
+          BlocProvider(
+            create: (context) => FeaturedCategoryCubit(
+                databaseRepository: context.read<DatabaseRepository>()),
+          ),
         ],
         child: BlocBuilder<AuthBloc, AuthState>(
           builder: (context, state) {
             bloc = context.read<AuthBloc>();
             return MaterialApp.router(
-              routeInformationParser: _router.routeInformationParser,
-              routerDelegate: _router.routerDelegate,
-              routeInformationProvider: _router.routeInformationProvider,
+              routeInformationParser: router.routeInformationParser,
+              routerDelegate: router.routerDelegate,
+              routeInformationProvider: router.routeInformationProvider,
               title: 'Inspired Senior Care App',
               theme: ThemeData(
                   scaffoldBackgroundColor: Colors.grey.shade200,
@@ -177,7 +182,7 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
-  late final _router = GoRouter(
+  late final router = GoRouter(
     routes: _routes,
     //  routerNeglect: true,
     initialLocation: '/',

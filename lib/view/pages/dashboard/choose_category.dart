@@ -1,9 +1,14 @@
-import 'dart:math';
-
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_carousel/infinite_carousel.dart';
+import 'package:inspired_senior_care_app/bloc/categories/categories_bloc.dart';
+import 'package:inspired_senior_care_app/bloc/group/group_bloc.dart';
+import 'package:inspired_senior_care_app/cubits/groups/featured_category_cubit.dart';
+import 'package:inspired_senior_care_app/data/models/category.dart';
 import 'package:inspired_senior_care_app/view/widget/bottom_app_bar.dart';
 import 'package:inspired_senior_care_app/view/widget/top_app_bar.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class ChooseCategory extends StatefulWidget {
   const ChooseCategory({Key? key}) : super(key: key);
@@ -13,165 +18,207 @@ class ChooseCategory extends StatefulWidget {
 }
 
 class _ChooseCategoryState extends State<ChooseCategory> {
+  final InfiniteScrollController controller = InfiniteScrollController();
+  Category? selectedCategory;
+
   @override
   Widget build(BuildContext context) {
-    final List<DashboardCategoryCard> categories = [
-      DashboardCategoryCard(
-        progressColor: Colors.lightBlueAccent,
-        assetName: 'Positive_Interactions.png',
-        textColor: Colors.black87,
-        progress: '4/12',
-      ),
-      DashboardCategoryCard(
-        progressColor: Colors.tealAccent,
-        progress: '14/14',
-        assetName: 'Communication.png',
-        textColor: Colors.black87,
-      ),
-      DashboardCategoryCard(
-        progressColor: Colors.grey,
-        assetName: 'Supportive_Environment.png',
-        progress: '8/11',
-      ),
-      DashboardCategoryCard(
-        progressColor: Colors.red,
-        progress: '3/18',
-        assetName: 'Brain_Change.png',
-      ),
-      DashboardCategoryCard(
-        progressColor: Colors.red,
-        progress: '3/18',
-        assetName: 'Damaging_Interactions.png',
-      ),
-      DashboardCategoryCard(
-        progressColor: Colors.red,
-        progress: '3/18',
-        assetName: 'Genuine_Relationships.png',
-      ),
-      DashboardCategoryCard(
-        progressColor: Colors.red,
-        progress: '3/18',
-        assetName: 'Language_Matters.png',
-      ),
-      DashboardCategoryCard(
-        progressColor: Colors.red,
-        progress: '3/18',
-        assetName: 'Strengths_Based.png',
-      ),
-      DashboardCategoryCard(
-        progressColor: Colors.red,
-        progress: '3/18',
-        assetName: 'Building_Blocks_2.png',
-      ),
-      DashboardCategoryCard(
-        progressColor: Colors.red,
-        progress: '3/18',
-        assetName: 'Meaningful_Engagement.png',
-      ),
-      DashboardCategoryCard(
-        progressColor: Colors.red,
-        progress: '3/18',
-        assetName: 'Well_Being.png',
-      ),
-      DashboardCategoryCard(
-        progressColor: Colors.red,
-        progress: '3/18',
-        assetName: 'What_if.png',
-      ),
-      DashboardCategoryCard(
-        progressColor: Colors.red,
-        progress: '3/18',
-        assetName: 'Wildly_Curious.png',
-      ),
-    ];
-    return SafeArea(
-      child: Scaffold(
-        bottomNavigationBar: const MainBottomAppBar(),
-        appBar: const PreferredSize(
-          preferredSize: Size.fromHeight(50),
-          child: MainTopAppBar(),
-        ),
-        body: Center(
-          child: Padding(
-            padding: const EdgeInsets.only(bottom: 60.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 16.0),
-                  child: Text(
-                    'Change Featured Category:',
-                    style: Theme.of(context).textTheme.headline5,
+    return BlocBuilder<CategoriesBloc, CategoriesState>(
+      builder: (context, state) {
+        if (state is CategoriesFailed) {
+          return const Center(
+            child: Text('Error Fetching Categories...'),
+          );
+        }
+        if (state is CategoriesLoaded) {
+          final List<Category> categories = state.categories;
+          return SafeArea(
+            child: Scaffold(
+              bottomNavigationBar: const MainBottomAppBar(),
+              appBar: const PreferredSize(
+                preferredSize: Size.fromHeight(50),
+                child: MainTopAppBar(),
+              ),
+              body: Center(
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 60.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 16.0),
+                        child: Text(
+                          'Change Featured Category:',
+                          style: Theme.of(context).textTheme.headline5,
+                        ),
+                      ),
+                      Center(
+                        child: SizedBox(
+                          height: 275,
+                          child: Stack(
+                            alignment: AlignmentDirectional.center,
+                            children: [
+                              BlocConsumer<FeaturedCategoryCubit,
+                                  FeaturedCategoryState>(
+                                listener: (context, state) {
+                                  if (state is FeaturedCategoryLoaded) {}
+                                },
+                                builder: (context, state) {
+                                  if (state is FeaturedCategoryLoading) {
+                                    return Center(
+                                      child: LoadingAnimationWidget
+                                          .fourRotatingDots(
+                                              color: Colors.blue, size: 30),
+                                    );
+                                  }
+                                  if (state is FeaturedCategoryUpdated) {
+                                    return Center(
+                                      child: Wrap(
+                                        crossAxisAlignment:
+                                            WrapCrossAlignment.center,
+                                        direction: Axis.vertical,
+                                        spacing: 8.0,
+                                        children: [
+                                          const Icon(
+                                            Icons.check_circle_outline_rounded,
+                                            color: Colors.lightGreen,
+                                            size: 30,
+                                          ),
+                                          Text(
+                                            'Category Updated!',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .titleMedium,
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  }
+                                  if (state is FeaturedCategoryLoaded) {
+                                    String featuredCategory =
+                                        state.featuredCategoryName;
+                                    int featuredCategoryIndex =
+                                        categories.indexWhere((category) =>
+                                            category.name == featuredCategory);
+
+                                    final List<DashboardCategoryCard> cards = [
+                                      for (Category category in categories)
+                                        DashboardCategoryCard(
+                                          controller: controller,
+                                          assetName: category.coverImageUrl,
+                                          featuredCategoryIndex:
+                                              featuredCategoryIndex,
+                                        ),
+                                    ];
+                                    WidgetsBinding.instance
+                                        .addPostFrameCallback((timeStamp) {
+                                      if (controller.hasClients) {
+                                        controller.animateToItem(
+                                            featuredCategoryIndex);
+                                      }
+                                    });
+                                    return InfiniteCarousel.builder(
+                                      controller: controller,
+                                      onIndexChanged: (p0) {
+                                        selectedCategory = categories[p0];
+                                      },
+                                      velocityFactor: 0.5,
+                                      itemCount: categories.length,
+                                      itemExtent: 175,
+                                      itemBuilder:
+                                          (context, itemIndex, realIndex) {
+                                        return cards[itemIndex];
+                                      },
+                                    );
+                                  }
+                                  return const Center(
+                                    child: Text('Something Went Wrong'),
+                                  );
+                                },
+                              ),
+                              IgnorePointer(
+                                child: Card(
+                                    semanticContainer: false,
+                                    elevation: 0,
+                                    color: Colors.transparent,
+                                    shape: RoundedRectangleBorder(
+                                        side: const BorderSide(
+                                            color: Colors.lightBlueAccent,
+                                            width: 4.0),
+                                        borderRadius:
+                                            BorderRadius.circular(4.0)),
+                                    child: const SizedBox(
+                                      width: 168,
+                                      height: 300,
+                                    )),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: ElevatedButton(onPressed: () {
+                          context
+                              .read<FeaturedCategoryCubit>()
+                              .updateFeaturedCategory(selectedCategory!);
+                          context.read<GroupBloc>().add(UpdateGroup(
+                              group: context
+                                  .read<FeaturedCategoryCubit>()
+                                  .currentGroup
+                                  .copyWith(
+                                      featuredCategory:
+                                          selectedCategory!.name)));
+                        }, child: BlocBuilder<FeaturedCategoryCubit,
+                            FeaturedCategoryState>(
+                          builder: (context, state) {
+                            if (state is FeaturedCategoryLoading) {
+                              return Center(
+                                child: LoadingAnimationWidget.bouncingBall(
+                                    color: Colors.white, size: 18),
+                              );
+                            }
+                            if (state is FeaturedCategoryFailed) {
+                              return const Center(
+                                child: Text('Error!'),
+                              );
+                            }
+                            if (state is FeaturedCategoryLoaded) {
+                              return const Text('Set Category');
+                            }
+                            return const Center(
+                              child: Text('Something Went Wrong!'),
+                            );
+                          },
+                        )),
+                      ),
+                    ],
                   ),
                 ),
-                Center(
-                  child: SizedBox(
-                    height: 275,
-                    child: Stack(
-                      alignment: AlignmentDirectional.center,
-                      children: [
-                        InfiniteCarousel.builder(
-                          onIndexChanged: (p0) {
-                            DashboardCategoryCard currentCategory =
-                                categories[p0];
-                            setState(() {
-                              currentCategory.selected = true;
-                            });
-                          },
-                          velocityFactor: 0.5,
-                          itemCount: categories.length,
-                          itemExtent: 175,
-                          itemBuilder: (context, itemIndex, realIndex) {
-                            return categories[itemIndex];
-                          },
-                        ),
-                        IgnorePointer(
-                          child: Card(
-                              semanticContainer: false,
-                              elevation: 0,
-                              color: Colors.transparent,
-                              shape: RoundedRectangleBorder(
-                                  side: const BorderSide(
-                                      color: Colors.lightBlueAccent,
-                                      width: 4.0),
-                                  borderRadius: BorderRadius.circular(4.0)),
-                              child: const SizedBox(
-                                width: 168,
-                                height: 300,
-                              )),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: ElevatedButton(
-                      onPressed: () {}, child: const Text('Set Category')),
-                ),
-              ],
+              ),
             ),
-          ),
-        ),
-      ),
+          );
+        }
+        return const Center(
+          child: Text('Something Went Wrong..'),
+        );
+      },
     );
   }
 }
 
 class DashboardCategoryCard extends StatefulWidget {
   String assetName;
-  Color progressColor;
-  Color? textColor;
-  String progress;
+
   bool? selected;
+  final InfiniteScrollController controller;
+  int featuredCategoryIndex;
 
   DashboardCategoryCard({
     Key? key,
-    this.selected,
     required this.assetName,
-    required this.progressColor,
-    required this.progress,
-    this.textColor,
+    required this.controller,
+    required this.featuredCategoryIndex,
   }) : super(key: key);
 
   @override
@@ -179,13 +226,8 @@ class DashboardCategoryCard extends StatefulWidget {
 }
 
 class _DashboardCategoryCardState extends State<DashboardCategoryCard> {
-  Random random = Random();
-
   @override
   Widget build(BuildContext context) {
-    final Color progressBasedColor;
-    Color randomColor = Color.fromRGBO(
-        random.nextInt(255), random.nextInt(255), random.nextInt(255), 1);
     return InkWell(
       onTap: () {
         if (widget.selected == true) {
@@ -204,8 +246,8 @@ class _DashboardCategoryCardState extends State<DashboardCategoryCard> {
                 side: const BorderSide(color: Colors.blue, width: 4.0),
                 borderRadius: BorderRadius.circular(4.0))
             : null,
-        child: Image.asset(
-          'lib/assets/card_covers/${widget.assetName}',
+        child: CachedNetworkImage(
+          imageUrl: widget.assetName,
           height: 300,
           fit: BoxFit.fitHeight,
         ),

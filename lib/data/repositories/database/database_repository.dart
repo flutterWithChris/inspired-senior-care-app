@@ -57,6 +57,13 @@ class DatabaseRepository extends BaseDatabaseRepository {
     }).asStream();
   }
 
+  Future<void> setGroupFeaturedCategory(String groupId, Category category) {
+    return _firebaseFirestore
+        .collection('groups')
+        .doc(groupId)
+        .update({'featuredCategory': category.name});
+  }
+
   Future<void> submitResponse(
       String categoryName, int cardNumber, String response) {
     return _firebaseFirestore

@@ -1,10 +1,14 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:go_router/go_router.dart';
+import 'package:inspired_senior_care_app/bloc/categories/categories_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/group/group_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/member/bloc/bloc/group_member_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
+import 'package:inspired_senior_care_app/cubits/groups/featured_category_cubit.dart';
+import 'package:inspired_senior_care_app/data/models/category.dart';
 import 'package:inspired_senior_care_app/data/models/group.dart';
 import 'package:inspired_senior_care_app/data/models/user.dart';
 import 'package:inspired_senior_care_app/main.dart';
@@ -260,6 +264,7 @@ class _GroupSectionState extends State<GroupSection> {
   Widget build(BuildContext context) {
     final Group currentGroup = widget.group;
     final currentUser = widget.manager;
+    context.read<FeaturedCategoryCubit>().loadFeaturedCategory(currentGroup);
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
@@ -326,12 +331,8 @@ class _GroupSectionState extends State<GroupSection> {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: Card(
-              elevation: 0.618,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.0)),
-              child: const CurrentCategoryCard(),
-            ),
+            child:
+                CurrentCategoryCard(group: currentGroup, user: widget.manager),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 4.0),
@@ -365,33 +366,93 @@ class _GroupSectionState extends State<GroupSection> {
 }
 
 class CurrentCategoryCard extends StatelessWidget {
+  final Group group;
+  final User user;
   const CurrentCategoryCard({
+    required this.group,
+    required this.user,
     Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 10.0),
-        child: ListTile(
-          minLeadingWidth: 10,
-          // dense: true,
-          onTap: () => context.goNamed('choose-category'),
-          title: const Text(
-            'Supportive Environment',
-          ),
-          subtitle: const Text('Creating a healthy environment.'),
-          trailing: const Icon(Icons.chevron_right_rounded),
-          leading: SizedBox(
-            height: 60,
-            child: Image.asset(
-              'lib/assets/Supportive_Environment.png',
-              fit: BoxFit.fitHeight,
-            ),
-          ),
-        ),
-      ),
+    return BlocBuilder<CategoriesBloc, CategoriesState>(
+      builder: (context, state) {
+        if (state is CategoriesFailed) {
+          return const Center(
+            child: Text('Error Fetching Categories...'),
+          );
+        }
+        if (state is CategoriesLoaded) {
+          Category currentCategory = state.categories.singleWhere(
+            (category) => category.name == group.featuredCategory,
+          );
+          return BlocBuilder<FeaturedCategoryCubit, FeaturedCategoryState>(
+            builder: (context, state) {
+              if (state is FeaturedCategoryLoading ||
+                  state is FeaturedCategoryUpdated) {
+                return Center(
+                  child: LoadingAnimationWidget.fourRotatingDots(
+                      color: Colors.blue, size: 20),
+                );
+              }
+
+              if (state is FeaturedCategoryFailed) {
+                return const Center(
+                  child: Text('Error Fetching Category!'),
+                );
+              }
+              if (state is FeaturedCategoryLoaded) {
+                return Card(
+                  shape: RoundedRectangleBorder(
+                      side: BorderSide(
+                          color: currentCategory.categoryColor.withOpacity(0.8),
+                          width: 2.0),
+                      borderRadius: BorderRadius.circular(12.0)),
+                  elevation: 1.5,
+                  child: SizedBox(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8.0, vertical: 10.0),
+                      child: ListTile(
+                        minLeadingWidth: 40,
+                        // dense: true,
+                        onTap: () {
+                          context
+                              .read<FeaturedCategoryCubit>()
+                              .loadFeaturedCategory(group);
+
+                          context.goNamed('choose-category');
+                        },
+
+                        title: Text(
+                          group.featuredCategory!,
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                        //  subtitle: const Text('Creating a healthy environment.'),
+                        trailing: const Icon(Icons.chevron_right_rounded),
+                        leading: SizedBox(
+                          height: 50,
+                          child: CachedNetworkImage(
+                            imageUrl: currentCategory.coverImageUrl,
+                            fit: BoxFit.fitHeight,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }
+              return const Center(
+                child: Text('Something Went Wrong!'),
+              );
+            },
+          );
+        }
+        return const Center(
+          child: Text('Something Went Wrong...'),
+        );
+      },
     );
   }
 }

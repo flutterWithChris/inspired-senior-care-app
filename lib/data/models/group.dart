@@ -5,12 +5,14 @@ class Group {
   final String? groupId;
   final List<String>? groupMemberIds;
   final List<String>? groupManagerIds;
+  final String? featuredCategory;
 
   const Group({
     this.groupName,
     this.groupId,
     this.groupMemberIds,
     this.groupManagerIds,
+    this.featuredCategory
   });
 
   Group copyWith({
@@ -18,12 +20,14 @@ class Group {
     String? groupId,
     List<String>? groupMemberIds,
     List<String>? groupManagerIds,
+    String? featuredCategory,
   }) {
     return Group(
       groupName: groupName ?? this.groupName,
       groupId: groupId ?? this.groupId,
       groupMemberIds: groupMemberIds ?? this.groupMemberIds,
       groupManagerIds: groupManagerIds ?? this.groupManagerIds,
+      featuredCategory: featuredCategory ?? this.featuredCategory,
     );
   }
 
@@ -32,7 +36,9 @@ class Group {
         groupName: snap['groupName'],
         groupId: snap['groupId'],
         groupMemberIds: List.from(snap['groupMemberIds']),
-        groupManagerIds: List.from(snap['groupManagerIds']));
+        groupManagerIds: List.from(snap['groupManagerIds']),
+        featuredCategory: snap['featuredCategory']
+        );
 
     return group;
   }
@@ -43,6 +49,7 @@ class Group {
       'groupId': groupId,
       'groupMemberIds': groupMemberIds,
       'groupManagerIds': groupManagerIds,
+      'featuredCategory': featuredCategory,
     };
   }
 
