@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:infinite_carousel/infinite_carousel.dart';
 import 'package:inspired_senior_care_app/bloc/categories/categories_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/group/group_bloc.dart';
@@ -158,39 +159,52 @@ class _ChooseCategoryState extends State<ChooseCategory> {
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: ElevatedButton(onPressed: () {
-                          context
-                              .read<FeaturedCategoryCubit>()
-                              .updateFeaturedCategory(selectedCategory!);
-                          context.read<GroupBloc>().add(UpdateGroup(
-                              group: context
+                        child: ElevatedButton(
+                            onPressed: () {
+                              context
                                   .read<FeaturedCategoryCubit>()
-                                  .currentGroup
-                                  .copyWith(
-                                      featuredCategory:
-                                          selectedCategory!.name)));
-                        }, child: BlocBuilder<FeaturedCategoryCubit,
-                            FeaturedCategoryState>(
-                          builder: (context, state) {
-                            if (state is FeaturedCategoryLoading) {
-                              return Center(
-                                child: LoadingAnimationWidget.bouncingBall(
-                                    color: Colors.white, size: 18),
-                              );
-                            }
-                            if (state is FeaturedCategoryFailed) {
-                              return const Center(
-                                child: Text('Error!'),
-                              );
-                            }
-                            if (state is FeaturedCategoryLoaded) {
-                              return const Text('Set Category');
-                            }
-                            return const Center(
-                              child: Text('Something Went Wrong!'),
-                            );
-                          },
-                        )),
+                                  .updateFeaturedCategory(selectedCategory!);
+                              context.read<GroupBloc>().add(UpdateGroup(
+                                  group: context
+                                      .read<FeaturedCategoryCubit>()
+                                      .currentGroup
+                                      .copyWith(
+                                          featuredCategory:
+                                              selectedCategory!.name)));
+                            },
+                            child: BlocConsumer<FeaturedCategoryCubit,
+                                FeaturedCategoryState>(
+                              listener: (context, state) async {
+                                if (state is FeaturedCategoryUpdated) {
+                                  await Future.delayed(
+                                      const Duration(seconds: 1));
+                                  if (!mounted) return;
+                                  context.pop();
+                                }
+                              },
+                              builder: (context, state) {
+                                if (state is FeaturedCategoryLoading) {
+                                  return Center(
+                                    child: LoadingAnimationWidget.bouncingBall(
+                                        color: Colors.white, size: 18),
+                                  );
+                                }
+                                if (state is FeaturedCategoryUpdated) {
+                                  return const Text('Category Updated!');
+                                }
+                                if (state is FeaturedCategoryFailed) {
+                                  return const Center(
+                                    child: Text('Error!'),
+                                  );
+                                }
+                                if (state is FeaturedCategoryLoaded) {
+                                  return const Text('Set Category');
+                                }
+                                return const Center(
+                                  child: Text('Something Went Wrong!'),
+                                );
+                              },
+                            )),
                       ),
                     ],
                   ),

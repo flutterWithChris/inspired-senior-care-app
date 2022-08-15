@@ -261,6 +261,12 @@ class GroupSection extends StatefulWidget {
 
 class _GroupSectionState extends State<GroupSection> {
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final Group currentGroup = widget.group;
     final currentUser = widget.manager;
@@ -378,6 +384,10 @@ class CurrentCategoryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<CategoriesBloc, CategoriesState>(
       builder: (context, state) {
+        if (state is CategoriesLoading) {
+          return LoadingAnimationWidget.fourRotatingDots(
+              color: Colors.blue, size: 30);
+        }
         if (state is CategoriesFailed) {
           return const Center(
             child: Text('Error Fetching Categories...'),

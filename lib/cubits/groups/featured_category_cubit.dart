@@ -30,8 +30,9 @@ class FeaturedCategoryCubit extends Cubit<FeaturedCategoryState> {
     await _databaseRepository.setGroupFeaturedCategory(
         currentGroup.groupId!, category);
     currentGroup = currentGroup.copyWith(featuredCategory: category.name);
-    emit(FeaturedCategoryUpdated());
     await Future.delayed(const Duration(seconds: 1));
-    loadFeaturedCategory(currentGroup);
+    emit(FeaturedCategoryUpdated());
+    await Future.delayed(const Duration(seconds: 5));
+    //loadFeaturedCategory(currentGroup);
   }
 }

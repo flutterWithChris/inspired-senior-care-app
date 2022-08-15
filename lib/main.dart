@@ -91,7 +91,6 @@ class _MyAppState extends State<MyApp> {
             create: (context) => InviteBloc(),
           ),
           BlocProvider(
-            lazy: false,
             create: (context) => ProfileBloc(
               authBloc: context.read<AuthBloc>(),
               databaseRepository: context.read<DatabaseRepository>(),
@@ -110,7 +109,6 @@ class _MyAppState extends State<MyApp> {
               ..add(LoadCategories()),
           ),
           BlocProvider(
-            lazy: false,
             create: (context) => GroupBloc(
                 databaseRepository: context.read<DatabaseRepository>()),
           ),
