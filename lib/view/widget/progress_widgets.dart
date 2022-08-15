@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:inspired_senior_care_app/bloc/cards/card_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/categories/categories_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/member/bloc/member_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
@@ -237,6 +238,8 @@ class GroupMemberProgressSection extends StatelessWidget {
                           ),
                           for (Category category in categoryList)
                             GroupMemberProgressCategory(
+                                category: category,
+                                member: groupMember,
                                 title: category.name,
                                 progressColor: category.categoryColor,
                                 progress: groupMember.progress!
@@ -270,12 +273,16 @@ class GroupMemberProgressSection extends StatelessWidget {
 }
 
 class GroupMemberProgressCategory extends StatelessWidget {
+  Category category;
+  final User member;
   final String title;
   Color progressColor;
   double progress;
   String message;
   GroupMemberProgressCategory({
     Key? key,
+    required this.category,
+    required this.member,
     required this.title,
     required this.progressColor,
     required this.progress,
@@ -359,9 +366,10 @@ class GroupMemberProgressCategory extends StatelessWidget {
                     ElevatedButton(
                         onPressed: () {
                           context.read<ResponseBloc>().add(FetchResponse(
-                              userId: 'nzeeburQleQBVF6UekJ51OjICYI3',
-                              categoryName: title,
-                              cardNumber: 2));
+                              user: member, category: category, cardNumber: 2));
+                          context.read<CardBloc>().add(LoadCards(
+                                category: category,
+                              ));
                           context.goNamed('view-responses');
                         },
                         child: const Text('View Responses >')),

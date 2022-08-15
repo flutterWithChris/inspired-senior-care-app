@@ -10,6 +10,7 @@ import 'package:inspired_senior_care_app/bloc/categories/categories_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/deck/deck_cubit.dart';
 import 'package:inspired_senior_care_app/bloc/group/group_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/invite/invite_bloc.dart';
+import 'package:inspired_senior_care_app/bloc/manage/response_interaction_cubit.dart';
 import 'package:inspired_senior_care_app/bloc/manage/view_response_deck_cubit.dart';
 import 'package:inspired_senior_care_app/bloc/member/bloc/bloc/group_member_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/member/bloc/member_bloc.dart';
@@ -141,6 +142,10 @@ class _MyAppState extends State<MyApp> {
             create: (context) => FeaturedCategoryCubit(
                 databaseRepository: context.read<DatabaseRepository>()),
           ),
+          BlocProvider(
+            create: (context) => DeckCubit(
+                databaseRepository: context.read<DatabaseRepository>()),
+          ),
         ],
         child: BlocBuilder<AuthBloc, AuthState>(
           builder: (context, state) {
@@ -236,13 +241,7 @@ class _MyAppState extends State<MyApp> {
               name: 'deck-page',
               path: 'deck-page',
               builder: (context, state) => MultiBlocProvider(
-                    providers: [
-                      BlocProvider(
-                        create: (context) => DeckCubit(
-                            databaseRepository:
-                                context.read<DatabaseRepository>()),
-                      ),
-                    ],
+                    providers: const [],
                     child: DeckPage(),
                   )),
         ]),
@@ -277,8 +276,12 @@ class _MyAppState extends State<MyApp> {
                                 BlocProvider(
                                   create: (context) => ViewResponseCubit(),
                                 ),
+                                BlocProvider(
+                                  create: (context) =>
+                                      ResponseInteractionCubit(),
+                                ),
                               ],
-                              child: const ViewResponses(),
+                              child: ViewResponses(),
                             )),
                   ],
                 ),

@@ -12,13 +12,13 @@ class ResponseInitial extends ResponseState {}
 class ResponseLoading extends ResponseState {}
 
 class ResponseLoaded extends ResponseState {
-  final Response response;
+  final List<Response>? responses;
   ResponseLoaded({
-    required this.response,
+    this.responses,
   });
   @override
   // TODO: implement props
-  List<Object?> get props => [response];
+  List<Object?> get props => [responses];
 }
 
 class ResponseFailed extends ResponseState {}

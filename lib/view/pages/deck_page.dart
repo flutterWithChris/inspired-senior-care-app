@@ -30,7 +30,7 @@ class DeckPage extends StatelessWidget {
           // TODO: implement listener
           if (state is CardsLoading) {}
           if (state is CardsLoaded) {
-            final String categoryName = state.categoryName;
+            final String categoryName = state.category.name;
           }
         },
         child: LoaderOverlay(
@@ -75,8 +75,8 @@ class DeckPage extends StatelessWidget {
                           return AppBar(
                             toolbarHeight: 50,
                             centerTitle: true,
-                            title: Text(state.categoryName),
-                            backgroundColor: state.categoryColor,
+                            title: Text(state.category.name),
+                            backgroundColor: state.category.categoryColor,
                           );
                         }
                         return AppBar(
@@ -176,8 +176,8 @@ class DeckPage extends StatelessWidget {
                             padding: const EdgeInsets.symmetric(vertical: 30.0),
                             child: Visibility(
                               visible: isSwipeDisabled ? true : false,
-                              child:
-                                  ShareButton(categoryName: state.categoryName),
+                              child: ShareButton(
+                                  categoryName: state.category.name),
                             ),
                           ),
                         ],
@@ -220,7 +220,7 @@ class CardCounter extends StatelessWidget {
                 builder: (context, state) {
                   if (state is CardsLoaded) {
                     Category currentCategory = state.category;
-                    String category = state.categoryName;
+                    String category = state.category.name;
 
                     bool categoryStarted =
                         user.progress!.containsKey(currentCategory.name);

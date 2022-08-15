@@ -137,10 +137,8 @@ class CategoryCard extends StatelessWidget {
               //   context.read<CardBloc>().add(ResetCards());
               return InkWell(
                 onTap: () {
-                  BlocProvider.of<CardBloc>(context).add(LoadCards(
-                      categoryName: category.name,
-                      categoryColor: category.categoryColor,
-                      category: category));
+                  BlocProvider.of<CardBloc>(context)
+                      .add(LoadCards(category: category));
 
                   context.goNamed('deck-page');
                 },

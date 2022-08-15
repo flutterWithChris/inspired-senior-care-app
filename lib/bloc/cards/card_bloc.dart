@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter/material.dart';
 import 'package:inspired_senior_care_app/data/models/category.dart';
 import 'package:inspired_senior_care_app/data/repositories/database/database_repository.dart';
 import 'package:inspired_senior_care_app/data/repositories/storage/storage_repository.dart';
@@ -27,11 +26,9 @@ class CardBloc extends Bloc<CardEvent, CardState> {
     emit(CardsLoading());
     _databaseSubscription?.cancel();
     var cardImageUrls =
-        await _storageRepository.getCategoryCards(event.categoryName);
+        await _storageRepository.getCategoryCards(event.category.name);
     emit(CardsLoaded(
       cardImageUrls: cardImageUrls,
-      categoryName: event.categoryName,
-      categoryColor: event.categoryColor,
       category: event.category,
     ));
   }

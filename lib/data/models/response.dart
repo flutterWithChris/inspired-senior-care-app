@@ -7,11 +7,10 @@ class Response {
     required this.response,
   });
 
-  static Response fromSnapshot(DocumentSnapshot snap, int cardNumber) {
-    Response response = Response(
-      response: snap[cardNumber.toString()],
-    );
-    print('${snap.get(cardNumber.toString())}: fetched');
+  static Response fromSnapshot(
+      DocumentSnapshot snap, final int responseNumber) {
+    Response response = Response(response: snap.get(responseNumber.toString()));
+    print('${snap.get(responseNumber.toString())}: fetched');
     return response;
   }
 }

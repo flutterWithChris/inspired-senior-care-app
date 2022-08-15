@@ -74,13 +74,12 @@ class DatabaseRepository extends BaseDatabaseRepository {
         .set({'$cardNumber': response}, SetOptions(merge: true));
   }
 
-  Stream<Response> viewResponse(
-      String userId, String categoryName, int cardNumber) {
+  Stream<Response> viewResponse(User user, Category category, int cardNumber) {
     return _firebaseFirestore
         .collection('users')
-        .doc(userId)
+        .doc(user.id)
         .collection('responses')
-        .doc(categoryName)
+        .doc(category.name)
         .snapshots()
         .map((event) => Response.fromSnapshot(event, cardNumber));
   }

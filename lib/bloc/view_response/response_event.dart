@@ -4,15 +4,15 @@ part of 'response_bloc.dart';
 abstract class ResponseEvent extends Equatable {}
 
 class FetchResponse extends ResponseEvent {
-  final String userId;
-  final String categoryName;
+  final User user;
+  final Category category;
   final int cardNumber;
   FetchResponse({
-    required this.userId,
-    required this.categoryName,
+    required this.user,
+    required this.category,
     required this.cardNumber,
   });
   @override
   // TODO: implement props
-  List<Object?> get props => [userId, categoryName, cardNumber];
+  List<Object?> get props => [user, category, cardNumber];
 }
