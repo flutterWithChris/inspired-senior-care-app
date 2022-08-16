@@ -417,9 +417,9 @@ class CurrentCategoryCard extends StatelessWidget {
                   shape: RoundedRectangleBorder(
                       side: BorderSide(
                           color: currentCategory.categoryColor.withOpacity(0.8),
-                          width: 2.0),
+                          width: 1.618),
                       borderRadius: BorderRadius.circular(12.0)),
-                  elevation: 1.5,
+                  elevation: 1.0,
                   child: SizedBox(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(

@@ -177,7 +177,7 @@ class _ChooseCategoryState extends State<ChooseCategory> {
                               listener: (context, state) async {
                                 if (state is FeaturedCategoryUpdated) {
                                   await Future.delayed(
-                                      const Duration(seconds: 1));
+                                      const Duration(seconds: 2));
                                   if (!mounted) return;
                                   context.pop();
                                 }
