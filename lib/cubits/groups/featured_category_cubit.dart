@@ -15,6 +15,8 @@ class FeaturedCategoryCubit extends Cubit<FeaturedCategoryState> {
         super(FeaturedCategoryInitial());
 
   void loadFeaturedCategory(Group group) => _onLoadFeaturedCategory(group);
+  void loadFeaturedCategoryById(String groupId) =>
+      _onLoadFeaturedCategoryById(groupId);
   void updateFeaturedCategory(Category category) =>
       _onUpdateFeaturedCategory(category);
 
@@ -23,6 +25,17 @@ class FeaturedCategoryCubit extends Cubit<FeaturedCategoryState> {
     await Future.delayed(const Duration(seconds: 1));
     currentGroup = group;
     emit(FeaturedCategoryLoaded(featuredCategoryName: group.featuredCategory!));
+  }
+
+  void _onLoadFeaturedCategoryById(String groupId) async {
+    emit(FeaturedCategoryLoading());
+    await Future.delayed(const Duration(seconds: 1));
+
+    _databaseRepository.getGroup(groupId).listen((group) {
+      currentGroup = group;
+    });
+    emit(FeaturedCategoryLoaded(
+        featuredCategoryName: currentGroup.featuredCategory!));
   }
 
   void _onUpdateFeaturedCategory(Category category) async {

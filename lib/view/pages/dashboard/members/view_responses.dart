@@ -42,6 +42,7 @@ class ViewResponses extends StatelessWidget {
               preferredSize: const Size.fromHeight(50),
               child: BlocConsumer<ViewResponseDeckCubit, ViewResponseDeckState>(
                 listener: (context, state) {
+                  
                   if (state.status == ViewResponseDeckStatus.swiped) {
                     if (currentCardIndex < 12) {
                       //currentCardIndex++;
@@ -509,6 +510,68 @@ class ViewResponsesButton extends StatelessWidget {
           deckCubit.unzoomDeck();
         });
       },
+    );
+  }
+}
+
+class ViewResponsesSheet extends StatelessWidget {
+  final TextEditingController shareFieldController = TextEditingController();
+
+  ViewResponsesSheet({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(25),
+      child: Container(
+        margin: const EdgeInsets.only(left: 15, right: 15),
+        height: 240,
+        child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(25),
+                child: Container(
+                  height: 5,
+                  width: 30,
+                  color: Colors.grey.shade400,
+                ),
+              ),
+              ShareTextField(
+                shareFieldController: shareFieldController,
+              ),
+              BlocBuilder<ResponseInteractionCubit, ResponseInteractionState>(
+                builder: (context, state) {
+                  if (state.interaction == Interaction.liked) {
+                    return IconButton(
+                        onPressed: () {
+                          context
+                              .read<ResponseInteractionCubit>()
+                              .unlikeResponse();
+                        },
+                        icon: const Icon(
+                          FontAwesomeIcons.solidHeart,
+                          color: Colors.redAccent,
+                          size: 22,
+                        ));
+                  }
+                  return IconButton(
+                      onPressed: () {
+                        context.read<ResponseInteractionCubit>().likeResponse();
+                      },
+                      icon: const Icon(
+                        FontAwesomeIcons.heart,
+                        size: 22,
+                      ));
+                },
+              ),
+              /*   SendButton(
+                        categoryName: cat,
+                        shareFieldController: shareFieldController,
+                      ),*/
+            ]),
+      ),
     );
   }
 }

@@ -57,6 +57,15 @@ class DatabaseRepository extends BaseDatabaseRepository {
     }).asStream();
   }
 
+  Stream<Category> getCategory(String categoryName) {
+    final List<Category> categories = [];
+    return _firebaseFirestore
+        .collection('categories')
+        .where({'categoryName': categoryName})
+        .snapshots()
+        .map((snap) => Category.fromSnapshot(snap.docs.first));
+  }
+
   Future<void> setGroupFeaturedCategory(String groupId, Category category) {
     return _firebaseFirestore
         .collection('groups')

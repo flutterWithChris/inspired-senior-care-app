@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -22,6 +23,8 @@ import 'package:inspired_senior_care_app/bloc/view_response/view_response_cubit.
 import 'package:inspired_senior_care_app/cubits/groups/featured_category_cubit.dart';
 import 'package:inspired_senior_care_app/cubits/login/login_cubit.dart';
 import 'package:inspired_senior_care_app/cubits/signup/signup_cubit.dart';
+import 'package:inspired_senior_care_app/data/models/category.dart';
+import 'package:inspired_senior_care_app/data/models/user.dart';
 import 'package:inspired_senior_care_app/data/repositories/auth/auth_repository.dart';
 import 'package:inspired_senior_care_app/data/repositories/database/database_repository.dart';
 import 'package:inspired_senior_care_app/data/repositories/storage/storage_repository.dart';
@@ -38,6 +41,7 @@ import 'package:inspired_senior_care_app/view/pages/profile.dart';
 import 'package:inspired_senior_care_app/view/pages/signup/signup.dart';
 import 'package:inspired_senior_care_app/view/widget/bottom_app_bar.dart';
 import 'package:inspired_senior_care_app/view/widget/top_app_bar.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -92,6 +96,7 @@ class _MyAppState extends State<MyApp> {
             create: (context) => InviteBloc(),
           ),
           BlocProvider(
+            lazy: false,
             create: (context) => ProfileBloc(
               authBloc: context.read<AuthBloc>(),
               databaseRepository: context.read<DatabaseRepository>(),
@@ -118,6 +123,10 @@ class _MyAppState extends State<MyApp> {
                 databaseRepository: context.read<DatabaseRepository>()),
           ),
           BlocProvider(
+            create: (context) => FeaturedCategoryCubit(
+                databaseRepository: context.read<DatabaseRepository>()),
+          ),
+          BlocProvider(
             create: (context) => MemberBloc(
                 databaseRepository: context.read<DatabaseRepository>()),
           ),
@@ -136,10 +145,6 @@ class _MyAppState extends State<MyApp> {
           ),
           BlocProvider(
             create: (context) => ResponseBloc(
-                databaseRepository: context.read<DatabaseRepository>()),
-          ),
-          BlocProvider(
-            create: (context) => FeaturedCategoryCubit(
                 databaseRepository: context.read<DatabaseRepository>()),
           ),
           BlocProvider(
@@ -389,56 +394,137 @@ class FeaturedCategory extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      splashColor: Colors.lightBlueAccent,
-      onTap: (() {
-        context.goNamed('deck-page');
-      }),
-      child: Card(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return ConstrainedBox(
-              constraints: BoxConstraints(
-                  maxWidth: constraints.maxWidth > 700 ? 350 : 275),
-              child: Container(
-                color: Colors.white,
-                child: Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Stack(
-                    clipBehavior: Clip.none,
-                    alignment: AlignmentDirectional.topEnd,
-                    children: [
-                      SizedBox(
-                        child: Image.asset(
-                            'lib/assets/Supportive_Environment.png'),
-                      ),
-                      const Positioned(
-                        top: -35,
-                        right: -25,
-                        child: CircleAvatar(
-                          radius: 30,
-                          backgroundColor: Colors.white,
-                          child: CircleAvatar(
-                            radius: 25,
-                            backgroundColor: Colors.lightBlue,
-                            child: Text(
-                              '8/11',
-                              style: TextStyle(
+    //context.read<ProfileBloc>().loadFeaturedCategory();
+    return BlocBuilder<ProfileBloc, ProfileState>(
+      builder: (context, state) {
+        if (state is ProfileLoading) {
+          return Center(
+            child: LoadingAnimationWidget.fourRotatingDots(
+                color: Colors.blue, size: 30),
+          );
+        }
+        /*  if (state is ProfileFailed) {
+          return const Center(
+            child: Text('Error Fetching Featured Category!'),
+          );
+        }*/
+        if (state is ProfileLoaded) {
+          User currentUser = state.user;
+          return BlocBuilder<CategoriesBloc, CategoriesState>(
+            builder: (context, state) {
+              if (state is CategoriesLoading) {
+                return Center(
+                  child: LoadingAnimationWidget.fourRotatingDots(
+                      color: Colors.blue, size: 30),
+                );
+              }
+              if (state is CategoriesFailed) {
+                return const Center(
+                  child: Text('Error Fetching Categories'),
+                );
+              }
+              if (state is CategoriesLoaded) {
+                List<Category> categories = state.categories;
+                context
+                    .read<FeaturedCategoryCubit>()
+                    .loadFeaturedCategoryById(currentUser.groups![0]);
+
+                return BlocBuilder<FeaturedCategoryCubit,
+                    FeaturedCategoryState>(
+                  builder: (context, state) {
+                    if (state is FeaturedCategoryLoading) {
+                      return Center(
+                        child: LoadingAnimationWidget.fourRotatingDots(
+                            color: Colors.blue, size: 30),
+                      );
+                    }
+                    if (state is FeaturedCategoryFailed) {
+                      return const Center(
+                        child: Text('Error Fetching Category!'),
+                      );
+                    }
+                    if (state is FeaturedCategoryLoaded) {
+                      Category featuredCategory = categories.singleWhere(
+                        (category) =>
+                            category.name == state.featuredCategoryName,
+                      );
+                      int progress =
+                          currentUser.progress![state.featuredCategoryName] ??
+                              0;
+                      return InkWell(
+                        splashColor: Colors.lightBlueAccent,
+                        onTap: (() {
+                          context.goNamed('deck-page');
+                        }),
+                        child: Card(
+                          child: LayoutBuilder(
+                            builder: (context, constraints) {
+                              return ConstrainedBox(
+                                constraints: BoxConstraints(
+                                    maxWidth:
+                                        constraints.maxWidth > 700 ? 350 : 275),
+                                child: Container(
                                   color: Colors.white,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold),
-                            ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(12.0),
+                                    child: Stack(
+                                      clipBehavior: Clip.none,
+                                      alignment: AlignmentDirectional.topEnd,
+                                      children: [
+                                        SizedBox(
+                                          child: CachedNetworkImage(
+                                            imageUrl:
+                                                featuredCategory.coverImageUrl,
+                                          ),
+                                        ),
+                                        Positioned(
+                                          top: -35,
+                                          right: -25,
+                                          child: CircleAvatar(
+                                            radius: 35,
+                                            backgroundColor: Colors.white,
+                                            child: CircleAvatar(
+                                              radius: 30,
+                                              backgroundColor: featuredCategory
+                                                  .progressColor,
+                                              child: Text(
+                                                '$progress/${featuredCategory.totalCards.toString()}',
+                                                style: const TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 18,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                            ),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
                           ),
                         ),
-                      )
-                    ],
-                  ),
-                ),
-              ),
-            );
-          },
-        ),
-      ),
+                      );
+                    }
+                    return const Center(
+                      child: Text('Something Went Wrong!'),
+                    );
+                  },
+                );
+              }
+              return const Center(
+                child: Text('Something Went Wrong!'),
+              );
+            },
+          );
+        } else {
+          return const Center(
+            child: Text('Something Went Wrong'),
+          );
+        }
+      },
     );
   }
 }
