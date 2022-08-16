@@ -77,6 +77,7 @@ class _MyAppState extends State<MyApp> {
           create: (context) => AuthRepository(),
         ),
         RepositoryProvider(
+          lazy: false,
           create: (context) => DatabaseRepository(),
         ),
         RepositoryProvider(
@@ -115,6 +116,7 @@ class _MyAppState extends State<MyApp> {
               ..add(LoadCategories()),
           ),
           BlocProvider(
+            lazy: false,
             create: (context) => GroupBloc(
                 databaseRepository: context.read<DatabaseRepository>()),
           ),
@@ -123,6 +125,7 @@ class _MyAppState extends State<MyApp> {
                 databaseRepository: context.read<DatabaseRepository>()),
           ),
           BlocProvider(
+            lazy: false,
             create: (context) => FeaturedCategoryCubit(
                 databaseRepository: context.read<DatabaseRepository>()),
           ),
@@ -243,12 +246,10 @@ class _MyAppState extends State<MyApp> {
         builder: (context, state) => const Categories(),
         routes: [
           GoRoute(
-              name: 'deck-page',
-              path: 'deck-page',
-              builder: (context, state) => MultiBlocProvider(
-                    providers: const [],
-                    child: DeckPage(),
-                  )),
+            name: 'deck-page',
+            path: 'deck-page',
+            builder: (context, state) => DeckPage(),
+          ),
         ]),
     GoRoute(
       name: 'profile',
@@ -488,7 +489,7 @@ class FeaturedCategory extends StatelessWidget {
                                               backgroundColor: featuredCategory
                                                   .progressColor,
                                               child: Text(
-                                                '$progress/${featuredCategory.totalCards.toString()}',
+                                                '${(progress / featuredCategory.totalCards! * 100).toStringAsFixed(0)}%',
                                                 style: const TextStyle(
                                                     color: Colors.white,
                                                     fontSize: 18,

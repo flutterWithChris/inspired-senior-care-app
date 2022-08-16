@@ -33,9 +33,10 @@ class FeaturedCategoryCubit extends Cubit<FeaturedCategoryState> {
 
     _databaseRepository.getGroup(groupId).listen((group) {
       currentGroup = group;
+    }).onData((data) {
+      emit(
+          FeaturedCategoryLoaded(featuredCategoryName: data.featuredCategory!));
     });
-    emit(FeaturedCategoryLoaded(
-        featuredCategoryName: currentGroup.featuredCategory!));
   }
 
   void _onUpdateFeaturedCategory(Category category) async {

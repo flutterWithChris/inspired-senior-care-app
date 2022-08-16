@@ -171,13 +171,13 @@ class CategoryCard extends StatelessWidget {
                                 backgroundColor: Colors.white,
                                 child: BlocBuilder<ProfileBloc, ProfileState>(
                                   builder: (context, state) {
-                                    int currentCard = 1;
+                                    int currentCard = 0;
                                     if (state is ProfileLoaded) {
                                       bool categoryStarted = state
                                           .user.progress!
                                           .containsKey(category.name);
                                       if (!categoryStarted) {
-                                        currentCard = 1;
+                                        currentCard = 0;
                                       }
                                       if (categoryStarted) {
                                         Map<String, int> progressList =
@@ -188,7 +188,7 @@ class CategoryCard extends StatelessWidget {
                                             currentCard / category.totalCards!;
                                       }
                                       return Text(
-                                        '$currentCard/${category.totalCards}',
+                                        '${(percentComplete * 100).toStringAsFixed(0)}%',
                                         style: const TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 14),

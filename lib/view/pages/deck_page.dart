@@ -239,7 +239,7 @@ class CardCounter extends StatelessWidget {
                       backgroundColor: Colors.white,
                       radius: 32,
                       child: Text(
-                        '$currentCardIndex/${currentCategory.totalCards}',
+                        '${((currentCardIndex / currentCategory.totalCards!) * 100).toStringAsFixed(0)}%',
                         style: const TextStyle(fontSize: 20),
                       ),
                     );
