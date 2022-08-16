@@ -3,10 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:infinite_carousel/infinite_carousel.dart';
-import 'package:inspired_senior_care_app/bloc/auth/auth_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/cards/card_bloc.dart';
-import 'package:inspired_senior_care_app/bloc/deck/deck_cubit.dart';
 import 'package:inspired_senior_care_app/bloc/manage/response_interaction_cubit.dart';
+import 'package:inspired_senior_care_app/bloc/manage/view_response_deck_cubit.dart';
 import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/share_bloc/share_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/view_response/response_bloc.dart';
@@ -25,7 +24,8 @@ class ViewResponses extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    int currentCardIndex = context.watch<DeckCubit>().currentCardNumber;
+    int currentCardIndex =
+        context.watch<ViewResponseDeckCubit>().currentCardNumber;
 
     return SafeArea(
       child: BlocListener<CardBloc, CardState>(
@@ -40,21 +40,13 @@ class ViewResponses extends StatelessWidget {
             resizeToAvoidBottomInset: true,
             appBar: PreferredSize(
               preferredSize: const Size.fromHeight(50),
-              child: BlocConsumer<DeckCubit, DeckState>(
+              child: BlocConsumer<ViewResponseDeckCubit, ViewResponseDeckState>(
                 listener: (context, state) {
-                  if (state.status == DeckStatus.swiped) {
+                  if (state.status == ViewResponseDeckStatus.swiped) {
                     if (currentCardIndex < 12) {
                       //currentCardIndex++;
                       // deckScrollController.animateToItem(currentCardIndex);
                     }
-                  }
-                  if (state.status == DeckStatus.completed) {
-                    showDialog(
-                      context: context,
-                      builder: (context) {
-                        return const DeckCompleteDialog();
-                      },
-                    );
                   }
                 },
                 builder: (context, state) {
@@ -128,19 +120,18 @@ class ViewResponses extends StatelessWidget {
                                       height: 500,
                                       child: IgnorePointer(
                                         ignoring: isSwipeDisabled,
-                                        child:
-                                            BlocListener<DeckCubit, DeckState>(
+                                        child: BlocListener<
+                                            ViewResponseDeckCubit,
+                                            ViewResponseDeckState>(
                                           listener: (context, state) {
                                             // TODO: implement listener
+
                                             if (state.status ==
-                                                DeckStatus.completed) {
-                                              isSwipeDisabled = false;
-                                            }
-                                            if (state.status ==
-                                                DeckStatus.zoomed) {
+                                                ViewResponseDeckStatus.zoomed) {
                                               isCardZoomed = true;
                                             } else if (state.status ==
-                                                DeckStatus.unzoomed) {
+                                                ViewResponseDeckStatus
+                                                    .unzoomed) {
                                               isCardZoomed = false;
                                             }
                                           },
@@ -189,7 +180,8 @@ class CardCounter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    int currentCardIndex = context.watch<DeckCubit>().currentCardNumber;
+    int currentCardIndex =
+        context.watch<ViewResponseDeckCubit>().currentCardNumber;
 
     return Stack(
       alignment: AlignmentDirectional.center,
@@ -211,10 +203,7 @@ class CardCounter extends StatelessWidget {
                       Map<String, int> progressList = user.progress!;
                       int currentCardIndex =
                           progressList[currentCategory.name]!;
-                      context
-                          .read<DeckCubit>()
-                          .updateCardNumber(currentCardIndex);
-                      context.read<DeckCubit>().loadDeck(currentCardIndex);
+
                       deckScrollController.animateToItem(currentCardIndex - 1);
                     }
                     return CircleAvatar(
@@ -392,7 +381,7 @@ class ShareButton extends StatelessWidget {
       ),
       onPressed: () {
         // * Zoom Deck on Press
-        var deckCubit = context.read<DeckCubit>();
+        var deckCubit = context.read<ViewResponseDeckCubit>();
         deckCubit.zoomDeck();
         // * Shows Bottom Sheet for Response
         var bottomSheet = showBottomSheet(
@@ -452,7 +441,7 @@ class ViewResponsesButton extends StatelessWidget {
       ),
       onPressed: () {
         // * Zoom Deck on Press
-        var deckCubit = context.read<DeckCubit>();
+        var deckCubit = context.read<ViewResponseDeckCubit>();
         deckCubit.zoomDeck();
         // * Shows Bottom Sheet for Response
         var viewResponseBottomSheet = showBottomSheet(
@@ -547,40 +536,50 @@ class ShareTextField extends StatelessWidget {
         }
         if (state is ResponseLoaded) {
           List<Response> responses = state.responses!;
-          shareFieldController.text = responses[0].response;
+
           return Container(
-            height: 150,
-            decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: const BorderRadius.all(Radius.circular(15)),
-                boxShadow: [
-                  BoxShadow(
-                      blurRadius: 10,
-                      color: Colors.grey.shade300,
-                      spreadRadius: 5),
-                ]),
-            child: Container(
-              height: 50,
-              alignment: Alignment.center,
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-              margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+              height: 150,
               decoration: BoxDecoration(
-                color: Colors.grey.shade300,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: TextField(
-                controller: shareFieldController,
-                autofocus: false,
-                readOnly: true,
-                textAlignVertical: TextAlignVertical.top,
-                textAlign: TextAlign.start,
-                minLines: 4,
-                maxLines: 4,
-                decoration: const InputDecoration.collapsed(
-                    hintText: 'Share your response..'),
-              ),
-            ),
-          );
+                  color: Colors.white,
+                  borderRadius: const BorderRadius.all(Radius.circular(15)),
+                  boxShadow: [
+                    BoxShadow(
+                        blurRadius: 10,
+                        color: Colors.grey.shade300,
+                        spreadRadius: 5),
+                  ]),
+              child: InfiniteCarousel.builder(
+                itemCount: responses.length,
+                itemExtent: 360,
+                onIndexChanged: (p0) {
+                  shareFieldController.text = responses[p0].response;
+                },
+                itemBuilder: (context, itemIndex, realIndex) {
+                  return Container(
+                    height: 50,
+                    alignment: Alignment.center,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 10),
+                    margin: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade300,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: TextField(
+                      controller: shareFieldController,
+                      autofocus: false,
+                      readOnly: true,
+                      textAlignVertical: TextAlignVertical.top,
+                      textAlign: TextAlign.start,
+                      minLines: 4,
+                      maxLines: 4,
+                      decoration: const InputDecoration.collapsed(
+                          hintText: 'Share your response..'),
+                    ),
+                  );
+                },
+              ));
         } else {
           return const Center(
             child: Text('Someting Went Wrong'),
@@ -608,7 +607,8 @@ class SendButton extends StatefulWidget {
 class _SendButtonState extends State<SendButton> {
   @override
   Widget build(BuildContext context) {
-    int currentCardIndex = context.watch<DeckCubit>().currentCardNumber;
+    int currentCardIndex =
+        context.watch<ViewResponseDeckCubit>().currentCardNumber;
     return ElevatedButton.icon(
       style: ElevatedButton.styleFrom(fixedSize: const Size(240, 42)),
       onPressed: () {
@@ -618,16 +618,14 @@ class _SendButtonState extends State<SendButton> {
             response: widget.shareFieldController.text));
 
         if (currentCardIndex == 12) {
-          //context.read<DeckCubit>().resetDeck();
+          //context.read<ViewResponseDeckCubit>().resetDeck();
           widget.shareFieldController.clear();
           Navigator.pop(context);
-          context.read<DeckCubit>().completeDeck();
         } else {
-          context.read<DeckCubit>().incrementCardNumber(
-              context.read<AuthBloc>().state.user, widget.categoryName);
+          context.read<ViewResponseDeckCubit>().incrementCardNumber();
 
-          context.read<DeckCubit>().swipeDeck();
-          context.read<DeckCubit>().resetDeck();
+          context.read<ViewResponseDeckCubit>().swipeDeck();
+          context.read<ViewResponseDeckCubit>().resetDeck();
           widget.shareFieldController.clear();
           Navigator.pop(context);
         }
