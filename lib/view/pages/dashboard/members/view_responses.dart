@@ -36,13 +36,13 @@ class ViewResponses extends StatelessWidget {
         },
         child: LoaderOverlay(
           child: Scaffold(
+            bottomSheet: ViewResponsesSheet(),
             backgroundColor: Colors.grey.shade200,
             resizeToAvoidBottomInset: true,
             appBar: PreferredSize(
               preferredSize: const Size.fromHeight(50),
               child: BlocConsumer<ViewResponseDeckCubit, ViewResponseDeckState>(
                 listener: (context, state) {
-                  
                   if (state.status == ViewResponseDeckStatus.swiped) {
                     if (currentCardIndex < 12) {
                       //currentCardIndex++;
@@ -576,7 +576,7 @@ class ViewResponsesSheet extends StatelessWidget {
   }
 }
 
-class ShareTextField extends StatelessWidget {
+class ShareTextField extends StatefulWidget {
   final TextEditingController shareFieldController;
 
   const ShareTextField({
@@ -585,69 +585,121 @@ class ShareTextField extends StatelessWidget {
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<ResponseBloc, ResponseState>(
-      builder: (context, state) {
-        if (state is ResponseLoading) {
-          return LoadingAnimationWidget.fourRotatingDots(
-              color: Colors.blue, size: 30);
-        }
-        if (state is ResponseFailed) {
-          return const Center(
-            child: Text('Error Fetching Responses!'),
-          );
-        }
-        if (state is ResponseLoaded) {
-          List<Response> responses = state.responses!;
+  State<ShareTextField> createState() => _ShareTextFieldState();
+}
 
-          return Container(
-              height: 150,
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: const BorderRadius.all(Radius.circular(15)),
-                  boxShadow: [
-                    BoxShadow(
-                        blurRadius: 10,
-                        color: Colors.grey.shade300,
-                        spreadRadius: 5),
-                  ]),
-              child: InfiniteCarousel.builder(
-                itemCount: responses.length,
-                itemExtent: 360,
-                onIndexChanged: (p0) {
-                  shareFieldController.text = responses[p0].response;
-                },
-                itemBuilder: (context, itemIndex, realIndex) {
-                  return Container(
-                    height: 50,
-                    alignment: Alignment.center,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 10),
-                    margin: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 10),
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade300,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: TextField(
-                      controller: shareFieldController,
-                      autofocus: false,
-                      readOnly: true,
-                      textAlignVertical: TextAlignVertical.top,
-                      textAlign: TextAlign.start,
-                      minLines: 4,
-                      maxLines: 4,
-                      decoration: const InputDecoration.collapsed(
-                          hintText: 'Share your response..'),
-                    ),
-                  );
-                },
-              ));
-        } else {
-          return const Center(
-            child: Text('Someting Went Wrong'),
+class _ShareTextFieldState extends State<ShareTextField> {
+  final InfiniteScrollController textFieldScrollController =
+      InfiniteScrollController();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    textFieldScrollController.addListener(() {});
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<CardBloc, CardState>(
+      builder: (context, state) {
+        /* if(state is CardsFailed) {
+          return ErrorOutput(message: state.message);
+        }*/
+        if (state is CardsLoading) {
+          return Center(
+            child: LoadingAnimationWidget.fourRotatingDots(
+                color: Colors.blue, size: 30),
           );
         }
+        if (state is CardsLoaded) {
+          Category currentCategory = state.category;
+          return BlocBuilder<ResponseBloc, ResponseState>(
+            builder: (context, state) {
+              if (state is ResponseLoading) {
+                return LoadingAnimationWidget.fourRotatingDots(
+                    color: Colors.blue, size: 30);
+              }
+              if (state is ResponseFailed) {
+                return const Center(
+                  child: Text('Error Fetching Responses!'),
+                );
+              }
+              if (state is ResponseLoaded) {
+                List<Response> responses = state.responses!;
+                return Container(
+                    height: 150,
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(15)),
+                        boxShadow: [
+                          BoxShadow(
+                              blurRadius: 10,
+                              color: Colors.grey.shade300,
+                              spreadRadius: 5),
+                        ]),
+                    child: InfiniteCarousel.builder(
+                      controller: textFieldScrollController,
+                      loop: false,
+                      itemCount: currentCategory.totalCards!,
+                      itemExtent: 360,
+                      onIndexChanged: (p0) {
+                        if (p0 < responses.length) {
+                          widget.shareFieldController.text =
+                              responses[p0].response;
+                        }
+
+                        if (p0 + 1 > responses.length) {
+                          widget.shareFieldController.text =
+                              'No Response Submitted Yet!';
+                        }
+                      },
+                      itemBuilder: (context, itemIndex, realIndex) {
+                        print('Response Count: ${responses.length}');
+
+                        if (realIndex <= 1) {
+                          widget.shareFieldController.text =
+                              responses[0].response;
+                        }
+
+                        print('Item Index is: ');
+                        return Container(
+                          height: 50,
+                          alignment: Alignment.center,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 10),
+                          margin: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 10),
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade300,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: TextField(
+                            controller: widget.shareFieldController,
+                            autofocus: false,
+                            readOnly: true,
+                            textAlignVertical: TextAlignVertical.top,
+                            textAlign: TextAlign.start,
+                            minLines: 4,
+                            maxLines: 4,
+                            decoration: const InputDecoration.collapsed(
+                                hintText: 'Share your response..'),
+                          ),
+                        );
+                      },
+                    ));
+              } else {
+                return const Center(
+                  child: Text('Someting Went Wrong'),
+                );
+              }
+            },
+          );
+        }
+        return const Center(
+          child: Text('Something Went Wrong...'),
+        );
       },
     );
   }

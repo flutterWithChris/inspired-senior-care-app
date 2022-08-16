@@ -87,6 +87,7 @@ class _MyAppState extends State<MyApp> {
       child: MultiBlocProvider(
         providers: [
           BlocProvider(
+            lazy: false,
             create: (context) =>
                 AuthBloc(authRepository: context.read<AuthRepository>()),
           ),
@@ -147,6 +148,7 @@ class _MyAppState extends State<MyApp> {
                 SignupCubit(authRepository: context.read<AuthRepository>()),
           ),
           BlocProvider(
+            lazy: false,
             create: (context) => ResponseBloc(
                 databaseRepository: context.read<DatabaseRepository>()),
           ),

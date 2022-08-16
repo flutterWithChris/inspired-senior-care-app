@@ -17,7 +17,7 @@ class ResponseBloc extends Bloc<ResponseEvent, ResponseState> {
   ResponseBloc({required DatabaseRepository databaseRepository})
       : _databaseRepository = databaseRepository,
         super(ResponseLoading()) {
-    on<FetchResponse>((event, emit) {
+    on<FetchResponse>((event, emit) async {
       if (event.user.progress![event.category.name] != null) {
         int responseCount = event.user.progress![event.category.name] ?? 0;
         for (int i = 1; i < responseCount; i++) {
@@ -28,6 +28,7 @@ class ResponseBloc extends Bloc<ResponseEvent, ResponseState> {
           });
         }
       }
+      await Future.delayed(const Duration(seconds: 1));
       emit(ResponseLoaded(responses: responses));
     });
   }

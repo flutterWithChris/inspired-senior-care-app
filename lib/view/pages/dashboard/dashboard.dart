@@ -421,6 +421,7 @@ class CurrentCategoryCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12.0)),
                   elevation: 1.0,
                   child: SizedBox(
+                    width: 325,
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 8.0, vertical: 10.0),
@@ -443,6 +444,7 @@ class CurrentCategoryCard extends StatelessWidget {
                         trailing: const Icon(Icons.chevron_right_rounded),
                         leading: SizedBox(
                           height: 50,
+                          width: 40,
                           child: CachedNetworkImage(
                             imageUrl: currentCategory.coverImageUrl,
                             fit: BoxFit.fitHeight,
