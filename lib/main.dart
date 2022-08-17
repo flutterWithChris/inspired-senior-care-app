@@ -88,9 +88,15 @@ class _MyAppState extends State<MyApp> {
       child: MultiBlocProvider(
         providers: [
           BlocProvider(
-            lazy: false,
             create: (context) =>
                 AuthBloc(authRepository: context.read<AuthRepository>()),
+          ),
+          BlocProvider(
+            create: (context) => ProfileBloc(
+              authBloc: context.read<AuthBloc>(),
+              databaseRepository: context.read<DatabaseRepository>(),
+            )..add(
+                LoadProfile(userId: context.read<AuthBloc>().state.user.id!)),
           ),
           BlocProvider(
               create: (context) =>
@@ -100,26 +106,16 @@ class _MyAppState extends State<MyApp> {
                 databaseRepository: context.read<DatabaseRepository>()),
           ),
           BlocProvider(
-            lazy: false,
-            create: (context) => ProfileBloc(
-              authBloc: context.read<AuthBloc>(),
-              databaseRepository: context.read<DatabaseRepository>(),
-            )..add(
-                LoadProfile(userId: context.read<AuthBloc>().state.user.id!)),
-          ),
-          BlocProvider(
             create: (context) => ShareBloc(
                 databaseRepository: context.read<DatabaseRepository>()),
           ),
           BlocProvider(
-            lazy: false,
             create: (context) => CategoriesBloc(
                 databaseRepository: context.read<DatabaseRepository>(),
                 storageRepository: context.read<StorageRepository>())
               ..add(LoadCategories()),
           ),
           BlocProvider(
-            lazy: false,
             create: (context) => GroupBloc(
                 databaseRepository: context.read<DatabaseRepository>()),
           ),
@@ -128,7 +124,6 @@ class _MyAppState extends State<MyApp> {
                 databaseRepository: context.read<DatabaseRepository>()),
           ),
           BlocProvider(
-            lazy: false,
             create: (context) => FeaturedCategoryCubit(
                 databaseRepository: context.read<DatabaseRepository>()),
           ),
@@ -273,7 +268,7 @@ class _MyAppState extends State<MyApp> {
                 GoRoute(
                   name: 'view-member',
                   path: 'view-member',
-                  builder: (context, state) => ViewMember(),
+                  builder: (context, state) => const ViewMember(),
                   routes: [
                     GoRoute(
                         name: 'view-responses',
@@ -317,7 +312,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        drawer: const ManagerAppDrawer(),
+        drawer: const MainAppDrawer(),
         bottomNavigationBar: const MainBottomAppBar(),
         appBar: const PreferredSize(
           preferredSize: Size.fromHeight(50),
@@ -360,35 +355,72 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-class ManagerAppDrawer extends StatelessWidget {
-  const ManagerAppDrawer({
+class MainAppDrawer extends StatelessWidget {
+  const MainAppDrawer({
     Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Drawer(
-      child: Center(
-        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-          Text(
-            'Settings',
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-          TextButton(
-              onPressed: () => context.goNamed('profile'),
-              child: Text(
-                'Profile',
-                style: Theme.of(context).textTheme.titleMedium,
-              )),
-          TextButton.icon(
-              onPressed: () {
-                context.read<LoginCubit>().signOut();
-              },
-              icon: const Icon(Icons.logout_rounded),
-              label: const Text('Logout'))
-        ]),
-      ),
-    );
+    return BlocBuilder<ProfileBloc, ProfileState>(builder: (context, state) {
+      if (state is ProfileLoaded) {
+        if (state.user.type == 'user') {
+          return Drawer(
+            child: Center(
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Settings',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    TextButton(
+                        onPressed: () => context.goNamed('profile'),
+                        child: Text(
+                          'Profile',
+                          style: Theme.of(context).textTheme.titleMedium,
+                        )),
+                    TextButton.icon(
+                        onPressed: () {
+                          context.read<LoginCubit>().signOut();
+                        },
+                        icon: const Icon(Icons.logout_rounded),
+                        label: const Text('Logout'))
+                  ]),
+            ),
+          );
+        } else {
+          return Drawer(
+            child: Center(
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Settings',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    TextButton(
+                        onPressed: () => context.goNamed('profile'),
+                        child: Text(
+                          'Profile',
+                          style: Theme.of(context).textTheme.titleMedium,
+                        )),
+                    TextButton.icon(
+                        onPressed: () {
+                          context.read<LoginCubit>().signOut();
+                        },
+                        icon: const Icon(Icons.logout_rounded),
+                        label: const Text('Logout'))
+                  ]),
+            ),
+          );
+        }
+      } else {
+        return const Center(
+          child: Text('Error Fetching Profile.'),
+        );
+      }
+    });
   }
 }
 

@@ -47,7 +47,7 @@ class _DashboardState extends State<Dashboard> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        drawer: const ManagerAppDrawer(),
+        drawer: const MainAppDrawer(),
         bottomNavigationBar: const MainBottomAppBar(),
         appBar: PreferredSize(
           preferredSize: const Size.fromHeight(50),
@@ -300,7 +300,7 @@ class _GroupSectionState extends State<GroupSection> {
                     showDialog(
                         context: context,
                         builder: (_) => AddMemberDialog(
-                          group: widget.group,
+                            group: widget.group,
                             inviteTextFieldController:
                                 widget.inviteTextFieldController));
                   },

@@ -24,7 +24,7 @@ class Categories extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        drawer: const ManagerAppDrawer(),
+        drawer: const MainAppDrawer(),
         bottomNavigationBar: const MainBottomAppBar(),
         appBar: PreferredSize(
           preferredSize: const Size.fromHeight(50),

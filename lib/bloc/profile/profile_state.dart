@@ -16,8 +16,9 @@ class ProfileInitial extends ProfileState {}
 class ProfileLoading extends ProfileState {}
 
 class ProfileLoaded extends ProfileState {
+  @override
   final User user;
-  ProfileLoaded({
+  const ProfileLoaded({
     required this.user,
   });
   @override

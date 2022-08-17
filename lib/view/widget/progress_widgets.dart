@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -63,10 +65,10 @@ class ProgressSection extends StatelessWidget {
                             }
 
                             return ProgressCategory(
+                                category: category,
                                 title: category.name,
                                 progressColor: category.categoryColor,
-                                progress: categoryStarted ? progress! : 0,
-                                message: 'All Done. Good Job!');
+                                progress: categoryStarted ? progress! : 0);
                           }
                           return const Text('Something Went Wrong...');
                         },
@@ -87,20 +89,78 @@ class ProgressSection extends StatelessWidget {
 }
 
 class ProgressCategory extends StatelessWidget {
+  final Category category;
   final String title;
   Color progressColor;
-  double progress;
-  String message;
+  final double progress;
+
   ProgressCategory({
     Key? key,
+    required this.category,
     required this.title,
     required this.progressColor,
     required this.progress,
-    required this.message,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    List<String> getStartedMessages = [
+      'Let\'s get started!',
+      'Not started yet!',
+      'No responses submitted.',
+      'Starting is the hardest part!',
+      'Let\'s change that!',
+    ];
+    List<String> keepGoingMessages = [
+      'You\'re doing great!',
+      'Keep up the hard work!',
+      'Keep going!',
+      'You got this!',
+      'You\'re crushing it.',
+      'Great job, keep it up!',
+      'Don\'t stop now!',
+      'You\'re doing great!',
+      'Keep up the momentum!',
+    ];
+    List<String> almostDoneMessages = [
+      'You\'re almost done!',
+      'You\'re so close!',
+      'Your hard work is paying off.',
+      'Almost there!',
+      'Just a bit more!',
+    ];
+    List<String> wellDoneMessages = [
+      'Job well done!',
+      'All Done. Good Job!!',
+      'You\'re all done; Awesome!',
+      'You finished!',
+      'Pat yourself on the back.',
+      'You\'re done',
+      'Job well done!',
+      'Job well done!',
+      'Job well done!',
+      'Job well done!',
+    ];
+
+    String message = ' ';
+    Random random = Random();
+
+    print('Progress is: ${progress.round()}');
+
+    if (progress.round() == 0) {
+      var randomInt = random.nextInt(getStartedMessages.length);
+      message = getStartedMessages[randomInt];
+    } else if (progress < 66) {
+      var randomInt = random.nextInt(getStartedMessages.length);
+      message = keepGoingMessages[randomInt];
+    } else if (progress < 100) {
+      var randomInt = random.nextInt(getStartedMessages.length);
+      message = almostDoneMessages[randomInt];
+    } else if (progress == 100) {
+      var randomInt = random.nextInt(getStartedMessages.length);
+      message = wellDoneMessages[randomInt];
+    }
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: Column(
@@ -172,12 +232,11 @@ class ProgressCategory extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                child: Text(
-                  message,
-                  textAlign: TextAlign.right,
-                ),
-              )
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: Text(
+                    message,
+                    textAlign: TextAlign.right,
+                  ))
             ]),
           ),
         ],
