@@ -52,7 +52,9 @@ class ViewMembers extends StatelessWidget {
                         print(
                             'Building list of ${state.groupMembers.length} members');
                         User user = state.groupMembers[index];
+                        
                         return GroupMemberTile(
+                          currentGroup: state.group,
                           memberId: user.id!,
                           memberName: user.name!,
                           memberTitle: user.title!,

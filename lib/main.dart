@@ -74,6 +74,7 @@ class _MyAppState extends State<MyApp> {
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider(
+          lazy: false,
           create: (context) => AuthRepository(),
         ),
         RepositoryProvider(
@@ -95,7 +96,8 @@ class _MyAppState extends State<MyApp> {
               create: (context) =>
                   LoginCubit(authRepository: context.read<AuthRepository>())),
           BlocProvider(
-            create: (context) => InviteBloc(),
+            create: (context) => InviteBloc(
+                databaseRepository: context.read<DatabaseRepository>()),
           ),
           BlocProvider(
             lazy: false,
@@ -271,7 +273,7 @@ class _MyAppState extends State<MyApp> {
                 GoRoute(
                   name: 'view-member',
                   path: 'view-member',
-                  builder: (context, state) => const ViewMember(),
+                  builder: (context, state) => ViewMember(),
                   routes: [
                     GoRoute(
                         name: 'view-responses',

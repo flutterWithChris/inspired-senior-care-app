@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:inspired_senior_care_app/bloc/group/group_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/invite/invite_bloc.dart';
+import 'package:inspired_senior_care_app/data/models/group.dart';
 
 class AddMemberDialog extends StatelessWidget {
+  final Group group;
+  final TextEditingController inviteTextFieldController;
   const AddMemberDialog({
     Key? key,
+    required this.group,
     required this.inviteTextFieldController,
   }) : super(key: key);
-
-  final TextEditingController inviteTextFieldController;
 
   @override
   Widget build(BuildContext context) {
@@ -79,7 +82,11 @@ class AddMemberDialog extends StatelessWidget {
                     primary: Colors.lightGreen,
                     fixedSize: const Size(175, 40)),
                 onPressed: () {
-                  context.read<InviteBloc>().add(InviteSent());
+                  context.read<InviteBloc>().add(InviteSent(
+                      emailAddress: inviteTextFieldController.text,
+                      group: group));
+
+                  context.read<GroupBloc>().add(UpdateGroup(group: group));
                 },
                 icon: BlocConsumer<InviteBloc, InviteState>(
                   listenWhen: (previous, current) =>

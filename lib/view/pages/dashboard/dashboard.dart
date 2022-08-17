@@ -300,6 +300,7 @@ class _GroupSectionState extends State<GroupSection> {
                     showDialog(
                         context: context,
                         builder: (_) => AddMemberDialog(
+                          group: widget.group,
                             inviteTextFieldController:
                                 widget.inviteTextFieldController));
                   },

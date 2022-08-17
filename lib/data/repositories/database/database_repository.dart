@@ -20,6 +20,16 @@ class DatabaseRepository extends BaseDatabaseRepository {
   }
 
   @override
+  Stream<User?> getUserByEmail(String emailAddress) {
+    return _firebaseFirestore
+        .collection('users')
+        .where('email', isEqualTo: emailAddress)
+        .limit(1)
+        .snapshots()
+        .map((event) => User.fromSnapshot(event.docs.first));
+  }
+
+  @override
   Stream<List<User>>? getUsers(List<String> userIds) {
     for (String userId in userIds) {
       return _firebaseFirestore
@@ -133,6 +143,18 @@ class DatabaseRepository extends BaseDatabaseRepository {
         .doc(group.groupId)
         .update(group.toMap())
         .then((value) => print('Group Updated!'));
+  }
+
+  Future<void> addMemberToGroup(String userId, Group group) {
+    return _firebaseFirestore.collection('groups').doc(group.groupId).update({
+      'groupMemberIds': FieldValue.arrayUnion([userId])
+    });
+  }
+
+  Future<void> removeMemberFromGroup(User user, Group group) {
+    return _firebaseFirestore.collection('groups').doc(group.groupId).update({
+      'groupMemberIds': FieldValue.arrayRemove([user.id]),
+    });
   }
 
   Future<void> updateProgress(

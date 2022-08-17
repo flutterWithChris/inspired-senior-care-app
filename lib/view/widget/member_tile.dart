@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:inspired_senior_care_app/bloc/member/bloc/member_bloc.dart';
+import 'package:inspired_senior_care_app/data/models/group.dart';
 
 class GroupMemberTile extends StatelessWidget {
+  final Group currentGroup;
   final String memberId;
   final String memberName;
   final Color memberColor;
@@ -14,6 +16,7 @@ class GroupMemberTile extends StatelessWidget {
   final Random random = Random();
   GroupMemberTile({
     Key? key,
+    required this.currentGroup,
     required this.memberId,
     required this.memberName,
     required this.memberTitle,
@@ -36,7 +39,7 @@ class GroupMemberTile extends StatelessWidget {
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           onTap: () {
-            context.read<MemberBloc>().add(LoadMember(userId: memberId));
+            context.read<MemberBloc>().add(LoadMember(userId: memberId, group: currentGroup));
             context.goNamed('view-member');
           },
           dense: true,

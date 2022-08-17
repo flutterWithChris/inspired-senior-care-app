@@ -4,9 +4,15 @@ part of 'invite_bloc.dart';
 abstract class InviteEvent extends Equatable {}
 
 class InviteSent extends InviteEvent {
+  final String emailAddress;
+  final Group group;
+  InviteSent({
+    required this.emailAddress,
+    required this.group,
+  });
   @override
   // TODO: implement props
-  List<Object?> get props => throw UnimplementedError();
+  List<Object?> get props => [emailAddress, group];
 }
 
 class InviteReceived extends InviteEvent {

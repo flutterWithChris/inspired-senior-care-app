@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:inspired_senior_care_app/data/models/group.dart';
 import 'package:inspired_senior_care_app/data/models/user.dart';
 import 'package:inspired_senior_care_app/data/repositories/database/database_repository.dart';
 import 'package:meta/meta.dart';
@@ -16,6 +17,14 @@ class MemberBloc extends Bloc<MemberEvent, MemberState> {
     on<ResetMember>(
       (event, emit) => emit(MemberInitial()),
     );
+    on<RemoveMemberFromGroup>(_removeMemberFromGroup);
+  }
+
+  void _removeMemberFromGroup(
+      RemoveMemberFromGroup event, Emitter<MemberState> emit) async {
+    emit(MemberLoading());
+    await _databaseRepository.removeMemberFromGroup(event.user, event.group);
+    emit(MemberRemoved());
   }
 
   void _onLoadMember(LoadMember event, Emitter<MemberState> emit) async {
@@ -25,6 +34,6 @@ class MemberBloc extends Bloc<MemberEvent, MemberState> {
       member = user;
     });
     await Future.delayed(const Duration(seconds: 1));
-    emit(MemberLoaded(user: member));
+    emit(MemberLoaded(user: member, group: event.group));
   }
 }

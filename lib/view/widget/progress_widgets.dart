@@ -201,6 +201,14 @@ class GroupMemberProgressSection extends StatelessWidget {
 
     return BlocBuilder<MemberBloc, MemberState>(
       builder: (context, state) {
+        if (state is MemberFailed) {
+          return const Center(
+            child: Text('Error Fetching Member!'),
+          );
+        }
+        if (state is MemberRemoved) {
+          return Container();
+        }
         if (state is MemberLoading) {
           return LoadingAnimationWidget.discreteCircle(
               color: Colors.blue, size: 30);
