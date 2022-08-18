@@ -1,5 +1,4 @@
 import 'dart:math';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cron/cron.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -508,6 +507,8 @@ class _FeaturedCategoryState extends State<FeaturedCategory> {
                         return InkWell(
                           splashColor: Colors.lightBlueAccent,
                           onTap: (() {
+                            BlocProvider.of<CardBloc>(context)
+                                .add(LoadCards(category: featuredCategory));
                             context.goNamed('deck-page');
                           }),
                           child: Card(
@@ -593,6 +594,8 @@ class _FeaturedCategoryState extends State<FeaturedCategory> {
                           splashColor: Colors.lightBlueAccent,
                           onTap: (() {
                             context.goNamed('deck-page');
+                            BlocProvider.of<CardBloc>(context)
+                                .add(LoadCards(category: featuredCategory));
                           }),
                           child: Card(
                             child: LayoutBuilder(

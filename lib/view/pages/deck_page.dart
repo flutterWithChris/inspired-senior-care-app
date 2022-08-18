@@ -234,11 +234,17 @@ class CardCounter extends StatelessWidget {
                             .animateToItem(currentCardIndex - 1);
                       });
                     }
+                    double progress =
+                        context.watch<DeckCubit>().currentCardNumber == 1
+                            ? 0.0
+                            : ((context.watch<DeckCubit>().currentCardNumber /
+                                    currentCategory.totalCards!) *
+                                100);
                     return CircleAvatar(
                       backgroundColor: Colors.white,
                       radius: 32,
                       child: Text(
-                        '${((context.watch<DeckCubit>().currentCardNumber / currentCategory.totalCards!) * 100).toStringAsFixed(0)}%',
+                        '${progress.toStringAsFixed(0)}%',
                         style: const TextStyle(fontSize: 20),
                       ),
                     );
