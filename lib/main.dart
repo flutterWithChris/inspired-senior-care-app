@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cron/cron.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -46,6 +47,7 @@ import 'package:inspired_senior_care_app/view/pages/signup/signup.dart';
 import 'package:inspired_senior_care_app/view/widget/bottom_app_bar.dart';
 import 'package:inspired_senior_care_app/view/widget/top_app_bar.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -206,7 +208,8 @@ class _MyAppState extends State<MyApp> {
     redirect: (state) {
       bool isLoggingIn = state.location == '/login';
       bool loggedIn = bloc.state.authStatus == AuthStatus.authenticated;
-      bool isOnboarding = state.location == '/signup';
+      bool isOnboarding = state.location == '/login/signup';
+      // TODO: Create Onboarding Completed SharedPrefs Value ***
       bool completedOnboarding = true;
 
       if (!loggedIn) {
@@ -228,15 +231,16 @@ class _MyAppState extends State<MyApp> {
   );
   final List<GoRoute> _routes = [
     GoRoute(
-      name: 'login',
-      path: '/login',
-      builder: (context, state) => const LoginScreen(),
-    ),
-    GoRoute(
-      name: 'signup',
-      path: '/signup',
-      builder: (context, state) => const SignupScreen(),
-    ),
+        name: 'login',
+        path: '/login',
+        builder: (context, state) => const LoginScreen(),
+        routes: [
+          GoRoute(
+            name: 'signup',
+            path: 'signup',
+            builder: (context, state) => const SignupScreen(),
+          ),
+        ]),
     GoRoute(
       name: 'home',
       path: '/',
@@ -567,65 +571,83 @@ class _FeaturedCategoryState extends State<FeaturedCategory> {
                   );
                 } else {
                   Random random = Random();
-                  final Category featuredCategory =
-                      categories[random.nextInt(categories.length)];
+                  final Cron cron = Cron();
+                  int randomInt = 2;
+                  _getRandomCategoryMonthly() {
+                    cron.schedule(Schedule.parse('15 * * * * *'), () async {
+                      SharedPreferences prefs =
+                          await SharedPreferences.getInstance();
+                      randomInt = random.nextInt(categories.length);
+                      prefs.setInt('randomFeaturedCategory', randomInt);
+                      print(randomInt);
+                    });
+                  }
+
+                  final Category featuredCategory = categories[randomInt];
                   int progress =
                       currentUser.progress![featuredCategory.name] ?? 0;
-                  return InkWell(
-                    splashColor: Colors.lightBlueAccent,
-                    onTap: (() {
-                      context.goNamed('deck-page');
-                    }),
-                    child: Card(
-                      child: LayoutBuilder(
-                        builder: (context, constraints) {
-                          return ConstrainedBox(
-                            constraints: BoxConstraints(
-                                maxWidth:
-                                    constraints.maxWidth > 700 ? 350 : 275),
-                            child: Container(
-                              color: Colors.white,
-                              child: Padding(
-                                padding: const EdgeInsets.all(12.0),
-                                child: Stack(
-                                  clipBehavior: Clip.none,
-                                  alignment: AlignmentDirectional.topEnd,
-                                  children: [
-                                    SizedBox(
-                                      child: CachedNetworkImage(
-                                        imageUrl:
-                                            featuredCategory.coverImageUrl,
+                  return FutureBuilder(
+                      future: SharedPreferences.getInstance(),
+                      builder: (context, snapshot) {
+                        return InkWell(
+                          splashColor: Colors.lightBlueAccent,
+                          onTap: (() {
+                            context.goNamed('deck-page');
+                          }),
+                          child: Card(
+                            child: LayoutBuilder(
+                              builder: (context, constraints) {
+                                return ConstrainedBox(
+                                  constraints: BoxConstraints(
+                                      maxWidth: constraints.maxWidth > 700
+                                          ? 350
+                                          : 275),
+                                  child: Container(
+                                    color: Colors.white,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(12.0),
+                                      child: Stack(
+                                        clipBehavior: Clip.none,
+                                        alignment: AlignmentDirectional.topEnd,
+                                        children: [
+                                          SizedBox(
+                                            child: CachedNetworkImage(
+                                              imageUrl: featuredCategory
+                                                  .coverImageUrl,
+                                            ),
+                                          ),
+                                          Positioned(
+                                            top: -35,
+                                            right: -25,
+                                            child: CircleAvatar(
+                                              radius: 35,
+                                              backgroundColor: Colors.white,
+                                              child: CircleAvatar(
+                                                radius: 30,
+                                                backgroundColor:
+                                                    featuredCategory
+                                                        .progressColor,
+                                                child: Text(
+                                                  '${(progress / featuredCategory.totalCards! * 100).toStringAsFixed(0)}%',
+                                                  style: const TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 18,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                              ),
+                                            ),
+                                          )
+                                        ],
                                       ),
                                     ),
-                                    Positioned(
-                                      top: -35,
-                                      right: -25,
-                                      child: CircleAvatar(
-                                        radius: 35,
-                                        backgroundColor: Colors.white,
-                                        child: CircleAvatar(
-                                          radius: 30,
-                                          backgroundColor:
-                                              featuredCategory.progressColor,
-                                          child: Text(
-                                            '${(progress / featuredCategory.totalCards! * 100).toStringAsFixed(0)}%',
-                                            style: const TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                        ),
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              ),
+                                  ),
+                                );
+                              },
                             ),
-                          );
-                        },
-                      ),
-                    ),
-                  );
+                          ),
+                        );
+                      });
                 }
               }
               return const Center(

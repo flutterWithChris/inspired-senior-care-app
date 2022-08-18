@@ -124,13 +124,7 @@ class _BasicInfoPageState extends State<BasicInfoPage> {
                               minLength: 6,
                               uppercaseCharCount: 1,
                               specialCharCount: 1,
-                              onFail: () {
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(const SnackBar(
-                                  content: Text('Invalid Password!'),
-                                  backgroundColor: Colors.redAccent,
-                                ));
-                              },
+                              onFail: () {},
                               onSuccess: () {},
                               controller: passwordFieldController),
                         ),
@@ -168,7 +162,7 @@ class _BasicInfoPageState extends State<BasicInfoPage> {
                             ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                     backgroundColor: Colors.redAccent,
-                                    content: Text('Invalid Email Entered!')));
+                                    content: Text('Invalid Signup Info!')));
                           }
                         }, child: BlocBuilder<SignupCubit, SignupState>(
                           builder: (context, state) {

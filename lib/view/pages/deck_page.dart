@@ -217,15 +217,13 @@ class CardCounter extends StatelessWidget {
                     previous.category != current.category,
                 builder: (context, state) {
                   if (state is CardsLoaded) {
+                    // Checking if Category has been started.
                     Category currentCategory = state.category;
-
                     bool categoryStarted =
                         user.progress!.containsKey(currentCategory.name);
-
                     if (categoryStarted) {
                       Map<String, int> progressList = user.progress!;
                       currentCardIndex = progressList[currentCategory.name]!;
-
                       context
                           .read<DeckCubit>()
                           .updateCardNumber(currentCardIndex);

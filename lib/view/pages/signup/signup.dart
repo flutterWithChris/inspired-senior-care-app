@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:inspired_senior_care_app/view/pages/signup/basic_info.dart';
 import 'package:inspired_senior_care_app/view/pages/signup/profile_info.dart';
 import 'package:inspired_senior_care_app/view/pages/signup/user_type.dart';
@@ -18,6 +19,7 @@ class _SignupScreenState extends State<SignupScreen> {
   @override
   void dispose() {
     controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -47,14 +49,35 @@ class _SignupScreenState extends State<SignupScreen> {
       bottomSheet: Container(
         height: 60,
         color: Colors.grey.shade300,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+        child: Stack(
+          alignment: AlignmentDirectional.centerStart,
           children: [
-            SmoothPageIndicator(
-              controller: controller,
-              count: 4,
-              effect: const WormEffect(spacing: 16),
-            )
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SmoothPageIndicator(
+                  controller: controller,
+                  count: 4,
+                  effect: const WormEffect(spacing: 16),
+                )
+              ],
+            ),
+            controller.hasClients && controller.page == 2
+                ? Container(
+                    height: 1,
+                  )
+                : Padding(
+                    padding: const EdgeInsets.only(left: 12.0),
+                    child: TextButton(
+                        onPressed: () {
+                          controller.hasClients && controller.page == 0
+                              ? context.pop()
+                              : controller.previousPage(
+                                  duration: const Duration(milliseconds: 500),
+                                  curve: Curves.easeInOut);
+                        },
+                        child: const Text('Back')),
+                  )
           ],
         ),
       ),

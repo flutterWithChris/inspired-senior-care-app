@@ -12,6 +12,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final GlobalKey<FormState> _loginFormKey = GlobalKey<FormState>();
   bool hidePassword = true;
   @override
   Widget build(BuildContext context) {
@@ -28,102 +29,114 @@ class _LoginScreenState extends State<LoginScreen> {
                   )),
               Center(
                 child: Form(
+                    key: _loginFormKey,
                     child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 4.0),
-                      child: Text(
-                        'Sign In',
-                        style: Theme.of(context).textTheme.headline4,
-                      ),
-                    ),
-                    SizedBox(
-                      width: 325,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          TextButton(
-                              onPressed: () {
-                                context.goNamed('signup');
-                              },
-                              child: const Text('New? Sign Up.'))
-                        ],
-                      ),
-                    ),
-                    SizedBox(
-                      width: 325,
-                      child: TextFormField(
-                        validator: (value) =>
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4.0),
+                          child: Text(
+                            'Sign In',
+                            style: Theme.of(context).textTheme.headline4,
+                          ),
+                        ),
+                        SizedBox(
+                          width: 325,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              TextButton(
+                                  onPressed: () {
+                                    context.goNamed('signup');
+                                  },
+                                  child: const Text('New? Sign Up.'))
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          width: 325,
+                          child: TextFormField(
+                            validator: (value) =>
                                 value != null && !EmailValidator.validate(value)
                                     ? 'Enter a valid email!'
                                     : null,
-                        onChanged: (value) =>
-                            context.read<LoginCubit>().emailChanged(value),
-                        decoration: InputDecoration(
-                          label: const Text('Email Address'),
-                          prefixIcon: const Icon(Icons.email),
-                          filled: true,
-                          fillColor: Colors.white,
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(25)),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 12.0,
-                    ),
-                    SizedBox(
-                      width: 325,
-                      child: TextFormField(
-                        obscureText: hidePassword,
-                        onChanged: (value) =>
-                            context.read<LoginCubit>().passwordChanged(value),
-                        decoration: InputDecoration(
-                          label: const Text('Password'),
-                          prefixIcon: const Icon(Icons.lock),
-                          suffixIcon: IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  hidePassword = !hidePassword;
-                                });
-                              },
-                              icon: hidePassword
-                                  ? const Icon(Icons.visibility_off_rounded)
-                                  : const Icon(Icons.visibility_rounded)),
-                          filled: true,
-                          fillColor: Colors.white,
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(25)),
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      width: 325,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          TextButton(
-                              onPressed: () {},
-                              child: const Text('Forgot Password?'))
-                        ],
-                      ),
-                    ),
-                    ElevatedButton(
-                      onPressed: () {
-                        context.read<LoginCubit>().signInWithCredentials();
-                      },
-                      style: Theme.of(context)
-                          .elevatedButtonTheme
-                          .style!
-                          .copyWith(
-                            fixedSize:
-                                MaterialStateProperty.all(const Size(200, 30)),
+                            onChanged: (value) =>
+                                context.read<LoginCubit>().emailChanged(value),
+                            decoration: InputDecoration(
+                              label: const Text('Email Address'),
+                              prefixIcon: const Icon(Icons.email),
+                              filled: true,
+                              fillColor: Colors.white,
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(25)),
+                            ),
                           ),
-                      child: const Text('Login'),
-                    ),
-                  ],
-                )),
+                        ),
+                        const SizedBox(
+                          height: 12.0,
+                        ),
+                        SizedBox(
+                          width: 325,
+                          child: TextFormField(
+                            obscureText: hidePassword,
+                            onChanged: (value) => context
+                                .read<LoginCubit>()
+                                .passwordChanged(value),
+                            decoration: InputDecoration(
+                              label: const Text('Password'),
+                              prefixIcon: const Icon(Icons.lock),
+                              suffixIcon: IconButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      hidePassword = !hidePassword;
+                                    });
+                                  },
+                                  icon: hidePassword
+                                      ? const Icon(Icons.visibility_off_rounded)
+                                      : const Icon(Icons.visibility_rounded)),
+                              filled: true,
+                              fillColor: Colors.white,
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(25)),
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          width: 325,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              TextButton(
+                                  onPressed: () {},
+                                  child: const Text('Forgot Password?'))
+                            ],
+                          ),
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            if (_loginFormKey.currentState!.validate()) {
+                              context
+                                  .read<LoginCubit>()
+                                  .signInWithCredentials();
+                            } else {
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(const SnackBar(
+                                content: Text('Invalid Login!'),
+                                backgroundColor: Colors.redAccent,
+                              ));
+                            }
+                          },
+                          style: Theme.of(context)
+                              .elevatedButtonTheme
+                              .style!
+                              .copyWith(
+                                fixedSize: MaterialStateProperty.all(
+                                    const Size(200, 30)),
+                              ),
+                          child: const Text('Login'),
+                        ),
+                      ],
+                    )),
               ),
             ],
           ),
