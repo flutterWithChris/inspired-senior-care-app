@@ -1,3 +1,4 @@
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -53,6 +54,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     SizedBox(
                       width: 325,
                       child: TextFormField(
+                        validator: (value) =>
+                                value != null && !EmailValidator.validate(value)
+                                    ? 'Enter a valid email!'
+                                    : null,
                         onChanged: (value) =>
                             context.read<LoginCubit>().emailChanged(value),
                         decoration: InputDecoration(

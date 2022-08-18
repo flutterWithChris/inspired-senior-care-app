@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -37,6 +39,8 @@ import 'package:inspired_senior_care_app/view/pages/dashboard/members/view_respo
 import 'package:inspired_senior_care_app/view/pages/dashboard/view_member.dart';
 import 'package:inspired_senior_care_app/view/pages/deck_page.dart';
 import 'package:inspired_senior_care_app/view/pages/login/login.dart';
+import 'package:inspired_senior_care_app/view/pages/manager_categories.dart';
+import 'package:inspired_senior_care_app/view/pages/manager_deck_page.dart';
 import 'package:inspired_senior_care_app/view/pages/profile.dart';
 import 'package:inspired_senior_care_app/view/pages/signup/signup.dart';
 import 'package:inspired_senior_care_app/view/widget/bottom_app_bar.dart';
@@ -145,7 +149,6 @@ class _MyAppState extends State<MyApp> {
                 SignupCubit(authRepository: context.read<AuthRepository>()),
           ),
           BlocProvider(
-            lazy: false,
             create: (context) => ResponseBloc(
                 databaseRepository: context.read<DatabaseRepository>()),
           ),
@@ -248,6 +251,17 @@ class _MyAppState extends State<MyApp> {
             name: 'deck-page',
             path: 'deck-page',
             builder: (context, state) => DeckPage(),
+          ),
+        ]),
+    GoRoute(
+        name: 'manager-categories',
+        path: '/manager-categories',
+        builder: (context, state) => const ManagerCategories(),
+        routes: [
+          GoRoute(
+            name: 'manager-deck-page',
+            path: 'manager-deck-page',
+            builder: (context, state) => ManagerDeckPage(),
           ),
         ]),
     GoRoute(
@@ -368,18 +382,12 @@ class MainAppDrawer extends StatelessWidget {
           return Drawer(
             child: Center(
               child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     Text(
                       'Settings',
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
-                    TextButton(
-                        onPressed: () => context.goNamed('profile'),
-                        child: Text(
-                          'Profile',
-                          style: Theme.of(context).textTheme.titleMedium,
-                        )),
                     TextButton.icon(
                         onPressed: () {
                           context.read<LoginCubit>().signOut();
@@ -424,14 +432,18 @@ class MainAppDrawer extends StatelessWidget {
   }
 }
 
-class FeaturedCategory extends StatelessWidget {
+class FeaturedCategory extends StatefulWidget {
   const FeaturedCategory({
     Key? key,
   }) : super(key: key);
 
   @override
+  State<FeaturedCategory> createState() => _FeaturedCategoryState();
+}
+
+class _FeaturedCategoryState extends State<FeaturedCategory> {
+  @override
   Widget build(BuildContext context) {
-    //context.read<ProfileBloc>().loadFeaturedCategory();
     return BlocBuilder<ProfileBloc, ProfileState>(
       builder: (context, state) {
         if (state is ProfileLoading) {
@@ -462,94 +474,159 @@ class FeaturedCategory extends StatelessWidget {
               }
               if (state is CategoriesLoaded) {
                 List<Category> categories = state.categories;
-                context
-                    .read<FeaturedCategoryCubit>()
-                    .loadFeaturedCategoryById(currentUser.groups![0]);
 
-                return BlocBuilder<FeaturedCategoryCubit,
-                    FeaturedCategoryState>(
-                  builder: (context, state) {
-                    if (state is FeaturedCategoryLoading) {
-                      return Center(
-                        child: LoadingAnimationWidget.fourRotatingDots(
-                            color: Colors.blue, size: 30),
-                      );
-                    }
-                    if (state is FeaturedCategoryFailed) {
-                      return const Center(
-                        child: Text('Error Fetching Category!'),
-                      );
-                    }
-                    if (state is FeaturedCategoryLoaded) {
-                      Category featuredCategory = categories.singleWhere(
-                        (category) =>
-                            category.name == state.featuredCategoryName,
-                      );
-                      int progress =
-                          currentUser.progress![state.featuredCategoryName] ??
-                              0;
-                      return InkWell(
-                        splashColor: Colors.lightBlueAccent,
-                        onTap: (() {
-                          context.goNamed('deck-page');
-                        }),
-                        child: Card(
-                          child: LayoutBuilder(
-                            builder: (context, constraints) {
-                              return ConstrainedBox(
-                                constraints: BoxConstraints(
-                                    maxWidth:
-                                        constraints.maxWidth > 700 ? 350 : 275),
-                                child: Container(
-                                  color: Colors.white,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(12.0),
-                                    child: Stack(
-                                      clipBehavior: Clip.none,
-                                      alignment: AlignmentDirectional.topEnd,
-                                      children: [
-                                        SizedBox(
-                                          child: CachedNetworkImage(
-                                            imageUrl:
-                                                featuredCategory.coverImageUrl,
-                                          ),
-                                        ),
-                                        Positioned(
-                                          top: -35,
-                                          right: -25,
-                                          child: CircleAvatar(
-                                            radius: 35,
-                                            backgroundColor: Colors.white,
-                                            child: CircleAvatar(
-                                              radius: 30,
-                                              backgroundColor: featuredCategory
-                                                  .progressColor,
-                                              child: Text(
-                                                '${(progress / featuredCategory.totalCards! * 100).toStringAsFixed(0)}%',
-                                                style: const TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 18,
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
+                if (currentUser.groups!.isNotEmpty) {
+                  context
+                      .read<FeaturedCategoryCubit>()
+                      .loadFeaturedCategoryById(currentUser.groups!.first);
+                  return BlocBuilder<FeaturedCategoryCubit,
+                      FeaturedCategoryState>(
+                    builder: (context, state) {
+                      if (state is FeaturedCategoryLoading) {
+                        return Center(
+                          child: LoadingAnimationWidget.fourRotatingDots(
+                              color: Colors.blue, size: 30),
+                        );
+                      }
+                      if (state is FeaturedCategoryFailed) {
+                        return const Center(
+                          child: Text('Error Fetching Category!'),
+                        );
+                      }
+                      if (state is FeaturedCategoryLoaded) {
+                        Category featuredCategory = categories.singleWhere(
+                          (category) =>
+                              category.name == state.featuredCategoryName,
+                        );
+                        int progress =
+                            currentUser.progress![state.featuredCategoryName] ??
+                                0;
+                        return InkWell(
+                          splashColor: Colors.lightBlueAccent,
+                          onTap: (() {
+                            context.goNamed('deck-page');
+                          }),
+                          child: Card(
+                            child: LayoutBuilder(
+                              builder: (context, constraints) {
+                                return ConstrainedBox(
+                                  constraints: BoxConstraints(
+                                      maxWidth: constraints.maxWidth > 700
+                                          ? 350
+                                          : 275),
+                                  child: Container(
+                                    color: Colors.white,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(12.0),
+                                      child: Stack(
+                                        clipBehavior: Clip.none,
+                                        alignment: AlignmentDirectional.topEnd,
+                                        children: [
+                                          SizedBox(
+                                            child: CachedNetworkImage(
+                                              imageUrl: featuredCategory
+                                                  .coverImageUrl,
                                             ),
                                           ),
-                                        )
-                                      ],
+                                          Positioned(
+                                            top: -35,
+                                            right: -25,
+                                            child: CircleAvatar(
+                                              radius: 35,
+                                              backgroundColor: Colors.white,
+                                              child: CircleAvatar(
+                                                radius: 30,
+                                                backgroundColor:
+                                                    featuredCategory
+                                                        .progressColor,
+                                                child: Text(
+                                                  '${(progress / featuredCategory.totalCards! * 100).toStringAsFixed(0)}%',
+                                                  style: const TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 18,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                              ),
+                                            ),
+                                          )
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                ),
-                              );
-                            },
+                                );
+                              },
+                            ),
                           ),
-                        ),
+                        );
+                      }
+                      return const Center(
+                        child: Text('Something Went Wrong!'),
                       );
-                    }
-                    return const Center(
-                      child: Text('Something Went Wrong!'),
-                    );
-                  },
-                );
+                    },
+                  );
+                } else {
+                  Random random = Random();
+                  final Category featuredCategory =
+                      categories[random.nextInt(categories.length)];
+                  int progress =
+                      currentUser.progress![featuredCategory.name] ?? 0;
+                  return InkWell(
+                    splashColor: Colors.lightBlueAccent,
+                    onTap: (() {
+                      context.goNamed('deck-page');
+                    }),
+                    child: Card(
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          return ConstrainedBox(
+                            constraints: BoxConstraints(
+                                maxWidth:
+                                    constraints.maxWidth > 700 ? 350 : 275),
+                            child: Container(
+                              color: Colors.white,
+                              child: Padding(
+                                padding: const EdgeInsets.all(12.0),
+                                child: Stack(
+                                  clipBehavior: Clip.none,
+                                  alignment: AlignmentDirectional.topEnd,
+                                  children: [
+                                    SizedBox(
+                                      child: CachedNetworkImage(
+                                        imageUrl:
+                                            featuredCategory.coverImageUrl,
+                                      ),
+                                    ),
+                                    Positioned(
+                                      top: -35,
+                                      right: -25,
+                                      child: CircleAvatar(
+                                        radius: 35,
+                                        backgroundColor: Colors.white,
+                                        child: CircleAvatar(
+                                          radius: 30,
+                                          backgroundColor:
+                                              featuredCategory.progressColor,
+                                          child: Text(
+                                            '${(progress / featuredCategory.totalCards! * 100).toStringAsFixed(0)}%',
+                                            style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  );
+                }
               }
               return const Center(
                 child: Text('Something Went Wrong!'),

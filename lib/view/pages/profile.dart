@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
+import 'package:inspired_senior_care_app/main.dart';
 import 'package:inspired_senior_care_app/view/widget/bottom_app_bar.dart';
 import 'package:inspired_senior_care_app/view/widget/name_plate.dart';
 import 'package:inspired_senior_care_app/view/widget/progress_widgets.dart';
@@ -20,6 +21,7 @@ class Profile extends StatelessWidget {
         }
         if (state is ProfileLoaded) {
           return Scaffold(
+            drawer: const MainAppDrawer(),
             bottomNavigationBar: const MainBottomAppBar(),
             appBar: PreferredSize(
                 preferredSize: const Size.fromHeight(50),
@@ -39,7 +41,7 @@ class Profile extends StatelessWidget {
                       memberColorHex: state.user.userColor!,
                     ),
                   ),
-                  const Badges(),
+                  //const Badges(),
                   const Padding(
                     padding: EdgeInsets.symmetric(vertical: 16.0),
                     child: ProgressSection(),

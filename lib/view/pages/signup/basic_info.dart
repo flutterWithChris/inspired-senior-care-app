@@ -1,10 +1,10 @@
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_pw_validator/flutter_pw_validator.dart';
 import 'package:inspired_senior_care_app/bloc/onboarding/onboarding_bloc.dart';
 import 'package:inspired_senior_care_app/cubits/signup/signup_cubit.dart';
 import 'package:inspired_senior_care_app/data/models/user.dart';
-import 'package:email_validator/email_validator.dart';
 
 class BasicInfoPage extends StatefulWidget {
   final PageController pageController;
@@ -93,6 +93,7 @@ class _BasicInfoPageState extends State<BasicInfoPage> {
                       SizedBox(
                         width: 325,
                         child: TextFormField(
+                          autovalidateMode: AutovalidateMode.disabled,
                           controller: passwordFieldController,
                           obscureText: hidePassword,
                           decoration: InputDecoration(

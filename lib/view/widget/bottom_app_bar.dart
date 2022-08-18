@@ -31,7 +31,7 @@ class _BottomAppBarState extends State<MainBottomAppBar> {
                   switch (index) {
                     case 0:
                       {
-                        context.goNamed('categories');
+                        context.goNamed('manager-categories');
                       }
                       break;
 

@@ -18,7 +18,7 @@ class InviteBloc extends Bloc<InviteEvent, InviteState> {
         emit(InviteState.sending());
         // Query User
         // If Users exists ? Add User to Group : Alert message.
-        emit.forEach(
+        await emit.forEach(
           _databaseRepository.getUserByEmail(event.emailAddress),
           onData: (User? user) {
             if (user != null) {

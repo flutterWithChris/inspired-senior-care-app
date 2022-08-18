@@ -10,9 +10,14 @@ import 'package:inspired_senior_care_app/view/widget/name_plate.dart';
 import 'package:inspired_senior_care_app/view/widget/progress_widgets.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
-class ViewMember extends StatelessWidget {
+class ViewMember extends StatefulWidget {
   const ViewMember({Key? key}) : super(key: key);
 
+  @override
+  State<ViewMember> createState() => _ViewMemberState();
+}
+
+class _ViewMemberState extends State<ViewMember> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,7 +26,14 @@ class ViewMember extends StatelessWidget {
         preferredSize: const Size.fromHeight(50),
         child: AppBar(title: const Text('Inspired Senior Care')),
       ),
-      body: BlocBuilder<MemberBloc, MemberState>(
+      body: BlocConsumer<MemberBloc, MemberState>(
+        listener: (context, state) async {
+          if (state is MemberRemoved) {
+            await Future.delayed(const Duration(seconds: 2));
+            if (!mounted) return;
+            context.pop();
+          }
+        },
         builder: (context, state) {
           if (state is MemberRemoved) {
             return Center(
@@ -89,6 +101,7 @@ class RemoveMemberButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    BuildContext? dialogContext;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10.0),
       child: Row(
@@ -99,6 +112,7 @@ class RemoveMemberButton extends StatelessWidget {
                 showDialog(
                   context: context,
                   builder: (context) {
+                    dialogContext = context;
                     return RemoveMemberDialog(
                       group: currentGroup,
                     );
@@ -133,6 +147,9 @@ class _RemoveMemberDialogState extends State<RemoveMemberDialog> {
     final TextEditingController textFieldController = TextEditingController();
     return BlocBuilder<MemberBloc, MemberState>(
       builder: (context, state) {
+        if (state is MemberRemoved) {
+          return Container();
+        }
         if (state is MemberLoading) {
           return LoadingAnimationWidget.fourRotatingDots(
               color: Colors.blue, size: 30);
@@ -192,17 +209,16 @@ class _RemoveMemberDialogState extends State<RemoveMemberDialog> {
                             ..remove(user.id);
                           context.read<GroupMemberBloc>().add(LoadGroupMembers(
                               userIds: updatedMembers, group: group));
-                          await Future.delayed(const Duration(seconds: 3));
-                          // TODO: Improve State Status on Removed
-                          if (!mounted) return;
-                          context.pop();
+                          Navigator.of(context, rootNavigator: true).pop();
                         } else {
                           print('Form not valid');
                         }
                       },
                       child: BlocConsumer<MemberBloc, MemberState>(
                         listener: (context, state) async {
-                          if (state is MemberRemoved) {}
+                          if (state is MemberRemoved) {
+                            // context.pop();
+                          }
                         },
                         builder: (context, state) {
                           if (state is MemberFailed) {

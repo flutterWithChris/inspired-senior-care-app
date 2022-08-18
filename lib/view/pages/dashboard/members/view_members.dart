@@ -30,43 +30,51 @@ class ViewMembers extends StatelessWidget {
             );
           }
           if (state is GroupMembersLoaded) {
-            return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 12.0),
-                    child: Text(
-                      '${state.group.groupName}',
-                      style: Theme.of(context).textTheme.headlineMedium,
+            if (state.groupMembers.isEmpty) {
+              return Center(
+                  child: Text(
+                'No Members Yet!',
+                style: Theme.of(context).textTheme.titleLarge,
+              ));
+            } else {
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 12.0),
+                      child: Text(
+                        '${state.group.groupName}',
+                        style: Theme.of(context).textTheme.headlineMedium,
+                      ),
                     ),
-                  ),
-                  Card(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12.0)),
-                    child: ListView.builder(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      shrinkWrap: true,
-                      itemCount: state.groupMembers.length,
-                      itemBuilder: (context, index) {
-                        print(
-                            'Building list of ${state.groupMembers.length} members');
-                        User user = state.groupMembers[index];
-                        
-                        return GroupMemberTile(
-                          currentGroup: state.group,
-                          memberId: user.id!,
-                          memberName: user.name!,
-                          memberTitle: user.title!,
-                          memberProgress: 0.3,
-                          memberColor: hexToColor(user.userColor!),
-                        );
-                      },
+                    Card(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12.0)),
+                      child: ListView.builder(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        shrinkWrap: true,
+                        itemCount: state.groupMembers.length,
+                        itemBuilder: (context, index) {
+                          print(
+                              'Building list of ${state.groupMembers.length} members');
+                          User user = state.groupMembers[index];
+
+                          return GroupMemberTile(
+                            currentGroup: state.group,
+                            memberId: user.id!,
+                            memberName: user.name!,
+                            memberTitle: user.title!,
+                            memberProgress: 0.3,
+                            memberColor: hexToColor(user.userColor!),
+                          );
+                        },
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            );
+                  ],
+                ),
+              );
+            }
           }
           return const Text('Something Went Wrong...');
         },

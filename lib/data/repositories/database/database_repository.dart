@@ -46,6 +46,13 @@ class DatabaseRepository extends BaseDatabaseRepository {
   @override
   Future<void> createUser(User user) async {
     await _firebaseFirestore.collection('users').doc(user.id).set(user.toMap());
+    
+    await _firebaseFirestore
+        .collection('users')
+        .doc(user.id)
+        .collection('responses')
+        .doc()
+        .set({});
   }
 
   @override
