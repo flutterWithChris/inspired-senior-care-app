@@ -119,17 +119,17 @@ class _DeckPageState extends State<DeckPage> {
                           curve: Curves.easeInOut,
                           duration: const Duration(milliseconds: 200),
                           offset: isCardZoomed
-                              ? const Offset(0, -0.33)
+                              ? const Offset(0, -0.35)
                               : const Offset(0, -0.0),
                           child: AnimatedScale(
                             duration: const Duration(milliseconds: 500),
-                            scale: isCardZoomed ? 1.1 : 1.0,
+                            scale: isCardZoomed ? 1.0 : 1.0,
                             child: Stack(
                               clipBehavior: Clip.none,
                               alignment: AlignmentDirectional.topEnd,
                               children: [
                                 SizedBox(
-                                  height: 500,
+                                  height: 520,
                                   child: IgnorePointer(
                                     ignoring: isSwipeDisabled,
                                     child: BlocListener<DeckCubit, DeckState>(
@@ -217,11 +217,16 @@ class CardCounter extends StatelessWidget {
                     previous.category != current.category,
                 builder: (context, state) {
                   if (state is CardsLoaded) {
+                    double progress = 0.0;
                     // Checking if Category has been started.
                     Category currentCategory = state.category;
                     bool categoryStarted =
                         user.progress!.containsKey(currentCategory.name);
                     if (categoryStarted) {
+                      progress =
+                          ((context.watch<DeckCubit>().currentCardNumber /
+                                  currentCategory.totalCards!) *
+                              100);
                       Map<String, int> progressList = user.progress!;
                       currentCardIndex = progressList[currentCategory.name]!;
                       context
@@ -233,13 +238,10 @@ class CardCounter extends StatelessWidget {
                         deckScrollController
                             .animateToItem(currentCardIndex - 1);
                       });
+                    } else {
+                      progress = 0.0;
                     }
-                    double progress =
-                        context.watch<DeckCubit>().currentCardNumber == 1
-                            ? 0.0
-                            : ((context.watch<DeckCubit>().currentCardNumber /
-                                    currentCategory.totalCards!) *
-                                100);
+
                     return CircleAvatar(
                       backgroundColor: Colors.white,
                       radius: 32,

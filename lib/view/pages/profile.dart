@@ -20,33 +20,35 @@ class Profile extends StatelessWidget {
           );
         }
         if (state is ProfileLoaded) {
-          return Scaffold(
-            drawer: const MainAppDrawer(),
-            bottomNavigationBar: const MainBottomAppBar(),
-            appBar: PreferredSize(
-                preferredSize: const Size.fromHeight(50),
-                child: AppBar(
-                  title: const Text('Inspired Senior Care'),
-                )),
-            body: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: ListView(
-                shrinkWrap: true,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 12.0),
-                    child: NamePlate(
-                      memberName: state.user.name!,
-                      memberTitle: state.user.title!,
-                      memberColorHex: state.user.userColor!,
+          return SafeArea(
+            child: Scaffold(
+              drawer: const MainAppDrawer(),
+              bottomNavigationBar: const MainBottomAppBar(),
+              appBar: PreferredSize(
+                  preferredSize: const Size.fromHeight(50),
+                  child: AppBar(
+                    title: const Text('Inspired Senior Care'),
+                  )),
+              body: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: ListView(
+                  shrinkWrap: true,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 12.0),
+                      child: NamePlate(
+                        memberName: state.user.name!,
+                        memberTitle: state.user.title!,
+                        memberColorHex: state.user.userColor!,
+                      ),
                     ),
-                  ),
-                  //const Badges(),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 16.0),
-                    child: ProgressSection(),
-                  )
-                ],
+                    //const Badges(),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 16.0),
+                      child: ProgressSection(),
+                    )
+                  ],
+                ),
               ),
             ),
           );
