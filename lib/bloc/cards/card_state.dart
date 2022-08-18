@@ -1,9 +1,15 @@
 part of 'card_bloc.dart';
 
 abstract class CardState extends Equatable {
+  final Category? category;
+  final List<String>? cardImageUrls;
+  CardState({
+    this.category,
+    this.cardImageUrls,
+  });
   @override
   // TODO: implement props
-  List<Object?> get props => throw UnimplementedError();
+  List<Object?> get props => [category, cardImageUrls];
 }
 
 class CardsInitial extends CardState {}

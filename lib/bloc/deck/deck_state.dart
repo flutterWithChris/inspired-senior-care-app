@@ -29,8 +29,8 @@ class DeckState extends Equatable {
     return DeckState(status: DeckStatus.loading);
   }
 
-  factory DeckState.loaded() {
-    return DeckState(status: DeckStatus.loaded);
+  factory DeckState.loaded(int currentCard) {
+    return DeckState(status: DeckStatus.loaded, currentCardNumber: currentCard);
   }
 
   factory DeckState.zoomed() {

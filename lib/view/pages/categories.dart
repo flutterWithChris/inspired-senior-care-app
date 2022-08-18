@@ -180,8 +180,11 @@ class CategoryCard extends StatelessWidget {
                                         currentCard = 0;
                                       }
                                       if (categoryStarted) {
-                                        Map<String, int> progressList =
-                                            state.user.progress!;
+                                        Map<String, int> progressList = context
+                                            .watch<ProfileBloc>()
+                                            .state
+                                            .user
+                                            .progress!;
                                         currentCard =
                                             progressList[category.name]!;
                                         percentComplete =

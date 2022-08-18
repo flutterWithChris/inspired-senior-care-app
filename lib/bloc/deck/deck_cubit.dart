@@ -14,10 +14,10 @@ class DeckCubit extends Cubit<DeckState> {
         super(DeckState.initial());
   void loadDeck(int currentCard) {
     currentCardNumber = currentCard;
-    emit(DeckState.loaded());
+    emit(DeckState.loaded(currentCard));
   }
 
-  void resetDeck() => emit(DeckState.loaded());
+  void resetDeck() => emit(DeckState.loaded(1));
   void zoomDeck() => emit(DeckState.zoomed());
   void unzoomDeck() => emit(DeckState.unzoomed());
   void swipeDeck() => emit(DeckState.swiped());
