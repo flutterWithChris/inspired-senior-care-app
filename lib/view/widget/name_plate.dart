@@ -14,26 +14,42 @@ class NamePlate extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String getInitials(String name) => name.isNotEmpty
-        ? name.trim().split(' ').map((l) => l[0]).take(2).join()
-        : '';
-
     Color userColor = hexToColor(memberColorHex);
     return ListTile(
       minLeadingWidth: 70,
-      leading: CircleAvatar(
-        backgroundColor: userColor,
-        radius: 30,
-        child: Text(
-          getInitials(memberName),
-          style: const TextStyle(fontSize: 24),
-        ),
-      ),
+      leading: InitialsIcon(userColor: userColor, memberName: memberName),
       title: Text(
         memberName,
         style: Theme.of(context).textTheme.titleLarge,
       ),
       subtitle: Text(memberTitle),
+    );
+  }
+}
+
+class InitialsIcon extends StatelessWidget {
+  const InitialsIcon({
+    Key? key,
+    required this.userColor,
+    required this.memberName,
+  }) : super(key: key);
+
+  final Color userColor;
+  final String memberName;
+
+  @override
+  Widget build(BuildContext context) {
+    String getInitials(String name) => name.isNotEmpty
+        ? name.trim().split(' ').map((l) => l[0]).take(2).join()
+        : '';
+
+    return CircleAvatar(
+      backgroundColor: userColor,
+      radius: 30,
+      child: Text(
+        getInitials(memberName),
+        style: const TextStyle(fontSize: 24),
+      ),
     );
   }
 }

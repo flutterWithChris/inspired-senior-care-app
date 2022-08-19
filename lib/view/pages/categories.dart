@@ -185,10 +185,10 @@ class CategoryCard extends StatelessWidget {
                                             .state
                                             .user
                                             .progress!;
-                                        currentCard =
-                                            progressList[category.name]!;
+
                                         percentComplete =
-                                            currentCard / category.totalCards!;
+                                            progressList[category.name]! /
+                                                category.totalCards!;
                                       }
                                       return Text(
                                         '${(percentComplete * 100).toStringAsFixed(0)}%',

@@ -44,6 +44,7 @@ import 'package:inspired_senior_care_app/view/pages/manager_deck_page.dart';
 import 'package:inspired_senior_care_app/view/pages/profile.dart';
 import 'package:inspired_senior_care_app/view/pages/signup/signup.dart';
 import 'package:inspired_senior_care_app/view/widget/bottom_app_bar.dart';
+import 'package:inspired_senior_care_app/view/widget/name_plate.dart';
 import 'package:inspired_senior_care_app/view/widget/top_app_bar.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -383,13 +384,35 @@ class MainAppDrawer extends StatelessWidget {
       if (state is ProfileLoaded) {
         if (state.user.type == 'user') {
           return Drawer(
-            child: Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 36.0),
               child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    Text(
-                      'Settings',
-                      style: Theme.of(context).textTheme.titleMedium,
+                    DrawerHeader(
+                        padding: const EdgeInsets.symmetric(horizontal: 0),
+                        child: Wrap(
+                          // alignment: WrapAlignment.start,
+                          spacing: 24.0,
+                          children: [
+                            SizedBox(
+                              child: InitialsIcon(
+                                  userColor: hexToColor(state.user.userColor!),
+                                  memberName: state.user.name!),
+                            ),
+                            Text(
+                              state.user.name!.split(' ')[0],
+                              style: Theme.of(context).textTheme.headlineMedium,
+                            ),
+                          ],
+                        )),
+                    ListTile(
+                      title: Text(
+                        'Settings',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      trailing: const Icon(Icons.chevron_right_rounded),
                     ),
                     TextButton.icon(
                         onPressed: () {
