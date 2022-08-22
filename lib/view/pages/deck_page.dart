@@ -36,21 +36,7 @@ class _DeckPageState extends State<DeckPage> {
         appBar: PreferredSize(
           preferredSize: const Size.fromHeight(50),
           child: BlocConsumer<DeckCubit, DeckState>(
-            listener: (context, state) {
-              if (state.status == DeckStatus.swiped) {
-                if (currentCardIndex < 12) {
-                  deckScrollController.animateToItem(currentCardIndex);
-                }
-              }
-              if (state.status == DeckStatus.completed) {
-                showDialog(
-                  context: context,
-                  builder: (context) {
-                    return const DeckCompleteDialog();
-                  },
-                );
-              }
-            },
+            listener: (context, state) {},
             builder: (context, state) {
               if (state.status == DeckStatus.zoomed) {
                 return Visibility(
@@ -63,7 +49,24 @@ class _DeckPageState extends State<DeckPage> {
               return AnimatedOpacity(
                 opacity: 1.0,
                 duration: const Duration(milliseconds: 1000),
-                child: BlocBuilder<CardBloc, CardState>(
+                child: BlocConsumer<CardBloc, CardState>(
+                  listener: (context, state) {
+                    if (context.read<DeckCubit>().state.status ==
+                        DeckStatus.swiped) {
+                      if (currentCardIndex < 12) {
+                        deckScrollController.animateToItem(currentCardIndex);
+                      }
+                    }
+                    if (context.read<DeckCubit>().state.status ==
+                        DeckStatus.completed) {
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return const DeckCompleteDialog();
+                        },
+                      );
+                    }
+                  },
                   builder: (context, state) {
                     if (state is CardsLoaded) {
                       return AppBar(
@@ -173,6 +176,7 @@ class _DeckPageState extends State<DeckPage> {
                         child: Visibility(
                           visible: isSwipeDisabled ? true : false,
                           child: ShareButton(
+                              category: state.category,
                               formKey: shareFieldFormKey,
                               categoryName: state.category.name),
                         ),
@@ -403,11 +407,16 @@ class DeckCompleteDialog extends StatelessWidget {
 }
 
 class ShareButton extends StatelessWidget {
+  final Category category;
   final GlobalKey<FormState> formKey;
   final String categoryName;
   final TextEditingController shareFieldController = TextEditingController();
 
-  ShareButton({required this.categoryName, required this.formKey, super.key});
+  ShareButton(
+      {required this.category,
+      required this.categoryName,
+      required this.formKey,
+      super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -448,6 +457,7 @@ class ShareButton extends StatelessWidget {
                         shareFieldController: shareFieldController,
                       ),
                       SendButton(
+                        category: category,
                         formKey: formKey,
                         categoryName: categoryName,
                         shareFieldController: shareFieldController,
@@ -584,12 +594,14 @@ class ShareTextField extends StatelessWidget {
 }
 
 class SendButton extends StatefulWidget {
+  final Category category;
   final GlobalKey<FormState> formKey;
   final String categoryName;
   final TextEditingController shareFieldController;
 
   const SendButton(
-      {required this.categoryName,
+      {required this.category,
+      required this.categoryName,
       required this.shareFieldController,
       required this.formKey,
       Key? key})
@@ -605,25 +617,27 @@ class _SendButtonState extends State<SendButton> {
     int currentCardIndex = context.watch<DeckCubit>().currentCardNumber;
     return ElevatedButton.icon(
       style: ElevatedButton.styleFrom(fixedSize: const Size(240, 42)),
-      onPressed: () {
+      onPressed: () async {
         if (widget.formKey.currentState!.validate()) {
           context.read<ShareBloc>().add(SubmitPressed(
               categoryName: widget.categoryName,
               cardNumber: currentCardIndex,
               response: widget.shareFieldController.text));
 
-          if (currentCardIndex == 12) {
+          if (currentCardIndex == widget.category.totalCards) {
             //context.read<DeckCubit>().resetDeck();
             widget.shareFieldController.clear();
             Navigator.pop(context);
             context.read<DeckCubit>().completeDeck();
           } else {
+            await Future.delayed(const Duration(seconds: 2));
+            if (!mounted) return;
             context.read<DeckCubit>().incrementCardNumber(
                 context.read<AuthBloc>().state.user, widget.categoryName);
-
             context.read<DeckCubit>().swipeDeck();
             context.read<DeckCubit>().resetDeck();
             widget.shareFieldController.clear();
+
             Navigator.pop(context);
           }
         }
