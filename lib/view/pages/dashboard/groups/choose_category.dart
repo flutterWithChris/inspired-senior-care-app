@@ -7,8 +7,8 @@ import 'package:inspired_senior_care_app/bloc/categories/categories_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/group/group_bloc.dart';
 import 'package:inspired_senior_care_app/cubits/groups/featured_category_cubit.dart';
 import 'package:inspired_senior_care_app/data/models/category.dart';
-import 'package:inspired_senior_care_app/view/widget/bottom_app_bar.dart';
-import 'package:inspired_senior_care_app/view/widget/top_app_bar.dart';
+import 'package:inspired_senior_care_app/view/widget/main/bottom_app_bar.dart';
+import 'package:inspired_senior_care_app/view/widget/main/top_app_bar.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class ChooseCategory extends StatefulWidget {

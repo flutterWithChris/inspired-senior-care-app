@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
-import 'package:inspired_senior_care_app/main.dart';
-import 'package:inspired_senior_care_app/view/widget/bottom_app_bar.dart';
+
+import 'package:inspired_senior_care_app/view/widget/main/bottom_app_bar.dart';
+import 'package:inspired_senior_care_app/view/widget/main/main_app_drawer.dart';
+
 import 'package:inspired_senior_care_app/view/widget/name_plate.dart';
 import 'package:inspired_senior_care_app/view/widget/progress_widgets.dart';
 

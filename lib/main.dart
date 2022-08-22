@@ -1,10 +1,6 @@
-import 'dart:math';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cron/cron.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:inspired_senior_care_app/bloc/auth/auth_bloc.dart';
@@ -25,29 +21,26 @@ import 'package:inspired_senior_care_app/bloc/view_response/view_response_cubit.
 import 'package:inspired_senior_care_app/cubits/groups/featured_category_cubit.dart';
 import 'package:inspired_senior_care_app/cubits/login/login_cubit.dart';
 import 'package:inspired_senior_care_app/cubits/signup/signup_cubit.dart';
-import 'package:inspired_senior_care_app/data/models/category.dart';
-import 'package:inspired_senior_care_app/data/models/user.dart';
 import 'package:inspired_senior_care_app/data/repositories/auth/auth_repository.dart';
 import 'package:inspired_senior_care_app/data/repositories/database/database_repository.dart';
 import 'package:inspired_senior_care_app/data/repositories/storage/storage_repository.dart';
 import 'package:inspired_senior_care_app/firebase_options.dart';
-import 'package:inspired_senior_care_app/view/pages/categories.dart';
-import 'package:inspired_senior_care_app/view/pages/dashboard/choose_category.dart';
+
+import 'package:inspired_senior_care_app/view/pages/dashboard/groups/choose_category.dart';
 import 'package:inspired_senior_care_app/view/pages/dashboard/dashboard.dart';
 import 'package:inspired_senior_care_app/view/pages/dashboard/members/view_members.dart';
 import 'package:inspired_senior_care_app/view/pages/dashboard/members/view_responses.dart';
-import 'package:inspired_senior_care_app/view/pages/dashboard/view_member.dart';
-import 'package:inspired_senior_care_app/view/pages/deck_page.dart';
+import 'package:inspired_senior_care_app/view/pages/dashboard/members/view_member.dart';
 import 'package:inspired_senior_care_app/view/pages/login/login.dart';
-import 'package:inspired_senior_care_app/view/pages/manager_categories.dart';
-import 'package:inspired_senior_care_app/view/pages/manager_deck_page.dart';
-import 'package:inspired_senior_care_app/view/pages/profile.dart';
+import 'package:inspired_senior_care_app/view/pages/main/categories.dart';
+import 'package:inspired_senior_care_app/view/pages/main/deck_page.dart';
+import 'package:inspired_senior_care_app/view/pages/main/homepage.dart';
+import 'package:inspired_senior_care_app/view/pages/main/manager_categories.dart';
+import 'package:inspired_senior_care_app/view/pages/main/manager_deck_page.dart';
+import 'package:inspired_senior_care_app/view/pages/main/profile.dart';
+
 import 'package:inspired_senior_care_app/view/pages/signup/signup.dart';
-import 'package:inspired_senior_care_app/view/widget/bottom_app_bar.dart';
-import 'package:inspired_senior_care_app/view/widget/name_plate.dart';
-import 'package:inspired_senior_care_app/view/widget/top_app_bar.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:inspired_senior_care_app/view/widget/main/settings.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -242,10 +235,16 @@ class _MyAppState extends State<MyApp> {
           ),
         ]),
     GoRoute(
-      name: 'home',
-      path: '/',
-      builder: (context, state) => const MyHomePage(),
-    ),
+        name: 'home',
+        path: '/',
+        builder: (context, state) => const MyHomePage(),
+        routes: [
+          GoRoute(
+            name: 'settings',
+            path: 'settings',
+            builder: (context, state) => const SettingsPage(),
+          ),
+        ]),
     GoRoute(
         name: 'categories',
         path: '/categories',
@@ -316,377 +315,4 @@ class _MyAppState extends State<MyApp> {
           ),
         ]),
   ];
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key});
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        drawer: const MainAppDrawer(),
-        bottomNavigationBar: const MainBottomAppBar(),
-        appBar: const PreferredSize(
-          preferredSize: Size.fromHeight(50),
-          child: MainTopAppBar(),
-        ),
-        body: Center(
-          child: SafeArea(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                const Padding(
-                  padding: EdgeInsets.only(bottom: 24.0),
-                  child: Text(
-                    'Featured Category',
-                    style: TextStyle(fontSize: 30),
-                  ),
-                ),
-                const FeaturedCategory(),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: ElevatedButton(
-                    onPressed: (() {
-                      context.goNamed('deck-page');
-                    }),
-                    style: ElevatedButton.styleFrom(
-                        fixedSize: const Size(200, 30)),
-                    child: const Text(
-                      'See More',
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  ),
-                ),
-                const Icon(FontAwesomeIcons.chevronDown),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class MainAppDrawer extends StatelessWidget {
-  const MainAppDrawer({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<ProfileBloc, ProfileState>(builder: (context, state) {
-      if (state is ProfileLoaded) {
-        if (state.user.type == 'user') {
-          return Drawer(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 36.0),
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    DrawerHeader(
-                        padding: const EdgeInsets.symmetric(horizontal: 0),
-                        child: Wrap(
-                          // alignment: WrapAlignment.start,
-                          spacing: 24.0,
-                          children: [
-                            SizedBox(
-                              child: InitialsIcon(
-                                  userColor: hexToColor(state.user.userColor!),
-                                  memberName: state.user.name!),
-                            ),
-                            Text(
-                              state.user.name!.split(' ')[0],
-                              style: Theme.of(context).textTheme.headlineMedium,
-                            ),
-                          ],
-                        )),
-                    ListTile(
-                      title: Text(
-                        'Settings',
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                      trailing: const Icon(Icons.chevron_right_rounded),
-                    ),
-                    TextButton.icon(
-                        onPressed: () {
-                          context.read<LoginCubit>().signOut();
-                        },
-                        icon: const Icon(Icons.logout_rounded),
-                        label: const Text('Logout'))
-                  ]),
-            ),
-          );
-        } else {
-          return Drawer(
-            child: Center(
-              child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Settings',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    TextButton(
-                        onPressed: () => context.goNamed('profile'),
-                        child: Text(
-                          'Profile',
-                          style: Theme.of(context).textTheme.titleMedium,
-                        )),
-                    TextButton.icon(
-                        onPressed: () {
-                          context.read<LoginCubit>().signOut();
-                        },
-                        icon: const Icon(Icons.logout_rounded),
-                        label: const Text('Logout'))
-                  ]),
-            ),
-          );
-        }
-      } else {
-        return const Center(
-          child: Text('Error Fetching Profile.'),
-        );
-      }
-    });
-  }
-}
-
-class FeaturedCategory extends StatefulWidget {
-  const FeaturedCategory({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  State<FeaturedCategory> createState() => _FeaturedCategoryState();
-}
-
-class _FeaturedCategoryState extends State<FeaturedCategory> {
-  @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<ProfileBloc, ProfileState>(
-      builder: (context, state) {
-        if (state is ProfileLoading) {
-          return Center(
-            child: LoadingAnimationWidget.fourRotatingDots(
-                color: Colors.blue, size: 30),
-          );
-        }
-        /*  if (state is ProfileFailed) {
-          return const Center(
-            child: Text('Error Fetching Featured Category!'),
-          );
-        }*/
-        if (state is ProfileLoaded) {
-          User currentUser = state.user;
-          return BlocBuilder<CategoriesBloc, CategoriesState>(
-            builder: (context, state) {
-              if (state is CategoriesLoading) {
-                return Center(
-                  child: LoadingAnimationWidget.fourRotatingDots(
-                      color: Colors.blue, size: 30),
-                );
-              }
-              if (state is CategoriesFailed) {
-                return const Center(
-                  child: Text('Error Fetching Categories'),
-                );
-              }
-              if (state is CategoriesLoaded) {
-                List<Category> categories = state.categories;
-
-                if (currentUser.groups!.isNotEmpty) {
-                  context
-                      .read<FeaturedCategoryCubit>()
-                      .loadFeaturedCategoryById(currentUser.groups!.first);
-                  return BlocBuilder<FeaturedCategoryCubit,
-                      FeaturedCategoryState>(
-                    builder: (context, state) {
-                      if (state is FeaturedCategoryLoading) {
-                        return Center(
-                          child: LoadingAnimationWidget.fourRotatingDots(
-                              color: Colors.blue, size: 30),
-                        );
-                      }
-                      if (state is FeaturedCategoryFailed) {
-                        return const Center(
-                          child: Text('Error Fetching Category!'),
-                        );
-                      }
-                      if (state is FeaturedCategoryLoaded) {
-                        Category featuredCategory = categories.singleWhere(
-                          (category) =>
-                              category.name == state.featuredCategoryName,
-                        );
-                        int progress =
-                            currentUser.progress![state.featuredCategoryName] ??
-                                0;
-                        return InkWell(
-                          splashColor: Colors.lightBlueAccent,
-                          onTap: (() {
-                            BlocProvider.of<CardBloc>(context)
-                                .add(LoadCards(category: featuredCategory));
-                            context.goNamed('deck-page');
-                          }),
-                          child: Card(
-                            child: LayoutBuilder(
-                              builder: (context, constraints) {
-                                return ConstrainedBox(
-                                  constraints: BoxConstraints(
-                                      maxWidth: constraints.maxWidth > 700
-                                          ? 350
-                                          : 275),
-                                  child: Container(
-                                    color: Colors.white,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(12.0),
-                                      child: Stack(
-                                        clipBehavior: Clip.none,
-                                        alignment: AlignmentDirectional.topEnd,
-                                        children: [
-                                          SizedBox(
-                                            child: CachedNetworkImage(
-                                              imageUrl: featuredCategory
-                                                  .coverImageUrl,
-                                            ),
-                                          ),
-                                          Positioned(
-                                            top: -35,
-                                            right: -25,
-                                            child: CircleAvatar(
-                                              radius: 35,
-                                              backgroundColor: Colors.white,
-                                              child: CircleAvatar(
-                                                radius: 30,
-                                                backgroundColor:
-                                                    featuredCategory
-                                                        .progressColor,
-                                                child: Text(
-                                                  '${(progress / featuredCategory.totalCards! * 100).toStringAsFixed(0)}%',
-                                                  style: const TextStyle(
-                                                      color: Colors.white,
-                                                      fontSize: 18,
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                                ),
-                                              ),
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                        );
-                      }
-                      return const Center(
-                        child: Text('Something Went Wrong!'),
-                      );
-                    },
-                  );
-                } else {
-                  Random random = Random();
-                  final Cron cron = Cron();
-                  int randomInt = 2;
-                  _getRandomCategoryMonthly() {
-                    cron.schedule(Schedule.parse('15 * * * * *'), () async {
-                      SharedPreferences prefs =
-                          await SharedPreferences.getInstance();
-                      randomInt = random.nextInt(categories.length);
-                      prefs.setInt('randomFeaturedCategory', randomInt);
-                      print(randomInt);
-                    });
-                  }
-
-                  final Category featuredCategory = categories[randomInt];
-                  int progress =
-                      currentUser.progress![featuredCategory.name] ?? 0;
-                  return FutureBuilder(
-                      future: SharedPreferences.getInstance(),
-                      builder: (context, snapshot) {
-                        return InkWell(
-                          splashColor: Colors.lightBlueAccent,
-                          onTap: (() {
-                            context.goNamed('deck-page');
-                            BlocProvider.of<CardBloc>(context)
-                                .add(LoadCards(category: featuredCategory));
-                          }),
-                          child: Card(
-                            child: LayoutBuilder(
-                              builder: (context, constraints) {
-                                return ConstrainedBox(
-                                  constraints: BoxConstraints(
-                                      maxWidth: constraints.maxWidth > 700
-                                          ? 350
-                                          : 275),
-                                  child: Container(
-                                    color: Colors.white,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(12.0),
-                                      child: Stack(
-                                        clipBehavior: Clip.none,
-                                        alignment: AlignmentDirectional.topEnd,
-                                        children: [
-                                          SizedBox(
-                                            child: CachedNetworkImage(
-                                              imageUrl: featuredCategory
-                                                  .coverImageUrl,
-                                            ),
-                                          ),
-                                          Positioned(
-                                            top: -35,
-                                            right: -25,
-                                            child: CircleAvatar(
-                                              radius: 35,
-                                              backgroundColor: Colors.white,
-                                              child: CircleAvatar(
-                                                radius: 30,
-                                                backgroundColor:
-                                                    featuredCategory
-                                                        .progressColor,
-                                                child: Text(
-                                                  '${(progress / featuredCategory.totalCards! * 100).toStringAsFixed(0)}%',
-                                                  style: const TextStyle(
-                                                      color: Colors.white,
-                                                      fontSize: 18,
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                                ),
-                                              ),
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                        );
-                      });
-                }
-              }
-              return const Center(
-                child: Text('Something Went Wrong!'),
-              );
-            },
-          );
-        } else {
-          return const Center(
-            child: Text('Something Went Wrong'),
-          );
-        }
-      },
-    );
-  }
 }

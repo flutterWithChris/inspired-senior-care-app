@@ -3,10 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/member/bloc/bloc/group_member_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/member/bloc/member_bloc.dart';
 import 'package:inspired_senior_care_app/data/models/user.dart';
-import 'package:inspired_senior_care_app/view/widget/bottom_app_bar.dart';
+import 'package:inspired_senior_care_app/view/widget/main/bottom_app_bar.dart';
+import 'package:inspired_senior_care_app/view/widget/main/top_app_bar.dart';
+
 import 'package:inspired_senior_care_app/view/widget/member_tile.dart';
 import 'package:inspired_senior_care_app/view/widget/name_plate.dart';
-import 'package:inspired_senior_care_app/view/widget/top_app_bar.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class ViewMembers extends StatelessWidget {

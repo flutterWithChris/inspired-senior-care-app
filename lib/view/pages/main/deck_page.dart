@@ -10,139 +10,186 @@ import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/share_bloc/share_bloc.dart';
 import 'package:inspired_senior_care_app/data/models/category.dart';
 import 'package:inspired_senior_care_app/data/models/user.dart';
-import 'package:inspired_senior_care_app/view/widget/bottom_app_bar.dart';
+import 'package:inspired_senior_care_app/view/widget/main/bottom_app_bar.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
-class ManagerDeckPage extends StatelessWidget {
+class DeckPage extends StatefulWidget {
+  @override
+  State<DeckPage> createState() => _DeckPageState();
+}
+
+class _DeckPageState extends State<DeckPage> {
+  bool isSwipeDisabled = true;
+
   bool isCardZoomed = false;
-  final InfiniteScrollController deckScrollController =
-      InfiniteScrollController();
+  InfiniteScrollController deckScrollController = InfiniteScrollController();
 
   @override
   Widget build(BuildContext context) {
     int currentCardIndex = context.watch<DeckCubit>().currentCardNumber;
+    final GlobalKey<FormState> shareFieldFormKey = GlobalKey<FormState>();
 
     return SafeArea(
-      child: BlocListener<CardBloc, CardState>(
-        listener: (context, state) {
-          // TODO: implement listener
-          if (state is CardsLoading) {}
-          if (state is CardsLoaded) {
-            final String categoryName = state.category.name;
-          }
-        },
-        child: Scaffold(
-          backgroundColor: Colors.grey.shade200,
-          resizeToAvoidBottomInset: true,
-          appBar: PreferredSize(
-            preferredSize: const Size.fromHeight(50),
-            child: BlocConsumer<DeckCubit, DeckState>(
-              listener: (context, state) {
-                if (state.status == DeckStatus.swiped) {
-                  if (currentCardIndex < 12) {
-                    //currentCardIndex++;
-                    deckScrollController.animateToItem(currentCardIndex);
-                  }
-                }
-                if (state.status == DeckStatus.completed) {
-                  showDialog(
-                    context: context,
-                    builder: (context) {
-                      return const DeckCompleteDialog();
-                    },
-                  );
-                }
-              },
-              builder: (context, state) {
-                if (state.status == DeckStatus.zoomed) {
-                  return Visibility(
-                    visible: false,
-                    child: AppBar(
-                        toolbarHeight: 50,
-                        title: const Text('Positive Interactions')),
-                  );
-                }
-                return AnimatedOpacity(
-                  opacity: 1.0,
-                  duration: const Duration(milliseconds: 1000),
-                  child: BlocBuilder<CardBloc, CardState>(
-                    builder: (context, state) {
-                      if (state is CardsLoaded) {
-                        //context.loaderOverlay.hide();
-                        return AppBar(
-                          toolbarHeight: 50,
-                          centerTitle: true,
-                          title: Text(state.category.name),
-                          backgroundColor: state.category.categoryColor,
-                        );
+      child: Scaffold(
+        backgroundColor: Colors.grey.shade200,
+        resizeToAvoidBottomInset: true,
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(50),
+          child: BlocConsumer<DeckCubit, DeckState>(
+            listener: (context, state) {},
+            builder: (context, state) {
+              if (state.status == DeckStatus.zoomed) {
+                return Visibility(
+                  visible: false,
+                  child: AppBar(
+                      toolbarHeight: 50,
+                      title: const Text('Positive Interactions')),
+                );
+              }
+              return AnimatedOpacity(
+                opacity: 1.0,
+                duration: const Duration(milliseconds: 1000),
+                child: BlocConsumer<CardBloc, CardState>(
+                  listener: (context, state) {
+                    if (context.read<DeckCubit>().state.status ==
+                        DeckStatus.swiped) {
+                      if (currentCardIndex < 12) {
+                        deckScrollController.animateToItem(currentCardIndex);
                       }
+                    }
+                    if (context.read<DeckCubit>().state.status ==
+                        DeckStatus.completed) {
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return const DeckCompleteDialog();
+                        },
+                      );
+                    }
+                  },
+                  builder: (context, state) {
+                    if (state is CardsLoaded) {
                       return AppBar(
                         toolbarHeight: 50,
                         centerTitle: true,
-                        title: LoadingAnimationWidget.prograssiveDots(
-                            color: Colors.white, size: 20),
-                        backgroundColor: Colors.grey,
+                        title: Text(state.category.name),
+                        backgroundColor: state.category.categoryColor,
                       );
-                    },
-                  ),
-                );
-              },
-            ),
+                    }
+                    return AppBar(
+                      toolbarHeight: 50,
+                      centerTitle: true,
+                      title: LoadingAnimationWidget.prograssiveDots(
+                          color: Colors.white, size: 20),
+                      backgroundColor: Colors.grey,
+                    );
+                  },
+                ),
+              );
+            },
           ),
-          bottomNavigationBar: const MainBottomAppBar(),
-          body: SafeArea(
-            child: BlocBuilder<CardBloc, CardState>(
-              builder: (context, state) {
-                if (state is CardsLoading) {
-                  return Center(
-                      child: Wrap(
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    direction: Axis.vertical,
-                    spacing: 12,
+        ),
+        bottomNavigationBar: const MainBottomAppBar(),
+        body: SafeArea(
+          child: BlocConsumer<CardBloc, CardState>(
+            listener: (context, state) async {
+              if (state is CardsLoaded) {}
+            },
+            builder: (context, state) {
+              if (state is CardsLoading) {
+                return Center(
+                    child: Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  direction: Axis.vertical,
+                  spacing: 12,
+                  children: [
+                    LoadingAnimationWidget.horizontalRotatingDots(
+                        color: Colors.blueAccent, size: 30),
+                    const Text('Loading Cards...')
+                  ],
+                ));
+              }
+              if (state is CardsLoaded) {
+                return SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      LoadingAnimationWidget.horizontalRotatingDots(
-                          color: Colors.blueAccent, size: 30),
-                      const Text('Loading Cards...')
-                    ],
-                  ));
-                }
-                if (state is CardsLoaded) {
-                  return SingleChildScrollView(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(top: 60.0),
-                          child: SizedBox(
-                            height: 525,
-                            child: BlocListener<DeckCubit, DeckState>(
-                              listener: (context, state) {
-                                // TODO: implement listener
-                                if (state.status == DeckStatus.completed) {}
-                                if (state.status == DeckStatus.zoomed) {
-                                  isCardZoomed = true;
-                                } else if (state.status ==
-                                    DeckStatus.unzoomed) {
-                                  isCardZoomed = false;
-                                }
-                              },
-                              child: Deck(
-                                  deckScrollController: deckScrollController),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 48.0),
+                        child: AnimatedSlide(
+                          curve: Curves.easeInOut,
+                          duration: const Duration(milliseconds: 200),
+                          offset: isCardZoomed
+                              ? const Offset(0, -0.35)
+                              : const Offset(0, -0.0),
+                          child: AnimatedScale(
+                            duration: const Duration(milliseconds: 500),
+                            scale: isCardZoomed ? 1.0 : 1.0,
+                            child: Stack(
+                              clipBehavior: Clip.none,
+                              alignment: AlignmentDirectional.topEnd,
+                              children: [
+                                SizedBox(
+                                  height: 520,
+                                  child: IgnorePointer(
+                                    ignoring: isSwipeDisabled,
+                                    child: BlocListener<DeckCubit, DeckState>(
+                                      listener: (context, state) {
+                                        // TODO: implement listener
+                                        if (state.status ==
+                                            DeckStatus.completed) {
+                                          isSwipeDisabled = false;
+                                        }
+                                        if (state.status == DeckStatus.zoomed) {
+                                          isCardZoomed = true;
+                                        } else if (state.status ==
+                                            DeckStatus.unzoomed) {
+                                          isCardZoomed = false;
+                                        }
+                                      },
+                                      child: Deck(
+                                          deckScrollController:
+                                              deckScrollController),
+                                    ),
+                                  ),
+                                ),
+                                Visibility(
+                                  visible: isSwipeDisabled ? true : false,
+                                  child: Positioned(
+                                    right: 20,
+                                    top: -20,
+                                    child: CardCounter(
+                                        currentCard: currentCardIndex,
+                                        deckScrollController:
+                                            deckScrollController),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
-                      ],
-                    ),
-                  );
-                } else {
-                  return const Center(
-                    child: Text('Something Went Wrong!'),
-                  );
-                }
-              },
-            ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 30.0),
+                        child: Visibility(
+                          visible: isSwipeDisabled ? true : false,
+                          child: ShareButton(
+                              category: state.category,
+                              formKey: shareFieldFormKey,
+                              categoryName: state.category.name),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              } else {
+                return const Center(
+                  child: Text('Something Went Wrong!'),
+                );
+              }
+            },
           ),
         ),
       ),
@@ -151,16 +198,17 @@ class ManagerDeckPage extends StatelessWidget {
 }
 
 class CardCounter extends StatelessWidget {
+  final int currentCard;
   final InfiniteScrollController deckScrollController;
   const CardCounter({
+    required this.currentCard,
     required this.deckScrollController,
     Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    int currentCardIndex = context.watch<DeckCubit>().currentCardNumber;
-
+    int currentCardIndex = currentCard;
     return Stack(
       alignment: AlignmentDirectional.center,
       children: [
@@ -169,29 +217,40 @@ class CardCounter extends StatelessWidget {
             if (state is ProfileLoaded) {
               User user = state.user;
               return BlocBuilder<CardBloc, CardState>(
+                buildWhen: (previous, current) =>
+                    previous.category != current.category,
                 builder: (context, state) {
                   if (state is CardsLoaded) {
+                    double progress = 0.0;
+                    // Checking if Category has been started.
                     Category currentCategory = state.category;
-                    String category = state.category.name;
-
                     bool categoryStarted =
                         user.progress!.containsKey(currentCategory.name);
-                    if (!categoryStarted) {}
                     if (categoryStarted) {
+                      progress =
+                          ((context.watch<DeckCubit>().currentCardNumber /
+                                  currentCategory.totalCards!) *
+                              100);
                       Map<String, int> progressList = user.progress!;
-                      int currentCardIndex =
-                          progressList[currentCategory.name]!;
+                      currentCardIndex = progressList[currentCategory.name]!;
                       context
                           .read<DeckCubit>()
                           .updateCardNumber(currentCardIndex);
+                      print('$currentCardIndex is the Index');
                       context.read<DeckCubit>().loadDeck(currentCardIndex);
-                      deckScrollController.animateToItem(currentCardIndex - 1);
+                      Future.delayed(const Duration(milliseconds: 500), () {
+                        deckScrollController
+                            .animateToItem(currentCardIndex - 1);
+                      });
+                    } else {
+                      progress = 0.0;
                     }
+
                     return CircleAvatar(
                       backgroundColor: Colors.white,
                       radius: 32,
                       child: Text(
-                        '${((currentCardIndex / currentCategory.totalCards!) * 100).toStringAsFixed(0)}%',
+                        '${progress.toStringAsFixed(0)}%',
                         style: const TextStyle(fontSize: 20),
                       ),
                     );
@@ -206,6 +265,8 @@ class CardCounter extends StatelessWidget {
         BlocBuilder<CardBloc, CardState>(
           builder: (context, state) {
             if (state is CardsLoaded) {
+              int currentCardIndex =
+                  context.watch<DeckCubit>().currentCardNumber;
               double percentageComplete =
                   currentCardIndex / state.category.totalCards!;
               return SizedBox(
@@ -346,10 +407,16 @@ class DeckCompleteDialog extends StatelessWidget {
 }
 
 class ShareButton extends StatelessWidget {
+  final Category category;
+  final GlobalKey<FormState> formKey;
   final String categoryName;
   final TextEditingController shareFieldController = TextEditingController();
 
-  ShareButton({required this.categoryName, super.key});
+  ShareButton(
+      {required this.category,
+      required this.categoryName,
+      required this.formKey,
+      super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -386,9 +453,12 @@ class ShareButton extends StatelessWidget {
                         ),
                       ),
                       ShareTextField(
+                        formKey: formKey,
                         shareFieldController: shareFieldController,
                       ),
                       SendButton(
+                        category: category,
+                        formKey: formKey,
                         categoryName: categoryName,
                         shareFieldController: shareFieldController,
                       ),
@@ -407,9 +477,10 @@ class ShareButton extends StatelessWidget {
 }
 
 class ViewResponsesButton extends StatelessWidget {
+  final GlobalKey<FormState> formKey;
   final TextEditingController shareFieldController = TextEditingController();
 
-  ViewResponsesButton({super.key});
+  ViewResponsesButton({super.key, required this.formKey});
 
   @override
   Widget build(BuildContext context) {
@@ -446,6 +517,7 @@ class ViewResponsesButton extends StatelessWidget {
                         ),
                       ),
                       ShareTextField(
+                        formKey: formKey,
                         shareFieldController: shareFieldController,
                       ),
                       /*   SendButton(
@@ -467,9 +539,11 @@ class ViewResponsesButton extends StatelessWidget {
 }
 
 class ShareTextField extends StatelessWidget {
+  final GlobalKey<FormState> formKey;
   final TextEditingController shareFieldController;
 
   const ShareTextField({
+    required this.formKey,
     required this.shareFieldController,
     Key? key,
   }) : super(key: key);
@@ -494,15 +568,25 @@ class ShareTextField extends StatelessWidget {
           color: Colors.grey.shade300,
           borderRadius: BorderRadius.circular(10),
         ),
-        child: TextField(
-          controller: shareFieldController,
-          autofocus: true,
-          textAlignVertical: TextAlignVertical.top,
-          textAlign: TextAlign.start,
-          minLines: 4,
-          maxLines: 4,
-          decoration: const InputDecoration.collapsed(
-              hintText: 'Share your response..'),
+        child: Form(
+          key: formKey,
+          child: TextFormField(
+            validator: (value) {
+              if (value!.isEmpty) {
+                return 'Enter a response!';
+              } else {
+                return null;
+              }
+            },
+            controller: shareFieldController,
+            autofocus: true,
+            textAlignVertical: TextAlignVertical.top,
+            textAlign: TextAlign.start,
+            minLines: 4,
+            maxLines: 4,
+            decoration: const InputDecoration.collapsed(
+                hintText: 'Share your response..'),
+          ),
         ),
       ),
     );
@@ -510,12 +594,16 @@ class ShareTextField extends StatelessWidget {
 }
 
 class SendButton extends StatefulWidget {
+  final Category category;
+  final GlobalKey<FormState> formKey;
   final String categoryName;
   final TextEditingController shareFieldController;
 
   const SendButton(
-      {required this.categoryName,
+      {required this.category,
+      required this.categoryName,
       required this.shareFieldController,
+      required this.formKey,
       Key? key})
       : super(key: key);
 
@@ -529,25 +617,29 @@ class _SendButtonState extends State<SendButton> {
     int currentCardIndex = context.watch<DeckCubit>().currentCardNumber;
     return ElevatedButton.icon(
       style: ElevatedButton.styleFrom(fixedSize: const Size(240, 42)),
-      onPressed: () {
-        context.read<ShareBloc>().add(SubmitPressed(
-            categoryName: widget.categoryName,
-            cardNumber: currentCardIndex,
-            response: widget.shareFieldController.text));
+      onPressed: () async {
+        if (widget.formKey.currentState!.validate()) {
+          context.read<ShareBloc>().add(SubmitPressed(
+              categoryName: widget.categoryName,
+              cardNumber: currentCardIndex,
+              response: widget.shareFieldController.text));
 
-        if (currentCardIndex == 12) {
-          //context.read<DeckCubit>().resetDeck();
-          widget.shareFieldController.clear();
-          Navigator.pop(context);
-          context.read<DeckCubit>().completeDeck();
-        } else {
-          context.read<DeckCubit>().incrementCardNumber(
-              context.read<AuthBloc>().state.user, widget.categoryName);
+          if (currentCardIndex == widget.category.totalCards) {
+            //context.read<DeckCubit>().resetDeck();
+            widget.shareFieldController.clear();
+            Navigator.pop(context);
+            context.read<DeckCubit>().completeDeck();
+          } else {
+            await Future.delayed(const Duration(seconds: 2));
+            if (!mounted) return;
+            context.read<DeckCubit>().incrementCardNumber(
+                context.read<AuthBloc>().state.user, widget.categoryName);
+            context.read<DeckCubit>().swipeDeck();
+            context.read<DeckCubit>().resetDeck();
+            widget.shareFieldController.clear();
 
-          context.read<DeckCubit>().swipeDeck();
-          context.read<DeckCubit>().resetDeck();
-          widget.shareFieldController.clear();
-          Navigator.pop(context);
+            Navigator.pop(context);
+          }
         }
       },
       icon: BlocBuilder<ShareBloc, ShareState>(

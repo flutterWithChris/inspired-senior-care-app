@@ -8,9 +8,11 @@ import 'package:inspired_senior_care_app/bloc/cards/card_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/categories/categories_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
 import 'package:inspired_senior_care_app/data/models/category.dart';
-import 'package:inspired_senior_care_app/main.dart';
-import 'package:inspired_senior_care_app/view/pages/upgrade_page.dart';
-import 'package:inspired_senior_care_app/view/widget/bottom_app_bar.dart';
+import 'package:inspired_senior_care_app/view/pages/IAP/upgrade_page.dart';
+
+import 'package:inspired_senior_care_app/view/widget/main/bottom_app_bar.dart';
+import 'package:inspired_senior_care_app/view/widget/main/main_app_drawer.dart';
+
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class Categories extends StatelessWidget {

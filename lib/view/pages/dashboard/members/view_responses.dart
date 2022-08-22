@@ -12,7 +12,8 @@ import 'package:inspired_senior_care_app/bloc/view_response/response_bloc.dart';
 import 'package:inspired_senior_care_app/data/models/category.dart';
 import 'package:inspired_senior_care_app/data/models/response.dart';
 import 'package:inspired_senior_care_app/data/models/user.dart';
-import 'package:inspired_senior_care_app/view/widget/bottom_app_bar.dart';
+import 'package:inspired_senior_care_app/view/widget/main/bottom_app_bar.dart';
+
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 

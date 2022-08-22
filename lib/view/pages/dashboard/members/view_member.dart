@@ -5,7 +5,7 @@ import 'package:inspired_senior_care_app/bloc/member/bloc/bloc/group_member_bloc
 import 'package:inspired_senior_care_app/bloc/member/bloc/member_bloc.dart';
 import 'package:inspired_senior_care_app/data/models/group.dart';
 import 'package:inspired_senior_care_app/data/models/user.dart';
-import 'package:inspired_senior_care_app/view/widget/bottom_app_bar.dart';
+import 'package:inspired_senior_care_app/view/widget/main/bottom_app_bar.dart';
 import 'package:inspired_senior_care_app/view/widget/name_plate.dart';
 import 'package:inspired_senior_care_app/view/widget/progress_widgets.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';

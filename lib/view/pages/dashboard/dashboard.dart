@@ -11,10 +11,10 @@ import 'package:inspired_senior_care_app/cubits/groups/featured_category_cubit.d
 import 'package:inspired_senior_care_app/data/models/category.dart';
 import 'package:inspired_senior_care_app/data/models/group.dart';
 import 'package:inspired_senior_care_app/data/models/user.dart';
-import 'package:inspired_senior_care_app/main.dart';
-import 'package:inspired_senior_care_app/view/pages/dashboard/add_member.dart';
-import 'package:inspired_senior_care_app/view/pages/dashboard/create_group.dart';
-import 'package:inspired_senior_care_app/view/widget/bottom_app_bar.dart';
+import 'package:inspired_senior_care_app/view/pages/dashboard/groups/create_group.dart';
+import 'package:inspired_senior_care_app/view/pages/dashboard/members/add_member.dart';
+import 'package:inspired_senior_care_app/view/widget/main/bottom_app_bar.dart';
+import 'package:inspired_senior_care_app/view/widget/main/main_app_drawer.dart';
 import 'package:inspired_senior_care_app/view/widget/name_plate.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 

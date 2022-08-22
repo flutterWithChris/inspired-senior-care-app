@@ -24,17 +24,6 @@ class ShareBloc extends Bloc<ShareEvent, ShareState> {
         await Future.delayed(const Duration(seconds: 1));
         emit(ShareState.initial());
       }
-
-      if (event is ResponseSubmitted) {
-        print('TSETSTEETs');
-
-        //  await Future.delayed(const Duration(seconds: 2));
-
-      }
     });
-  }
-  _submitShareResponse(SubmitPressed event, Emitter<ShareState> emit) {
-    emit(ShareState.submitted());
-    print('Submitted');
   }
 }
