@@ -15,6 +15,7 @@ import 'package:inspired_senior_care_app/view/pages/dashboard/groups/create_grou
 import 'package:inspired_senior_care_app/view/pages/dashboard/members/add_member.dart';
 import 'package:inspired_senior_care_app/view/widget/main/bottom_app_bar.dart';
 import 'package:inspired_senior_care_app/view/widget/main/main_app_drawer.dart';
+import 'package:inspired_senior_care_app/view/widget/main/top_app_bar.dart';
 import 'package:inspired_senior_care_app/view/widget/name_plate.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
@@ -29,13 +30,6 @@ class _DashboardState extends State<Dashboard> {
   TextEditingController inviteTextFieldController = TextEditingController();
   List<Group> myGroupList = [];
   User currentUser = User.empty;
-  static List<Group> sampleGroupList = [
-    const Group(
-        groupName: 'Cleveland Senior Care',
-        groupId: '5167',
-        groupMemberIds: [''],
-        groupManagerIds: ['']),
-  ];
 
   @override
   void initState() {
@@ -49,9 +43,9 @@ class _DashboardState extends State<Dashboard> {
       child: Scaffold(
         drawer: const MainAppDrawer(),
         bottomNavigationBar: const MainBottomAppBar(),
-        appBar: PreferredSize(
-          preferredSize: const Size.fromHeight(50),
-          child: AppBar(title: const Text('Inspired Senior Care')),
+        appBar: const PreferredSize(
+          preferredSize: Size.fromHeight(60),
+          child: MainTopAppBar(),
         ),
         // * Main Content
         body: BlocBuilder<ProfileBloc, ProfileState>(
@@ -63,9 +57,6 @@ class _DashboardState extends State<Dashboard> {
             }
             if (state is ProfileLoaded) {
               currentUser = state.user;
-              context
-                  .watch<GroupBloc>()
-                  .add(LoadGroups(currentUser: currentUser));
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10.0),
                 child: ListView(
@@ -193,7 +184,6 @@ class _DashboardState extends State<Dashboard> {
                                               inviteTextFieldController:
                                                   inviteTextFieldController),
                                         ),
-                                      // TODO: Handle No Groups Created State
                                     ],
                                   );
                                 }
@@ -270,7 +260,6 @@ class _GroupSectionState extends State<GroupSection> {
   Widget build(BuildContext context) {
     final Group currentGroup = widget.group;
     final currentUser = widget.manager;
-    // context.read<FeaturedCategoryCubit>().loadFeaturedCategory(currentGroup);
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),

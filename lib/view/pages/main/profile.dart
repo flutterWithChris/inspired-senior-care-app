@@ -5,6 +5,7 @@ import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
 
 import 'package:inspired_senior_care_app/view/widget/main/bottom_app_bar.dart';
 import 'package:inspired_senior_care_app/view/widget/main/main_app_drawer.dart';
+import 'package:inspired_senior_care_app/view/widget/main/top_app_bar.dart';
 
 import 'package:inspired_senior_care_app/view/widget/name_plate.dart';
 import 'package:inspired_senior_care_app/view/widget/progress_widgets.dart';
@@ -26,11 +27,8 @@ class Profile extends StatelessWidget {
             child: Scaffold(
               drawer: const MainAppDrawer(),
               bottomNavigationBar: const MainBottomAppBar(),
-              appBar: PreferredSize(
-                  preferredSize: const Size.fromHeight(50),
-                  child: AppBar(
-                    title: const Text('Inspired Senior Care'),
-                  )),
+              appBar: const PreferredSize(
+                  preferredSize: Size.fromHeight(60), child: MainTopAppBar()),
               body: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: ListView(

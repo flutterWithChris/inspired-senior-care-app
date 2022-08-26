@@ -61,20 +61,40 @@ class MainAppDrawer extends StatelessWidget {
           );
         } else {
           return Drawer(
-            child: Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 36.0),
               child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    Text(
-                      'Settings',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    TextButton(
-                        onPressed: () => context.goNamed('profile'),
-                        child: Text(
-                          'Profile',
-                          style: Theme.of(context).textTheme.titleMedium,
+                    DrawerHeader(
+                        padding: const EdgeInsets.symmetric(horizontal: 0),
+                        child: Wrap(
+                          // alignment: WrapAlignment.start,
+                          spacing: 24.0,
+                          children: [
+                            SizedBox(
+                              child: InitialsIcon(
+                                  userColor: hexToColor(state.user.userColor!),
+                                  memberName: state.user.name!),
+                            ),
+                            Text(
+                              state.user.name!.split(' ')[0],
+                              style: Theme.of(context).textTheme.headlineMedium,
+                            ),
+                          ],
                         )),
+                    ListTile(
+                      onTap: () {
+                        context.goNamed('settings');
+                      },
+                      title: Text(
+                        'Settings',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      trailing: const Icon(Icons.chevron_right_rounded),
+                    ),
+                    const Divider(),
                     TextButton.icon(
                         onPressed: () {
                           context.read<LoginCubit>().signOut();

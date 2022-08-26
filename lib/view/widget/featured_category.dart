@@ -23,25 +23,27 @@ class _FeaturedCategoryState extends State<FeaturedCategory> {
   @override
   Widget build(BuildContext context) {
     User currentUser = context.watch<ProfileBloc>().state.user;
-
-    final List<Category> categories =
-        context.watch<CategoriesBloc>().state.categories!;
+    // CategoriesBloc categoriesState = context.read<CategoriesBloc>();
+    CategoriesState categoriesState = context.watch<CategoriesBloc>().state;
 
     return BlocBuilder<FeaturedCategoryCubit, FeaturedCategoryState>(
       builder: (context, state) {
-        if (state is FeaturedCategoryLoading) {
+        if (state is FeaturedCategoryLoading ||
+            categoriesState is CategoriesLoading) {
           return Center(
             child: LoadingAnimationWidget.fourRotatingDots(
                 color: Colors.blue, size: 30),
           );
         }
-        if (state is FeaturedCategoryFailed) {
+        if (state is FeaturedCategoryFailed ||
+            categoriesState is CategoriesFailed) {
           return const Center(
             child: Text('Error Fetching Category!'),
           );
         }
-        if (state is FeaturedCategoryLoaded) {
-          Category featuredCategory = categories.singleWhere(
+        if (state is FeaturedCategoryLoaded &&
+            categoriesState is CategoriesLoaded) {
+          Category featuredCategory = categoriesState.categories.singleWhere(
             (category) => category.name == state.featuredCategoryName,
           );
           int progress = currentUser.progress![state.featuredCategoryName] ?? 0;

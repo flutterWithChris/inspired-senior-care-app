@@ -173,21 +173,7 @@ class CardCounter extends StatelessWidget {
                 builder: (context, state) {
                   if (state is CardsLoaded) {
                     Category currentCategory = state.category;
-                    String category = state.category.name;
 
-                    bool categoryStarted =
-                        user.progress!.containsKey(currentCategory.name);
-                    if (!categoryStarted) {}
-                    if (categoryStarted) {
-                      Map<String, int> progressList = user.progress!;
-                      int currentCardIndex =
-                          progressList[currentCategory.name]!;
-                      context
-                          .read<DeckCubit>()
-                          .updateCardNumber(currentCardIndex);
-                      context.read<DeckCubit>().loadDeck(currentCardIndex);
-                      deckScrollController.animateToItem(currentCardIndex - 1);
-                    }
                     return CircleAvatar(
                       backgroundColor: Colors.white,
                       radius: 32,

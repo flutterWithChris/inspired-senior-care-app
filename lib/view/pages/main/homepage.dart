@@ -20,7 +20,7 @@ class _MyHomePageState extends State<MyHomePage> {
         drawer: const MainAppDrawer(),
         bottomNavigationBar: const MainBottomAppBar(),
         appBar: const PreferredSize(
-          preferredSize: Size.fromHeight(50),
+          preferredSize: Size.fromHeight(60),
           child: MainTopAppBar(),
         ),
         body: Center(

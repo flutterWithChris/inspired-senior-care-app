@@ -25,3 +25,5 @@ class ProfileLoaded extends ProfileState {
   // TODO: implement props
   List<Object?> get props => [user];
 }
+
+class ProfileFailed extends ProfileState {}

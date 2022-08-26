@@ -10,8 +10,17 @@ class MainTopAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      toolbarHeight: 50,
-      title: Text(title ?? 'Inspired Senior Care'),
+      backgroundColor: Colors.white,
+      foregroundColor: Colors.black87,
+      centerTitle: true,
+      toolbarHeight: 60,
+      title: title != null
+          ? Text(title!)
+          : Image.asset(
+              'lib/assets/Logo-01.png',
+              height: 40,
+              fit: BoxFit.contain,
+            ),
     );
   }
 }
