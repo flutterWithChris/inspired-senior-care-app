@@ -2,9 +2,15 @@ part of 'categories_bloc.dart';
 
 @immutable
 abstract class CategoriesState extends Equatable {
+  final List<Category>? categories;
+  final List<dynamic>? categoryImageUrls;
+  CategoriesState({
+    this.categories,
+    this.categoryImageUrls,
+  });
   @override
   // TODO: implement props
-  List<Object?> get props => throw UnimplementedError();
+  List<Object?> get props => [categories, categoryImageUrls];
 }
 
 class CategoriesLoading extends CategoriesState {}

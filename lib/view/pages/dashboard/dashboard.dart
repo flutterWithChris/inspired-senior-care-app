@@ -270,7 +270,7 @@ class _GroupSectionState extends State<GroupSection> {
   Widget build(BuildContext context) {
     final Group currentGroup = widget.group;
     final currentUser = widget.manager;
-    context.read<FeaturedCategoryCubit>().loadFeaturedCategory(currentGroup);
+    // context.read<FeaturedCategoryCubit>().loadFeaturedCategory(currentGroup);
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),

@@ -123,7 +123,9 @@ class _MyAppState extends State<MyApp> {
           ),
           BlocProvider(
             create: (context) => FeaturedCategoryCubit(
-                databaseRepository: context.read<DatabaseRepository>()),
+                databaseRepository: context.read<DatabaseRepository>())
+              ..loadUserFeaturedCategory(
+                  context.read<ProfileBloc>().state.user),
           ),
           BlocProvider(
             create: (context) => MemberBloc(
