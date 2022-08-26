@@ -20,16 +20,16 @@ import 'package:inspired_senior_care_app/bloc/view_response/response_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/view_response/view_response_cubit.dart';
 import 'package:inspired_senior_care_app/cubits/groups/featured_category_cubit.dart';
 import 'package:inspired_senior_care_app/cubits/login/login_cubit.dart';
+import 'package:inspired_senior_care_app/cubits/response/response_deck_cubit.dart';
 import 'package:inspired_senior_care_app/cubits/signup/signup_cubit.dart';
 import 'package:inspired_senior_care_app/data/repositories/auth/auth_repository.dart';
 import 'package:inspired_senior_care_app/data/repositories/database/database_repository.dart';
 import 'package:inspired_senior_care_app/data/repositories/storage/storage_repository.dart';
 import 'package:inspired_senior_care_app/firebase_options.dart';
-
 import 'package:inspired_senior_care_app/view/pages/dashboard/groups/choose_category.dart';
 import 'package:inspired_senior_care_app/view/pages/dashboard/dashboard.dart';
 import 'package:inspired_senior_care_app/view/pages/dashboard/members/view_members.dart';
-import 'package:inspired_senior_care_app/view/pages/dashboard/members/view_responses.dart';
+import 'package:inspired_senior_care_app/view/pages/dashboard/members/view_responses/view_responses.dart';
 import 'package:inspired_senior_care_app/view/pages/dashboard/members/view_member.dart';
 import 'package:inspired_senior_care_app/view/pages/login/login.dart';
 import 'package:inspired_senior_care_app/view/pages/main/categories.dart';
@@ -38,7 +38,6 @@ import 'package:inspired_senior_care_app/view/pages/main/homepage.dart';
 import 'package:inspired_senior_care_app/view/pages/main/manager_categories.dart';
 import 'package:inspired_senior_care_app/view/pages/main/manager_deck_page.dart';
 import 'package:inspired_senior_care_app/view/pages/main/profile.dart';
-
 import 'package:inspired_senior_care_app/view/pages/signup/signup.dart';
 import 'package:inspired_senior_care_app/view/widget/main/settings.dart';
 
@@ -294,6 +293,9 @@ class _MyAppState extends State<MyApp> {
                               providers: [
                                 BlocProvider(
                                   create: (context) => ViewResponseDeckCubit(),
+                                ),
+                                BlocProvider(
+                                  create: (context) => ResponseDeckCubit(),
                                 ),
                                 BlocProvider(
                                   create: (context) => ViewResponseCubit(),

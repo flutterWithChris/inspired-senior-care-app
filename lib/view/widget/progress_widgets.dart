@@ -274,8 +274,6 @@ class GroupMemberProgressSection extends StatelessWidget {
         }
         if (state is MemberLoaded) {
           User groupMember = state.user;
-
-          print(groupMember.progress!['Brain Change']);
           return BlocBuilder<CategoriesBloc, CategoriesState>(
             builder: (context, state) {
               if (state is CategoriesLoading) {
@@ -359,7 +357,7 @@ class GroupMemberProgressCategory extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: Column(
         children: [
           Padding(
@@ -431,15 +429,19 @@ class GroupMemberProgressCategory extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     ElevatedButton(
-                        onPressed: () {
-                          context.read<ResponseBloc>().add(FetchResponse(
-                              user: member, category: category, cardNumber: 2));
-                          context.read<CardBloc>().add(LoadCards(
-                                category: category,
-                              ));
-                          context.goNamed('view-responses');
-                        },
-                        child: const Text('View Responses >')),
+                        onPressed: progress > 0
+                            ? () {
+                                context.read<ResponseBloc>().add(FetchResponse(
+                                    user: member,
+                                    category: category,
+                                    cardNumber: 2));
+                                context.read<CardBloc>().add(LoadCards(
+                                      category: category,
+                                    ));
+                                context.goNamed('view-responses');
+                              }
+                            : null,
+                        child: const Text('View Responses >'))
                   ],
                 ),
               )
