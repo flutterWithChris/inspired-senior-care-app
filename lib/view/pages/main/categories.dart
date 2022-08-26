@@ -12,6 +12,7 @@ import 'package:inspired_senior_care_app/view/pages/IAP/upgrade_page.dart';
 
 import 'package:inspired_senior_care_app/view/widget/main/bottom_app_bar.dart';
 import 'package:inspired_senior_care_app/view/widget/main/main_app_drawer.dart';
+import 'package:inspired_senior_care_app/view/widget/main/top_app_bar.dart';
 
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
@@ -28,9 +29,9 @@ class Categories extends StatelessWidget {
       child: Scaffold(
         drawer: const MainAppDrawer(),
         bottomNavigationBar: const MainBottomAppBar(),
-        appBar: PreferredSize(
-          preferredSize: const Size.fromHeight(50),
-          child: AppBar(title: const Text('Inspired Senior Care')),
+        appBar: const PreferredSize(
+          preferredSize: Size.fromHeight(60),
+          child: MainTopAppBar(),
         ),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -136,7 +137,6 @@ class CategoryCard extends StatelessWidget {
         if (state is CategoriesLoaded) {
           return BlocBuilder<CardBloc, CardState>(
             builder: (context, state) {
-              //   context.read<CardBloc>().add(ResetCards());
               return InkWell(
                 onTap: () {
                   BlocProvider.of<CardBloc>(context)

@@ -6,6 +6,7 @@ import 'package:inspired_senior_care_app/bloc/member/bloc/member_bloc.dart';
 import 'package:inspired_senior_care_app/data/models/group.dart';
 import 'package:inspired_senior_care_app/data/models/user.dart';
 import 'package:inspired_senior_care_app/view/widget/main/bottom_app_bar.dart';
+import 'package:inspired_senior_care_app/view/widget/main/top_app_bar.dart';
 import 'package:inspired_senior_care_app/view/widget/name_plate.dart';
 import 'package:inspired_senior_care_app/view/widget/progress_widgets.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -22,9 +23,9 @@ class _ViewMemberState extends State<ViewMember> {
   Widget build(BuildContext context) {
     return Scaffold(
       bottomNavigationBar: const MainBottomAppBar(),
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(50),
-        child: AppBar(title: const Text('Inspired Senior Care')),
+      appBar: const PreferredSize(
+        preferredSize: Size.fromHeight(60),
+        child: MainTopAppBar(),
       ),
       body: BlocConsumer<MemberBloc, MemberState>(
         listener: (context, state) async {

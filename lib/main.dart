@@ -90,6 +90,7 @@ class _MyAppState extends State<MyApp> {
                 AuthBloc(authRepository: context.read<AuthRepository>()),
           ),
           BlocProvider(
+            lazy: false,
             create: (context) => ProfileBloc(
               authBloc: context.read<AuthBloc>(),
               databaseRepository: context.read<DatabaseRepository>(),
@@ -115,7 +116,9 @@ class _MyAppState extends State<MyApp> {
           ),
           BlocProvider(
             create: (context) => GroupBloc(
-                databaseRepository: context.read<DatabaseRepository>()),
+                databaseRepository: context.read<DatabaseRepository>())
+              ..add(LoadGroups(
+                  currentUser: context.read<ProfileBloc>().state.user)),
           ),
           BlocProvider(
             create: (context) => GroupMemberBloc(
@@ -123,7 +126,10 @@ class _MyAppState extends State<MyApp> {
           ),
           BlocProvider(
             create: (context) => FeaturedCategoryCubit(
-                databaseRepository: context.read<DatabaseRepository>()),
+                categoriesBloc: context.read<CategoriesBloc>(),
+                databaseRepository: context.read<DatabaseRepository>())
+              ..loadUserFeaturedCategory(
+                  context.read<ProfileBloc>().state.user),
           ),
           BlocProvider(
             create: (context) => MemberBloc(
