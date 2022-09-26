@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:infinite_carousel/infinite_carousel.dart';
@@ -36,14 +37,18 @@ class _DeckPageState extends State<DeckPage> {
         appBar: PreferredSize(
           preferredSize: const Size.fromHeight(50),
           child: BlocConsumer<DeckCubit, DeckState>(
-            listener: (context, state) {},
+            listener: (context, state) {
+              if (state.status == DeckStatus.zoomed) {}
+            },
             builder: (context, state) {
               if (state.status == DeckStatus.zoomed) {
                 return Visibility(
                   visible: false,
                   child: AppBar(
-                      toolbarHeight: 50,
-                      title: const Text('Positive Interactions')),
+                    toolbarHeight: 50,
+                    centerTitle: true,
+                    title: const Text(''),
+                  ),
                 );
               }
               return AnimatedOpacity(
@@ -69,11 +74,19 @@ class _DeckPageState extends State<DeckPage> {
                   },
                   builder: (context, state) {
                     if (state is CardsLoaded) {
-                      return AppBar(
-                        toolbarHeight: 50,
-                        centerTitle: true,
-                        title: Text(state.category.name),
-                        backgroundColor: state.category.categoryColor,
+                      return Visibility(
+                        visible: !isCardZoomed,
+                        child: Animate(
+                          effects: const [
+                            SlideEffect(curve: Curves.easeInOutSine)
+                          ],
+                          child: AppBar(
+                            toolbarHeight: 50,
+                            centerTitle: true,
+                            title: Text(state.category.name),
+                            backgroundColor: state.category.categoryColor,
+                          ),
+                        ),
                       );
                     }
                     return AppBar(
@@ -122,7 +135,7 @@ class _DeckPageState extends State<DeckPage> {
                           curve: Curves.easeInOut,
                           duration: const Duration(milliseconds: 200),
                           offset: isCardZoomed
-                              ? const Offset(0, -0.35)
+                              ? const Offset(0, -0.4)
                               : const Offset(0, -0.0),
                           child: AnimatedScale(
                             duration: const Duration(milliseconds: 500),
@@ -208,12 +221,14 @@ class CardCounter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double progress = 0.0;
     int currentCardIndex = currentCard;
     return Stack(
       alignment: AlignmentDirectional.center,
       children: [
         BlocBuilder<ProfileBloc, ProfileState>(
           builder: (context, state) {
+            double percentComplete = 0.0;
             if (state is ProfileLoaded) {
               User user = state.user;
               return BlocBuilder<CardBloc, CardState>(
@@ -221,11 +236,19 @@ class CardCounter extends StatelessWidget {
                     previous.category != current.category,
                 builder: (context, state) {
                   if (state is CardsLoaded) {
-                    double progress = 0.0;
-                    // Checking if Category has been started.
                     Category currentCategory = state.category;
                     bool categoryStarted =
                         user.progress!.containsKey(currentCategory.name);
+
+                    if (categoryStarted) {
+                      Map<String, int> progressList =
+                          context.watch<ProfileBloc>().state.user.progress!;
+
+                      percentComplete = progressList[currentCategory.name]! /
+                          currentCategory.totalCards!;
+                    }
+                    // Checking if Category has been started.
+
                     if (categoryStarted) {
                       progress =
                           ((context.watch<DeckCubit>().currentCardNumber /
@@ -236,24 +259,32 @@ class CardCounter extends StatelessWidget {
                       context
                           .read<DeckCubit>()
                           .updateCardNumber(currentCardIndex);
-                      print('$currentCardIndex is the Index');
+                      print(
+                          '$currentCardIndex is the Index & progress is: ${(percentComplete * 100)}');
                       context.read<DeckCubit>().loadDeck(currentCardIndex);
                       Future.delayed(const Duration(milliseconds: 500), () {
                         deckScrollController
                             .animateToItem(currentCardIndex - 1);
                       });
-                    } else {
-                      progress = 0.0;
-                    }
 
-                    return CircleAvatar(
-                      backgroundColor: Colors.white,
-                      radius: 32,
-                      child: Text(
-                        '${progress.toStringAsFixed(0)}%',
-                        style: const TextStyle(fontSize: 20),
-                      ),
-                    );
+                      return CircleAvatar(
+                        backgroundColor: Colors.white,
+                        radius: 32,
+                        child: Text(
+                          '${(percentComplete * 100).toStringAsFixed(0)}%',
+                          style: const TextStyle(fontSize: 20),
+                        ),
+                      );
+                    } else {
+                      return const CircleAvatar(
+                        backgroundColor: Colors.white,
+                        radius: 32,
+                        child: Text(
+                          '0%',
+                          style: TextStyle(fontSize: 20),
+                        ),
+                      );
+                    }
                   }
                   return const Text('Something Went Wrong..');
                 },

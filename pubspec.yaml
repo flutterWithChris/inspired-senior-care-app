@@ -62,6 +62,7 @@ dependencies:
   shared_preferences: ^2.0.15
   settings_ui: ^2.0.2
   change_app_package_name: ^1.1.0
+  flutter_animate: ^1.0.0
 
 
 

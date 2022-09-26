@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:inspired_senior_care_app/bloc/cards/card_bloc.dart';
@@ -30,9 +31,65 @@ class _FeaturedCategoryState extends State<FeaturedCategory> {
       builder: (context, state) {
         if (state is FeaturedCategoryLoading ||
             categoriesState is CategoriesLoading) {
-          return Center(
-            child: LoadingAnimationWidget.fourRotatingDots(
-                color: Colors.blue, size: 30),
+          return Column(
+            children: [
+              InkWell(
+                splashColor: Colors.lightBlueAccent,
+                child: Card(
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      return ConstrainedBox(
+                        constraints: BoxConstraints(
+                            maxWidth: constraints.maxWidth > 700 ? 350 : 275),
+                        child: Animate(
+                          onComplete: (controller) {
+                            controller.repeat();
+                          },
+                          effects: const [ShimmerEffect()],
+                          child: Container(
+                            color: Colors.white,
+                            child: Padding(
+                              padding: const EdgeInsets.all(12.0),
+                              child: Stack(
+                                clipBehavior: Clip.none,
+                                alignment: AlignmentDirectional.topEnd,
+                                children: [
+                                  SizedBox(
+                                      height: 400,
+                                      width: 350,
+                                      child: Container(
+                                        color: Colors.grey.shade300,
+                                        child: Center(
+                                            child:
+                                                LoadingAnimationWidget.inkDrop(
+                                                    color: Theme.of(context)
+                                                        .primaryColor,
+                                                    size: 30)),
+                                      )),
+                                  const Positioned(
+                                    top: -35,
+                                    right: -25,
+                                    child: CircleAvatar(
+                                      radius: 35,
+                                      backgroundColor: Colors.white,
+                                      child: CircleAvatar(
+                                        radius: 30,
+                                        backgroundColor: Colors.blueGrey,
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+              const SeeMoreButton(),
+            ],
           );
         }
         if (state is FeaturedCategoryFailed ||
@@ -56,51 +113,54 @@ class _FeaturedCategoryState extends State<FeaturedCategory> {
                       .add(LoadCards(category: featuredCategory));
                   context.goNamed('deck-page');
                 }),
-                child: Card(
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      return ConstrainedBox(
-                        constraints: BoxConstraints(
-                            maxWidth: constraints.maxWidth > 700 ? 350 : 275),
-                        child: Container(
-                          color: Colors.white,
-                          child: Padding(
-                            padding: const EdgeInsets.all(12.0),
-                            child: Stack(
-                              clipBehavior: Clip.none,
-                              alignment: AlignmentDirectional.topEnd,
-                              children: [
-                                SizedBox(
-                                  child: CachedNetworkImage(
-                                    imageUrl: featuredCategory.coverImageUrl,
-                                  ),
-                                ),
-                                Positioned(
-                                  top: -35,
-                                  right: -25,
-                                  child: CircleAvatar(
-                                    radius: 35,
-                                    backgroundColor: Colors.white,
-                                    child: CircleAvatar(
-                                      radius: 30,
-                                      backgroundColor:
-                                          featuredCategory.progressColor,
-                                      child: Text(
-                                        '${(progress / featuredCategory.totalCards! * 100).toStringAsFixed(0)}%',
-                                        style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold),
-                                      ),
+                child: Animate(
+                  effects: const [ShimmerEffect()],
+                  child: Card(
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        return ConstrainedBox(
+                          constraints: BoxConstraints(
+                              maxWidth: constraints.maxWidth > 700 ? 350 : 275),
+                          child: Container(
+                            color: Colors.white,
+                            child: Padding(
+                              padding: const EdgeInsets.all(12.0),
+                              child: Stack(
+                                clipBehavior: Clip.none,
+                                alignment: AlignmentDirectional.topEnd,
+                                children: [
+                                  SizedBox(
+                                    child: CachedNetworkImage(
+                                      imageUrl: featuredCategory.coverImageUrl,
                                     ),
                                   ),
-                                )
-                              ],
+                                  Positioned(
+                                    top: -35,
+                                    right: -25,
+                                    child: CircleAvatar(
+                                      radius: 35,
+                                      backgroundColor: Colors.white,
+                                      child: CircleAvatar(
+                                        radius: 30,
+                                        backgroundColor:
+                                            featuredCategory.progressColor,
+                                        child: Text(
+                                          '${(progress / featuredCategory.totalCards! * 100).toStringAsFixed(0)}%',
+                                          style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                      );
-                    },
+                        );
+                      },
+                    ),
                   ),
                 ),
               ),
@@ -117,9 +177,9 @@ class _FeaturedCategoryState extends State<FeaturedCategory> {
 }
 
 class SeeMoreButton extends StatelessWidget {
-  final Category featuredCategory;
+  final Category? featuredCategory;
   const SeeMoreButton({
-    required this.featuredCategory,
+    this.featuredCategory,
     Key? key,
   }) : super(key: key);
 
@@ -130,7 +190,7 @@ class SeeMoreButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: (() {
           BlocProvider.of<CardBloc>(context)
-              .add(LoadCards(category: featuredCategory));
+              .add(LoadCards(category: featuredCategory!));
           context.goNamed('deck-page');
         }),
         style: ElevatedButton.styleFrom(fixedSize: const Size(200, 30)),
