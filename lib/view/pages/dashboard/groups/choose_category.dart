@@ -123,7 +123,7 @@ class _ChooseCategoryState extends State<ChooseCategory> {
                                       onIndexChanged: (p0) {
                                         selectedCategory = categories[p0];
                                       },
-                                      velocityFactor: 0.5,
+                                      //
                                       itemCount: categories.length,
                                       itemExtent: 175,
                                       itemBuilder:

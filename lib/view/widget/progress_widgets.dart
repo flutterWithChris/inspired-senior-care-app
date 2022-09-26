@@ -24,7 +24,7 @@ class ProgressSection extends StatelessWidget {
     // CategoriesBloc categoriesState = context.read<CategoriesBloc>();
     CategoriesState categoriesState = context.watch<CategoriesBloc>().state;
     // List<Category> categoryList = state.categories;
-    return Builder(builder: (context) {
+    return BlocBuilder<ProfileBloc, ProfileState>(builder: (context, state) {
       if (profileState is ProfileLoading ||
           categoriesState is CategoriesLoading) {
         return LoadingAnimationWidget.fourRotatingDots(
@@ -34,7 +34,8 @@ class ProgressSection extends StatelessWidget {
           categoriesState is CategoriesFailed) {}
       if (profileState is ProfileLoaded &&
           categoriesState is CategoriesLoaded) {
-        return SizedBox(
+        return ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 200),
           child: Card(
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(33)),
@@ -56,9 +57,10 @@ class ProgressSection extends StatelessWidget {
                     BlocBuilder<ProfileBloc, ProfileState>(
                       builder: (context, state) {
                         if (state is ProfileLoaded) {
+                          double progress = 0;
                           bool categoryStarted =
                               state.user.progress!.containsKey(category.name);
-                          double? progress;
+
                           if (categoryStarted) {
                             progress = state.user.progress![category.name]! /
                                 category.totalCards! *
@@ -69,7 +71,7 @@ class ProgressSection extends StatelessWidget {
                               category: category,
                               title: category.name,
                               progressColor: category.categoryColor,
-                              progress: categoryStarted ? progress! : 0);
+                              progress: progress);
                         }
                         return const Text('Something Went Wrong...');
                       },
@@ -159,6 +161,7 @@ class ProgressCategory extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 4.0),
@@ -169,7 +172,7 @@ class ProgressCategory extends StatelessWidget {
                   title,
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
-                progress == 100
+                progress != 0
                     ? ClipRRect(
                         borderRadius: BorderRadius.circular(25),
                         child: Container(
@@ -177,20 +180,35 @@ class ProgressCategory extends StatelessWidget {
                           child: Padding(
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 12.0, vertical: 2.0),
-                            child: Wrap(
-                              crossAxisAlignment: WrapCrossAlignment.center,
-                              spacing: 5,
-                              children: [
-                                Text(
-                                  '${progress.toStringAsFixed(0)}%',
-                                ),
-                                const Icon(
-                                  Icons.check_circle,
-                                  color: Colors.lightBlueAccent,
-                                  size: 12,
-                                ),
-                              ],
-                            ),
+                            child: progress == 100
+                                ? Wrap(
+                                    crossAxisAlignment:
+                                        WrapCrossAlignment.center,
+                                    spacing: 5,
+                                    children: [
+                                      Text(
+                                        '${progress.toStringAsFixed(0)}%',
+                                      ),
+                                      const Icon(
+                                        Icons.check_circle,
+                                        color: Colors.lightBlueAccent,
+                                        size: 12,
+                                      ),
+                                    ],
+                                  )
+                                : ClipRRect(
+                                    borderRadius: BorderRadius.circular(25),
+                                    child: Container(
+                                      color: Colors.grey.shade100,
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 12.0, vertical: 2.0),
+                                        child: Text(
+                                          '${progress.toStringAsFixed(0)}%',
+                                        ),
+                                      ),
+                                    ),
+                                  ),
                           ),
                         ),
                       )
@@ -198,11 +216,11 @@ class ProgressCategory extends StatelessWidget {
                         borderRadius: BorderRadius.circular(25),
                         child: Container(
                           color: Colors.grey.shade100,
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
+                          child: const Padding(
+                            padding: EdgeInsets.symmetric(
                                 horizontal: 12.0, vertical: 2.0),
                             child: Text(
-                              '${progress.toStringAsFixed(0)}%',
+                              '0%',
                             ),
                           ),
                         ),
@@ -210,30 +228,58 @@ class ProgressCategory extends StatelessWidget {
               ],
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            child:
-                Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(525),
-                  child: LinearProgressIndicator(
-                    minHeight: 12,
-                    value: progress / 100,
-                    backgroundColor: Colors.grey.shade300,
-                    color: progressColor,
-                  ),
-                ),
-              ),
-              Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: Text(
-                    message,
-                    textAlign: TextAlign.right,
-                  ))
-            ]),
-          ),
+          progress.roundToDouble() > 0.0
+              ? Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(525),
+                            child: LinearProgressIndicator(
+                              minHeight: 12,
+                              value: progress / 100,
+                              backgroundColor: Colors.grey.shade300,
+                              color: progressColor,
+                            ),
+                          ),
+                        ),
+                        Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8.0),
+                            child: Text(
+                              message,
+                              textAlign: TextAlign.right,
+                            ))
+                      ]),
+                )
+              : Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(525),
+                            child: LinearProgressIndicator(
+                              minHeight: 12,
+                              value: 0,
+                              backgroundColor: Colors.grey.shade300,
+                              color: progressColor,
+                            ),
+                          ),
+                        ),
+                        Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8.0),
+                            child: Text(
+                              message,
+                              textAlign: TextAlign.right,
+                            ))
+                      ]),
+                )
         ],
       ),
     );

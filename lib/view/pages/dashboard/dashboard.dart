@@ -114,9 +114,9 @@ class _DashboardState extends State<Dashboard> {
                             builder: (context, state) {
                               if (state is GroupLoading) {
                                 return Center(
-                                  child:
-                                      LoadingAnimationWidget.fourRotatingDots(
-                                          color: Colors.blue, size: 25),
+                                  child: LoadingAnimationWidget.inkDrop(
+                                      color: Theme.of(context).primaryColor,
+                                      size: 25),
                                 );
                               }
                               if (state is GroupLoaded) {
@@ -281,9 +281,9 @@ class _GroupSectionState extends State<GroupSection> {
             children: [
               ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white,
                     fixedSize: const Size(140, 30),
-                    primary: Colors.lightGreen,
-                    onPrimary: Colors.white,
+                    backgroundColor: Colors.lightGreen,
                   ),
                   onPressed: () {
                     showDialog(

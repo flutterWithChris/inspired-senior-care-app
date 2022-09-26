@@ -90,7 +90,6 @@ class _MyAppState extends State<MyApp> {
                 AuthBloc(authRepository: context.read<AuthRepository>()),
           ),
           BlocProvider(
-            lazy: false,
             create: (context) => ProfileBloc(
               authBloc: context.read<AuthBloc>(),
               databaseRepository: context.read<DatabaseRepository>(),
