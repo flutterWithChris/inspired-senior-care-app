@@ -43,49 +43,52 @@ class _AddMemberDialogState extends State<AddMemberDialog> {
             builder: (context, state) {
               return Form(
                 key: addMemberFormKey,
-                child: TextFormField(
-                  // autovalidateMode: AutovalidateMode.onUserInteraction,
-                  validator: (value) {
-                    if (value != null && !EmailValidator.validate(value)) {
-                      return 'Enter a valid email!';
-                    } else if (state.inviteStatus == InviteStatus.failed) {
-                      return 'User Not Found!';
-                    }
-                    return null;
-                  },
-                  autofocus: true,
-                  controller: widget.inviteTextFieldController,
-                  style: const TextStyle(color: Colors.black),
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: InputDecoration(
-                    hintText: 'example@email.com',
-                    suffixIcon: Padding(
-                      padding: const EdgeInsetsDirectional.only(end: 12),
-                      child: BlocBuilder<InviteBloc, InviteState>(
-                        builder: (context, state) {
-                          if (state.inviteStatus == InviteStatus.sending) {
-                            return const SizedBox(
-                                height: 8,
-                                width: 8,
-                                child:
-                                    Center(child: CircularProgressIndicator()));
-                          }
-                          if (state.inviteStatus == InviteStatus.sent) {
-                            return const Icon(
-                              Icons.check,
-                              color: Colors.lime,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: TextFormField(
+                    // autovalidateMode: AutovalidateMode.onUserInteraction,
+                    validator: (value) {
+                      if (value != null && !EmailValidator.validate(value)) {
+                        return 'Enter a valid email!';
+                      } else if (state.inviteStatus == InviteStatus.failed) {
+                        return 'User Not Found!';
+                      }
+                      return null;
+                    },
+                    autofocus: true,
+                    controller: widget.inviteTextFieldController,
+                    style: const TextStyle(color: Colors.black),
+                    keyboardType: TextInputType.emailAddress,
+                    decoration: InputDecoration(
+                      hintText: 'example@email.com',
+                      suffixIcon: Padding(
+                        padding: const EdgeInsetsDirectional.only(end: 12),
+                        child: BlocBuilder<InviteBloc, InviteState>(
+                          builder: (context, state) {
+                            if (state.inviteStatus == InviteStatus.sending) {
+                              return const SizedBox(
+                                  height: 8,
+                                  width: 8,
+                                  child: Center(
+                                      child: CircularProgressIndicator()));
+                            }
+                            if (state.inviteStatus == InviteStatus.sent) {
+                              return const Icon(
+                                Icons.check,
+                                color: Colors.lime,
+                              );
+                            }
+                            return Container(
+                              width: 1,
                             );
-                          }
-                          return Container(
-                            width: 1,
-                          );
-                        },
+                          },
+                        ),
                       ),
-                    ),
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(25),
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(25),
+                      ),
                     ),
                   ),
                 ),
@@ -102,7 +105,7 @@ class _AddMemberDialogState extends State<AddMemberDialog> {
             child: ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                     onPrimary: Colors.white,
-                    primary: Colors.lightGreen,
+                    backgroundColor: Colors.lightGreen,
                     fixedSize: const Size(175, 40)),
                 onPressed: () {
                   if (addMemberFormKey.currentState!.validate()) {
