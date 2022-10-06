@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:inspired_senior_care_app/bloc/auth/auth_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
 import 'package:inspired_senior_care_app/cubits/login/login_cubit.dart';
 import 'package:inspired_senior_care_app/view/widget/name_plate.dart';
@@ -98,6 +99,7 @@ class MainAppDrawer extends StatelessWidget {
                     TextButton.icon(
                         onPressed: () {
                           context.read<LoginCubit>().signOut();
+                          context.read<AuthBloc>().add(AppLogoutRequested());
                         },
                         icon: const Icon(Icons.logout_rounded),
                         label: const Text('Logout'))

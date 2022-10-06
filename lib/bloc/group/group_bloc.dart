@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
@@ -11,9 +13,13 @@ part 'group_state.dart';
 class GroupBloc extends Bloc<GroupEvent, GroupState> {
   List<Group> groups = [];
   final DatabaseRepository _databaseRepository;
+
   GroupBloc({required DatabaseRepository databaseRepository})
       : _databaseRepository = databaseRepository,
         super(GroupLoading()) {
+    StreamSubscription memberStream;
+    StreamSubscription managerStream;
+
     on<LoadGroups>(_onGroupLoaded);
     on<CreateGroup>(_onCreateGroup);
     on<UpdateGroup>(_onUpdateGroup);
@@ -77,5 +83,12 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
       print('Adding ${event.currentUser.groups![i]}');
       await Future.delayed(const Duration(milliseconds: 500));
     }
+  }
+
+  @override
+  Future<void> close() {
+    // TODO: implement close
+
+    return super.close();
   }
 }

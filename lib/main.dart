@@ -73,11 +73,11 @@ class _MyAppState extends State<MyApp> {
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider(
-          lazy: false,
+          // lazy: false,
           create: (context) => AuthRepository(),
         ),
         RepositoryProvider(
-          lazy: false,
+          // lazy: false,
           create: (context) => DatabaseRepository(),
         ),
         RepositoryProvider(
@@ -205,7 +205,7 @@ class _MyAppState extends State<MyApp> {
       bool loggedIn = bloc.state.authStatus == AuthStatus.authenticated;
       bool isOnboarding = state.location == '/login/signup';
       // TODO: Create Onboarding Completed SharedPrefs Value ***
-      bool completedOnboarding = true;
+      bool completedOnboarding = false;
       // if (!completedOnboarding) return '/login/signup';
       if (!loggedIn) {
         return isLoggingIn

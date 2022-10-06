@@ -15,6 +15,7 @@ class Profile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ScrollController pageScrollController = ScrollController();
     return BlocBuilder<ProfileBloc, ProfileState>(
       builder: (context, state) {
         if (state is ProfileLoading) {
@@ -32,6 +33,7 @@ class Profile extends StatelessWidget {
               body: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: ListView(
+                  controller: pageScrollController,
                   shrinkWrap: true,
                   children: [
                     Padding(
@@ -44,9 +46,11 @@ class Profile extends StatelessWidget {
                       ),
                     ),
                     //const Badges(),
-                    const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 16.0),
-                      child: ProgressSection(),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 16.0),
+                      child: ProgressSection(
+                        pageScrollController: pageScrollController,
+                      ),
                     )
                   ],
                 ),

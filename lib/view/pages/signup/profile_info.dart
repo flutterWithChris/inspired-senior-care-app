@@ -1,6 +1,7 @@
 import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:inspired_senior_care_app/bloc/onboarding/onboarding_bloc.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
@@ -224,6 +225,7 @@ class _ProfileInfoState extends State<ProfileInfo> {
                                       organization: organizationFieldController
                                           .value.text,
                                       userColor: screenPickerColor.hex)));
+                              context.go('/');
                             }
                           },
                           child: const Text('Finish Setup')),
