@@ -31,7 +31,6 @@ import 'package:inspired_senior_care_app/globals.dart';
 import 'package:inspired_senior_care_app/view/pages/dashboard/groups/choose_category.dart';
 
 import 'package:inspired_senior_care_app/view/pages/dashboard/dashboard.dart';
-import 'package:inspired_senior_care_app/view/pages/dashboard/groups/choose_category.dart';
 import 'package:inspired_senior_care_app/view/pages/dashboard/members/view_member.dart';
 import 'package:inspired_senior_care_app/view/pages/dashboard/members/view_members.dart';
 import 'package:inspired_senior_care_app/view/pages/dashboard/members/view_responses/view_responses.dart';
@@ -220,8 +219,7 @@ class _MyAppState extends State<MyApp> {
 
       final isLoggedIn = state.location == '/';
 
-   if (!completedOnboarding) return '/login/signup';
-
+      //if (!completedOnboarding) return '/login/signup';
 
       if (loggedIn && completedOnboarding == true) return null;
 

@@ -50,7 +50,6 @@ class _AddMemberDialogState extends State<AddMemberDialog> {
             builder: (context, state) {
               return Form(
                 key: addMemberFormKey,
-
                 child: TextFormField(
                   // autovalidateMode: AutovalidateMode.onUserInteraction,
                   validator: (value) {
@@ -69,31 +68,31 @@ class _AddMemberDialogState extends State<AddMemberDialog> {
                   decoration: InputDecoration(
                     prefixIcon: const Icon(Icons.email_rounded),
                     hintText: 'example@email.com',
-                    suffixIcon: Padding(
-                      padding: const EdgeInsetsDirectional.only(end: 12),
-                      child: BlocBuilder<InviteBloc, InviteState>(
-                        builder: (context, state) {
-                          if (state.inviteStatus == InviteStatus.sending) {
-                            return const SizedBox(
-                                height: 8,
-                                width: 8,
-                                child:
-                                    Center(child: CircularProgressIndicator()));
-                          }
-                          if (state.inviteStatus == InviteStatus.sent) {
-                            return const Icon(
-                              Icons.check,
-                              color: Colors.lime,
-
-                            );
-                          },
-                        ),
-                      ),
-                      filled: true,
-                      fillColor: Colors.white,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(25),
-                      ),
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(25),
+                    ),
+                    suffixIcon: BlocBuilder<InviteBloc, InviteState>(
+                      builder: (context, state) {
+                        if (state.inviteStatus == InviteStatus.sending) {
+                          return const SizedBox(
+                              height: 8,
+                              width: 8,
+                              child:
+                                  Center(child: CircularProgressIndicator()));
+                        }
+                        if (state.inviteStatus == InviteStatus.sent) {
+                          return const Icon(
+                            Icons.check,
+                            color: Colors.lime,
+                          );
+                        } else {
+                          return const Center(
+                            child: Text('Error Loading Invite Service!'),
+                          );
+                        }
+                      },
                     ),
                   ),
                 ),
@@ -110,7 +109,7 @@ class _AddMemberDialogState extends State<AddMemberDialog> {
             child: ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,
-                    onPrimary: Colors.white,
+                    // foregroundColor: Colors.white,
                     backgroundColor: Colors.lightGreen,
                     fixedSize: const Size(175, 40)),
                 onPressed: () {
