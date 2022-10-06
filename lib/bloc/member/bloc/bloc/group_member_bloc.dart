@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:inspired_senior_care_app/data/models/group.dart';
@@ -15,6 +17,12 @@ class GroupMemberBloc extends Bloc<GroupMemberEvent, GroupMemberState> {
       : _databaseRepository = databaseRepository,
         super(GroupMemberInitial()) {
     on<LoadGroupMembers>(_onLoadGroupMembers);
+    on<UpdateGroupMembers>((event, emit) async {
+      emit(GroupMembersLoading());
+      await Future.delayed(const Duration(seconds: 1));
+      add(LoadGroupMembers(
+          userIds: event.group.groupMemberIds!, group: event.group));
+    });
   }
 
   void _onLoadGroupMembers(

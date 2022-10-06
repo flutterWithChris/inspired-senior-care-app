@@ -36,7 +36,7 @@ class FeaturedCategoryCubit extends Cubit<FeaturedCategoryState> {
 
   void _onLoadFeaturedCategory(Group group) async {
     emit(FeaturedCategoryLoading());
-    await Future.delayed(const Duration(seconds: 1));
+    await Future.delayed(const Duration(milliseconds: 250));
     currentGroup = group;
     emit(FeaturedCategoryLoaded(featuredCategoryName: group.featuredCategory!));
   }
@@ -74,7 +74,7 @@ class FeaturedCategoryCubit extends Cubit<FeaturedCategoryState> {
     currentGroup = currentGroup.copyWith(featuredCategory: category.name);
     await Future.delayed(const Duration(seconds: 1));
     emit(FeaturedCategoryUpdated());
-    await Future.delayed(const Duration(seconds: 5));
-    //loadFeaturedCategory(currentGroup);
+    await Future.delayed(const Duration(seconds: 1));
+    loadFeaturedCategory(currentGroup);
   }
 }

@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:inspired_senior_care_app/data/models/user.dart';
 
 class NamePlate extends StatelessWidget {
   final String memberName;
   final String memberTitle;
   final String memberColorHex;
+  final User user;
 
   const NamePlate({
     required this.memberName,
     required this.memberTitle,
     required this.memberColorHex,
+    required this.user,
     Key? key,
   }) : super(key: key);
 
@@ -22,7 +25,16 @@ class NamePlate extends StatelessWidget {
         memberName,
         style: Theme.of(context).textTheme.titleLarge,
       ),
-      subtitle: Text(memberTitle),
+      subtitle: Wrap(
+        spacing: 4.0,
+        children: [
+          Text(memberTitle),
+          const Text('•'),
+          Text(
+            user.organization!,
+          )
+        ],
+      ),
     );
   }
 }

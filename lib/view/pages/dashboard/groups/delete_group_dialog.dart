@@ -1,23 +1,46 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/group/group_bloc.dart';
-import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
 import 'package:inspired_senior_care_app/data/models/group.dart';
 import 'package:inspired_senior_care_app/data/models/user.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
-class EditGroupDialog extends StatelessWidget {
+class DeleteGroupDialog extends StatefulWidget {
   final User currentUser;
   final Group currentGroup;
-  const EditGroupDialog({
+  const DeleteGroupDialog({
     Key? key,
     required this.currentUser,
     required this.currentGroup,
   }) : super(key: key);
 
   @override
+  State<DeleteGroupDialog> createState() => _DeleteGroupDialogState();
+}
+
+class _DeleteGroupDialogState extends State<DeleteGroupDialog> {
+  final TextEditingController groupNameController = TextEditingController();
+  bool isButtonDisabled = true;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    groupNameController.addListener(() {
+      if (groupNameController.value.text == widget.currentGroup.groupName) {
+        setState(() {
+          isButtonDisabled = false;
+        });
+      } else {
+        setState(() {
+          isButtonDisabled = true;
+        });
+      }
+    });
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final TextEditingController groupNameController = TextEditingController();
-    groupNameController.text = currentGroup.groupName!;
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
       child: Padding(
@@ -28,9 +51,14 @@ class EditGroupDialog extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 16.0),
               child: Text(
-                'Edit Group',
+                'Delete Group',
                 style: Theme.of(context).textTheme.titleLarge,
               ),
+            ),
+            Text(
+                'Type "${widget.currentGroup.groupName}" to confirm deletion.'),
+            const SizedBox(
+              height: 20.0,
             ),
             TextFormField(
               style: const TextStyle(),
@@ -39,7 +67,7 @@ class EditGroupDialog extends StatelessWidget {
               autofocus: true,
               keyboardType: TextInputType.text,
               decoration: InputDecoration(
-                  hintText: 'ABC Senior Care',
+                  hintText: widget.currentGroup.groupName,
                   label: const Text('Group Name'),
                   suffixIcon: BlocBuilder<GroupBloc, GroupState>(
                     builder: (context, state) {
@@ -65,16 +93,16 @@ class EditGroupDialog extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: ElevatedButton(
-                  onPressed: () {
-                    print('Group Created: ');
-                    // * Create a New Group
-                    Group editedGroup = currentGroup.copyWith(
-                        groupName: groupNameController.text);
-                    BlocProvider.of<GroupBloc>(context).add(UpdateGroup(
-                      group: editedGroup,
-                      manager: context.read<ProfileBloc>().state.user,
-                    ));
-                  },
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                  onPressed: isButtonDisabled
+                      ? null
+                      : () {
+                          print('Group Created: ');
+
+                          BlocProvider.of<GroupBloc>(context).add(DeleteGroup(
+                              group: widget.currentGroup,
+                              manager: widget.currentUser));
+                        },
                   child: BlocConsumer<GroupBloc, GroupState>(
                     listenWhen: (previous, current) => previous != current,
                     listener: (context, state) {
@@ -86,13 +114,17 @@ class EditGroupDialog extends StatelessWidget {
                     builder: (context, state) {
                       // TODO: Error Handling
                       if (state is GroupLoaded) {
-                        return const Text('Update Group');
+                        return const Text('Delete Group');
+                      }
+                      if (state is GroupLoading) {
+                        return LoadingAnimationWidget.discreteCircle(
+                            color: Theme.of(context).primaryColor, size: 30);
                       }
                       if (state is GroupSubmitting) {
-                        return const Text('Submitting...');
+                        return const Text('Deleting...');
                       }
-                      if (state is GroupUpdated) {
-                        return const Text('Group Updated!');
+                      if (state is GroupDeleted) {
+                        return const Text('Group Deleted!');
                       }
                       return const Text('Something\'s Wrong!');
                     },

@@ -14,7 +14,7 @@ class InviteBloc extends Bloc<InviteEvent, InviteState> {
       : _databaseRepository = databaseRepository,
         super(InviteState.initial()) {
     on<InviteEvent>((event, emit) async {
-      if (event is InviteSent) {
+      if (event is MemberInviteSent) {
         emit(InviteState.sending());
         // Query User
         // If Users exists ? Add User to Group : Alert message.
@@ -23,6 +23,27 @@ class InviteBloc extends Bloc<InviteEvent, InviteState> {
           onData: (User? user) {
             if (user != null) {
               _databaseRepository.addMemberToGroup(user.id!, event.group);
+              return InviteState.sent();
+            } else {
+              return InviteState.failed();
+            }
+          },
+          onError: (error, stackTrace) {
+            return InviteState.failed();
+          },
+        );
+        await Future.delayed(const Duration(seconds: 3));
+        emit(InviteState.initial());
+      }
+      if (event is ManagerInviteSent) {
+        emit(InviteState.sending());
+        // Query User
+        // If Users exists ? Add User to Group : Alert message.
+        await emit.forEach(
+          _databaseRepository.getUserByEmail(event.emailAddress),
+          onData: (User? user) {
+            if (user != null) {
+              _databaseRepository.addManagerToGroup(user.id!, event.group);
               return InviteState.sent();
             } else {
               return InviteState.failed();

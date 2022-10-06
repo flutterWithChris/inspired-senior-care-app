@@ -6,20 +6,20 @@ import 'package:inspired_senior_care_app/bloc/invite/invite_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
 import 'package:inspired_senior_care_app/data/models/group.dart';
 
-class AddMemberDialog extends StatefulWidget {
+class AddManagerDialog extends StatefulWidget {
   final Group group;
   final TextEditingController inviteTextFieldController;
-  const AddMemberDialog({
+  const AddManagerDialog({
     Key? key,
     required this.group,
     required this.inviteTextFieldController,
   }) : super(key: key);
 
   @override
-  State<AddMemberDialog> createState() => _AddMemberDialogState();
+  State<AddManagerDialog> createState() => _AddMemberDialogState();
 }
 
-class _AddMemberDialogState extends State<AddMemberDialog> {
+class _AddMemberDialogState extends State<AddManagerDialog> {
   @override
   Widget build(BuildContext context) {
     final GlobalKey<FormState> addMemberFormKey = GlobalKey<FormState>();
@@ -31,7 +31,7 @@ class _AddMemberDialogState extends State<AddMemberDialog> {
       actionsAlignment: MainAxisAlignment.center,
       // * Main Content
       title: Text(
-        'Add Member',
+        'Add Manager',
         textAlign: TextAlign.center,
         style: Theme.of(context)
             .textTheme
@@ -39,7 +39,7 @@ class _AddMemberDialogState extends State<AddMemberDialog> {
             .copyWith(color: Theme.of(context).textTheme.bodyMedium!.color),
       ),
       content: const Text(
-        'Enter a member\'s email!',
+        'Enter email to add a manager!',
         textAlign: TextAlign.center,
       ),
 
@@ -50,7 +50,6 @@ class _AddMemberDialogState extends State<AddMemberDialog> {
             builder: (context, state) {
               return Form(
                 key: addMemberFormKey,
-
                 child: TextFormField(
                   // autovalidateMode: AutovalidateMode.onUserInteraction,
                   validator: (value) {
@@ -61,7 +60,6 @@ class _AddMemberDialogState extends State<AddMemberDialog> {
                     }
                     return null;
                   },
-
                   autofocus: true,
                   controller: widget.inviteTextFieldController,
                   style: const TextStyle(color: Colors.black),
@@ -84,16 +82,18 @@ class _AddMemberDialogState extends State<AddMemberDialog> {
                             return const Icon(
                               Icons.check,
                               color: Colors.lime,
-
                             );
-                          },
-                        ),
+                          }
+                          return Container(
+                            width: 1,
+                          );
+                        },
                       ),
-                      filled: true,
-                      fillColor: Colors.white,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(25),
-                      ),
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(25),
                     ),
                   ),
                 ),
@@ -110,12 +110,11 @@ class _AddMemberDialogState extends State<AddMemberDialog> {
             child: ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,
-                    onPrimary: Colors.white,
                     backgroundColor: Colors.lightGreen,
                     fixedSize: const Size(175, 40)),
                 onPressed: () {
                   if (addMemberFormKey.currentState!.validate()) {
-                    context.read<InviteBloc>().add(MemberInviteSent(
+                    context.read<InviteBloc>().add(ManagerInviteSent(
                         emailAddress:
                             widget.inviteTextFieldController.value.text,
                         group: widget.group));
@@ -157,7 +156,7 @@ class _AddMemberDialogState extends State<AddMemberDialog> {
                       );
                     } else {
                       return const Icon(
-                        Icons.group_add_rounded,
+                        Icons.add_moderator_rounded,
                         size: 18,
                       );
                     }
@@ -169,12 +168,12 @@ class _AddMemberDialogState extends State<AddMemberDialog> {
                       return const Text('Try Again!');
                     }
                     if (state.inviteStatus == InviteStatus.sending) {
-                      return const Text('Sending...');
+                      return const Text('Adding Manager...');
                     }
                     if (state.inviteStatus == InviteStatus.sent) {
-                      return const Text('Member Added!');
+                      return const Text('Manager Added!');
                     } else {
-                      return const Text('Add Member');
+                      return const Text('Add Manager');
                     }
                   },
                 )),

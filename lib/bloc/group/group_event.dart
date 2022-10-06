@@ -24,17 +24,30 @@ class CreateGroup extends GroupEvent {
 
   @override
   // TODO: implement props
-  List<Object?> get props => [group];
+  List<Object?> get props => [group, manager];
 }
 
 class EditGroup extends GroupEvent {}
 
-class DeleteGroup extends GroupEvent {}
+class DeleteGroup extends GroupEvent {
+  final Group group;
+  final User manager;
+  DeleteGroup({
+    required this.group,
+    required this.manager,
+  });
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [group, manager];
+}
 
 class UpdateGroup extends GroupEvent {
+  User manager;
   Group group;
   UpdateGroup({
     required this.group,
+    required this.manager,
   });
 
   @override
