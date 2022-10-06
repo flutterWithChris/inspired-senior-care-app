@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
-import 'package:inspired_senior_care_app/cubits/settings/cubit/settings_cubit.dart';
 import 'package:inspired_senior_care_app/data/models/user.dart';
 import 'package:inspired_senior_care_app/view/widget/main/bottom_app_bar.dart';
 import 'package:inspired_senior_care_app/view/widget/main/top_app_bar.dart';
@@ -46,7 +45,14 @@ class SettingsPage extends StatelessWidget {
                           showDialog(
                             context: context,
                             builder: (context) {
-                              return const ChangeEmailDialog();
+                              return Dialog(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: const [
+                                    Text('Change Email?'),
+                                  ],
+                                ),
+                              );
                             },
                           );
                         },
@@ -59,7 +65,14 @@ class SettingsPage extends StatelessWidget {
                           showDialog(
                             context: context,
                             builder: (context) {
-                              return const ChangeNameDialog();
+                              return Dialog(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: const [
+                                    Text('Change Name?'),
+                                  ],
+                                ),
+                              );
                             },
                           );
                         },
@@ -71,7 +84,14 @@ class SettingsPage extends StatelessWidget {
                           showDialog(
                             context: context,
                             builder: (context) {
-                              return const ChangePasswordDialog();
+                              return Dialog(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: const [
+                                    Text('Change Password?'),
+                                  ],
+                                ),
+                              );
                             },
                           );
                         },
@@ -132,156 +152,6 @@ class SettingsPage extends StatelessWidget {
               return const Text('Something Went Wrong');
             }
           },
-        ),
-      ),
-    );
-  }
-}
-
-class ChangeEmailDialog extends StatefulWidget {
-  const ChangeEmailDialog({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  State<ChangeEmailDialog> createState() => _ChangeEmailDialogState();
-}
-
-class _ChangeEmailDialogState extends State<ChangeEmailDialog> {
-  final TextEditingController emailFieldController = TextEditingController();
-
-  @override
-  void initState() {
-    // TODO: implement initState
-
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    User currentUser = context.watch<ProfileBloc>().state.user;
-    emailFieldController.text = currentUser.email!;
-    return Dialog(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 24.0),
-        child: SizedBox(
-          height: 175,
-          child: Column(
-            //mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  'Edit Email',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-              ),
-              TextFormField(
-                controller: emailFieldController,
-                decoration: const InputDecoration(label: Text('Your Email')),
-              ),
-              ElevatedButton(
-                  onPressed: () {
-                    context.read<ProfileBloc>().add(UpdateProfile(
-                        user: currentUser.copyWith(
-                            email: emailFieldController.value.text)));
-                  },
-                  child: const Text('Update Email'))
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class ChangeNameDialog extends StatefulWidget {
-  const ChangeNameDialog({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  State<ChangeNameDialog> createState() => _ChangeNameDialogState();
-}
-
-class _ChangeNameDialogState extends State<ChangeNameDialog> {
-  final TextEditingController nameFieldController = TextEditingController();
-
-  @override
-  Widget build(BuildContext context) {
-    User currentUser = context.watch<ProfileBloc>().state.user;
-    nameFieldController.text = currentUser.name!;
-    return Dialog(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 24.0),
-        child: SizedBox(
-          height: 175,
-          child: Column(
-            //mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  'Edit Name',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-              ),
-              TextFormField(
-                controller: nameFieldController,
-                decoration: const InputDecoration(label: Text('Your Name')),
-              ),
-              ElevatedButton(
-                  onPressed: () {
-                    context.read<ProfileBloc>().add(UpdateProfile(
-                        user: currentUser.copyWith(
-                            name: nameFieldController.value.text)));
-                  },
-                  child: const Text('Update Name'))
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class ChangePasswordDialog extends StatelessWidget {
-  const ChangePasswordDialog({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Dialog(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
-        child: SizedBox(
-          height: 175,
-          child: Column(
-            //mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  'Edit Password',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-              ),
-              const Text(
-                'To reset your password you\'ll need to request a password reset email.',
-                textAlign: TextAlign.center,
-              ),
-              ElevatedButton(
-                  onPressed: () {
-                    context.read<EditPassCubit>().passwordResetRequest(
-                        context.read<ProfileBloc>().state.user.email!);
-                  },
-                  child: const Text('Request Password Reset'))
-            ],
-          ),
         ),
       ),
     );

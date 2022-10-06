@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/group/group_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/invite/invite_bloc.dart';
-import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
 import 'package:inspired_senior_care_app/data/models/group.dart';
 
 class AddMemberDialog extends StatefulWidget {
@@ -24,22 +23,16 @@ class _AddMemberDialogState extends State<AddMemberDialog> {
   Widget build(BuildContext context) {
     final GlobalKey<FormState> addMemberFormKey = GlobalKey<FormState>();
     return AlertDialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
-      // contentPadding: const EdgeInsets.symmetric(horizontal: 16.0),
-      actionsPadding: const EdgeInsets.symmetric(horizontal: 12.0),
+      actionsPadding: const EdgeInsets.only(bottom: 12.0),
       alignment: AlignmentDirectional.center,
       actionsAlignment: MainAxisAlignment.center,
       // * Main Content
-      title: Text(
+      title: const Text(
         'Add Member',
         textAlign: TextAlign.center,
-        style: Theme.of(context)
-            .textTheme
-            .headline4!
-            .copyWith(color: Theme.of(context).textTheme.bodyMedium!.color),
       ),
       content: const Text(
-        'Enter a member\'s email!',
+        'Enter their email to send an invite!',
         textAlign: TextAlign.center,
       ),
 
@@ -50,41 +43,43 @@ class _AddMemberDialogState extends State<AddMemberDialog> {
             builder: (context, state) {
               return Form(
                 key: addMemberFormKey,
-
-                child: TextFormField(
-                  // autovalidateMode: AutovalidateMode.onUserInteraction,
-                  validator: (value) {
-                    if (value != null && !EmailValidator.validate(value)) {
-                      return 'Enter a valid email!';
-                    } else if (state.inviteStatus == InviteStatus.failed) {
-                      return 'User Not Found!';
-                    }
-                    return null;
-                  },
-
-                  autofocus: true,
-                  controller: widget.inviteTextFieldController,
-                  style: const TextStyle(color: Colors.black),
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: InputDecoration(
-                    prefixIcon: const Icon(Icons.email_rounded),
-                    hintText: 'example@email.com',
-                    suffixIcon: Padding(
-                      padding: const EdgeInsetsDirectional.only(end: 12),
-                      child: BlocBuilder<InviteBloc, InviteState>(
-                        builder: (context, state) {
-                          if (state.inviteStatus == InviteStatus.sending) {
-                            return const SizedBox(
-                                height: 8,
-                                width: 8,
-                                child:
-                                    Center(child: CircularProgressIndicator()));
-                          }
-                          if (state.inviteStatus == InviteStatus.sent) {
-                            return const Icon(
-                              Icons.check,
-                              color: Colors.lime,
-
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: TextFormField(
+                    // autovalidateMode: AutovalidateMode.onUserInteraction,
+                    validator: (value) {
+                      if (value != null && !EmailValidator.validate(value)) {
+                        return 'Enter a valid email!';
+                      } else if (state.inviteStatus == InviteStatus.failed) {
+                        return 'User Not Found!';
+                      }
+                      return null;
+                    },
+                    autofocus: true,
+                    controller: widget.inviteTextFieldController,
+                    style: const TextStyle(color: Colors.black),
+                    keyboardType: TextInputType.emailAddress,
+                    decoration: InputDecoration(
+                      hintText: 'example@email.com',
+                      suffixIcon: Padding(
+                        padding: const EdgeInsetsDirectional.only(end: 12),
+                        child: BlocBuilder<InviteBloc, InviteState>(
+                          builder: (context, state) {
+                            if (state.inviteStatus == InviteStatus.sending) {
+                              return const SizedBox(
+                                  height: 8,
+                                  width: 8,
+                                  child: Center(
+                                      child: CircularProgressIndicator()));
+                            }
+                            if (state.inviteStatus == InviteStatus.sent) {
+                              return const Icon(
+                                Icons.check,
+                                color: Colors.lime,
+                              );
+                            }
+                            return Container(
+                              width: 1,
                             );
                           },
                         ),
@@ -106,24 +101,21 @@ class _AddMemberDialogState extends State<AddMemberDialog> {
         ),
         Center(
           child: Padding(
-            padding: const EdgeInsets.only(bottom: 24.0, top: 4.0),
+            padding: const EdgeInsets.all(6.0),
             child: ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white,
                     onPrimary: Colors.white,
                     backgroundColor: Colors.lightGreen,
                     fixedSize: const Size(175, 40)),
                 onPressed: () {
                   if (addMemberFormKey.currentState!.validate()) {
-                    context.read<InviteBloc>().add(MemberInviteSent(
-                        emailAddress:
-                            widget.inviteTextFieldController.value.text,
+                    context.read<InviteBloc>().add(InviteSent(
+                        emailAddress: widget.inviteTextFieldController.text,
                         group: widget.group));
 
-                    context.read<GroupBloc>().add(UpdateGroup(
-                          group: widget.group,
-                          manager: context.read<ProfileBloc>().state.user,
-                        ));
+                    context
+                        .read<GroupBloc>()
+                        .add(UpdateGroup(group: widget.group));
                   }
                 },
                 icon: BlocConsumer<InviteBloc, InviteState>(
@@ -157,7 +149,7 @@ class _AddMemberDialogState extends State<AddMemberDialog> {
                       );
                     } else {
                       return const Icon(
-                        Icons.group_add_rounded,
+                        Icons.send,
                         size: 18,
                       );
                     }
@@ -172,9 +164,9 @@ class _AddMemberDialogState extends State<AddMemberDialog> {
                       return const Text('Sending...');
                     }
                     if (state.inviteStatus == InviteStatus.sent) {
-                      return const Text('Member Added!');
+                      return const Text('Invite Sent!');
                     } else {
-                      return const Text('Add Member');
+                      return const Text('Send Invite');
                     }
                   },
                 )),

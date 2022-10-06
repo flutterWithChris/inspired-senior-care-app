@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/group/group_bloc.dart';
-import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
 import 'package:inspired_senior_care_app/data/models/group.dart';
 import 'package:inspired_senior_care_app/data/models/user.dart';
 
@@ -19,9 +18,8 @@ class EditGroupDialog extends StatelessWidget {
     final TextEditingController groupNameController = TextEditingController();
     groupNameController.text = currentGroup.groupName!;
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 12.0),
+        padding: const EdgeInsets.symmetric(horizontal: 12.0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -70,10 +68,8 @@ class EditGroupDialog extends StatelessWidget {
                     // * Create a New Group
                     Group editedGroup = currentGroup.copyWith(
                         groupName: groupNameController.text);
-                    BlocProvider.of<GroupBloc>(context).add(UpdateGroup(
-                      group: editedGroup,
-                      manager: context.read<ProfileBloc>().state.user,
-                    ));
+                    BlocProvider.of<GroupBloc>(context)
+                        .add(UpdateGroup(group: editedGroup));
                   },
                   child: BlocConsumer<GroupBloc, GroupState>(
                     listenWhen: (previous, current) => previous != current,
@@ -97,6 +93,13 @@ class EditGroupDialog extends StatelessWidget {
                       return const Text('Something\'s Wrong!');
                     },
                   )),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                context.read<GroupBloc>().add(DeleteGroup());
+              },
+              style: ElevatedButton.styleFrom(primary: Colors.redAccent),
+              child: const Text('Delete Group'),
             ),
           ],
         ),

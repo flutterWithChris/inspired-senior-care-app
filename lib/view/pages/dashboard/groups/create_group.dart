@@ -23,18 +23,16 @@ class _CreateGroupDialogState extends State<CreateGroupDialog> {
   Widget build(BuildContext context) {
     final currentUser = widget.manager;
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 12.0),
+        padding: const EdgeInsets.symmetric(horizontal: 12.0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Padding(
-              padding: const EdgeInsets.only(top: 8.0, bottom: 24.0),
+              padding: const EdgeInsets.symmetric(vertical: 16.0),
               child: Text(
-                'Create a Group',
-                style: Theme.of(context).textTheme.headline4!.copyWith(
-                    color: Theme.of(context).textTheme.bodyMedium!.color),
+                'Create New Group',
+                style: Theme.of(context).textTheme.titleLarge,
               ),
             ),
             TextFormField(
@@ -44,7 +42,7 @@ class _CreateGroupDialogState extends State<CreateGroupDialog> {
               keyboardType: TextInputType.text,
               controller: groupNameController,
               decoration: InputDecoration(
-                  hintText: 'Example: Nurses',
+                  hintText: 'ABC Senior Care',
                   label: const Text('Group Name'),
                   suffixIcon: BlocBuilder<GroupBloc, GroupState>(
                     builder: (context, state) {
@@ -68,8 +66,8 @@ class _CreateGroupDialogState extends State<CreateGroupDialog> {
                   )),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12.0),
-              child: ElevatedButton.icon(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: ElevatedButton(
                   onPressed: () {
                     print('Group Created: ${groupNameController.text}');
                     // * Create a New Group
@@ -84,15 +82,10 @@ class _CreateGroupDialogState extends State<CreateGroupDialog> {
                     // * Add new group to list
                     //  sampleGroupList.add(newGroup);
                   },
-                  icon: const Icon(
-                    Icons.group_add_rounded,
-                    size: 20.0,
-                  ),
-                  label: BlocConsumer<GroupBloc, GroupState>(
+                  child: BlocConsumer<GroupBloc, GroupState>(
                     listenWhen: (previous, current) => previous != current,
                     listener: (context, state) {
-                      if (state is GroupCreated) {
-                        Future.delayed(const Duration(seconds: 1));
+                      if (state is GroupInitial) {
                         Navigator.pop(context);
                         // TODO: Dispose?
                       }

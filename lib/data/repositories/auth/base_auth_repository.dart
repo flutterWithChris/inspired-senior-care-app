@@ -12,5 +12,4 @@ abstract class BaseAuthRepository {
     required String password,
   });
   void signOut();
-  Future<void> requestPasswordReset(String email);
 }

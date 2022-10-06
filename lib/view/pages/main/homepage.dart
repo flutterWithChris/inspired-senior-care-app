@@ -31,7 +31,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 Padding(
                   padding: EdgeInsets.only(bottom: 24.0),
                   child: Text(
-                    'Monthly Category',
+                    'Featured Category',
                     style: TextStyle(fontSize: 30),
                   ),
                 ),

@@ -46,7 +46,7 @@ class DatabaseRepository extends BaseDatabaseRepository {
   @override
   Future<void> createUser(User user) async {
     await _firebaseFirestore.collection('users').doc(user.id).set(user.toMap());
-
+    
     await _firebaseFirestore
         .collection('users')
         .doc(user.id)
@@ -124,14 +124,9 @@ class DatabaseRepository extends BaseDatabaseRepository {
   }
 
   void deleteGroup(Group group, User manager) async {
-    try {
-      await _firebaseFirestore.collection('users').doc(manager.id).update({
-        'groups': FieldValue.arrayRemove([group.groupId]),
-      });
-      await _firebaseFirestore.collection('groups').doc(group.groupId).delete();
-    } catch (e) {
-      print(e);
-    }
+    await _firebaseFirestore.collection('users').doc(manager.id).update({
+      'groups': FieldValue.arrayRemove([group.groupId]),
+    });
   }
 
   Stream<Group> getGroup(String groupId) {
@@ -142,31 +137,8 @@ class DatabaseRepository extends BaseDatabaseRepository {
         .map((event) => Group.fromSnapshot(event));
   }
 
-  Future<int> getGroupCount() {
-    return _firebaseFirestore
-        .collection('users')
-        .doc(_firebaseAuth.currentUser!.uid)
-        .get()
-        .then((value) => List.from(value.get('groups')).length);
-  }
-
-  Stream<List<Group>> getManagerGroups(User user) {
-    return _firebaseFirestore
-        .collection('groups')
-        .where('groupManagerIds', arrayContains: user.id)
-        .snapshots()
-        .map((snapshot) {
-      print('Fetching Groups from Firebase');
-      return snapshot.docs.map((doc) => Group.fromSnapshot(doc)).toList();
-    });
-  }
-
-  Stream<List<Group>> getMemberGroups(User user) {
-    return _firebaseFirestore
-        .collection('groups')
-        .where('groupMemberIds', arrayContains: user.id)
-        .snapshots()
-        .map((snapshot) {
+  Stream<List<Group>> getGroups(User user) {
+    return _firebaseFirestore.collection('groups').snapshots().map((snapshot) {
       print('Fetching Groups from Firebase');
       return snapshot.docs.map((doc) => Group.fromSnapshot(doc)).toList();
     });
@@ -180,68 +152,16 @@ class DatabaseRepository extends BaseDatabaseRepository {
         .then((value) => print('Group Updated!'));
   }
 
-  Future<void> addMemberToGroup(String userId, Group group) async {
-    try {
-      await _firebaseFirestore.collection('users').doc(userId).update({
-        'groups': FieldValue.arrayUnion([group.groupId])
-      });
-      return await _firebaseFirestore
-          .collection('groups')
-          .doc(group.groupId)
-          .update({
-        'groupMemberIds': FieldValue.arrayUnion([userId])
-      });
-    } catch (e) {
-      print(e);
-    }
+  Future<void> addMemberToGroup(String userId, Group group) {
+    return _firebaseFirestore.collection('groups').doc(group.groupId).update({
+      'groupMemberIds': FieldValue.arrayUnion([userId])
+    });
   }
 
-  Future<void> removeMemberFromGroup(User user, Group group) async {
-    try {
-      await _firebaseFirestore.collection('users').doc(user.id).update({
-        'groups': FieldValue.arrayRemove([group.groupId])
-      });
-      return await _firebaseFirestore
-          .collection('groups')
-          .doc(group.groupId)
-          .update({
-        'groupMemberIds': FieldValue.arrayRemove([user.id]),
-      });
-    } catch (e) {
-      print(e);
-    }
-  }
-
-  Future<void> addManagerToGroup(String userId, Group group) async {
-    try {
-      await _firebaseFirestore.collection('users').doc(userId).update({
-        'groups': FieldValue.arrayUnion([group.groupId])
-      });
-      return await _firebaseFirestore
-          .collection('groups')
-          .doc(group.groupId)
-          .update({
-        'groupManagerIds': FieldValue.arrayUnion([userId])
-      });
-    } catch (e) {
-      print(e);
-    }
-  }
-
-  Future<void> removeManagerFromGroup(User user, Group group) async {
-    try {
-      await _firebaseFirestore.collection('users').doc(user.id).update({
-        'groups': FieldValue.arrayRemove([group.groupId])
-      });
-      return await _firebaseFirestore
-          .collection('groups')
-          .doc(group.groupId)
-          .update({
-        'groupManagerIds': FieldValue.arrayRemove([user.id]),
-      });
-    } catch (e) {
-      print(e);
-    }
+  Future<void> removeMemberFromGroup(User user, Group group) {
+    return _firebaseFirestore.collection('groups').doc(group.groupId).update({
+      'groupMemberIds': FieldValue.arrayRemove([user.id]),
+    });
   }
 
   Future<void> updateProgress(

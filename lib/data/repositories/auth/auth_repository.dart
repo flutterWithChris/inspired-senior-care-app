@@ -1,8 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart' as auth;
-import 'package:flutter/material.dart';
 import 'package:inspired_senior_care_app/data/models/user.dart';
 import 'package:inspired_senior_care_app/data/repositories/auth/base_auth_repository.dart';
-import 'package:inspired_senior_care_app/globals.dart';
 
 class AuthRepository extends BaseAuthRepository {
   final auth.FirebaseAuth _firebaseAuth;
@@ -46,36 +44,15 @@ class AuthRepository extends BaseAuthRepository {
           email: email, password: password);
       final auth.User? user = credential.user;
       return user;
-    } on auth.FirebaseAuthException catch (e) {
-      print('Failed with error code: ${e.code}');
-      print(e.message);
-      final SnackBar snackBar = SnackBar(
-        content: Text(e.message!),
-        backgroundColor: Colors.redAccent,
-      );
-      snackbarKey.currentState?.showSnackBar(snackBar);
-    }
+    } catch (_) {}
     return null;
   }
 
   @override
   Future<void> signOut() async {
-    await _firebaseAuth.signOut();
-  }
-
-  @override
-  Future<void> requestPasswordReset(String email) async {
     try {
-      await _firebaseAuth.sendPasswordResetEmail(email: email);
-    } on auth.FirebaseAuthException catch (e) {
-      print('Failed with error code: ${e.code}');
-      print(e.message);
-      final SnackBar snackBar = SnackBar(
-        content: Text(e.message!),
-        backgroundColor: Colors.redAccent,
-      );
-      snackbarKey.currentState?.showSnackBar(snackBar);
-    }
+      await _firebaseAuth.signOut();
+    } catch (_) {}
   }
 }
 

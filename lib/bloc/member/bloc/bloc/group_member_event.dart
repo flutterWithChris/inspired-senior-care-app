@@ -1,7 +1,7 @@
 part of 'group_member_bloc.dart';
 
 @immutable
-abstract class GroupMemberEvent extends Equatable {}
+abstract class GroupMemberEvent {}
 
 class LoadGroupMembers extends GroupMemberEvent {
   final List<String> userIds;
@@ -13,12 +13,4 @@ class LoadGroupMembers extends GroupMemberEvent {
   @override
   // TODO: implement props
   List<Object?> get props => [userIds, group];
-}
-
-class UpdateGroupMembers extends GroupMemberEvent {
-  final Group group;
-  UpdateGroupMembers({required this.group});
-  @override
-  // TODO: implement props
-  List<Object?> get props => [group];
 }

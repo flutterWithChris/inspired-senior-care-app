@@ -7,7 +7,6 @@ import 'package:go_router/go_router.dart';
 import 'package:inspired_senior_care_app/bloc/cards/card_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/categories/categories_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
-import 'package:inspired_senior_care_app/bloc/share_bloc/share_bloc.dart';
 import 'package:inspired_senior_care_app/data/models/category.dart';
 import 'package:inspired_senior_care_app/view/pages/IAP/upgrade_page.dart';
 
@@ -211,21 +210,12 @@ class CategoryCard extends StatelessWidget {
                                     return SizedBox(
                                       height: 50,
                                       width: 50,
-                                      child: BlocBuilder<ShareBloc, ShareState>(
-                                        buildWhen: (previous, current) =>
-                                            previous.status ==
-                                                Status.submitted &&
-                                            current.status == Status.initial,
-                                        builder: (context, state) {
-                                          return CircularProgressIndicator(
-                                            backgroundColor:
-                                                Colors.grey.shade300,
-                                            valueColor:
-                                                AlwaysStoppedAnimation<Color>(
-                                                    category.progressColor),
-                                            value: percentComplete,
-                                          );
-                                        },
+                                      child: CircularProgressIndicator(
+                                        backgroundColor: Colors.grey.shade300,
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                                category.progressColor),
+                                        value: percentComplete,
                                       ),
                                     );
                                   }

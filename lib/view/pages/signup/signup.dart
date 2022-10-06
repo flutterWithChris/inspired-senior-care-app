@@ -31,18 +31,19 @@ class _SignupScreenState extends State<SignupScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
-      body: Padding(
-        padding: const EdgeInsets.only(bottom: 60),
-        child: PageView(
-          controller: controller,
-          //physics: const NeverScrollableScrollPhysics(),
-          children: [
-            WelcomePage(pageController: controller),
-            BasicInfoPage(pageController: controller),
-            UserTypePage(pageController: controller),
-            ProfileInfo(pageController: controller),
-          ],
+      body: Container(
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 60),
+          child: PageView(
+            controller: controller,
+            physics: const NeverScrollableScrollPhysics(),
+            children: [
+              WelcomePage(pageController: controller),
+              BasicInfoPage(pageController: controller),
+              UserTypePage(pageController: controller),
+              ProfileInfo(pageController: controller),
+            ],
+          ),
         ),
       ),
       bottomSheet: Container(

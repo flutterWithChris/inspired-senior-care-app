@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-
-import '../../../cubits/login/login_cubit.dart';
 
 class MainTopAppBar extends StatelessWidget {
   final String? title;
@@ -17,14 +14,6 @@ class MainTopAppBar extends StatelessWidget {
       foregroundColor: Colors.black87,
       centerTitle: true,
       toolbarHeight: 60,
-      actions: const [
-        // TextButton.icon(
-        //     onPressed: () {
-        //       context.read<LoginCubit>().signOut();
-        //     },
-        //     icon: const Icon(Icons.logout_rounded),
-        //     label: const Text('Logout'))
-      ],
       title: title != null
           ? Text(title!)
           : Image.asset(
