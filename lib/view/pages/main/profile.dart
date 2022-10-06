@@ -37,6 +37,7 @@ class Profile extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 12.0),
                       child: NamePlate(
+                        user: state.user,
                         memberName: state.user.name!,
                         memberTitle: state.user.title!,
                         memberColorHex: state.user.userColor!,

@@ -5,13 +5,18 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:go_router/go_router.dart';
 import 'package:inspired_senior_care_app/bloc/categories/categories_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/group/group_bloc.dart';
+import 'package:inspired_senior_care_app/bloc/invite/invite_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/member/bloc/bloc/group_member_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
 import 'package:inspired_senior_care_app/cubits/groups/featured_category_cubit.dart';
 import 'package:inspired_senior_care_app/data/models/category.dart';
 import 'package:inspired_senior_care_app/data/models/group.dart';
 import 'package:inspired_senior_care_app/data/models/user.dart';
+import 'package:inspired_senior_care_app/data/repositories/database/database_repository.dart';
 import 'package:inspired_senior_care_app/view/pages/dashboard/groups/create_group.dart';
+import 'package:inspired_senior_care_app/view/pages/dashboard/groups/delete_group_dialog.dart';
+import 'package:inspired_senior_care_app/view/pages/dashboard/groups/edit_group.dart';
+import 'package:inspired_senior_care_app/view/pages/dashboard/members/add_manager.dart';
 import 'package:inspired_senior_care_app/view/pages/dashboard/members/add_member.dart';
 import 'package:inspired_senior_care_app/view/widget/main/bottom_app_bar.dart';
 import 'package:inspired_senior_care_app/view/widget/main/main_app_drawer.dart';
@@ -66,6 +71,7 @@ class _DashboardState extends State<Dashboard> {
                     Padding(
                       padding: const EdgeInsets.only(top: 12.0),
                       child: NamePlate(
+                        user: currentUser,
                         memberName: currentUser.name!,
                         memberTitle: currentUser.title!,
                         memberColorHex: currentUser.userColor!,
@@ -112,7 +118,10 @@ class _DashboardState extends State<Dashboard> {
                           BlocBuilder<GroupBloc, GroupState>(
                             // * Rebuild when groups updated.
                             builder: (context, state) {
-                              if (state is GroupLoading) {
+                              if (state is GroupLoading ||
+                                  state is GroupUpdated ||
+                                  state is GroupCreated ||
+                                  state is GroupDeleted) {
                                 return Center(
                                   child: LoadingAnimationWidget.inkDrop(
                                       color: Theme.of(context).primaryColor,
@@ -267,10 +276,145 @@ class _GroupSectionState extends State<GroupSection> {
         padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 12.0),
         child: Column(children: [
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 5),
-            child: Text(
-              currentGroup.groupName!,
-              style: Theme.of(context).textTheme.headline5,
+            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Flexible(
+                  flex: 3,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 4.0),
+                    child: Text(
+                      currentGroup.groupName!,
+                      style: Theme.of(context).textTheme.headline4!.copyWith(
+                          color: Theme.of(context).textTheme.bodyMedium!.color),
+                    ),
+                  ),
+                ),
+                Flexible(
+                  child: Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: 2.0,
+                    children: [
+                      PopupMenuButton(
+                        position: PopupMenuPosition.under,
+                        itemBuilder: (context) => <PopupMenuEntry>[
+                          PopupMenuItem(
+                              onTap: () {
+                                Future.delayed(
+                                    const Duration(seconds: 0),
+                                    () => showDialog(
+                                          context: context,
+                                          builder: (context) => BlocProvider(
+                                            create: (context) => InviteBloc(
+                                                databaseRepository:
+                                                    context.read<
+                                                        DatabaseRepository>()),
+                                            child: AddMemberDialog(
+                                                group: widget.group,
+                                                inviteTextFieldController: widget
+                                                    .inviteTextFieldController),
+                                          ),
+                                        ));
+                              },
+                              child: Wrap(
+                                spacing: 6.0,
+                                children: const [
+                                  Icon(Icons.group_add_rounded),
+                                  Text('Add Member'),
+                                ],
+                              )),
+                          PopupMenuItem(
+                              onTap: () {
+                                Future.delayed(
+                                    const Duration(seconds: 0),
+                                    () => showDialog(
+                                          context: context,
+                                          builder: (context) => BlocProvider(
+                                            create: (context) => InviteBloc(
+                                                databaseRepository:
+                                                    context.read<
+                                                        DatabaseRepository>()),
+                                            child: AddManagerDialog(
+                                                group: widget.group,
+                                                inviteTextFieldController: widget
+                                                    .inviteTextFieldController),
+                                          ),
+                                        ));
+                              },
+                              child: Wrap(
+                                spacing: 6.0,
+                                children: const [
+                                  Icon(Icons.add_moderator_rounded),
+                                  Text('Add Manager'),
+                                ],
+                              )),
+                        ],
+                        child: const Icon(
+                          Icons.add_circle_rounded,
+                          color: Colors.lightGreen,
+                        ),
+                      ),
+                      PopupMenuButton(
+                        position: PopupMenuPosition.under,
+                        itemBuilder: (context) => <PopupMenuEntry>[
+                          PopupMenuItem(
+                              onTap: () {
+                                Future.delayed(
+                                  const Duration(seconds: 0),
+                                  () => showDialog(
+                                      context: context,
+                                      builder: (context) => EditGroupDialog(
+                                          currentUser: currentUser,
+                                          currentGroup: currentGroup)),
+                                );
+                              },
+                              child: Wrap(
+                                spacing: 6.0,
+                                children: const [
+                                  Icon(Icons.edit),
+                                  Text('Rename'),
+                                ],
+                              )),
+                          PopupMenuItem(
+                              onTap: () {
+                                Future.delayed(
+                                  const Duration(seconds: 0),
+                                  () => showDialog(
+                                      context: context,
+                                      builder: (context) => DeleteGroupDialog(
+                                          currentUser: currentUser,
+                                          currentGroup: currentGroup)),
+                                );
+                              },
+                              child: Wrap(
+                                spacing: 6.0,
+                                children: const [
+                                  Icon(Icons.delete_forever_rounded),
+                                  Text('Delete Group'),
+                                ],
+                              )),
+                          PopupMenuItem(
+                              onTap: () {
+                                context.read<GroupMemberBloc>().add(
+                                    LoadGroupMembers(
+                                        userIds: widget.group.groupMemberIds!,
+                                        group: currentGroup));
+                                context.goNamed('view-group-members');
+                              },
+                              child: Wrap(
+                                spacing: 6.0,
+                                children: const [
+                                  Icon(Icons.group),
+                                  Text('Edit Members'),
+                                ],
+                              )),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
           Wrap(
@@ -278,51 +422,62 @@ class _GroupSectionState extends State<GroupSection> {
             alignment: WrapAlignment.end,
             spacing: 8.0,
             crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    fixedSize: const Size(140, 30),
-                    backgroundColor: Colors.lightGreen,
-                  ),
-                  onPressed: () {
-                    showDialog(
-                        context: context,
-                        builder: (_) => AddMemberDialog(
-                            group: widget.group,
-                            inviteTextFieldController:
-                                widget.inviteTextFieldController));
-                  },
-                  icon: const Icon(
-                    Icons.add_circle_rounded,
-                    size: 18,
-                  ),
-                  label: const Text(
-                    'Add Member',
-                  )),
-              ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    fixedSize: const Size(140, 30),
-                  ),
-                  onPressed: () {
-                    print(currentUser.name);
-                  },
-                  icon: const Icon(
-                    Icons.edit,
-                    size: 18,
-                  ),
-                  label: const Text(
-                    'Edit Group',
-                  )),
+            children: const [
+              // ElevatedButton.icon(
+              //     style: ElevatedButton.styleFrom(
+              //       foregroundColor: Colors.white,
+              //       fixedSize: const Size(140, 30),
+              //       backgroundColor: Colors.lightGreen,
+              //     ),
+              //     onPressed: () {
+              //       showDialog(
+              //           context: context,
+              //           builder: (_) => AddMemberDialog(
+              //               group: widget.group,
+              //               inviteTextFieldController:
+              //                   widget.inviteTextFieldController));
+              //     },
+              //     icon: const Icon(
+              //       Icons.add_circle_rounded,
+              //       size: 18,
+              //     ),
+              //     label: const Text(
+              //       'Add Member',
+              //     )),
+
+              // ElevatedButton.icon(
+              //     style: ElevatedButton.styleFrom(
+              //       fixedSize: const Size(140, 30),
+              //     ),
+              //     onPressed: () {
+              //       // showDialog(
+              //       //   context: context,
+              //       //   builder: (context) {
+              //       //     return EditGroupDialog(
+              //       //         currentUser: currentUser,
+              //       //         currentGroup: currentGroup);
+              //       //   },
+              //       // );
+              //       print(currentUser.name);
+              //     },
+              //     icon: const Icon(
+              //       Icons.edit,
+              //       size: 18,
+              //     ),
+              //     label: const Text(
+              //       'Edit Group',
+              //     )),
             ],
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4.0),
+            padding: const EdgeInsets.only(bottom: 8.0, top: 4.0),
             child: SizedBox(
                 width: 300,
-                child: Text(
-                  'Featured Category',
-                  style: Theme.of(context).textTheme.titleLarge,
+                child: Center(
+                  child: Text(
+                    'Featured Category',
+                    style: Theme.of(context).textTheme.headline6,
+                  ),
                 )),
           ),
           Padding(

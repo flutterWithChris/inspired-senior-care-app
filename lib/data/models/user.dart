@@ -4,6 +4,7 @@ class User {
   final String? id;
   final String? name;
   final String? email;
+  final String? organization;
   final String? type;
   final String? title;
   final String? userColor;
@@ -14,6 +15,7 @@ class User {
     this.id,
     this.name,
     this.email,
+    this.organization,
     this.type,
     this.title,
     this.userColor,
@@ -26,6 +28,7 @@ class User {
       id: snap['id'],
       name: snap['name'],
       email: snap['email'],
+      organization: snap['organization'],
       type: snap['type'],
       title: snap['title'],
       userColor: snap['userColor'],
@@ -41,6 +44,7 @@ class User {
       'id': id,
       'name': name,
       'email': email,
+      'organization': organization,
       'type': type,
       'title': title,
       'userColor': userColor,
@@ -58,6 +62,7 @@ class User {
     String? id,
     String? name,
     String? email,
+    String? organization,
     String? type,
     String? title,
     String? userColor,
@@ -68,6 +73,7 @@ class User {
       id: id ?? this.id,
       name: name ?? this.name,
       email: email ?? this.email,
+      organization: organization ?? this.organization,
       type: type ?? this.type,
       title: title ?? this.title,
       userColor: userColor ?? this.userColor,

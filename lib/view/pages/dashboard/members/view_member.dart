@@ -72,6 +72,7 @@ class _ViewMemberState extends State<ViewMember> {
                   Padding(
                     padding: const EdgeInsets.only(top: 12.0),
                     child: NamePlate(
+                      user: thisUser,
                       memberName: thisUser.name!,
                       memberTitle: thisUser.title!,
                       memberColorHex: thisUser.userColor!,
@@ -121,7 +122,8 @@ class RemoveMemberButton extends StatelessWidget {
                 );
               },
               style: ElevatedButton.styleFrom(
-                  fixedSize: const Size(175, 32), primary: Colors.redAccent),
+                  fixedSize: const Size(175, 32),
+                  backgroundColor: Colors.redAccent),
               icon: const Icon(Icons.group_remove_outlined),
               label: const Text('Remove Member')),
         ],
@@ -199,8 +201,8 @@ class _RemoveMemberDialogState extends State<RemoveMemberDialog> {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: ElevatedButton(
-                      style:
-                          ElevatedButton.styleFrom(primary: Colors.redAccent),
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.redAccent),
                       onPressed: () async {
                         if (removeMemberForm.currentState!.validate()) {
                           print('Remove Member Fired');
@@ -210,7 +212,11 @@ class _RemoveMemberDialogState extends State<RemoveMemberDialog> {
                             ..remove(user.id);
                           context.read<GroupMemberBloc>().add(LoadGroupMembers(
                               userIds: updatedMembers, group: group));
-                          Navigator.of(context, rootNavigator: true).pop();
+
+                          await Future.delayed(
+                              const Duration(milliseconds: 1000));
+                          if (!mounted) return;
+                          context.goNamed('dashboard');
                         } else {
                           print('Form not valid');
                         }

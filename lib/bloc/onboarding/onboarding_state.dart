@@ -11,7 +11,7 @@ abstract class OnboardingState extends Equatable {
 
 class OnboardingInitial extends OnboardingState {}
 
-class OnboarsingLoading extends OnboardingState {}
+class OnboardingLoading extends OnboardingState {}
 
 class OnboardingLoaded extends OnboardingState {
   final User user;

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:infinite_carousel/infinite_carousel.dart';
 import 'package:inspired_senior_care_app/bloc/categories/categories_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/group/group_bloc.dart';
+import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
 import 'package:inspired_senior_care_app/cubits/groups/featured_category_cubit.dart';
 import 'package:inspired_senior_care_app/data/models/category.dart';
 import 'package:inspired_senior_care_app/view/widget/main/bottom_app_bar.dart';
@@ -165,6 +166,8 @@ class _ChooseCategoryState extends State<ChooseCategory> {
                                   .read<FeaturedCategoryCubit>()
                                   .updateFeaturedCategory(selectedCategory!);
                               context.read<GroupBloc>().add(UpdateGroup(
+                                  manager:
+                                      context.read<ProfileBloc>().state.user,
                                   group: context
                                       .read<FeaturedCategoryCubit>()
                                       .currentGroup
@@ -177,7 +180,7 @@ class _ChooseCategoryState extends State<ChooseCategory> {
                               listener: (context, state) async {
                                 if (state is FeaturedCategoryUpdated) {
                                   await Future.delayed(
-                                      const Duration(seconds: 2));
+                                      const Duration(seconds: 1));
                                   if (!mounted) return;
                                   context.pop();
                                 }

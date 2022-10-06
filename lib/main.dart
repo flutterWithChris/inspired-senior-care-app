@@ -8,7 +8,6 @@ import 'package:inspired_senior_care_app/bloc/cards/card_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/categories/categories_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/deck/deck_cubit.dart';
 import 'package:inspired_senior_care_app/bloc/group/group_bloc.dart';
-import 'package:inspired_senior_care_app/bloc/invite/invite_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/manage/response_interaction_cubit.dart';
 import 'package:inspired_senior_care_app/bloc/manage/view_response_deck_cubit.dart';
 import 'package:inspired_senior_care_app/bloc/member/bloc/bloc/group_member_bloc.dart';
@@ -21,11 +20,13 @@ import 'package:inspired_senior_care_app/bloc/view_response/view_response_cubit.
 import 'package:inspired_senior_care_app/cubits/groups/featured_category_cubit.dart';
 import 'package:inspired_senior_care_app/cubits/login/login_cubit.dart';
 import 'package:inspired_senior_care_app/cubits/response/response_deck_cubit.dart';
+import 'package:inspired_senior_care_app/cubits/settings/cubit/settings_cubit.dart';
 import 'package:inspired_senior_care_app/cubits/signup/signup_cubit.dart';
 import 'package:inspired_senior_care_app/data/repositories/auth/auth_repository.dart';
 import 'package:inspired_senior_care_app/data/repositories/database/database_repository.dart';
 import 'package:inspired_senior_care_app/data/repositories/storage/storage_repository.dart';
 import 'package:inspired_senior_care_app/firebase_options.dart';
+import 'package:inspired_senior_care_app/globals.dart';
 import 'package:inspired_senior_care_app/view/pages/dashboard/groups/choose_category.dart';
 import 'package:inspired_senior_care_app/view/pages/dashboard/dashboard.dart';
 import 'package:inspired_senior_care_app/view/pages/dashboard/members/view_members.dart';
@@ -100,10 +101,6 @@ class _MyAppState extends State<MyApp> {
               create: (context) =>
                   LoginCubit(authRepository: context.read<AuthRepository>())),
           BlocProvider(
-            create: (context) => InviteBloc(
-                databaseRepository: context.read<DatabaseRepository>()),
-          ),
-          BlocProvider(
             create: (context) => ShareBloc(
                 databaseRepository: context.read<DatabaseRepository>()),
           ),
@@ -160,6 +157,7 @@ class _MyAppState extends State<MyApp> {
           builder: (context, state) {
             bloc = context.read<AuthBloc>();
             return MaterialApp.router(
+              scaffoldMessengerKey: snackbarKey,
               routeInformationParser: router.routeInformationParser,
               routerDelegate: router.routerDelegate,
               routeInformationProvider: router.routeInformationProvider,
@@ -208,7 +206,7 @@ class _MyAppState extends State<MyApp> {
       bool isOnboarding = state.location == '/login/signup';
       // TODO: Create Onboarding Completed SharedPrefs Value ***
       bool completedOnboarding = true;
-
+      // if (!completedOnboarding) return '/login/signup';
       if (!loggedIn) {
         return isLoggingIn
             ? null
@@ -218,7 +216,7 @@ class _MyAppState extends State<MyApp> {
       }
 
       final isLoggedIn = state.location == '/';
-
+      //  if (!completedOnboarding) return '/login/signup';
       if (loggedIn && completedOnboarding == false) return null;
       if (loggedIn && isLoggingIn) return isLoggedIn ? null : '/';
       if (loggedIn && isOnboarding) return isLoggedIn ? null : '/';
@@ -246,7 +244,11 @@ class _MyAppState extends State<MyApp> {
           GoRoute(
             name: 'settings',
             path: 'settings',
-            builder: (context, state) => const SettingsPage(),
+            builder: (context, state) => BlocProvider(
+              create: (context) =>
+                  EditPassCubit(authRepository: context.read<AuthRepository>()),
+              child: const SettingsPage(),
+            ),
           ),
         ]),
     GoRoute(
