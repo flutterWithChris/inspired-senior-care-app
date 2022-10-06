@@ -50,6 +50,7 @@ class _AddMemberDialogState extends State<AddMemberDialog> {
             builder: (context, state) {
               return Form(
                 key: addMemberFormKey,
+
                 child: TextFormField(
                   // autovalidateMode: AutovalidateMode.onUserInteraction,
                   validator: (value) {
@@ -83,18 +84,16 @@ class _AddMemberDialogState extends State<AddMemberDialog> {
                             return const Icon(
                               Icons.check,
                               color: Colors.lime,
+
                             );
-                          }
-                          return Container(
-                            width: 1,
-                          );
-                        },
+                          },
+                        ),
                       ),
-                    ),
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(25),
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(25),
+                      ),
                     ),
                   ),
                 ),
@@ -111,6 +110,7 @@ class _AddMemberDialogState extends State<AddMemberDialog> {
             child: ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,
+                    onPrimary: Colors.white,
                     backgroundColor: Colors.lightGreen,
                     fixedSize: const Size(175, 40)),
                 onPressed: () {

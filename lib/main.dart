@@ -26,12 +26,15 @@ import 'package:inspired_senior_care_app/data/repositories/auth/auth_repository.
 import 'package:inspired_senior_care_app/data/repositories/database/database_repository.dart';
 import 'package:inspired_senior_care_app/data/repositories/storage/storage_repository.dart';
 import 'package:inspired_senior_care_app/firebase_options.dart';
+
 import 'package:inspired_senior_care_app/globals.dart';
 import 'package:inspired_senior_care_app/view/pages/dashboard/groups/choose_category.dart';
+
 import 'package:inspired_senior_care_app/view/pages/dashboard/dashboard.dart';
+import 'package:inspired_senior_care_app/view/pages/dashboard/groups/choose_category.dart';
+import 'package:inspired_senior_care_app/view/pages/dashboard/members/view_member.dart';
 import 'package:inspired_senior_care_app/view/pages/dashboard/members/view_members.dart';
 import 'package:inspired_senior_care_app/view/pages/dashboard/members/view_responses/view_responses.dart';
-import 'package:inspired_senior_care_app/view/pages/dashboard/members/view_member.dart';
 import 'package:inspired_senior_care_app/view/pages/login/login.dart';
 import 'package:inspired_senior_care_app/view/pages/main/categories.dart';
 import 'package:inspired_senior_care_app/view/pages/main/deck_page.dart';
@@ -206,7 +209,7 @@ class _MyAppState extends State<MyApp> {
       bool isOnboarding = state.location == '/login/signup';
       // TODO: Create Onboarding Completed SharedPrefs Value ***
       bool completedOnboarding = false;
-      // if (!completedOnboarding) return '/login/signup';
+
       if (!loggedIn) {
         return isLoggingIn
             ? null
@@ -216,8 +219,12 @@ class _MyAppState extends State<MyApp> {
       }
 
       final isLoggedIn = state.location == '/';
-      //  if (!completedOnboarding) return '/login/signup';
-      if (loggedIn && completedOnboarding == false) return null;
+
+   if (!completedOnboarding) return '/login/signup';
+
+
+      if (loggedIn && completedOnboarding == true) return null;
+
       if (loggedIn && isLoggingIn) return isLoggedIn ? null : '/';
       if (loggedIn && isOnboarding) return isLoggedIn ? null : '/';
 

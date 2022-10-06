@@ -29,6 +29,11 @@ class _DeckPageState extends State<DeckPage> {
   Widget build(BuildContext context) {
     int currentCardIndex = context.watch<DeckCubit>().currentCardNumber;
     final GlobalKey<FormState> shareFieldFormKey = GlobalKey<FormState>();
+    // showDialog(
+    //     context: context,
+    //     builder: (context) {
+    //       return const DeckCompleteDialog();
+    //     });
 
     return SafeArea(
       child: Scaffold(
@@ -655,7 +660,7 @@ class _SendButtonState extends State<SendButton> {
               cardNumber: currentCardIndex,
               response: widget.shareFieldController.text));
 
-          if (currentCardIndex == widget.category.totalCards) {
+          if (currentCardIndex == (widget.category.totalCards)) {
             //context.read<DeckCubit>().resetDeck();
             widget.shareFieldController.clear();
             Navigator.pop(context);
