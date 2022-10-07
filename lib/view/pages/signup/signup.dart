@@ -36,7 +36,7 @@ class _SignupScreenState extends State<SignupScreen> {
         padding: const EdgeInsets.only(bottom: 60),
         child: PageView(
           controller: controller,
-          //physics: const NeverScrollableScrollPhysics(),
+          physics: const NeverScrollableScrollPhysics(),
           children: [
             WelcomePage(pageController: controller),
             BasicInfoPage(pageController: controller),

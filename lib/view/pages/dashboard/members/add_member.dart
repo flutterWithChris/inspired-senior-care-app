@@ -88,9 +88,7 @@ class _AddMemberDialogState extends State<AddMemberDialog> {
                             color: Colors.lime,
                           );
                         } else {
-                          return const Center(
-                            child: Text('Error Loading Invite Service!'),
-                          );
+                          return const SizedBox();
                         }
                       },
                     ),

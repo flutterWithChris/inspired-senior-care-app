@@ -118,6 +118,7 @@ class _DashboardState extends State<Dashboard> {
                           BlocBuilder<GroupBloc, GroupState>(
                             // * Rebuild when groups updated.
                             builder: (context, state) {
+                              print(state.toString());
                               if (state is GroupLoading ||
                                   state is GroupUpdated ||
                                   state is GroupCreated ||
@@ -281,13 +282,16 @@ class _GroupSectionState extends State<GroupSection> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Flexible(
-                  flex: 3,
+                  flex: 2,
                   child: Padding(
                     padding: const EdgeInsets.only(left: 4.0),
-                    child: Text(
-                      currentGroup.groupName!,
-                      style: Theme.of(context).textTheme.headline4!.copyWith(
-                          color: Theme.of(context).textTheme.bodyMedium!.color),
+                    child: FittedBox(
+                      child: Text(
+                        currentGroup.groupName!,
+                        style: Theme.of(context).textTheme.headline4!.copyWith(
+                            color:
+                                Theme.of(context).textTheme.bodyMedium!.color),
+                      ),
                     ),
                   ),
                 ),
