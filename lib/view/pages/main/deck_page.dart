@@ -135,12 +135,12 @@ class _DeckPageState extends State<DeckPage> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.only(top: 48.0),
+                        padding: const EdgeInsets.only(top: 36.0),
                         child: AnimatedSlide(
                           curve: Curves.easeInOut,
                           duration: const Duration(milliseconds: 200),
                           offset: isCardZoomed
-                              ? const Offset(0, -0.4)
+                              ? const Offset(0, -0.45)
                               : const Offset(0, -0.0),
                           child: AnimatedScale(
                             duration: const Duration(milliseconds: 500),
@@ -150,7 +150,7 @@ class _DeckPageState extends State<DeckPage> {
                               alignment: AlignmentDirectional.topEnd,
                               children: [
                                 SizedBox(
-                                  height: 520,
+                                  height: 500,
                                   child: IgnorePointer(
                                     ignoring: isSwipeDisabled,
                                     child: BlocListener<DeckCubit, DeckState>(
@@ -190,7 +190,7 @@ class _DeckPageState extends State<DeckPage> {
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 30.0),
+                        padding: const EdgeInsets.only(top: 16.0, bottom: 16.0),
                         child: Visibility(
                           visible: isSwipeDisabled ? true : false,
                           child: ShareButton(
@@ -253,7 +253,10 @@ class CardCounter extends StatelessWidget {
                           currentCategory.totalCards!;
                     }
                     // Checking if Category has been started.
-
+                    if (!categoryStarted) {
+                      percentComplete = 0.0;
+                      progress = 0.0;
+                    }
                     if (categoryStarted) {
                       progress =
                           ((context.watch<DeckCubit>().currentCardNumber /
@@ -306,13 +309,13 @@ class CardCounter extends StatelessWidget {
               double percentageComplete =
                   currentCardIndex / state.category.totalCards!;
               return SizedBox(
-                height: 64,
-                width: 64,
+                height: 60,
+                width: 60,
                 child: CircularProgressIndicator(
                   backgroundColor: Colors.grey.shade300,
                   valueColor: AlwaysStoppedAnimation<Color>(
                       state.category.progressColor),
-                  value: percentageComplete,
+                  value: currentCardIndex > 1 ? percentageComplete : 0,
                 ),
               );
             }

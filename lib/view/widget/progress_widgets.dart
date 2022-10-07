@@ -104,7 +104,7 @@ List<String> getStartedMessages = [
   'Starting is the hardest part!',
   'Let\'s change that!',
   'Get started today!',
-  'The lonliest number is..0',
+  'The loneliest number is..0',
   'Starting is the first step :)'
 ];
 List<String> keepGoingMessages = [

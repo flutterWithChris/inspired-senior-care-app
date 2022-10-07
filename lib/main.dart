@@ -221,7 +221,7 @@ class _MyAppState extends State<MyApp> {
 
       //if (!completedOnboarding) return '/login/signup';
 
-      if (loggedIn && completedOnboarding == true) return null;
+      if (loggedIn && completedOnboarding == false) return null;
 
       if (loggedIn && isLoggingIn) return isLoggedIn ? null : '/';
       if (loggedIn && isOnboarding) return isLoggedIn ? null : '/';

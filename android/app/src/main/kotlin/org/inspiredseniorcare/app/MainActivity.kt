@@ -1,4 +1,4 @@
-package org.inspiredseniorcare.app
+package org.inspiredseniorcare.android
 
 import io.flutter.embedding.android.FlutterActivity
 
