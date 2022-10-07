@@ -64,6 +64,7 @@ dependencies:
   change_app_package_name: ^1.1.0
   flutter_animate: ^1.0.0
   fluttertoast: ^8.0.9
+  firebase_crashlytics: ^2.8.13
 
 
 
