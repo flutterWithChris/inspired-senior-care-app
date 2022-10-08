@@ -66,15 +66,18 @@ class _FeaturedCategoryState extends State<FeaturedCategory> {
                                                         .primaryColor,
                                                     size: 30)),
                                       )),
-                                  const Positioned(
-                                    top: -35,
-                                    right: -25,
-                                    child: CircleAvatar(
-                                      radius: 35,
-                                      backgroundColor: Colors.white,
+                                  Visibility(
+                                    visible: currentUser.type == 'user',
+                                    child: const Positioned(
+                                      top: -35,
+                                      right: -25,
                                       child: CircleAvatar(
-                                        radius: 30,
-                                        backgroundColor: Colors.blueGrey,
+                                        radius: 35,
+                                        backgroundColor: Colors.white,
+                                        child: CircleAvatar(
+                                          radius: 30,
+                                          backgroundColor: Colors.blueGrey,
+                                        ),
                                       ),
                                     ),
                                   )
@@ -111,7 +114,9 @@ class _FeaturedCategoryState extends State<FeaturedCategory> {
                 onTap: (() {
                   BlocProvider.of<CardBloc>(context)
                       .add(LoadCards(category: featuredCategory));
-                  context.goNamed('deck-page');
+                  currentUser.type == 'user'
+                      ? context.goNamed('deck-page')
+                      : context.goNamed('manager-deck-page');
                 }),
                 child: Animate(
                   effects: const [ShimmerEffect()],
@@ -134,22 +139,25 @@ class _FeaturedCategoryState extends State<FeaturedCategory> {
                                       imageUrl: featuredCategory.coverImageUrl,
                                     ),
                                   ),
-                                  Positioned(
-                                    top: -35,
-                                    right: -25,
-                                    child: CircleAvatar(
-                                      radius: 32,
-                                      backgroundColor: Colors.white,
+                                  Visibility(
+                                    visible: currentUser.title == 'user',
+                                    child: Positioned(
+                                      top: -35,
+                                      right: -25,
                                       child: CircleAvatar(
-                                        radius: 28,
-                                        backgroundColor:
-                                            featuredCategory.progressColor,
-                                        child: Text(
-                                          '${(progress / featuredCategory.totalCards! * 100).toStringAsFixed(0)}%',
-                                          style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold),
+                                        radius: 32,
+                                        backgroundColor: Colors.white,
+                                        child: CircleAvatar(
+                                          radius: 28,
+                                          backgroundColor:
+                                              featuredCategory.progressColor,
+                                          child: Text(
+                                            '${(progress / featuredCategory.totalCards! * 100).toStringAsFixed(0)}%',
+                                            style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold),
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -185,13 +193,16 @@ class SeeMoreButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    User currentUser = context.watch<ProfileBloc>().state.user;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: ElevatedButton(
         onPressed: (() {
           BlocProvider.of<CardBloc>(context)
               .add(LoadCards(category: featuredCategory!));
-          context.goNamed('deck-page');
+          currentUser.type == 'user'
+              ? context.goNamed('deck-page')
+              : context.goNamed('manager-deck-page');
         }),
         style: ElevatedButton.styleFrom(fixedSize: const Size(200, 30)),
         child: const Text(
