@@ -138,10 +138,10 @@ class _FeaturedCategoryState extends State<FeaturedCategory> {
                                     top: -35,
                                     right: -25,
                                     child: CircleAvatar(
-                                      radius: 35,
+                                      radius: 32,
                                       backgroundColor: Colors.white,
                                       child: CircleAvatar(
-                                        radius: 30,
+                                        radius: 28,
                                         backgroundColor:
                                             featuredCategory.progressColor,
                                         child: Text(

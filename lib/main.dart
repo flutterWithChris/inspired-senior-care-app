@@ -97,7 +97,7 @@ class _MyAppState extends State<MyApp> {
               authBloc: context.read<AuthBloc>(),
               databaseRepository: context.read<DatabaseRepository>(),
             )..add(
-                LoadProfile(userId: context.read<AuthBloc>().state.user.id!)),
+                LoadProfile(userId: context.read<AuthBloc>().state.user!.uid)),
           ),
           BlocProvider(
               create: (context) =>
@@ -221,10 +221,10 @@ class _MyAppState extends State<MyApp> {
 
       //if (!completedOnboarding) return '/login/signup';
 
-      if (loggedIn && completedOnboarding == false) return null;
+      //  if (loggedIn && completedOnboarding == false) return null;
 
       if (loggedIn && isLoggingIn) return isLoggedIn ? null : '/';
-      if (loggedIn && isOnboarding) return isLoggedIn ? null : '/';
+      //  if (loggedIn && isOnboarding) return isLoggedIn ? null : '/';
 
       return null;
     },

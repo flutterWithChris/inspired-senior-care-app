@@ -10,16 +10,10 @@ class AuthRepository extends BaseAuthRepository {
   AuthRepository({auth.FirebaseAuth? firebaseAuth})
       : _firebaseAuth = firebaseAuth ?? auth.FirebaseAuth.instance;
 
-  var currentUser = User.empty;
+  auth.User? currentUser;
 
   @override
-  Stream<User> get user {
-    return _firebaseAuth.authStateChanges().map((firebaseUser) {
-      final user = firebaseUser == null ? User.empty : firebaseUser.toUser;
-      currentUser = user;
-      return user;
-    });
-  }
+  Stream<auth.User?> get user => _firebaseAuth.userChanges();
 
   @override
   Future<auth.User?> signUp({
