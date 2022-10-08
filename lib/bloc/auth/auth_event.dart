@@ -7,10 +7,10 @@ class AuthEvent extends Equatable {
 }
 
 class AuthUserChanged extends AuthEvent {
-  final User user;
+  final auth.User? user;
   AuthUserChanged({required this.user});
   @override
-  List<Object> get props => [user];
+  List<Object?> get props => [user!];
 }
 
 class AppLogoutRequested extends AuthEvent {}

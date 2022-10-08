@@ -18,8 +18,8 @@ class LoginCubit extends Cubit<LoginState> {
     emit(state.copyWith(password: value, status: LoginStatus.initial));
   }
 
-  void signOut() {
-    _authRepository.signOut();
+  void signOut() async {
+    await _authRepository.signOut();
   }
 
   Future<void> signInWithCredentials() async {

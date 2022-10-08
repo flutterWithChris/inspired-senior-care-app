@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:inspired_senior_care_app/view/widget/featured_category.dart';
 import 'package:inspired_senior_care_app/view/widget/main/bottom_app_bar.dart';
 import 'package:inspired_senior_care_app/view/widget/main/main_app_drawer.dart';
@@ -26,17 +25,16 @@ class _MyHomePageState extends State<MyHomePage> {
         body: Center(
           child: SafeArea(
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              //   mainAxisAlignment: MainAxisAlignment.center,
               children: const <Widget>[
                 Padding(
-                  padding: EdgeInsets.only(bottom: 24.0),
+                  padding: EdgeInsets.only(top: 36.0, bottom: 24.0),
                   child: Text(
                     'Monthly Category',
                     style: TextStyle(fontSize: 30),
                   ),
                 ),
                 FeaturedCategory(),
-                Icon(FontAwesomeIcons.chevronDown),
               ],
             ),
           ),

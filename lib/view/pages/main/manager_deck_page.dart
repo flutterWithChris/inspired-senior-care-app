@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:infinite_carousel/infinite_carousel.dart';
-import 'package:inspired_senior_care_app/bloc/auth/auth_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/cards/card_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/deck/deck_cubit.dart';
 import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
@@ -529,7 +528,7 @@ class _SendButtonState extends State<SendButton> {
           context.read<DeckCubit>().completeDeck();
         } else {
           context.read<DeckCubit>().incrementCardNumber(
-              context.read<AuthBloc>().state.user, widget.categoryName);
+              context.read<ProfileBloc>().state.user, widget.categoryName);
 
           context.read<DeckCubit>().swipeDeck();
           context.read<DeckCubit>().resetDeck();

@@ -25,7 +25,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
 
     _authSubscription = _authBloc.stream.listen((state) {
       state.authStatus == AuthStatus.authenticated
-          ? add(LoadProfile(userId: state.user.id!))
+          ? add(LoadProfile(userId: state.user!.uid))
           : null;
     });
   }

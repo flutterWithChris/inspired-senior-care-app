@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:inspired_senior_care_app/data/models/user.dart';
+import 'package:firebase_auth/firebase_auth.dart' as auth;
 
 import 'package:inspired_senior_care_app/data/repositories/auth/auth_repository.dart';
 
@@ -11,14 +11,14 @@ part 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> with ChangeNotifier {
   final AuthRepository _authRepository;
-  StreamSubscription<User>? _userSubscription;
+  StreamSubscription<auth.User?>? _userSubscription;
 
   AuthBloc({
     required AuthRepository authRepository,
   })  : _authRepository = authRepository,
         super(
-          authRepository.currentUser.isNotEmpty
-              ? AuthState.authenticated(user: authRepository.currentUser)
+          authRepository.currentUser != null
+              ? AuthState.authenticated(user: authRepository.currentUser!)
               : const AuthState.unauthenticated(),
         ) {
     on<AuthUserChanged>(_onUserChanged);
@@ -37,8 +37,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> with ChangeNotifier {
   void _onUserChanged(AuthUserChanged event, Emitter<AuthState> emit) {
     print('User Authenticated');
 
-    emit(event.user.isNotEmpty
-        ? AuthState.authenticated(user: event.user)
+    emit(event.user != null
+        ? AuthState.authenticated(user: event.user!)
         : const AuthState.unauthenticated());
     notifyListeners();
   }
