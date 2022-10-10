@@ -470,14 +470,15 @@ class _GroupSectionState extends State<GroupSection> {
             ],
           ),
           Padding(
-            padding: const EdgeInsets.only(bottom: 8.0, top: 4.0),
+            padding: const EdgeInsets.only(bottom: 8.0, left: 16.0),
             child: SizedBox(
                 width: 300,
-                child: Center(
-                  child: Text(
-                    'Featured Category',
-                    style: Theme.of(context).textTheme.headline6,
-                  ),
+                child: Text(
+                  'Featured Category',
+                  style: Theme.of(context)
+                      .textTheme
+                      .headline6!
+                      .copyWith(color: Colors.black87),
                 )),
           ),
           Padding(

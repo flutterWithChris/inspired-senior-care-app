@@ -41,7 +41,9 @@ import 'package:inspired_senior_care_app/view/pages/main/categories.dart';
 import 'package:inspired_senior_care_app/view/pages/main/deck_page.dart';
 import 'package:inspired_senior_care_app/view/pages/main/homepage.dart';
 import 'package:inspired_senior_care_app/view/pages/main/manager_categories.dart';
+import 'package:inspired_senior_care_app/view/pages/main/manager_categories_share.dart';
 import 'package:inspired_senior_care_app/view/pages/main/manager_deck_page.dart';
+import 'package:inspired_senior_care_app/view/pages/main/manager_share_deck_page.dart';
 import 'package:inspired_senior_care_app/view/pages/main/profile.dart';
 import 'package:inspired_senior_care_app/view/pages/signup/signup.dart';
 import 'package:inspired_senior_care_app/view/widget/main/settings.dart';
@@ -278,6 +280,17 @@ class _MyAppState extends State<MyApp> {
             name: 'manager-deck-page',
             path: 'manager-deck-page',
             builder: (context, state) => ManagerDeckPage(),
+          ),
+        ]),
+    GoRoute(
+        name: 'manager-categories-share',
+        path: '/manager-categories-share',
+        builder: (context, state) => const ManagerCategoriesShare(),
+        routes: [
+          GoRoute(
+            name: 'manager-share-deck-page',
+            path: 'manager-share-deck-page',
+            builder: (context, state) => ManagerShareDeckPage(),
           ),
         ]),
     GoRoute(
