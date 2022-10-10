@@ -42,9 +42,6 @@ class _FeaturedCategoryState extends State<FeaturedCategory> {
                         constraints: BoxConstraints(
                             maxWidth: constraints.maxWidth > 700 ? 350 : 275),
                         child: Animate(
-                          onComplete: (controller) {
-                            controller.repeat();
-                          },
                           effects: const [ShimmerEffect()],
                           child: Container(
                             color: Colors.white,
@@ -115,8 +112,8 @@ class _FeaturedCategoryState extends State<FeaturedCategory> {
                   BlocProvider.of<CardBloc>(context)
                       .add(LoadCards(category: featuredCategory));
                   currentUser.type == 'user'
-                      ? context.goNamed('deck-page')
-                      : context.goNamed('manager-deck-page');
+                      ? context.pushNamed('deck-page')
+                      : context.pushNamed('manager-deck-page');
                 }),
                 child: Animate(
                   effects: const [ShimmerEffect()],
@@ -140,25 +137,42 @@ class _FeaturedCategoryState extends State<FeaturedCategory> {
                                     ),
                                   ),
                                   Visibility(
-                                    visible: currentUser.title == 'user',
+                                    visible: currentUser.type == 'user',
                                     child: Positioned(
                                       top: -35,
                                       right: -25,
-                                      child: CircleAvatar(
-                                        radius: 32,
-                                        backgroundColor: Colors.white,
-                                        child: CircleAvatar(
-                                          radius: 28,
-                                          backgroundColor:
-                                              featuredCategory.progressColor,
-                                          child: Text(
-                                            '${(progress / featuredCategory.totalCards! * 100).toStringAsFixed(0)}%',
-                                            style: const TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold),
+                                      child: Stack(
+                                        alignment: AlignmentDirectional.center,
+                                        children: [
+                                          CircleAvatar(
+                                            radius: 32,
+                                            backgroundColor: Colors.white,
+                                            child: CircleAvatar(
+                                              radius: 28,
+                                              backgroundColor: Colors.white,
+                                              child: Text(
+                                                '${(progress / featuredCategory.totalCards! * 100).toStringAsFixed(0)}%',
+                                                style: const TextStyle(
+                                                    fontSize: 18,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                            ),
                                           ),
-                                        ),
+                                          SizedBox(
+                                            height: 59,
+                                            width: 59,
+                                            child: CircularProgressIndicator(
+                                              color: featuredCategory
+                                                  .progressColor,
+                                              backgroundColor:
+                                                  Colors.grey.shade200,
+                                              value: ((progress /
+                                                  featuredCategory
+                                                      .totalCards!)),
+                                            ),
+                                          )
+                                        ],
                                       ),
                                     ),
                                   )
@@ -201,8 +215,8 @@ class SeeMoreButton extends StatelessWidget {
           BlocProvider.of<CardBloc>(context)
               .add(LoadCards(category: featuredCategory!));
           currentUser.type == 'user'
-              ? context.goNamed('deck-page')
-              : context.goNamed('manager-deck-page');
+              ? context.pushNamed('deck-page')
+              : context.pushNamed('manager-deck-page');
         }),
         style: ElevatedButton.styleFrom(fixedSize: const Size(200, 30)),
         child: const Text(

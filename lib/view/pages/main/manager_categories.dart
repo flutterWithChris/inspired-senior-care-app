@@ -23,78 +23,76 @@ class ManagerCategories extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        drawer: const MainAppDrawer(),
-        bottomNavigationBar: const MainBottomAppBar(),
-        appBar: const PreferredSize(
-          preferredSize: Size.fromHeight(60),
-          child: MainTopAppBar(),
-        ),
-        body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          child: BlocBuilder<CategoriesBloc, CategoriesState>(
-            builder: (context, state) {
-              if (state is CategoriesLoading) {
-                return Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      LoadingAnimationWidget.inkDrop(
-                          color: Colors.blueAccent, size: 30.0),
-                      const SizedBox(
-                        height: 8.0,
-                      ),
-                      const Text('Loading Categories...')
-                    ],
-                  ),
-                );
-              }
-              if (state is CategoriesLoaded) {
-                List<Category> allCategories = state.categories;
-                int categoryCount = state.categoryImageUrls.length;
-                final List<CategoryCard> categoryCards = [
-                  for (Category category in allCategories)
-                    CategoryCard(category: category),
-                ];
-
-                return ListView(
-                  physics: const ScrollPhysics(),
-                  shrinkWrap: true,
+    return Scaffold(
+      drawer: const MainAppDrawer(),
+      bottomNavigationBar: const MainBottomAppBar(),
+      appBar: const PreferredSize(
+        preferredSize: Size.fromHeight(60),
+        child: MainTopAppBar(),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+        child: BlocBuilder<CategoriesBloc, CategoriesState>(
+          builder: (context, state) {
+            if (state is CategoriesLoading) {
+              return Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 18.0, horizontal: 8.0),
-                      child: Text(
-                        'All Categories',
-                        style: Theme.of(context).textTheme.headlineMedium,
-                      ),
+                    LoadingAnimationWidget.inkDrop(
+                        color: Colors.blueAccent, size: 30.0),
+                    const SizedBox(
+                      height: 8.0,
                     ),
-                    LayoutBuilder(builder: (context, constraints) {
-                      int crossAxisCount = constraints.maxWidth > 500 ? 4 : 2;
-                      return GridView.builder(
-                        physics: const ScrollPhysics(),
-                        itemCount: categoryCount,
-                        shrinkWrap: true,
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisSpacing: 6.0,
-                            mainAxisExtent: 285,
-                            mainAxisSpacing: 6.0,
-                            crossAxisCount: crossAxisCount),
-                        itemBuilder: (context, index) {
-                          return categoryCards[index];
-                        },
-                      );
-                    }),
+                    const Text('Loading Categories...')
                   ],
-                );
-              } else {
-                return const Center(
-                  child: Text('Something Went Wrong...'),
-                );
-              }
-            },
-          ),
+                ),
+              );
+            }
+            if (state is CategoriesLoaded) {
+              List<Category> allCategories = state.categories;
+              int categoryCount = state.categoryImageUrls.length;
+              final List<CategoryCard> categoryCards = [
+                for (Category category in allCategories)
+                  CategoryCard(category: category),
+              ];
+
+              return ListView(
+                physics: const ScrollPhysics(),
+                shrinkWrap: true,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 18.0, horizontal: 8.0),
+                    child: Text(
+                      'All Categories',
+                      style: Theme.of(context).textTheme.headlineMedium,
+                    ),
+                  ),
+                  LayoutBuilder(builder: (context, constraints) {
+                    int crossAxisCount = constraints.maxWidth > 500 ? 4 : 2;
+                    return GridView.builder(
+                      physics: const ScrollPhysics(),
+                      itemCount: categoryCount,
+                      shrinkWrap: true,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisSpacing: 6.0,
+                          mainAxisExtent: 285,
+                          mainAxisSpacing: 6.0,
+                          crossAxisCount: crossAxisCount),
+                      itemBuilder: (context, index) {
+                        return categoryCards[index];
+                      },
+                    );
+                  }),
+                ],
+              );
+            } else {
+              return const Center(
+                child: Text('Something Went Wrong...'),
+              );
+            }
+          },
         ),
       ),
     );

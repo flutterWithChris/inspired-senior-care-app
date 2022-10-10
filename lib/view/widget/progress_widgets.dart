@@ -31,60 +31,68 @@ class ProgressSection extends StatelessWidget {
         return LoadingAnimationWidget.fourRotatingDots(
             color: Colors.blue, size: 30);
       }
-      if (state is CategoriesFailed) {}
+      if (state is CategoriesFailed) {
+        return const Center(
+          child: Text('Error Loading Categories!..'),
+        );
+      }
       if (state is CategoriesLoaded) {
         List<Category> categories =
             context.watch<CategoriesBloc>().state.categories!;
         User currentUser = context.watch<ProfileBloc>().state.user;
         bool categoryStarted = false;
         double categoryProgress = 0.0;
-        return Card(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(33)),
-          color: Colors.white,
-          child: Padding(
-            padding:
-                const EdgeInsets.symmetric(vertical: 12.0, horizontal: 24.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: Text(
-                    'Your Progress',
-                    textAlign: TextAlign.left,
-                    style: Theme.of(context).textTheme.titleLarge,
+        return SizedBox(
+          height: 1700,
+          child: Card(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(33)),
+            color: Colors.white,
+            child: Padding(
+              padding:
+                  const EdgeInsets.symmetric(vertical: 12.0, horizontal: 24.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: Text(
+                      'Your Progress',
+                      textAlign: TextAlign.left,
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
                   ),
-                ),
 
-                // if (currentUser.progress != null &&
-                //     currentUser.progress!
-                //         .containsKey(categories![index].name)) {
-                //   categoryStarted = true;
-                // }
-                // print(
-                //     'Progress is: ${currentUser.progress![categories![index]]}');
-                for (Category category in categories)
-                  currentUser.progress?[category.name] == null
-                      ? Flexible(
-                          child: ProgressCategory(
-                            progress: categoryProgress,
+                  // if (currentUser.progress != null &&
+                  //     currentUser.progress!
+                  //         .containsKey(categories![index].name)) {
+                  //   categoryStarted = true;
+                  // }
+                  // print(
+                  //     'Progress is: ${currentUser.progress![categories![index]]}');
+                  for (Category category in categories)
+                    currentUser.progress?[category.name] == null
+                        ? ProgressCategory(
+                            message: setMessageNorm(0.0),
+                            progress: 0.0,
                             category: category,
                             title: category.name,
                             progressColor: category.categoryColor,
-                          ),
-                        )
-                      : Flexible(
-                          child: ProgressCategory(
+                          )
+                        : ProgressCategory(
+                            message: setMessageNorm(
+                                ((currentUser.progress![category.name]! /
+                                        category.totalCards!) *
+                                    100.0)),
                             progress: ((currentUser.progress![category.name]! /
                                     category.totalCards!) *
                                 100.0),
                             category: category,
                             title: category.name,
                             progressColor: category.categoryColor,
-                          ),
-                        )
-              ],
+                          )
+                ],
+              ),
             ),
           ),
         );
@@ -138,9 +146,29 @@ List<String> wellDoneMessages = [
   'Job well done!',
 ];
 
+String setMessageNorm(double progress) {
+  Random random = Random();
+
+  if (progress.roundToDouble() == 0.0) {
+    var randomInt = random.nextInt(getStartedMessages.length);
+    return getStartedMessages[randomInt];
+  } else if (progress.roundToDouble() < 66) {
+    var randomInt = random.nextInt(keepGoingMessages.length);
+    return keepGoingMessages[randomInt];
+  } else if (progress.roundToDouble() < 100) {
+    var randomInt = random.nextInt(almostDoneMessages.length);
+    return almostDoneMessages[randomInt];
+  } else if (progress.roundToDouble() == 100) {
+    var randomInt = random.nextInt(wellDoneMessages.length);
+    return wellDoneMessages[randomInt];
+  }
+  return '';
+}
+
 class ProgressCategory extends StatefulWidget {
   final Category category;
   final String title;
+  final String message;
   final Color progressColor;
   final double progress;
 
@@ -148,6 +176,7 @@ class ProgressCategory extends StatefulWidget {
       {Key? key,
       required this.category,
       required this.title,
+      required this.message,
       required this.progressColor,
       required this.progress})
       : super(key: key);
@@ -157,156 +186,135 @@ class ProgressCategory extends StatefulWidget {
 }
 
 class _ProgressCategoryState extends State<ProgressCategory> {
-  late String message = ' ';
-
-  String setMessage(double progress) {
-    Random random = Random();
-    if (progress.roundToDouble() == 0.0) {
-      var randomInt = random.nextInt(getStartedMessages.length);
-      return getStartedMessages[randomInt];
-    } else if (progress.roundToDouble() < 66) {
-      var randomInt = random.nextInt(keepGoingMessages.length);
-      return keepGoingMessages[randomInt];
-    } else if (progress.roundToDouble() < 100) {
-      var randomInt = random.nextInt(almostDoneMessages.length);
-      return almostDoneMessages[randomInt];
-    } else if (progress.roundToDouble() == 100) {
-      var randomInt = random.nextInt(wellDoneMessages.length);
-      return wellDoneMessages[randomInt];
-    }
-    return '';
-  }
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    message = setMessage(widget.progress);
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     print('PRogress is now ${widget.progress}');
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 4.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                widget.title,
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              widget.progress != 0
-                  ? ClipRRect(
-                      borderRadius: BorderRadius.circular(25),
-                      child: Container(
-                        color: Colors.grey.shade100,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 12.0, vertical: 2.0),
-                          child: widget.progress == 100
-                              ? Wrap(
-                                  crossAxisAlignment: WrapCrossAlignment.center,
-                                  spacing: 5,
-                                  children: [
-                                    Text(
-                                      '${widget.progress.toStringAsFixed(0)}%',
-                                    ),
-                                    const Icon(
-                                      Icons.check_circle,
-                                      color: Colors.lightBlueAccent,
-                                      size: 12,
-                                    ),
-                                  ],
-                                )
-                              : ClipRRect(
-                                  borderRadius: BorderRadius.circular(25),
-                                  child: Container(
-                                    color: Colors.grey.shade100,
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 12.0, vertical: 2.0),
-                                      child: Text(
+    return SizedBox(
+      height: 125,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4.0),
+            child: Row(
+              // mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  widget.title,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                widget.progress != 0
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(25),
+                        child: Container(
+                          color: Colors.grey.shade100,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12.0, vertical: 2.0),
+                            child: widget.progress == 100
+                                ? Wrap(
+                                    crossAxisAlignment:
+                                        WrapCrossAlignment.center,
+                                    spacing: 5,
+                                    children: [
+                                      Text(
                                         '${widget.progress.toStringAsFixed(0)}%',
+                                      ),
+                                      const Icon(
+                                        Icons.check_circle,
+                                        color: Colors.lightBlueAccent,
+                                        size: 12,
+                                      ),
+                                    ],
+                                  )
+                                : ClipRRect(
+                                    borderRadius: BorderRadius.circular(25),
+                                    child: Container(
+                                      color: Colors.grey.shade100,
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 12.0, vertical: 2.0),
+                                        child: Text(
+                                          '${widget.progress.toStringAsFixed(0)}%',
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
+                          ),
                         ),
-                      ),
-                    )
-                  : ClipRRect(
-                      borderRadius: BorderRadius.circular(25),
-                      child: Container(
-                        color: Colors.grey.shade100,
-                        child: const Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 12.0, vertical: 2.0),
-                          child: Text(
-                            '0%',
+                      )
+                    : ClipRRect(
+                        borderRadius: BorderRadius.circular(25),
+                        child: Container(
+                          color: Colors.grey.shade100,
+                          child: const Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 12.0, vertical: 2.0),
+                            child: Text(
+                              '0%',
+                            ),
                           ),
                         ),
                       ),
-                    ),
-            ],
+              ],
+            ),
           ),
-        ),
-        widget.progress.roundToDouble() > 0.0
-            ? Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(525),
-                          child: LinearProgressIndicator(
-                            minHeight: 12,
-                            value: widget.progress / 100,
-                            backgroundColor: Colors.grey.shade300,
-                            color: widget.progressColor,
+          widget.progress.roundToDouble() > 0.0
+              ? Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(525),
+                            child: LinearProgressIndicator(
+                              minHeight: 12,
+                              value: widget.progress / 100,
+                              backgroundColor: Colors.grey.shade300,
+                              color: widget.progressColor,
+                            ),
                           ),
                         ),
-                      ),
-                      Padding(
+                        Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8.0),
+                            child: Text(
+                              widget.message,
+                              textAlign: TextAlign.right,
+                            ))
+                      ]),
+                )
+              : Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Padding(
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
-                          child: Text(
-                            message,
-                            textAlign: TextAlign.right,
-                          ))
-                    ]),
-              )
-            : Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(525),
-                          child: LinearProgressIndicator(
-                            minHeight: 12,
-                            value: 0,
-                            backgroundColor: Colors.grey.shade300,
-                            color: widget.progressColor,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(525),
+                            child: LinearProgressIndicator(
+                              minHeight: 12,
+                              value: 0,
+                              backgroundColor: Colors.grey.shade300,
+                              color: widget.progressColor,
+                            ),
                           ),
                         ),
-                      ),
-                      Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8.0),
-                          child: Text(
-                            message,
-                            textAlign: TextAlign.right,
-                          ))
-                    ]),
-              )
-      ],
+                        Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8.0),
+                            child: Text(
+                              widget.message,
+                              textAlign: TextAlign.right,
+                            ))
+                      ]),
+                )
+        ],
+      ),
     );
   }
 }

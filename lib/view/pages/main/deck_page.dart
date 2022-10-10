@@ -34,180 +34,178 @@ class _DeckPageState extends State<DeckPage> {
     //       return const DeckCompleteDialog();
     //     });
 
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: Colors.grey.shade200,
-        resizeToAvoidBottomInset: true,
-        appBar: PreferredSize(
-          preferredSize: const Size.fromHeight(50),
-          child: BlocConsumer<DeckCubit, DeckState>(
-            listener: (context, state) {
-              if (state.status == DeckStatus.zoomed) {}
-            },
-            builder: (context, state) {
-              if (state.status == DeckStatus.zoomed) {
-                return Visibility(
-                  visible: false,
-                  child: AppBar(
-                    toolbarHeight: 50,
-                    centerTitle: true,
-                    title: const Text(''),
-                  ),
-                );
-              }
-              return AnimatedOpacity(
-                opacity: 1.0,
-                duration: const Duration(milliseconds: 1000),
-                child: BlocConsumer<CardBloc, CardState>(
-                  listener: (context, state) {
-                    if (context.read<DeckCubit>().state.status ==
-                        DeckStatus.swiped) {
-                      if (currentCardIndex < 12) {
-                        deckScrollController.animateToItem(currentCardIndex);
-                      }
-                    }
-                    if (context.read<DeckCubit>().state.status ==
-                        DeckStatus.completed) {
-                      showDialog(
-                        context: context,
-                        builder: (context) {
-                          return const DeckCompleteDialog();
-                        },
-                      );
-                    }
-                  },
-                  builder: (context, state) {
-                    if (state is CardsLoaded) {
-                      return Visibility(
-                        visible: !isCardZoomed,
-                        child: Animate(
-                          effects: const [
-                            SlideEffect(curve: Curves.easeInOutSine)
-                          ],
-                          child: AppBar(
-                            toolbarHeight: 50,
-                            centerTitle: true,
-                            title: Text(state.category.name),
-                            backgroundColor: state.category.categoryColor,
-                          ),
-                        ),
-                      );
-                    }
-                    return AppBar(
-                      toolbarHeight: 50,
-                      centerTitle: true,
-                      title: LoadingAnimationWidget.prograssiveDots(
-                          color: Colors.white, size: 20),
-                      backgroundColor: Colors.grey,
-                    );
-                  },
+    return Scaffold(
+      backgroundColor: Colors.grey.shade200,
+      resizeToAvoidBottomInset: true,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(50),
+        child: BlocConsumer<DeckCubit, DeckState>(
+          listener: (context, state) {
+            if (state.status == DeckStatus.zoomed) {}
+          },
+          builder: (context, state) {
+            if (state.status == DeckStatus.zoomed) {
+              return Visibility(
+                visible: false,
+                child: AppBar(
+                  toolbarHeight: 50,
+                  centerTitle: true,
+                  title: const Text(''),
                 ),
               );
-            },
-          ),
+            }
+            return AnimatedOpacity(
+              opacity: 1.0,
+              duration: const Duration(milliseconds: 1000),
+              child: BlocConsumer<CardBloc, CardState>(
+                listener: (context, state) {
+                  if (context.read<DeckCubit>().state.status ==
+                      DeckStatus.swiped) {
+                    if (currentCardIndex < 12) {
+                      deckScrollController.animateToItem(currentCardIndex);
+                    }
+                  }
+                  if (context.read<DeckCubit>().state.status ==
+                      DeckStatus.completed) {
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return const DeckCompleteDialog();
+                      },
+                    );
+                  }
+                },
+                builder: (context, state) {
+                  if (state is CardsLoaded) {
+                    return Visibility(
+                      visible: !isCardZoomed,
+                      child: Animate(
+                        effects: const [
+                          SlideEffect(curve: Curves.easeInOutSine)
+                        ],
+                        child: AppBar(
+                          toolbarHeight: 50,
+                          centerTitle: true,
+                          title: Text(state.category.name),
+                          backgroundColor: state.category.categoryColor,
+                        ),
+                      ),
+                    );
+                  }
+                  return AppBar(
+                    toolbarHeight: 50,
+                    centerTitle: true,
+                    title: LoadingAnimationWidget.prograssiveDots(
+                        color: Colors.white, size: 20),
+                    backgroundColor: Colors.grey,
+                  );
+                },
+              ),
+            );
+          },
         ),
-        bottomNavigationBar: const MainBottomAppBar(),
-        body: SafeArea(
-          child: BlocConsumer<CardBloc, CardState>(
-            listener: (context, state) async {
-              if (state is CardsLoaded) {}
-            },
-            builder: (context, state) {
-              if (state is CardsLoading) {
-                return Center(
-                    child: Wrap(
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  direction: Axis.vertical,
-                  spacing: 12,
+      ),
+      bottomNavigationBar: const MainBottomAppBar(),
+      body: SafeArea(
+        child: BlocConsumer<CardBloc, CardState>(
+          listener: (context, state) async {
+            if (state is CardsLoaded) {}
+          },
+          builder: (context, state) {
+            if (state is CardsLoading) {
+              return Center(
+                  child: Wrap(
+                crossAxisAlignment: WrapCrossAlignment.center,
+                direction: Axis.vertical,
+                spacing: 12,
+                children: [
+                  LoadingAnimationWidget.horizontalRotatingDots(
+                      color: Colors.blueAccent, size: 30),
+                  const Text('Loading Cards...')
+                ],
+              ));
+            }
+            if (state is CardsLoaded) {
+              return SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    LoadingAnimationWidget.horizontalRotatingDots(
-                        color: Colors.blueAccent, size: 30),
-                    const Text('Loading Cards...')
-                  ],
-                ));
-              }
-              if (state is CardsLoaded) {
-                return SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 36.0),
-                        child: AnimatedSlide(
-                          curve: Curves.easeInOut,
-                          duration: const Duration(milliseconds: 200),
-                          offset: isCardZoomed
-                              ? const Offset(0, -0.45)
-                              : const Offset(0, -0.0),
-                          child: AnimatedScale(
-                            duration: const Duration(milliseconds: 500),
-                            scale: isCardZoomed ? 1.0 : 1.0,
-                            child: Stack(
-                              clipBehavior: Clip.none,
-                              alignment: AlignmentDirectional.topEnd,
-                              children: [
-                                SizedBox(
-                                  height: 500,
-                                  child: IgnorePointer(
-                                    ignoring: isSwipeDisabled,
-                                    child: BlocListener<DeckCubit, DeckState>(
-                                      listener: (context, state) {
-                                        // TODO: implement listener
-                                        if (state.status ==
-                                            DeckStatus.completed) {
-                                          isSwipeDisabled = false;
-                                        }
-                                        if (state.status == DeckStatus.zoomed) {
-                                          isCardZoomed = true;
-                                        } else if (state.status ==
-                                            DeckStatus.unzoomed) {
-                                          isCardZoomed = false;
-                                        }
-                                      },
-                                      child: Deck(
-                                          deckScrollController:
-                                              deckScrollController),
-                                    ),
-                                  ),
-                                ),
-                                Visibility(
-                                  visible: isSwipeDisabled ? true : false,
-                                  child: Positioned(
-                                    right: 20,
-                                    top: -20,
-                                    child: CardCounter(
-                                        currentCard: currentCardIndex,
+                    Padding(
+                      padding: const EdgeInsets.only(top: 36.0),
+                      child: AnimatedSlide(
+                        curve: Curves.easeInOut,
+                        duration: const Duration(milliseconds: 200),
+                        offset: isCardZoomed
+                            ? const Offset(0, -0.45)
+                            : const Offset(0, -0.0),
+                        child: AnimatedScale(
+                          duration: const Duration(milliseconds: 500),
+                          scale: isCardZoomed ? 1.0 : 1.0,
+                          child: Stack(
+                            clipBehavior: Clip.none,
+                            alignment: AlignmentDirectional.topEnd,
+                            children: [
+                              SizedBox(
+                                height: 500,
+                                child: IgnorePointer(
+                                  ignoring: isSwipeDisabled,
+                                  child: BlocListener<DeckCubit, DeckState>(
+                                    listener: (context, state) {
+                                      // TODO: implement listener
+                                      if (state.status ==
+                                          DeckStatus.completed) {
+                                        isSwipeDisabled = false;
+                                      }
+                                      if (state.status == DeckStatus.zoomed) {
+                                        isCardZoomed = true;
+                                      } else if (state.status ==
+                                          DeckStatus.unzoomed) {
+                                        isCardZoomed = false;
+                                      }
+                                    },
+                                    child: Deck(
                                         deckScrollController:
                                             deckScrollController),
                                   ),
                                 ),
-                              ],
-                            ),
+                              ),
+                              Visibility(
+                                visible: isSwipeDisabled ? true : false,
+                                child: Positioned(
+                                  right: 20,
+                                  top: -20,
+                                  child: CardCounter(
+                                      currentCard: currentCardIndex,
+                                      deckScrollController:
+                                          deckScrollController),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 16.0, bottom: 16.0),
-                        child: Visibility(
-                          visible: isSwipeDisabled ? true : false,
-                          child: ShareButton(
-                              category: state.category,
-                              formKey: shareFieldFormKey,
-                              categoryName: state.category.name),
-                        ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 16.0, bottom: 16.0),
+                      child: Visibility(
+                        visible: isSwipeDisabled ? true : false,
+                        child: ShareButton(
+                            category: state.category,
+                            formKey: shareFieldFormKey,
+                            categoryName: state.category.name),
                       ),
-                    ],
-                  ),
-                );
-              } else {
-                return const Center(
-                  child: Text('Something Went Wrong!'),
-                );
-              }
-            },
-          ),
+                    ),
+                  ],
+                ),
+              );
+            } else {
+              return const Center(
+                child: Text('Something Went Wrong!'),
+              );
+            }
+          },
         ),
       ),
     );

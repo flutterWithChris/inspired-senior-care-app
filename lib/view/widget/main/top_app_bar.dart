@@ -28,7 +28,7 @@ class MainTopAppBar extends StatelessWidget {
       title: title != null
           ? Text(title!)
           : Image.asset(
-              'lib/assets/Logo-01.png',
+              'lib/assets/Inspired-Senior-care.png',
               height: 40,
               fit: BoxFit.contain,
             ),
