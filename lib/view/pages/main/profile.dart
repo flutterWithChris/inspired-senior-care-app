@@ -24,36 +24,34 @@ class Profile extends StatelessWidget {
           );
         }
         if (state is ProfileLoaded) {
-          return SafeArea(
-            child: Scaffold(
-              drawer: const MainAppDrawer(),
-              bottomNavigationBar: const MainBottomAppBar(),
-              appBar: const PreferredSize(
-                  preferredSize: Size.fromHeight(60), child: MainTopAppBar()),
-              body: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: ListView(
-                  controller: pageScrollController,
-                  shrinkWrap: true,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 12.0),
-                      child: NamePlate(
-                        user: state.user,
-                        memberName: state.user.name!,
-                        memberTitle: state.user.title!,
-                        memberColorHex: state.user.userColor!,
-                      ),
+          return Scaffold(
+            drawer: const MainAppDrawer(),
+            bottomNavigationBar: const MainBottomAppBar(),
+            appBar: const PreferredSize(
+                preferredSize: Size.fromHeight(60), child: MainTopAppBar()),
+            body: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: ListView(
+                controller: pageScrollController,
+                //  shrinkWrap: true,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 12.0),
+                    child: NamePlate(
+                      user: state.user,
+                      memberName: state.user.name!,
+                      memberTitle: state.user.title!,
+                      memberColorHex: state.user.userColor!,
                     ),
-                    //const Badges(),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 16.0),
-                      child: ProgressSection(
-                        pageScrollController: pageScrollController,
-                      ),
-                    )
-                  ],
-                ),
+                  ),
+                  //const Badges(),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16.0),
+                    child: ProgressSection(
+                      pageScrollController: pageScrollController,
+                    ),
+                  )
+                ],
               ),
             ),
           );

@@ -7,20 +7,23 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:inspired_senior_care_app/bloc/cards/card_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/categories/categories_bloc.dart';
+import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
+import 'package:inspired_senior_care_app/bloc/share_bloc/share_bloc.dart';
 import 'package:inspired_senior_care_app/data/models/category.dart';
 import 'package:inspired_senior_care_app/view/pages/IAP/upgrade_page.dart';
+
 import 'package:inspired_senior_care_app/view/widget/main/bottom_app_bar.dart';
 import 'package:inspired_senior_care_app/view/widget/main/main_app_drawer.dart';
+import 'package:inspired_senior_care_app/view/widget/main/top_app_bar.dart';
 
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
-import '../../widget/main/top_app_bar.dart';
-
-class ManagerCategories extends StatelessWidget {
-  const ManagerCategories({Key? key}) : super(key: key);
+class ManagerCategoriesShare extends StatelessWidget {
+  const ManagerCategoriesShare({Key? key}) : super(key: key);
 
   static Route route() {
-    return MaterialPageRoute<void>(builder: (_) => const ManagerCategories());
+    return MaterialPageRoute<void>(
+        builder: (_) => const ManagerCategoriesShare());
   }
 
   @override
@@ -46,7 +49,7 @@ class ManagerCategories extends StatelessWidget {
                     const SizedBox(
                       height: 8.0,
                     ),
-                    const Text('Loading Categories...')
+                    const Text('Loading Manager...')
                   ],
                 ),
               );
@@ -63,50 +66,49 @@ class ManagerCategories extends StatelessWidget {
                 physics: const ScrollPhysics(),
                 shrinkWrap: true,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 24.0, horizontal: 8.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 24.0, horizontal: 8.0),
+                        child: Text(
                           'All Categories',
-                          style: Theme.of(context).textTheme.headline4,
+                          style: Theme.of(context).textTheme.headlineMedium,
                         ),
-                        SizedBox(
-                          height: 42,
-                          width: 130,
-                          child: FittedBox(
-                            child: PopupMenuButton(
-                              position: PopupMenuPosition.under,
-                              itemBuilder: (context) {
-                                return [
-                                  PopupMenuItem(
-                                    child: const Text('Share Mode'),
-                                    onTap: () {
-                                      context
-                                          .goNamed('manager-categories-share');
-                                    },
-                                  )
-                                ];
-                              },
-                              child: IgnorePointer(
-                                child: ElevatedButton.icon(
-                                    style: ElevatedButton.styleFrom(
-                                        minimumSize: const Size(0, 0),
-                                        fixedSize: const Size(130, 42)),
-                                    onPressed: () {},
-                                    label: const Text('View Mode'),
-                                    icon: const Icon(
-                                      FontAwesomeIcons.eye,
-                                      size: 12.0,
-                                    )),
-                              ),
+                      ),
+                      SizedBox(
+                        height: 42,
+                        width: 130,
+                        child: FittedBox(
+                          child: PopupMenuButton(
+                            position: PopupMenuPosition.under,
+                            itemBuilder: (context) {
+                              return [
+                                PopupMenuItem(
+                                  child: const Text('View Mode'),
+                                  onTap: () {
+                                    context.goNamed('manager-categories');
+                                  },
+                                )
+                              ];
+                            },
+                            child: IgnorePointer(
+                              child: ElevatedButton.icon(
+                                  style: OutlinedButton.styleFrom(
+                                      minimumSize: const Size(0, 0),
+                                      fixedSize: const Size(130, 42)),
+                                  onPressed: () {},
+                                  label: const Text('Share Mode'),
+                                  icon: const Icon(
+                                    FontAwesomeIcons.shareNodes,
+                                    size: 12.0,
+                                  )),
                             ),
                           ),
-                        )
-                      ],
-                    ),
+                        ),
+                      )
+                    ],
                   ),
                   LayoutBuilder(builder: (context, constraints) {
                     int crossAxisCount = constraints.maxWidth > 500 ? 4 : 2;
@@ -177,7 +179,7 @@ class CategoryCard extends StatelessWidget {
                   BlocProvider.of<CardBloc>(context)
                       .add(LoadCards(category: category));
 
-                  context.goNamed('manager-deck-page');
+                  context.goNamed('manager-share-deck-page');
                 },
                 child: Card(
                   child: Container(
@@ -197,6 +199,80 @@ class CategoryCard extends StatelessWidget {
                               height: 250,
                               fit: BoxFit.fitHeight,
                             )),
+                        Positioned(
+                          top: 5,
+                          right: 2,
+                          child: Stack(
+                            alignment: AlignmentDirectional.center,
+                            children: [
+                              CircleAvatar(
+                                radius: 23,
+                                backgroundColor: Colors.white,
+                                child: BlocBuilder<ProfileBloc, ProfileState>(
+                                  builder: (context, state) {
+                                    int currentCard = 0;
+                                    if (state is ProfileLoaded) {
+                                      bool categoryStarted = state
+                                          .user.progress!
+                                          .containsKey(category.name);
+                                      if (!categoryStarted) {
+                                        currentCard = 0;
+                                      }
+                                      if (categoryStarted) {
+                                        Map<String, int> progressList = context
+                                            .watch<ProfileBloc>()
+                                            .state
+                                            .user
+                                            .progress!;
+
+                                        percentComplete =
+                                            progressList[category.name]! /
+                                                category.totalCards!;
+                                      }
+                                      return Text(
+                                        '${(percentComplete * 100).toStringAsFixed(0)}%',
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 14),
+                                      );
+                                    }
+                                    return const Text(
+                                        'Something Went Wrong...');
+                                  },
+                                ),
+                              ),
+                              BlocBuilder<CategoriesBloc, CategoriesState>(
+                                builder: (context, state) {
+                                  if (state is CategoriesLoaded) {
+                                    return SizedBox(
+                                      height: 50,
+                                      width: 50,
+                                      child: BlocBuilder<ShareBloc, ShareState>(
+                                        buildWhen: (previous, current) =>
+                                            previous.status ==
+                                                Status.submitted &&
+                                            current.status == Status.initial,
+                                        builder: (context, state) {
+                                          return CircularProgressIndicator(
+                                            backgroundColor:
+                                                Colors.grey.shade200,
+                                            valueColor:
+                                                AlwaysStoppedAnimation<Color>(
+                                                    category.progressColor),
+                                            value: percentComplete,
+                                          );
+                                        },
+                                      ),
+                                    );
+                                  }
+                                  return const Center(
+                                    child: Text('Something Went Wrong...'),
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                        )
                       ],
                     ),
                   ),

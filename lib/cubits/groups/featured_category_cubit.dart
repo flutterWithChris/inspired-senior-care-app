@@ -46,7 +46,7 @@ class FeaturedCategoryCubit extends Cubit<FeaturedCategoryState> {
 
     user.groups == null || user.groups!.isEmpty == true
         ? emit(
-            const FeaturedCategoryLoaded(featuredCategoryName: 'Communication'))
+            const FeaturedCategoryLoaded(featuredCategoryName: 'Brain Change'))
         : _databaseRepository.getGroup(user.groups![0]).listen((group) {
             currentGroup = group;
           }).onData((group) {

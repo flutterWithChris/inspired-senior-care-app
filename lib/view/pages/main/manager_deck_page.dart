@@ -22,127 +22,124 @@ class ManagerDeckPage extends StatelessWidget {
   Widget build(BuildContext context) {
     int currentCardIndex = context.watch<DeckCubit>().currentCardNumber;
 
-    return SafeArea(
-      child: BlocListener<CardBloc, CardState>(
-        listener: (context, state) {
-          // TODO: implement listener
-          if (state is CardsLoading) {}
-          if (state is CardsLoaded) {
-            final String categoryName = state.category.name;
-          }
-        },
-        child: Scaffold(
-          backgroundColor: Colors.grey.shade200,
-          resizeToAvoidBottomInset: true,
-          appBar: PreferredSize(
-            preferredSize: const Size.fromHeight(50),
-            child: BlocConsumer<DeckCubit, DeckState>(
-              listener: (context, state) {
-                if (state.status == DeckStatus.swiped) {
-                  if (currentCardIndex < 12) {
-                    //currentCardIndex++;
-                    deckScrollController.animateToItem(currentCardIndex);
-                  }
+    return BlocListener<CardBloc, CardState>(
+      listener: (context, state) {
+        // TODO: implement listener
+        if (state is CardsLoading) {}
+        if (state is CardsLoaded) {
+          final String categoryName = state.category.name;
+        }
+      },
+      child: Scaffold(
+        backgroundColor: Colors.grey.shade200,
+        resizeToAvoidBottomInset: true,
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(50),
+          child: BlocConsumer<DeckCubit, DeckState>(
+            listener: (context, state) {
+              if (state.status == DeckStatus.swiped) {
+                if (currentCardIndex < 12) {
+                  //currentCardIndex++;
+                  deckScrollController.animateToItem(currentCardIndex);
                 }
-                if (state.status == DeckStatus.completed) {
-                  showDialog(
-                    context: context,
-                    builder: (context) {
-                      return const DeckCompleteDialog();
-                    },
-                  );
-                }
-              },
-              builder: (context, state) {
-                if (state.status == DeckStatus.zoomed) {
-                  return Visibility(
-                    visible: false,
-                    child: AppBar(
-                        toolbarHeight: 50,
-                        title: const Text('Positive Interactions')),
-                  );
-                }
-                return AnimatedOpacity(
-                  opacity: 1.0,
-                  duration: const Duration(milliseconds: 1000),
-                  child: BlocBuilder<CardBloc, CardState>(
-                    builder: (context, state) {
-                      if (state is CardsLoaded) {
-                        //context.loaderOverlay.hide();
-                        return AppBar(
-                          toolbarHeight: 50,
-                          centerTitle: true,
-                          title: Text(state.category.name),
-                          backgroundColor: state.category.categoryColor,
-                        );
-                      }
+              }
+              if (state.status == DeckStatus.completed) {
+                showDialog(
+                  context: context,
+                  builder: (context) {
+                    return const DeckCompleteDialog();
+                  },
+                );
+              }
+            },
+            builder: (context, state) {
+              if (state.status == DeckStatus.zoomed) {
+                return Visibility(
+                  visible: false,
+                  child: AppBar(
+                      toolbarHeight: 50,
+                      title: const Text('Positive Interactions')),
+                );
+              }
+              return AnimatedOpacity(
+                opacity: 1.0,
+                duration: const Duration(milliseconds: 1000),
+                child: BlocBuilder<CardBloc, CardState>(
+                  builder: (context, state) {
+                    if (state is CardsLoaded) {
+                      //context.loaderOverlay.hide();
                       return AppBar(
                         toolbarHeight: 50,
                         centerTitle: true,
-                        title: LoadingAnimationWidget.prograssiveDots(
-                            color: Colors.white, size: 20),
-                        backgroundColor: Colors.grey,
+                        title: Text(state.category.name),
+                        backgroundColor: state.category.categoryColor,
                       );
-                    },
-                  ),
-                );
-              },
-            ),
+                    }
+                    return AppBar(
+                      toolbarHeight: 50,
+                      centerTitle: true,
+                      title: LoadingAnimationWidget.prograssiveDots(
+                          color: Colors.white, size: 20),
+                      backgroundColor: Colors.grey,
+                    );
+                  },
+                ),
+              );
+            },
           ),
-          bottomNavigationBar: const MainBottomAppBar(),
-          body: SafeArea(
-            child: BlocBuilder<CardBloc, CardState>(
-              builder: (context, state) {
-                if (state is CardsLoading) {
-                  return Center(
-                      child: Wrap(
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    direction: Axis.vertical,
-                    spacing: 12,
+        ),
+        bottomNavigationBar: const MainBottomAppBar(),
+        body: SafeArea(
+          child: BlocBuilder<CardBloc, CardState>(
+            builder: (context, state) {
+              if (state is CardsLoading) {
+                return Center(
+                    child: Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  direction: Axis.vertical,
+                  spacing: 12,
+                  children: [
+                    LoadingAnimationWidget.horizontalRotatingDots(
+                        color: Colors.blueAccent, size: 30),
+                    const Text('Loading Cards...')
+                  ],
+                ));
+              }
+              if (state is CardsLoaded) {
+                return SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      LoadingAnimationWidget.horizontalRotatingDots(
-                          color: Colors.blueAccent, size: 30),
-                      const Text('Loading Cards...')
-                    ],
-                  ));
-                }
-                if (state is CardsLoaded) {
-                  return SingleChildScrollView(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(top: 60.0),
-                          child: SizedBox(
-                            height: 525,
-                            child: BlocListener<DeckCubit, DeckState>(
-                              listener: (context, state) {
-                                // TODO: implement listener
-                                if (state.status == DeckStatus.completed) {}
-                                if (state.status == DeckStatus.zoomed) {
-                                  isCardZoomed = true;
-                                } else if (state.status ==
-                                    DeckStatus.unzoomed) {
-                                  isCardZoomed = false;
-                                }
-                              },
-                              child: Deck(
-                                  deckScrollController: deckScrollController),
-                            ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 60.0),
+                        child: SizedBox(
+                          height: 525,
+                          child: BlocListener<DeckCubit, DeckState>(
+                            listener: (context, state) {
+                              // TODO: implement listener
+                              if (state.status == DeckStatus.completed) {}
+                              if (state.status == DeckStatus.zoomed) {
+                                isCardZoomed = true;
+                              } else if (state.status == DeckStatus.unzoomed) {
+                                isCardZoomed = false;
+                              }
+                            },
+                            child: Deck(
+                                deckScrollController: deckScrollController),
                           ),
                         ),
-                      ],
-                    ),
-                  );
-                } else {
-                  return const Center(
-                    child: Text('Something Went Wrong!'),
-                  );
-                }
-              },
-            ),
+                      ),
+                    ],
+                  ),
+                );
+              } else {
+                return const Center(
+                  child: Text('Something Went Wrong!'),
+                );
+              }
+            },
           ),
         ),
       ),

@@ -14,29 +14,27 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        drawer: const MainAppDrawer(),
-        bottomNavigationBar: const MainBottomAppBar(),
-        appBar: const PreferredSize(
-          preferredSize: Size.fromHeight(60),
-          child: MainTopAppBar(),
-        ),
-        body: Center(
-          child: SafeArea(
-            child: Column(
-              //   mainAxisAlignment: MainAxisAlignment.center,
-              children: const <Widget>[
-                Padding(
-                  padding: EdgeInsets.only(top: 36.0, bottom: 24.0),
-                  child: Text(
-                    'Monthly Category',
-                    style: TextStyle(fontSize: 30),
-                  ),
+    return Scaffold(
+      drawer: const MainAppDrawer(),
+      bottomNavigationBar: const MainBottomAppBar(),
+      appBar: const PreferredSize(
+        preferredSize: Size.fromHeight(60),
+        child: MainTopAppBar(),
+      ),
+      body: Center(
+        child: SafeArea(
+          child: Column(
+            //   mainAxisAlignment: MainAxisAlignment.center,
+            children: const <Widget>[
+              Padding(
+                padding: EdgeInsets.only(top: 36.0, bottom: 24.0),
+                child: Text(
+                  'Monthly Category',
+                  style: TextStyle(fontSize: 30),
                 ),
-                FeaturedCategory(),
-              ],
-            ),
+              ),
+              FeaturedCategory(),
+            ],
           ),
         ),
       ),

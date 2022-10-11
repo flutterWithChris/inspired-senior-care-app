@@ -15,7 +15,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.0.1+1
+version: 1.0.3+1
 
 environment:
   sdk: '>=2.17.6 <3.0.0'
@@ -36,11 +36,11 @@ dependencies:
   cupertino_icons: ^1.0.2
   font_awesome_flutter: ^10.1.0
   google_fonts: ^3.0.1
-  flutter_initicon: ^2.0.0
+  flutter_initicon: ^3.0.0+1
   bloc: ^8.0.3
   flutter_bloc: ^8.0.1
   equatable: ^2.0.3
-  go_router: ^4.1.1
+  go_router: ^5.0.5
   flutter_randomcolor: ^1.0.12
   smooth_page_indicator: ^1.0.0+2
   flex_color_picker: ^2.5.0
@@ -79,6 +79,7 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
 
+
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
@@ -98,6 +99,8 @@ flutter:
   assets:
     - lib/assets/backgrounds/
     - lib/assets/Logo-01.png
+    - lib/assets/Inspired-Senior-care.png
+    - lib/assets/Inspired-Senior-care-purple-circle.png
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
 

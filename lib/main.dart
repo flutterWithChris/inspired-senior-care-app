@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -39,7 +41,9 @@ import 'package:inspired_senior_care_app/view/pages/main/categories.dart';
 import 'package:inspired_senior_care_app/view/pages/main/deck_page.dart';
 import 'package:inspired_senior_care_app/view/pages/main/homepage.dart';
 import 'package:inspired_senior_care_app/view/pages/main/manager_categories.dart';
+import 'package:inspired_senior_care_app/view/pages/main/manager_categories_share.dart';
 import 'package:inspired_senior_care_app/view/pages/main/manager_deck_page.dart';
+import 'package:inspired_senior_care_app/view/pages/main/manager_share_deck_page.dart';
 import 'package:inspired_senior_care_app/view/pages/main/profile.dart';
 import 'package:inspired_senior_care_app/view/pages/signup/signup.dart';
 import 'package:inspired_senior_care_app/view/widget/main/settings.dart';
@@ -198,11 +202,11 @@ class _MyAppState extends State<MyApp> {
     routes: _routes,
     //  routerNeglect: true,
     initialLocation: '/',
-    urlPathStrategy: UrlPathStrategy.path,
+    // urlPathStrategy: UrlPathStrategy.path,
     debugLogDiagnostics: true,
     // errorPageBuilder: ,
     refreshListenable: GoRouterRefreshStream(bloc.stream),
-    redirect: (state) {
+    redirect: (context, state) {
       bool isLoggingIn = state.location == '/login';
       bool loggedIn = bloc.state.authStatus == AuthStatus.authenticated;
       bool isOnboarding = state.location == '/login/signup';
@@ -279,6 +283,17 @@ class _MyAppState extends State<MyApp> {
           ),
         ]),
     GoRoute(
+        name: 'manager-categories-share',
+        path: '/manager-categories-share',
+        builder: (context, state) => const ManagerCategoriesShare(),
+        routes: [
+          GoRoute(
+            name: 'manager-share-deck-page',
+            path: 'manager-share-deck-page',
+            builder: (context, state) => ManagerShareDeckPage(),
+          ),
+        ]),
+    GoRoute(
       name: 'profile',
       path: '/profile',
       builder: (context, state) => const Profile(),
@@ -329,4 +344,21 @@ class _MyAppState extends State<MyApp> {
           ),
         ]),
   ];
+}
+
+class GoRouterRefreshStream extends ChangeNotifier {
+  GoRouterRefreshStream(Stream<dynamic> stream) {
+    notifyListeners();
+    _subscription = stream.asBroadcastStream().listen(
+          (dynamic _) => notifyListeners(),
+        );
+  }
+
+  late final StreamSubscription<dynamic> _subscription;
+
+  @override
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
+  }
 }

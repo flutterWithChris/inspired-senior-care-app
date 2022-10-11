@@ -13,12 +13,12 @@ import 'package:inspired_senior_care_app/data/models/user.dart';
 import 'package:inspired_senior_care_app/view/widget/main/bottom_app_bar.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
-class DeckPage extends StatefulWidget {
+class ManagerShareDeckPage extends StatefulWidget {
   @override
-  State<DeckPage> createState() => _DeckPageState();
+  State<ManagerShareDeckPage> createState() => _DeckPageState();
 }
 
-class _DeckPageState extends State<DeckPage> {
+class _DeckPageState extends State<ManagerShareDeckPage> {
   bool isSwipeDisabled = true;
 
   bool isCardZoomed = false;
