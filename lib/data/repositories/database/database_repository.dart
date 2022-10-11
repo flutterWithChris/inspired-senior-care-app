@@ -90,6 +90,14 @@ class DatabaseRepository extends BaseDatabaseRepository {
         .update({'featuredCategory': category.name});
   }
 
+  Future<String> getGroupFeaturedCategory(String groupId) {
+    return _firebaseFirestore
+        .collection('groups')
+        .doc(groupId)
+        .get()
+        .then((value) => value.data()!['featuredCategory']);
+  }
+
   Future<void> submitResponse(
       String categoryName, int cardNumber, String response) {
     return _firebaseFirestore
@@ -148,6 +156,14 @@ class DatabaseRepository extends BaseDatabaseRepository {
         .doc(_firebaseAuth.currentUser!.uid)
         .get()
         .then((value) => List.from(value.get('groups')).length);
+  }
+
+  Future<List<String>> getGroups() {
+    return _firebaseFirestore
+        .collection('users')
+        .doc(_firebaseAuth.currentUser!.uid)
+        .get()
+        .then((value) => List.from(value.get('groups')));
   }
 
   Stream<List<Group>> getManagerGroups(User user) {

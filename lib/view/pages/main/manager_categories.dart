@@ -74,8 +74,8 @@ class ManagerCategories extends StatelessWidget {
                           style: Theme.of(context).textTheme.headline4,
                         ),
                         SizedBox(
-                          height: 42,
-                          width: 130,
+                          height: 40,
+                          width: 120,
                           child: FittedBox(
                             child: PopupMenuButton(
                               position: PopupMenuPosition.under,
@@ -91,10 +91,10 @@ class ManagerCategories extends StatelessWidget {
                                 ];
                               },
                               child: IgnorePointer(
-                                child: ElevatedButton.icon(
+                                child: OutlinedButton.icon(
                                     style: ElevatedButton.styleFrom(
                                         minimumSize: const Size(0, 0),
-                                        fixedSize: const Size(130, 42)),
+                                        fixedSize: const Size(120, 42)),
                                     onPressed: () {},
                                     label: const Text('View Mode'),
                                     icon: const Icon(

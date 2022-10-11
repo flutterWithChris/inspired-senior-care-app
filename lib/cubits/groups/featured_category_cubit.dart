@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:inspired_senior_care_app/bloc/auth/auth_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/categories/categories_bloc.dart';
 import 'package:inspired_senior_care_app/data/models/group.dart';
-import 'package:inspired_senior_care_app/data/models/user.dart';
 import 'package:inspired_senior_care_app/data/repositories/database/database_repository.dart';
 
 import '../../data/models/category.dart';
@@ -14,14 +14,21 @@ part 'featured_category_state.dart';
 class FeaturedCategoryCubit extends Cubit<FeaturedCategoryState> {
   Group currentGroup = Group.empty;
   final CategoriesBloc _categoriesBloc;
+  final AuthBloc _authBloc;
   StreamSubscription? _categoriesStream;
   final DatabaseRepository _databaseRepository;
+  StreamSubscription? _authSubscription;
   FeaturedCategoryCubit({
     required DatabaseRepository databaseRepository,
     required CategoriesBloc categoriesBloc,
+    required AuthBloc authBloc,
   })  : _databaseRepository = databaseRepository,
         _categoriesBloc = categoriesBloc,
+        _authBloc = authBloc,
         super(FeaturedCategoryLoading()) {
+    _authSubscription = authBloc.stream.listen((event) {
+      _loadUserFeaturedCategory();
+    });
     _categoriesStream = _categoriesBloc.stream.listen((state) {
       if (state is CategoriesLoaded) {}
     });
@@ -32,7 +39,7 @@ class FeaturedCategoryCubit extends Cubit<FeaturedCategoryState> {
       _onLoadFeaturedCategoryById(groupId);
   void updateFeaturedCategory(Category category) =>
       _onUpdateFeaturedCategory(category);
-  void loadUserFeaturedCategory(User user) => _loadUserFeaturedCategory(user);
+  void loadUserFeaturedCategory() => _loadUserFeaturedCategory();
 
   void _onLoadFeaturedCategory(Group group) async {
     emit(FeaturedCategoryLoading());
@@ -41,18 +48,16 @@ class FeaturedCategoryCubit extends Cubit<FeaturedCategoryState> {
     emit(FeaturedCategoryLoaded(featuredCategoryName: group.featuredCategory!));
   }
 
-  void _loadUserFeaturedCategory(User user) async {
+  void _loadUserFeaturedCategory() async {
     emit(FeaturedCategoryLoading());
 
-    user.groups == null || user.groups!.isEmpty == true
+    var groups = await _databaseRepository.getGroups();
+    groups.isEmpty
         ? emit(
-            const FeaturedCategoryLoaded(featuredCategoryName: 'Brain Change'))
-        : _databaseRepository.getGroup(user.groups![0]).listen((group) {
-            currentGroup = group;
-          }).onData((group) {
-            emit(FeaturedCategoryLoaded(
-                featuredCategoryName: group.featuredCategory!));
-          });
+            const FeaturedCategoryLoaded(featuredCategoryName: 'Communication'))
+        : emit(FeaturedCategoryLoaded(
+            featuredCategoryName:
+                await _databaseRepository.getGroupFeaturedCategory(groups[0])));
   }
 
   void _onLoadFeaturedCategoryById(String groupId) async {
@@ -76,5 +81,13 @@ class FeaturedCategoryCubit extends Cubit<FeaturedCategoryState> {
     emit(FeaturedCategoryUpdated());
     await Future.delayed(const Duration(seconds: 1));
     loadFeaturedCategory(currentGroup);
+  }
+
+  @override
+  Future<void> close() {
+    // TODO: implement close
+    _categoriesStream?.cancel();
+    _authSubscription?.cancel();
+    return super.close();
   }
 }

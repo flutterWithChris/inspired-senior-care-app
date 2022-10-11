@@ -209,7 +209,7 @@ class SeeMoreButton extends StatelessWidget {
   Widget build(BuildContext context) {
     User currentUser = context.watch<ProfileBloc>().state.user;
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: const EdgeInsets.symmetric(vertical: 12.0),
       child: ElevatedButton(
         onPressed: (() {
           BlocProvider.of<CardBloc>(context)

@@ -241,9 +241,9 @@ class Deck extends StatelessWidget {
         if (state is CardsLoaded) {
           return InfiniteCarousel.builder(
             controller: deckScrollController,
-            velocityFactor: 0.5,
+            velocityFactor: 0.3,
             itemCount: state.cardImageUrls.length,
-            itemExtent: 330,
+            itemExtent: 320,
             itemBuilder: (context, itemIndex, realIndex) {
               return InfoCard(
                 cardNumber: itemIndex + 1,
@@ -613,14 +613,15 @@ class InfoCard extends StatelessWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(25),
               child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16),
                 child: CachedNetworkImage(
                   placeholder: (context, url) => Center(
                     child: LoadingAnimationWidget.discreteCircle(
                         color: Colors.blueAccent, size: 30.0),
                   ),
                   imageUrl: state.cardImageUrls[cardNumber - 1],
-                  height: 195,
+                  //height: 195,
                   fit: BoxFit.fitHeight,
                 ),
               ),

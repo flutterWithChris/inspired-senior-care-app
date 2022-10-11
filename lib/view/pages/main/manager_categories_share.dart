@@ -78,8 +78,8 @@ class ManagerCategoriesShare extends StatelessWidget {
                         ),
                       ),
                       SizedBox(
-                        height: 42,
-                        width: 130,
+                        height: 40,
+                        width: 120,
                         child: FittedBox(
                           child: PopupMenuButton(
                             position: PopupMenuPosition.under,
@@ -94,10 +94,10 @@ class ManagerCategoriesShare extends StatelessWidget {
                               ];
                             },
                             child: IgnorePointer(
-                              child: ElevatedButton.icon(
+                              child: OutlinedButton.icon(
                                   style: OutlinedButton.styleFrom(
                                       minimumSize: const Size(0, 0),
-                                      fixedSize: const Size(130, 42)),
+                                      fixedSize: const Size(130, 40)),
                                   onPressed: () {},
                                   label: const Text('Share Mode'),
                                   icon: const Icon(

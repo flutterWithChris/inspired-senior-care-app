@@ -758,7 +758,8 @@ class InfoCard extends StatelessWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(25),
               child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                padding: const EdgeInsets.symmetric(
+                    vertical: 16.0, horizontal: 16.0),
                 child: CachedNetworkImage(
                   placeholder: (context, url) => Center(
                     child: LoadingAnimationWidget.discreteCircle(
