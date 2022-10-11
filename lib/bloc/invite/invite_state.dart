@@ -2,6 +2,8 @@ part of 'invite_bloc.dart';
 
 enum InviteStatus {
   initial,
+  loading,
+  loaded,
   sending,
   sent,
   cancelled,
@@ -14,13 +16,21 @@ enum InviteStatus {
 @immutable
 class InviteState extends Equatable {
   InviteStatus inviteStatus;
+  List<Invite>? invites;
 
   InviteState({
     required this.inviteStatus,
+    this.invites,
   });
 
   factory InviteState.initial() {
     return InviteState(inviteStatus: InviteStatus.initial);
+  }
+  factory InviteState.loading() {
+    return InviteState(inviteStatus: InviteStatus.loading);
+  }
+  factory InviteState.loaded(List<Invite> invites) {
+    return InviteState(inviteStatus: InviteStatus.loaded, invites: invites);
   }
 
   factory InviteState.sending() {
@@ -53,5 +63,5 @@ class InviteState extends Equatable {
 
   @override
   // TODO: implement props
-  List<Object?> get props => [inviteStatus];
+  List<Object?> get props => [inviteStatus, invites];
 }

@@ -10,6 +10,7 @@ import 'package:inspired_senior_care_app/bloc/cards/card_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/categories/categories_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/deck/deck_cubit.dart';
 import 'package:inspired_senior_care_app/bloc/group/group_bloc.dart';
+import 'package:inspired_senior_care_app/bloc/invite/invite_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/manage/response_interaction_cubit.dart';
 import 'package:inspired_senior_care_app/bloc/manage/view_response_deck_cubit.dart';
 import 'package:inspired_senior_care_app/bloc/member/bloc/bloc/group_member_bloc.dart';
@@ -163,6 +164,14 @@ class _MyAppState extends State<MyApp> {
           BlocProvider(
             create: (context) => DeckCubit(
                 databaseRepository: context.read<DatabaseRepository>()),
+          ),
+          BlocProvider(
+            create: (context) => InviteBloc(
+                authBloc: context.read<AuthBloc>(),
+                profileBloc: context.read<ProfileBloc>(),
+                authRepository: context.read<AuthRepository>(),
+                databaseRepository: context.read<DatabaseRepository>())
+              ..add(LoadInvites()),
           ),
         ],
         child: BlocBuilder<AuthBloc, AuthState>(

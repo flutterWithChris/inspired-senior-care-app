@@ -66,6 +66,7 @@ dependencies:
   fluttertoast: ^8.0.9
   firebase_crashlytics: ^2.8.13
   jiffy: ^5.0.0
+  flex_color_scheme: ^6.0.1
 
 
 

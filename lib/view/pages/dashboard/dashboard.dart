@@ -5,7 +5,6 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:go_router/go_router.dart';
 import 'package:inspired_senior_care_app/bloc/categories/categories_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/group/group_bloc.dart';
-import 'package:inspired_senior_care_app/bloc/invite/invite_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/member/bloc/bloc/group_member_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
 import 'package:inspired_senior_care_app/cubits/groups/featured_category_cubit.dart';
@@ -13,7 +12,6 @@ import 'package:inspired_senior_care_app/cubits/groups/group_featured_category_c
 import 'package:inspired_senior_care_app/data/models/category.dart';
 import 'package:inspired_senior_care_app/data/models/group.dart';
 import 'package:inspired_senior_care_app/data/models/user.dart';
-import 'package:inspired_senior_care_app/data/repositories/database/database_repository.dart';
 import 'package:inspired_senior_care_app/view/pages/dashboard/groups/create_group.dart';
 import 'package:inspired_senior_care_app/view/pages/dashboard/groups/delete_group_dialog.dart';
 import 'package:inspired_senior_care_app/view/pages/dashboard/groups/edit_group.dart';
@@ -306,16 +304,10 @@ class _GroupSectionState extends State<GroupSection> {
                                     const Duration(seconds: 0),
                                     () => showDialog(
                                           context: context,
-                                          builder: (context) => BlocProvider(
-                                            create: (context) => InviteBloc(
-                                                databaseRepository:
-                                                    context.read<
-                                                        DatabaseRepository>()),
-                                            child: AddMemberDialog(
-                                                group: widget.group,
-                                                inviteTextFieldController: widget
-                                                    .inviteTextFieldController),
-                                          ),
+                                          builder: (context) => AddMemberDialog(
+                                              group: widget.group,
+                                              inviteTextFieldController: widget
+                                                  .inviteTextFieldController),
                                         ));
                               },
                               child: Wrap(
@@ -331,16 +323,10 @@ class _GroupSectionState extends State<GroupSection> {
                                     const Duration(seconds: 0),
                                     () => showDialog(
                                           context: context,
-                                          builder: (context) => BlocProvider(
-                                            create: (context) => InviteBloc(
-                                                databaseRepository:
-                                                    context.read<
-                                                        DatabaseRepository>()),
-                                            child: AddManagerDialog(
-                                                group: widget.group,
-                                                inviteTextFieldController: widget
-                                                    .inviteTextFieldController),
-                                          ),
+                                          builder: (context) => AddManagerDialog(
+                                              group: widget.group,
+                                              inviteTextFieldController: widget
+                                                  .inviteTextFieldController),
                                         ));
                               },
                               child: Wrap(

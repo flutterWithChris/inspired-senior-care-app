@@ -171,7 +171,7 @@ class _AddMemberDialogState extends State<AddManagerDialog> {
                       return const Text('Adding Manager...');
                     }
                     if (state.inviteStatus == InviteStatus.sent) {
-                      return const Text('Manager Added!');
+                      return const Text('Manager Invited!');
                     } else {
                       return const Text('Add Manager');
                     }

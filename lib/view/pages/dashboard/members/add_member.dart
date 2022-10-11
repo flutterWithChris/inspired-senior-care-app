@@ -1,9 +1,7 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:inspired_senior_care_app/bloc/group/group_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/invite/invite_bloc.dart';
-import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
 import 'package:inspired_senior_care_app/data/models/group.dart';
 
 class AddMemberDialog extends StatefulWidget {
@@ -117,10 +115,10 @@ class _AddMemberDialogState extends State<AddMemberDialog> {
                             widget.inviteTextFieldController.value.text,
                         group: widget.group));
 
-                    context.read<GroupBloc>().add(UpdateGroup(
-                          group: widget.group,
-                          manager: context.read<ProfileBloc>().state.user,
-                        ));
+                    // context.read<GroupBloc>().add(UpdateGroup(
+                    //       group: widget.group,
+                    //       manager: context.read<ProfileBloc>().state.user,
+                    //     ));
                   }
                 },
                 icon: BlocConsumer<InviteBloc, InviteState>(
@@ -169,7 +167,7 @@ class _AddMemberDialogState extends State<AddMemberDialog> {
                       return const Text('Sending...');
                     }
                     if (state.inviteStatus == InviteStatus.sent) {
-                      return const Text('Member Added!');
+                      return const Text('Member Invited!');
                     } else {
                       return const Text('Add Member');
                     }

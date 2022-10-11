@@ -6,6 +6,8 @@ import 'package:inspired_senior_care_app/data/models/response.dart';
 import 'package:inspired_senior_care_app/data/models/user.dart';
 import 'package:inspired_senior_care_app/data/repositories/database/base_database_repository.dart';
 
+import '../../models/invite.dart';
+
 class DatabaseRepository extends BaseDatabaseRepository {
   final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
   final auth.FirebaseAuth _firebaseAuth = auth.FirebaseAuth.instance;
@@ -196,20 +198,92 @@ class DatabaseRepository extends BaseDatabaseRepository {
         .then((value) => print('Group Updated!'));
   }
 
-  Future<void> addMemberToGroup(String userId, Group group) async {
+  Future<void> addMemberToGroup(
+      String userId, String groupId, Invite invite) async {
     try {
       await _firebaseFirestore.collection('users').doc(userId).update({
-        'groups': FieldValue.arrayUnion([group.groupId])
+        'groups': FieldValue.arrayUnion([groupId])
       });
-      return await _firebaseFirestore
-          .collection('groups')
-          .doc(group.groupId)
-          .update({
+
+      await _firebaseFirestore.collection('groups').doc(groupId).update({
         'groupMemberIds': FieldValue.arrayUnion([userId])
       });
     } catch (e) {
       print(e);
     }
+  }
+
+  Future<void> addInvitedMemberToGroup(String userId, String groupId) async {
+    try {
+      await _firebaseFirestore.collection('users').doc(userId).update({
+        'groups': FieldValue.arrayUnion([groupId])
+      });
+      return await _firebaseFirestore.collection('groups').doc(groupId).update({
+        'groupMemberIds': FieldValue.arrayUnion([userId])
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void>? inviteMemberToGroup(Invite invite) async {
+    try {
+      var docRef = _firebaseFirestore
+          .collection('invites')
+          .doc(invite.invitedUserId)
+          .collection('invites')
+          .doc();
+
+      docRef.set(invite.toMap());
+      DocumentSnapshot documentSnapshot = await docRef.get();
+      var docId = documentSnapshot.reference.id;
+      docRef.set({'inviteId': docId}, SetOptions(merge: true));
+    } catch (e) {
+      print(e);
+    }
+    return;
+  }
+
+  Future<void>? deleteInvite(Invite invite) async {
+    try {
+      var docRef =
+          _firebaseFirestore.collection('invites').doc(invite.invitedUserId);
+      // Delete this invite
+      docRef.collection('invites').doc(invite.inviteId).delete();
+      // Delete user invite collection if empty
+      docRef.collection('invites').get().then((value) async {
+        if (value.size == 0) {
+          await docRef.delete();
+        }
+      });
+    } catch (e) {
+      print(e);
+    }
+    return;
+  }
+
+  Stream<Invite?>? getInvites() {
+    auth.User? user = _firebaseAuth.currentUser;
+    try {
+      return _firebaseFirestore
+          .collection('invites')
+          .doc(user!.uid)
+          .collection('invites')
+          .get()
+          .then((value) {
+        var docs = value.docs;
+        if (docs.isNotEmpty) {
+          for (QueryDocumentSnapshot<Map<String, dynamic>> doc in docs) {
+            return Invite.fromSnapshot(doc);
+          }
+        } else {
+          return null;
+        }
+      }).asStream();
+    } catch (e) {
+      print(e);
+    }
+    return null;
   }
 
   Future<void> removeMemberFromGroup(User user, Group group) async {
@@ -228,15 +302,19 @@ class DatabaseRepository extends BaseDatabaseRepository {
     }
   }
 
-  Future<void> addManagerToGroup(String userId, Group group) async {
+  Future<void> addManagerToGroup(
+      String userId, String groupId, Invite invite) async {
     try {
       await _firebaseFirestore.collection('users').doc(userId).update({
-        'groups': FieldValue.arrayUnion([group.groupId])
+        'groups': FieldValue.arrayUnion([groupId])
       });
-      return await _firebaseFirestore
-          .collection('groups')
-          .doc(group.groupId)
-          .update({
+      await _firebaseFirestore
+          .collection(invite.invitedUserId)
+          .doc()
+          .collection('invites')
+          .doc(invite.inviteId)
+          .delete();
+      return await _firebaseFirestore.collection('groups').doc(groupId).update({
         'groupManagerIds': FieldValue.arrayUnion([userId])
       });
     } catch (e) {

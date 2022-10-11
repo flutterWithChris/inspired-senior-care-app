@@ -44,6 +44,9 @@ class Profile extends StatelessWidget {
                       memberColorHex: state.user.userColor!,
                     ),
                   ),
+                  Wrap(
+                    children: [Chip(label: Text(state.user.groups![0]))],
+                  ),
                   //const Badges(),
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 16.0),
