@@ -9,6 +9,7 @@ import 'package:inspired_senior_care_app/bloc/invite/invite_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/member/bloc/bloc/group_member_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
 import 'package:inspired_senior_care_app/cubits/groups/featured_category_cubit.dart';
+import 'package:inspired_senior_care_app/cubits/groups/group_featured_category_cubit.dart';
 import 'package:inspired_senior_care_app/data/models/category.dart';
 import 'package:inspired_senior_care_app/data/models/group.dart';
 import 'package:inspired_senior_care_app/data/models/user.dart';
@@ -576,7 +577,7 @@ class CurrentCategoryCard extends StatelessWidget {
                         // dense: true,
                         onTap: () {
                           context
-                              .read<FeaturedCategoryCubit>()
+                              .read<GroupFeaturedCategoryCubit>()
                               .loadFeaturedCategory(group);
 
                           context.goNamed('choose-category');

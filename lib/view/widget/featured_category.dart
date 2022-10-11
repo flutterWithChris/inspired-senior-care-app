@@ -42,7 +42,12 @@ class _FeaturedCategoryState extends State<FeaturedCategory> {
                         constraints: BoxConstraints(
                             maxWidth: constraints.maxWidth > 700 ? 350 : 275),
                         child: Animate(
-                          effects: const [ShimmerEffect()],
+                          effects: const [
+                            ShimmerEffect(duration: Duration(milliseconds: 800))
+                          ],
+                          onComplete: (controller) {
+                            controller.repeat();
+                          },
                           child: Container(
                             color: Colors.white,
                             child: Padding(

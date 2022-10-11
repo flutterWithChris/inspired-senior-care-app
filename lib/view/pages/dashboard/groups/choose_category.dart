@@ -6,11 +6,13 @@ import 'package:infinite_carousel/infinite_carousel.dart';
 import 'package:inspired_senior_care_app/bloc/categories/categories_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/group/group_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
-import 'package:inspired_senior_care_app/cubits/groups/featured_category_cubit.dart';
+import 'package:inspired_senior_care_app/cubits/groups/group_featured_category_cubit.dart';
 import 'package:inspired_senior_care_app/data/models/category.dart';
 import 'package:inspired_senior_care_app/view/widget/main/bottom_app_bar.dart';
 import 'package:inspired_senior_care_app/view/widget/main/top_app_bar.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+
+import '../../../../cubits/groups/featured_category_cubit.dart';
 
 class ChooseCategory extends StatefulWidget {
   const ChooseCategory({Key? key}) : super(key: key);
@@ -34,183 +36,182 @@ class _ChooseCategoryState extends State<ChooseCategory> {
         }
         if (state is CategoriesLoaded) {
           final List<Category> categories = state.categories;
-          return SafeArea(
-            child: Scaffold(
-              bottomNavigationBar: const MainBottomAppBar(),
-              appBar: const PreferredSize(
-                preferredSize: Size.fromHeight(50),
-                child: MainTopAppBar(),
-              ),
-              body: Center(
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 60.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 16.0),
-                        child: Text(
-                          'Change Featured Category:',
-                          style: Theme.of(context).textTheme.headline5,
-                        ),
+          return Scaffold(
+            bottomNavigationBar: const MainBottomAppBar(),
+            appBar: const PreferredSize(
+              preferredSize: Size.fromHeight(50),
+              child: MainTopAppBar(),
+            ),
+            body: Center(
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 60.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 16.0),
+                      child: Text(
+                        'Change Featured Category:',
+                        style: Theme.of(context).textTheme.headline5,
                       ),
-                      Center(
-                        child: SizedBox(
-                          height: 275,
-                          child: Stack(
-                            alignment: AlignmentDirectional.center,
-                            children: [
-                              BlocConsumer<FeaturedCategoryCubit,
-                                  FeaturedCategoryState>(
-                                listener: (context, state) {
-                                  if (state is FeaturedCategoryLoaded) {}
-                                },
-                                builder: (context, state) {
-                                  if (state is FeaturedCategoryLoading) {
-                                    return Center(
-                                      child: LoadingAnimationWidget
-                                          .fourRotatingDots(
-                                              color: Colors.blue, size: 30),
-                                    );
-                                  }
-                                  if (state is FeaturedCategoryUpdated) {
-                                    return Center(
-                                      child: Wrap(
-                                        crossAxisAlignment:
-                                            WrapCrossAlignment.center,
-                                        direction: Axis.vertical,
-                                        spacing: 8.0,
-                                        children: [
-                                          const Icon(
-                                            Icons.check_circle_outline_rounded,
-                                            color: Colors.lightGreen,
-                                            size: 30,
-                                          ),
-                                          Text(
-                                            'Category Updated!',
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .titleMedium,
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  }
-                                  if (state is FeaturedCategoryLoaded) {
-                                    String featuredCategory =
-                                        state.featuredCategoryName;
-                                    int featuredCategoryIndex =
-                                        categories.indexWhere((category) =>
-                                            category.name == featuredCategory);
-
-                                    final List<DashboardCategoryCard> cards = [
-                                      for (Category category in categories)
-                                        DashboardCategoryCard(
-                                          controller: controller,
-                                          assetName: category.coverImageUrl,
-                                          featuredCategoryIndex:
-                                              featuredCategoryIndex,
-                                        ),
-                                    ];
-                                    WidgetsBinding.instance
-                                        .addPostFrameCallback((timeStamp) {
-                                      if (controller.hasClients) {
-                                        controller.animateToItem(
-                                            featuredCategoryIndex);
-                                      }
-                                    });
-                                    return InfiniteCarousel.builder(
-                                      controller: controller,
-                                      onIndexChanged: (p0) {
-                                        selectedCategory = categories[p0];
-                                      },
-                                      //
-                                      itemCount: categories.length,
-                                      itemExtent: 175,
-                                      itemBuilder:
-                                          (context, itemIndex, realIndex) {
-                                        return cards[itemIndex];
-                                      },
-                                    );
-                                  }
-                                  return const Center(
-                                    child: Text('Something Went Wrong'),
-                                  );
-                                },
-                              ),
-                              IgnorePointer(
-                                child: Card(
-                                    semanticContainer: false,
-                                    elevation: 0,
-                                    color: Colors.transparent,
-                                    shape: RoundedRectangleBorder(
-                                        side: const BorderSide(
-                                            color: Colors.lightBlueAccent,
-                                            width: 4.0),
-                                        borderRadius:
-                                            BorderRadius.circular(4.0)),
-                                    child: const SizedBox(
-                                      width: 168,
-                                      height: 300,
-                                    )),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: ElevatedButton(
-                            onPressed: () {
-                              context
-                                  .read<FeaturedCategoryCubit>()
-                                  .updateFeaturedCategory(selectedCategory!);
-                              context.read<GroupBloc>().add(UpdateGroup(
-                                  manager:
-                                      context.read<ProfileBloc>().state.user,
-                                  group: context
-                                      .read<FeaturedCategoryCubit>()
-                                      .currentGroup
-                                      .copyWith(
-                                          featuredCategory:
-                                              selectedCategory!.name)));
-                            },
-                            child: BlocConsumer<FeaturedCategoryCubit,
-                                FeaturedCategoryState>(
-                              listener: (context, state) async {
-                                if (state is FeaturedCategoryUpdated) {
-                                  await Future.delayed(
-                                      const Duration(seconds: 1));
-                                  if (!mounted) return;
-                                  context.pop();
-                                }
+                    ),
+                    Center(
+                      child: SizedBox(
+                        height: 275,
+                        child: Stack(
+                          alignment: AlignmentDirectional.center,
+                          children: [
+                            BlocConsumer<GroupFeaturedCategoryCubit,
+                                GroupFeaturedCategoryState>(
+                              listener: (context, state) {
+                                if (state is GroupFeaturedCategoryLoaded) {}
                               },
                               builder: (context, state) {
-                                if (state is FeaturedCategoryLoading) {
+                                if (state is GroupFeaturedCategoryLoading) {
                                   return Center(
-                                    child: LoadingAnimationWidget.bouncingBall(
-                                        color: Colors.white, size: 18),
+                                    child:
+                                        LoadingAnimationWidget.fourRotatingDots(
+                                            color: Colors.blue, size: 30),
                                   );
                                 }
-                                if (state is FeaturedCategoryUpdated) {
-                                  return const Text('Category Updated!');
-                                }
-                                if (state is FeaturedCategoryFailed) {
-                                  return const Center(
-                                    child: Text('Error!'),
+                                if (state is GroupFeaturedCategoryUpdated) {
+                                  return Center(
+                                    child: Wrap(
+                                      crossAxisAlignment:
+                                          WrapCrossAlignment.center,
+                                      direction: Axis.vertical,
+                                      spacing: 8.0,
+                                      children: [
+                                        const Icon(
+                                          Icons.check_circle_outline_rounded,
+                                          color: Colors.lightGreen,
+                                          size: 30,
+                                        ),
+                                        Text(
+                                          'Category Updated!',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleMedium,
+                                        ),
+                                      ],
+                                    ),
                                   );
                                 }
-                                if (state is FeaturedCategoryLoaded) {
-                                  return const Text('Set Category');
+                                if (state is GroupFeaturedCategoryLoaded) {
+                                  String featuredCategory =
+                                      state.featuredCategoryName;
+                                  int featuredCategoryIndex =
+                                      categories.indexWhere((category) =>
+                                          category.name == featuredCategory);
+
+                                  final List<DashboardCategoryCard> cards = [
+                                    for (Category category in categories)
+                                      DashboardCategoryCard(
+                                        controller: controller,
+                                        assetName: category.coverImageUrl,
+                                        featuredCategoryIndex:
+                                            featuredCategoryIndex,
+                                      ),
+                                  ];
+                                  WidgetsBinding.instance
+                                      .addPostFrameCallback((timeStamp) {
+                                    if (controller.hasClients) {
+                                      controller
+                                          .animateToItem(featuredCategoryIndex);
+                                    }
+                                  });
+                                  return InfiniteCarousel.builder(
+                                    controller: controller,
+                                    onIndexChanged: (p0) {
+                                      selectedCategory = categories[p0];
+                                    },
+                                    //
+                                    itemCount: categories.length,
+                                    itemExtent: 175,
+                                    itemBuilder:
+                                        (context, itemIndex, realIndex) {
+                                      return cards[itemIndex];
+                                    },
+                                  );
                                 }
                                 return const Center(
-                                  child: Text('Something Went Wrong!'),
+                                  child: Text('Something Went Wrong'),
                                 );
                               },
-                            )),
+                            ),
+                            IgnorePointer(
+                              child: Card(
+                                  semanticContainer: false,
+                                  elevation: 0,
+                                  color: Colors.transparent,
+                                  shape: RoundedRectangleBorder(
+                                      side: const BorderSide(
+                                          color: Colors.lightBlueAccent,
+                                          width: 4.0),
+                                      borderRadius: BorderRadius.circular(4.0)),
+                                  child: const SizedBox(
+                                    width: 168,
+                                    height: 300,
+                                  )),
+                            ),
+                          ],
+                        ),
                       ),
-                    ],
-                  ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: ElevatedButton(
+                          onPressed: () {
+                            context
+                                .read<GroupFeaturedCategoryCubit>()
+                                .updateFeaturedCategory(selectedCategory!);
+                            context.read<GroupBloc>().add(UpdateGroup(
+                                manager: context.read<ProfileBloc>().state.user,
+                                group: context
+                                    .read<GroupFeaturedCategoryCubit>()
+                                    .currentGroup
+                                    .copyWith(
+                                        featuredCategory:
+                                            selectedCategory!.name)));
+                            context
+                                .read<FeaturedCategoryCubit>()
+                                .loadUserFeaturedCategory();
+                          },
+                          child: BlocConsumer<GroupFeaturedCategoryCubit,
+                              GroupFeaturedCategoryState>(
+                            listener: (context, state) async {
+                              if (state is GroupFeaturedCategoryUpdated) {
+                                await Future.delayed(
+                                    const Duration(seconds: 1));
+                                if (!mounted) return;
+                                context.pop();
+                              }
+                            },
+                            builder: (context, state) {
+                              if (state is GroupFeaturedCategoryLoading) {
+                                return Center(
+                                  child: LoadingAnimationWidget.bouncingBall(
+                                      color: Colors.white, size: 18),
+                                );
+                              }
+                              if (state is GroupFeaturedCategoryUpdated) {
+                                return const Text('Category Updated!');
+                              }
+                              if (state is GroupFeaturedCategoryFailed) {
+                                return const Center(
+                                  child: Text('Error!'),
+                                );
+                              }
+                              if (state is GroupFeaturedCategoryLoaded) {
+                                return const Text('Set Category');
+                              }
+                              return const Center(
+                                child: Text('Something Went Wrong!'),
+                              );
+                            },
+                          )),
+                    ),
+                  ],
                 ),
               ),
             ),

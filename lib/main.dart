@@ -20,6 +20,7 @@ import 'package:inspired_senior_care_app/bloc/share_bloc/share_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/view_response/response_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/view_response/view_response_cubit.dart';
 import 'package:inspired_senior_care_app/cubits/groups/featured_category_cubit.dart';
+import 'package:inspired_senior_care_app/cubits/groups/group_featured_category_cubit.dart';
 import 'package:inspired_senior_care_app/cubits/login/login_cubit.dart';
 import 'package:inspired_senior_care_app/cubits/response/response_deck_cubit.dart';
 import 'package:inspired_senior_care_app/cubits/settings/cubit/settings_cubit.dart';
@@ -132,6 +133,11 @@ class _MyAppState extends State<MyApp> {
                 categoriesBloc: context.read<CategoriesBloc>(),
                 databaseRepository: context.read<DatabaseRepository>())
               ..loadUserFeaturedCategory(),
+          ),
+          BlocProvider(
+            create: (context) => GroupFeaturedCategoryCubit(
+                categoriesBloc: context.read<CategoriesBloc>(),
+                databaseRepository: context.read<DatabaseRepository>()),
           ),
           BlocProvider(
             create: (context) => MemberBloc(

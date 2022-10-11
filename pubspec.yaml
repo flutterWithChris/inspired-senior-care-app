@@ -65,6 +65,7 @@ dependencies:
   flutter_animate: ^1.0.0
   fluttertoast: ^8.0.9
   firebase_crashlytics: ^2.8.13
+  jiffy: ^5.0.0
 
 
 
