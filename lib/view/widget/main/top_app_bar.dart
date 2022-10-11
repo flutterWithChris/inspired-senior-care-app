@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-
-import '../../../cubits/login/login_cubit.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class MainTopAppBar extends StatelessWidget {
   final String? title;
@@ -24,6 +22,12 @@ class MainTopAppBar extends StatelessWidget {
         //     },
         //     icon: const Icon(Icons.logout_rounded),
         //     label: const Text('Logout'))
+        // IconButton(
+        //     onPressed: () {},
+        //     icon: Icon(
+        //       FontAwesomeIcons.inbox,
+        //       color: Theme.of(context).iconTheme.color,
+        //     ))
       ],
       title: title != null
           ? Text(title!)

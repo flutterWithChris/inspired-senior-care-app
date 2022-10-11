@@ -220,7 +220,7 @@ class SeeMoreButton extends StatelessWidget {
         }),
         style: ElevatedButton.styleFrom(fixedSize: const Size(200, 30)),
         child: const Text(
-          'See More',
+          'See Category',
           style: TextStyle(fontSize: 16),
         ),
       ),
