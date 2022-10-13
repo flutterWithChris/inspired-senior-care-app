@@ -6,6 +6,7 @@ class Invite {
   final String groupName;
   final String inviterId;
   final String invitedUserId;
+  final String invitedUserName;
   final String status;
   final String inviteType;
   final String inviterName;
@@ -16,6 +17,7 @@ class Invite {
     required this.inviterName,
     required this.inviterId,
     required this.invitedUserId,
+    required this.invitedUserName,
     required this.inviteType,
     required this.status,
   });
@@ -28,9 +30,11 @@ class Invite {
     String? inviterName,
     String? inviteType,
     String? invitedUserId,
+    String? invitedUserName,
     String? status,
   }) {
     return Invite(
+      invitedUserName: invitedUserName ?? this.invitedUserName,
       inviteId: inviteId ?? this.inviteId,
       inviterName: inviterName ?? this.inviterName,
       groupName: groupName ?? this.groupName,
@@ -50,6 +54,7 @@ class Invite {
       inviterId: snap['inviterId'],
       inviterName: snap['inviterName'],
       invitedUserId: snap['invitedUserId'],
+      invitedUserName: snap['invitedUserName'],
       inviteType: snap['inviteType'],
       status: snap['status'],
     );
@@ -66,6 +71,7 @@ class Invite {
       'inviterName': inviterName,
       'inviteType': inviteType,
       'invitedUserId': invitedUserId,
+      'invitedUserName': invitedUserName,
       'status': status,
     };
   }

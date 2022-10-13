@@ -9,6 +9,7 @@ import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
 import 'package:inspired_senior_care_app/data/models/group.dart';
 import 'package:inspired_senior_care_app/data/models/user.dart';
 import 'package:inspired_senior_care_app/data/repositories/database/database_repository.dart';
+import 'package:jiffy/jiffy.dart';
 
 part 'group_event.dart';
 part 'group_state.dart';
@@ -57,12 +58,30 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
   }
 
   void _onCreateGroup(CreateGroup event, Emitter<GroupState> emit) async {
+    Map<int, String> monthlyCategories = {
+      1: 'Genuine Relationships',
+      2: 'Brain Change',
+      3: 'What If',
+      4: 'Supportive Environment',
+      5: 'Language Matters',
+      6: 'Well Being',
+      7: 'Meaningful Engagement',
+      8: 'Communication',
+      9: 'Damaging Interactions',
+      10: 'Positive Interactions',
+      11: 'Wildly Curious',
+      12: 'Strengths Based'
+    };
+    int month = Jiffy().month;
+    String thisMonthsCategory = monthlyCategories[month]!;
     await Future.delayed(const Duration(milliseconds: 500));
-    _databaseRepository.addNewGroup(event.group, event.manager);
-    groups.add(event.group);
+    Group groupWithCategory =
+        event.group.copyWith(featuredCategory: thisMonthsCategory);
+    _databaseRepository.addNewGroup(groupWithCategory, event.manager);
+    groups.add(groupWithCategory);
     // event.manager.groups!.add(event.group.groupId!);
 
-    emit(GroupCreated(group: event.group));
+    emit(GroupCreated(group: groupWithCategory));
     await Future.delayed(const Duration(milliseconds: 500));
     emit(GroupLoading());
     add(LoadGroups(userId: event.manager.id!));

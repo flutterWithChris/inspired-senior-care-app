@@ -76,7 +76,8 @@ class _CreateGroupDialogState extends State<CreateGroupDialog> {
                     Group newGroup = Group(
                         groupName: groupNameController.text,
                         groupId: '',
-                        featuredCategory: 'Supportive Environment',
+                        onSchedule: true,
+                        featuredCategory: '',
                         groupMemberIds: [],
                         groupManagerIds: [currentUser.id!]);
                     BlocProvider.of<GroupBloc>(context).add(

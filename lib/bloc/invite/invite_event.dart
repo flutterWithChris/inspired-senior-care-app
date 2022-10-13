@@ -43,6 +43,17 @@ class InviteReceived extends InviteEvent {
   List<Object?> get props => throw UnimplementedError();
 }
 
+class InviteDeleted extends InviteEvent {
+  @override
+  final Invite invite;
+  const InviteDeleted({
+    required this.invite,
+  });
+  @override
+  // TODO: implement props
+  List<Object?> get props => [invite];
+}
+
 class InviteAccepted extends InviteEvent {
   @override
   Invite invite;

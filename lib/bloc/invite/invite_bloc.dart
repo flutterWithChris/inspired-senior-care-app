@@ -78,6 +78,7 @@ class InviteBloc extends Bloc<InviteEvent, InviteState> {
                 groupId: event.group.groupId!,
                 inviterId: currentUser.id!,
                 invitedUserId: user!.id!,
+                invitedUserName: user.name!,
                 inviteType: 'member',
                 status: 'sent');
             _databaseRepository.inviteMemberToGroup(invite);
@@ -108,6 +109,7 @@ class InviteBloc extends Bloc<InviteEvent, InviteState> {
                 groupName: event.group.groupName!,
                 groupId: event.group.groupId!,
                 inviterId: currentUser.id!,
+                invitedUserName: currentUser.name!,
                 invitedUserId: user!.id!,
                 inviteType: 'manager',
                 status: 'sent');
@@ -133,6 +135,13 @@ class InviteBloc extends Bloc<InviteEvent, InviteState> {
                 event.invite.invitedUserId, event.invite.groupId, event.invite);
         emit(InviteState.accepted());
         _databaseRepository.deleteInvite(event.invite);
+        Invite acceptedInvite = event.invite.copyWith(
+            status: 'accepted',
+            inviterId: event.invite.invitedUserId,
+            invitedUserId: event.invite.inviterId,
+            inviterName: event.invite.invitedUserName,
+            invitedUserName: event.invite.inviterName);
+        _databaseRepository.inviteMemberToGroup(acceptedInvite);
         await Future.delayed(const Duration(seconds: 2));
         add(LoadInvites());
       }
@@ -142,12 +151,24 @@ class InviteBloc extends Bloc<InviteEvent, InviteState> {
       if (event is InviteReceived) {
         emit(InviteState.receieved());
       }
+      if (event is InviteDeleted) {
+        _databaseRepository.deleteInvite(event.invite);
+        add(LoadInvites());
+      }
       if (event is InviteDenied) {
         _databaseRepository.deleteInvite(event.invite);
         emit(InviteState.denied());
+        Invite declinedInvite = event.invite.copyWith(
+            status: 'declined',
+            inviterId: event.invite.invitedUserId,
+            invitedUserId: event.invite.inviterId,
+            inviterName: event.invite.invitedUserName,
+            invitedUserName: event.invite.inviterName);
+        _databaseRepository.inviteMemberToGroup(declinedInvite);
         await Future.delayed(const Duration(seconds: 2));
         add(LoadInvites());
       }
+
       // TODO: implement event handler
     });
   }

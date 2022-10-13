@@ -85,11 +85,11 @@ class DatabaseRepository extends BaseDatabaseRepository {
         .map((snap) => Category.fromSnapshot(snap.docs.first));
   }
 
-  Future<void> setGroupFeaturedCategory(String groupId, Category category) {
+  Future<void> setGroupFeaturedCategory(String groupId, String categoryName) {
     return _firebaseFirestore
         .collection('groups')
         .doc(groupId)
-        .update({'featuredCategory': category.name});
+        .update({'featuredCategory': categoryName});
   }
 
   Future<String> getGroupFeaturedCategory(String groupId) {

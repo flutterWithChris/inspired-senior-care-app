@@ -140,16 +140,18 @@ class _MyAppState extends State<MyApp> {
                 databaseRepository: context.read<DatabaseRepository>()),
           ),
           BlocProvider(
+            create: (context) => GroupFeaturedCategoryCubit(
+                categoriesBloc: context.read<CategoriesBloc>(),
+                databaseRepository: context.read<DatabaseRepository>()),
+          ),
+          BlocProvider(
             create: (context) => FeaturedCategoryCubit(
+                groupFeaturedCategoryCubit:
+                    context.read<GroupFeaturedCategoryCubit>(),
                 authBloc: context.read<AuthBloc>(),
                 categoriesBloc: context.read<CategoriesBloc>(),
                 databaseRepository: context.read<DatabaseRepository>())
               ..loadUserFeaturedCategory(),
-          ),
-          BlocProvider(
-            create: (context) => GroupFeaturedCategoryCubit(
-                categoriesBloc: context.read<CategoriesBloc>(),
-                databaseRepository: context.read<DatabaseRepository>()),
           ),
           BlocProvider(
             create: (context) => MemberBloc(
@@ -187,7 +189,7 @@ class _MyAppState extends State<MyApp> {
               routeInformationProvider: router.routeInformationProvider,
               title: 'Inspired Senior Care App',
               theme: ThemeData(
-                  scaffoldBackgroundColor: Colors.grey.shade200,
+                  scaffoldBackgroundColor: Colors.grey.shade100,
                   inputDecorationTheme: InputDecorationTheme(
                     filled: true,
                     fillColor: Colors.white,
@@ -200,7 +202,14 @@ class _MyAppState extends State<MyApp> {
                     style: ElevatedButton.styleFrom(
                       shape: const StadiumBorder(),
                       fixedSize: const Size(200, 30),
-                      minimumSize: const Size(35, 30),
+                      minimumSize: const Size(25, 30),
+                    ),
+                  ),
+                  outlinedButtonTheme: OutlinedButtonThemeData(
+                    style: OutlinedButton.styleFrom(
+                      shape: const StadiumBorder(),
+                      fixedSize: const Size(200, 30),
+                      minimumSize: const Size(25, 30),
                     ),
                   ),
                   bottomSheetTheme:

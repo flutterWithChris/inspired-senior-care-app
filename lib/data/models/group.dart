@@ -6,14 +6,15 @@ class Group {
   final List<String>? groupMemberIds;
   final List<String>? groupManagerIds;
   final String? featuredCategory;
+  final bool? onSchedule;
 
-  const Group({
-    this.groupName,
-    this.groupId,
-    this.groupMemberIds,
-    this.groupManagerIds,
-    this.featuredCategory
-  });
+  const Group(
+      {this.groupName,
+      this.groupId,
+      this.groupMemberIds,
+      this.groupManagerIds,
+      this.featuredCategory,
+      this.onSchedule});
 
   Group copyWith({
     String? groupName,
@@ -21,6 +22,7 @@ class Group {
     List<String>? groupMemberIds,
     List<String>? groupManagerIds,
     String? featuredCategory,
+    bool? onSchedule,
   }) {
     return Group(
       groupName: groupName ?? this.groupName,
@@ -28,17 +30,19 @@ class Group {
       groupMemberIds: groupMemberIds ?? this.groupMemberIds,
       groupManagerIds: groupManagerIds ?? this.groupManagerIds,
       featuredCategory: featuredCategory ?? this.featuredCategory,
+      onSchedule: onSchedule ?? this.onSchedule,
     );
   }
 
   static Group fromSnapshot(DocumentSnapshot snap) {
     Group group = Group(
-        groupName: snap['groupName'],
-        groupId: snap['groupId'],
-        groupMemberIds: List.from(snap['groupMemberIds']),
-        groupManagerIds: List.from(snap['groupManagerIds']),
-        featuredCategory: snap['featuredCategory']
-        );
+      groupName: snap['groupName'],
+      groupId: snap['groupId'],
+      groupMemberIds: List.from(snap['groupMemberIds']),
+      groupManagerIds: List.from(snap['groupManagerIds']),
+      featuredCategory: snap['featuredCategory'],
+      onSchedule: snap['onSchedule'],
+    );
 
     return group;
   }
@@ -50,6 +54,7 @@ class Group {
       'groupMemberIds': groupMemberIds,
       'groupManagerIds': groupManagerIds,
       'featuredCategory': featuredCategory,
+      'onSchedule': onSchedule,
     };
   }
 

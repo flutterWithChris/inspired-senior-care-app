@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:inspired_senior_care_app/bloc/categories/categories_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/group/group_bloc.dart';
@@ -404,58 +405,6 @@ class _GroupSectionState extends State<GroupSection> {
               ],
             ),
           ),
-          Wrap(
-            runAlignment: WrapAlignment.end,
-            alignment: WrapAlignment.end,
-            spacing: 8.0,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: const [
-              // ElevatedButton.icon(
-              //     style: ElevatedButton.styleFrom(
-              //       foregroundColor: Colors.white,
-              //       fixedSize: const Size(140, 30),
-              //       backgroundColor: Colors.lightGreen,
-              //     ),
-              //     onPressed: () {
-              //       showDialog(
-              //           context: context,
-              //           builder: (_) => AddMemberDialog(
-              //               group: widget.group,
-              //               inviteTextFieldController:
-              //                   widget.inviteTextFieldController));
-              //     },
-              //     icon: const Icon(
-              //       Icons.add_circle_rounded,
-              //       size: 18,
-              //     ),
-              //     label: const Text(
-              //       'Add Member',
-              //     )),
-
-              // ElevatedButton.icon(
-              //     style: ElevatedButton.styleFrom(
-              //       fixedSize: const Size(140, 30),
-              //     ),
-              //     onPressed: () {
-              //       // showDialog(
-              //       //   context: context,
-              //       //   builder: (context) {
-              //       //     return EditGroupDialog(
-              //       //         currentUser: currentUser,
-              //       //         currentGroup: currentGroup);
-              //       //   },
-              //       // );
-              //       print(currentUser.name);
-              //     },
-              //     icon: const Icon(
-              //       Icons.edit,
-              //       size: 18,
-              //     ),
-              //     label: const Text(
-              //       'Edit Group',
-              //     )),
-            ],
-          ),
           Padding(
             padding: const EdgeInsets.only(bottom: 8.0, left: 16.0),
             child: SizedBox(
@@ -573,7 +522,20 @@ class CurrentCategoryCard extends StatelessWidget {
                           group.featuredCategory!,
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
-                        //  subtitle: const Text('Creating a healthy environment.'),
+                        subtitle: group.onSchedule == true
+                            ? Wrap(
+                                spacing: 6.0,
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                children: const [
+                                  Icon(
+                                    FontAwesomeIcons.solidCalendarCheck,
+                                    size: 12.0,
+                                    color: Colors.blue,
+                                  ),
+                                  Text('On Schedule'),
+                                ],
+                              )
+                            : const SizedBox(),
                         trailing: const Icon(Icons.chevron_right_rounded),
                         leading: SizedBox(
                           height: 50,
