@@ -413,7 +413,7 @@ class _GroupSectionState extends State<GroupSection> {
                   'Featured Category',
                   style: Theme.of(context)
                       .textTheme
-                      .headline6!
+                      .titleLarge!
                       .copyWith(color: Colors.black87),
                 )),
           ),
@@ -495,55 +495,116 @@ class CurrentCategoryCard extends StatelessWidget {
                 );
               }
               if (state is FeaturedCategoryLoaded) {
-                return Card(
-                  shape: RoundedRectangleBorder(
-                      side: BorderSide(
-                          color: currentCategory.categoryColor.withOpacity(0.8),
-                          width: 1.618),
-                      borderRadius: BorderRadius.circular(12.0)),
-                  elevation: 1.0,
-                  child: SizedBox(
-                    width: 325,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8.0, vertical: 10.0),
-                      child: ListTile(
-                        minLeadingWidth: 40,
-                        // dense: true,
-                        onTap: () {
-                          context
-                              .read<GroupFeaturedCategoryCubit>()
-                              .loadFeaturedCategory(group);
+                return ConstrainedBox(
+                  constraints:
+                      const BoxConstraints(maxHeight: 100, minHeight: 60),
+                  child: InkWell(
+                    onTap: () {
+                      context
+                          .read<GroupFeaturedCategoryCubit>()
+                          .loadFeaturedCategory(group);
 
-                          context.goNamed('choose-category');
-                        },
-
-                        title: Text(
-                          group.featuredCategory!,
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                        subtitle: group.onSchedule == true
-                            ? Wrap(
-                                spacing: 6.0,
-                                crossAxisAlignment: WrapCrossAlignment.center,
-                                children: const [
-                                  Icon(
-                                    FontAwesomeIcons.solidCalendarCheck,
-                                    size: 12.0,
-                                    color: Colors.blue,
+                      context.goNamed('choose-category');
+                    },
+                    child: Card(
+                      shape: RoundedRectangleBorder(
+                          side: BorderSide(
+                              color: currentCategory.categoryColor
+                                  .withOpacity(0.8),
+                              width: 1.618),
+                          borderRadius: BorderRadius.circular(12.0)),
+                      elevation: 1.0,
+                      child: SizedBox(
+                        width: 325,
+                        //height: 100,
+                        child: Flex(
+                          direction: Axis.horizontal,
+                          children: [
+                            Flexible(
+                              child: ClipRRect(
+                                borderRadius: const BorderRadius.only(
+                                  topLeft: Radius.circular(12.0),
+                                  bottomLeft: Radius.circular(12.0),
+                                ),
+                                child: CachedNetworkImage(
+                                  imageUrl: currentCategory.coverImageUrl,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                            Flexible(
+                              flex: 4,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 16.0),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        FittedBox(
+                                          child: Text(
+                                            group.featuredCategory!,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .titleMedium!
+                                                .copyWith(
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                          ),
+                                        ),
+                                        const Padding(
+                                          padding: EdgeInsets.only(right: 12.0),
+                                          child:
+                                              Icon(Icons.chevron_right_rounded),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                  Text('On Schedule'),
+                                  group.onSchedule == true
+                                      ? Flexible(
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 16.0),
+                                            child: Wrap(
+                                              alignment: WrapAlignment.start,
+                                              spacing: 6.0,
+                                              crossAxisAlignment:
+                                                  WrapCrossAlignment.center,
+                                              children: const [
+                                                Icon(
+                                                  FontAwesomeIcons
+                                                      .solidCalendarCheck,
+                                                  size: 12.0,
+                                                  color: Colors.blue,
+                                                ),
+                                                Text('On Schedule'),
+                                              ],
+                                            ),
+                                          ),
+                                        )
+                                      : Flexible(
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 16.0,
+                                                top: 4.0,
+                                                right: 4.0),
+                                            child: Text(
+                                              currentCategory.description,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .bodyMedium,
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        ),
                                 ],
-                              )
-                            : const SizedBox(),
-                        trailing: const Icon(Icons.chevron_right_rounded),
-                        leading: SizedBox(
-                          height: 50,
-                          width: 40,
-                          child: CachedNetworkImage(
-                            imageUrl: currentCategory.coverImageUrl,
-                            fit: BoxFit.fitHeight,
-                          ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),

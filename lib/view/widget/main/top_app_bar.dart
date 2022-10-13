@@ -198,12 +198,15 @@ class InviteList extends StatelessWidget {
                 return SizedBox(
                   height: 100,
                   child: Center(
-                    child: Text(
-                      'No Invites!',
-                      style: Theme.of(context)
-                          .textTheme
-                          .subtitle2!
-                          .copyWith(color: Colors.grey.shade600),
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 36.0),
+                      child: Text(
+                        'No Invites!',
+                        style: Theme.of(context)
+                            .textTheme
+                            .subtitle2!
+                            .copyWith(color: Colors.grey.shade600),
+                      ),
                     ),
                   ),
                 );
