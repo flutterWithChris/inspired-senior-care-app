@@ -13,6 +13,7 @@ part 'profile_state.dart';
 class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   final AuthBloc _authBloc;
   final DatabaseRepository _databaseRepository;
+  List<String> groupNames = [];
   StreamSubscription? _authSubscription;
   ProfileBloc({
     required AuthBloc authBloc,
@@ -22,11 +23,12 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         super(ProfileLoading()) {
     on<LoadProfile>(_onLoadProfile);
     on<UpdateProfile>(_onUpdateProfile);
+    on<ResetProfile>((event, emit) => emit(ProfileLoading()));
 
     _authSubscription = _authBloc.stream.listen((state) {
       state.authStatus == AuthStatus.authenticated
           ? add(LoadProfile(userId: state.user!.uid))
-          : null;
+          : add(ResetProfile());
     });
   }
   void _onLoadProfile(LoadProfile event, Emitter<ProfileState> emit) {

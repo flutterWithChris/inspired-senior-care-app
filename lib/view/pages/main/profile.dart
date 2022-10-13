@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
+import 'package:inspired_senior_care_app/view/widget/group_chips.dart';
 
 import 'package:inspired_senior_care_app/view/widget/main/bottom_app_bar.dart';
 import 'package:inspired_senior_care_app/view/widget/main/main_app_drawer.dart';
@@ -36,7 +37,7 @@ class Profile extends StatelessWidget {
                 //  shrinkWrap: true,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 12.0),
+                    padding: const EdgeInsets.only(top: 12.0),
                     child: NamePlate(
                       user: state.user,
                       memberName: state.user.name!,
@@ -44,9 +45,7 @@ class Profile extends StatelessWidget {
                       memberColorHex: state.user.userColor!,
                     ),
                   ),
-                  Wrap(
-                    children: [Chip(label: Text(state.user.groups![0]))],
-                  ),
+                  const GroupChips(),
                   //const Badges(),
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 16.0),

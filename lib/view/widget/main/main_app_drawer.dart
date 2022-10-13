@@ -100,6 +100,7 @@ class MainAppDrawer extends StatelessWidget {
                         onPressed: () {
                           context.read<LoginCubit>().signOut();
                           context.read<AuthBloc>().add(AppLogoutRequested());
+                          context.read<ProfileBloc>().add(ResetProfile());
                         },
                         icon: const Icon(Icons.logout_rounded),
                         label: const Text('Logout'))

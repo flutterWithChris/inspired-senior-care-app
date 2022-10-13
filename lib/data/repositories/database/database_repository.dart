@@ -152,10 +152,10 @@ class DatabaseRepository extends BaseDatabaseRepository {
         .map((event) => Group.fromSnapshot(event));
   }
 
-  Future<int> getGroupCount() {
+  Future<int> getGroupCount(String userId) {
     return _firebaseFirestore
         .collection('users')
-        .doc(_firebaseAuth.currentUser!.uid)
+        .doc(userId)
         .get()
         .then((value) => List.from(value.get('groups')).length);
   }
@@ -168,10 +168,10 @@ class DatabaseRepository extends BaseDatabaseRepository {
         .then((value) => List.from(value.get('groups')));
   }
 
-  Stream<List<Group>> getManagerGroups(User user) {
+  Stream<List<Group>> getManagerGroups(String userId) {
     return _firebaseFirestore
         .collection('groups')
-        .where('groupManagerIds', arrayContains: user.id)
+        .where('groupManagerIds', arrayContains: userId)
         .snapshots()
         .map((snapshot) {
       print('Fetching Groups from Firebase');
@@ -179,10 +179,10 @@ class DatabaseRepository extends BaseDatabaseRepository {
     });
   }
 
-  Stream<List<Group>> getMemberGroups(User user) {
+  Stream<List<Group>> getMemberGroups(String userId) {
     return _firebaseFirestore
         .collection('groups')
-        .where('groupMemberIds', arrayContains: user.id)
+        .where('groupMemberIds', arrayContains: userId)
         .snapshots()
         .map((snapshot) {
       print('Fetching Groups from Firebase');
@@ -262,7 +262,7 @@ class DatabaseRepository extends BaseDatabaseRepository {
     return;
   }
 
-  Stream<Invite?>? getInvites() {
+  Stream<List<Invite>?>? getInvites() {
     auth.User? user = _firebaseAuth.currentUser;
     try {
       return _firebaseFirestore
@@ -273,9 +273,13 @@ class DatabaseRepository extends BaseDatabaseRepository {
           .then((value) {
         var docs = value.docs;
         if (docs.isNotEmpty) {
+          List<Invite> invites = [];
           for (QueryDocumentSnapshot<Map<String, dynamic>> doc in docs) {
-            return Invite.fromSnapshot(doc);
+            Invite thisInvite = Invite.fromSnapshot(doc);
+            invites.add(thisInvite);
+            print('Invite ${thisInvite.inviteId} Fetched***');
           }
+          return invites;
         } else {
           return null;
         }

@@ -51,8 +51,8 @@ class InviteBloc extends Bloc<InviteEvent, InviteState> {
           _databaseRepository.getInvites()!,
           onData: (data) {
             if (data != null) {
-              Invite invite = data as Invite;
-              invites.add(invite);
+              List<Invite> invites = data as List<Invite>;
+
               print('Fetched ${invites.length} invites.');
               return InviteState.loaded(invites);
             } else {
@@ -102,16 +102,17 @@ class InviteBloc extends Bloc<InviteEvent, InviteState> {
         await emit.forEach(
           _databaseRepository.getUserByEmail(event.emailAddress),
           onData: (User? user) {
-            var currentUser = _authRepository.currentUser;
+            var currentUser = _profileBloc.state.user;
             Invite invite = Invite(
-                inviterName: currentUser!.displayName!,
+                inviterName: currentUser.name!,
                 groupName: event.group.groupName!,
                 groupId: event.group.groupId!,
-                inviterId: currentUser.uid,
+                inviterId: currentUser.id!,
                 invitedUserId: user!.id!,
                 inviteType: 'manager',
                 status: 'sent');
             if (user != null) {
+              _databaseRepository.inviteMemberToGroup(invite);
               return InviteState.sent();
             } else {
               return InviteState.failed();

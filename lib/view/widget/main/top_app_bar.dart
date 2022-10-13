@@ -54,7 +54,7 @@ class InboxButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<InviteBloc, InviteState>(
       builder: (context, state) {
-        List<Invite> invites = context.watch<InviteBloc>().state.invites ?? [];
+        List<Invite> invites = context.watch<InviteBloc>().state.invites;
         return Stack(
           fit: StackFit.passthrough,
           clipBehavior: Clip.none,
@@ -83,7 +83,7 @@ class InboxButton extends StatelessWidget {
                       BlocBuilder<InviteBloc, InviteState>(
                         builder: (context, state) {
                           print(state.toString());
-                          if (state.inviteStatus == InviteStatus.loading) {
+                          if (state == InviteState.loading()) {
                             return LoadingAnimationWidget.fourRotatingDots(
                                 color: Colors.blue, size: 20.0);
                           }
@@ -115,124 +115,168 @@ class InboxButton extends StatelessWidget {
                               ),
                             );
                           }
-                          if (state.inviteStatus == InviteStatus.loaded) {
+                          if (state == InviteState.loaded(state.invites)) {
                             return ListView.builder(
-                              shrinkWrap: true,
-                              itemCount: state.invites?.length ?? 1,
-                              itemBuilder: (context, index) {
-                                if (state.invites!.isEmpty) {
-                                  return const SizedBox(
-                                    height: 125,
-                                    child: Center(
-                                      child: Text('No Invites!'),
-                                    ),
-                                  );
-                                } else {
-                                  Invite thisInvite = state.invites!.first;
-                                  return Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Flex(
-                                      direction: Axis.vertical,
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.only(
-                                              left: 0.0, right: 0),
-                                          child: Row(
+                                shrinkWrap: true,
+                                itemCount: state.invites.isNotEmpty
+                                    ? state.invites.length
+                                    : 1,
+                                itemBuilder: (context, index) {
+                                  if (state.invites.isNotEmpty) {
+                                    print(
+                                        'Invite 1: ${state.invites[0].inviteId}}');
+
+                                    Invite thisInvite = state.invites[index];
+
+                                    return Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Flex(
+                                        direction: Axis.vertical,
+                                        children: [
+                                          Row(
                                             mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
+                                                MainAxisAlignment.start,
                                             children: [
-                                              Flexible(
-                                                flex: 3,
-                                                child: Text(
-                                                  thisInvite.groupName,
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .titleLarge,
-                                                ),
+                                              Text(
+                                                '${thisInvite.inviterName.split(' ')[0]} ',
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .subtitle2!
+                                                    .copyWith(
+                                                        color: Colors.blue),
                                               ),
-                                              Padding(
-                                                padding: const EdgeInsets.only(
-                                                    right: 1.0),
-                                                child: Flexible(
-                                                  child: Row(
-                                                      mainAxisSize:
-                                                          MainAxisSize.min,
-                                                      children: [
-                                                        IconButton(
-                                                          splashRadius: 18,
-                                                          iconSize: 18,
-                                                          visualDensity:
-                                                              VisualDensity
-                                                                  .compact,
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(0),
-                                                          onPressed: () {
-                                                            context
-                                                                .read<
-                                                                    InviteBloc>()
-                                                                .add(InviteAccepted(
-                                                                    invite:
-                                                                        thisInvite));
-                                                          },
-                                                          icon: Icon(
-                                                            color: Colors
-                                                                .green.shade400,
-                                                            Icons
-                                                                .check_circle_rounded,
-                                                          ),
-                                                        ),
-                                                        IconButton(
-                                                          splashRadius: 18,
-                                                          iconSize: 18,
-                                                          visualDensity:
-                                                              VisualDensity
-                                                                  .compact,
-                                                          padding:
-                                                              EdgeInsets.zero,
-                                                          onPressed: () {
-                                                            context
-                                                                .read<
-                                                                    InviteBloc>()
-                                                                .add(InviteDenied(
-                                                                    invite:
-                                                                        thisInvite));
-                                                          },
-                                                          icon: const Icon(
-                                                            Icons
-                                                                .remove_circle_rounded,
-                                                            color: Colors
-                                                                .redAccent,
-                                                          ),
-                                                        ),
-                                                      ]),
-                                                ),
+                                              Text(
+                                                'invited you to:',
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .subtitle2,
                                               ),
                                             ],
                                           ),
-                                        ),
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              'Invited by: ${thisInvite.inviterName}',
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .subtitle2,
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 0.0, right: 0),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                FittedBox(
+                                                  child: Text(
+                                                    thisInvite.groupName,
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .titleLarge,
+                                                  ),
+                                                ),
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          right: 1.0),
+                                                  child: Flexible(
+                                                    child: Row(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        children: [
+                                                          IconButton(
+                                                            splashRadius: 18,
+                                                            iconSize: 18,
+                                                            visualDensity:
+                                                                VisualDensity
+                                                                    .compact,
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .all(0),
+                                                            onPressed: () {
+                                                              context
+                                                                  .read<
+                                                                      InviteBloc>()
+                                                                  .add(InviteAccepted(
+                                                                      invite:
+                                                                          thisInvite));
+                                                            },
+                                                            icon: Icon(
+                                                              color: Colors
+                                                                  .green
+                                                                  .shade400,
+                                                              Icons
+                                                                  .check_circle_rounded,
+                                                            ),
+                                                          ),
+                                                          IconButton(
+                                                            splashRadius: 18,
+                                                            iconSize: 18,
+                                                            visualDensity:
+                                                                VisualDensity
+                                                                    .compact,
+                                                            padding:
+                                                                EdgeInsets.zero,
+                                                            onPressed: () {
+                                                              context
+                                                                  .read<
+                                                                      InviteBloc>()
+                                                                  .add(InviteDenied(
+                                                                      invite:
+                                                                          thisInvite));
+                                                            },
+                                                            icon: const Icon(
+                                                              Icons
+                                                                  .cancel_rounded,
+                                                              color: Colors
+                                                                  .redAccent,
+                                                            ),
+                                                          ),
+                                                        ]),
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                          ],
-                                        ),
-                                        const Padding(
-                                          padding: EdgeInsets.all(8.0),
-                                          child: Divider(),
-                                        )
-                                      ],
+                                          ),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                'As a',
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .subtitle2!,
+                                              ),
+                                              Text(
+                                                ' ${thisInvite.inviteType}',
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .subtitle2!
+                                                    .copyWith(
+                                                      color: Colors.blue,
+                                                    ),
+                                              ),
+                                            ],
+                                          ),
+                                          const Padding(
+                                            padding: EdgeInsets.all(8.0),
+                                            child: Divider(),
+                                          )
+                                        ],
+                                      ),
+                                    );
+                                  }
+
+                                  print('no invtites!!!');
+                                  return SizedBox(
+                                    height: 100,
+                                    child: Center(
+                                      child: Text(
+                                        'No Invites!',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .subtitle2!
+                                            .copyWith(
+                                                color: Colors.grey.shade600),
+                                      ),
                                     ),
                                   );
-                                }
-                              },
-                            );
+                                });
                           } else {
                             return const Center(
                               child: Text('Something Went Wrong..'),

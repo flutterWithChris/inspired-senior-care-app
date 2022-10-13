@@ -119,10 +119,21 @@ class _MyAppState extends State<MyApp> {
               ..add(LoadCategories()),
           ),
           BlocProvider(
-            create: (context) => GroupBloc(
+            create: (context) => InviteBloc(
+                authBloc: context.read<AuthBloc>(),
+                profileBloc: context.read<ProfileBloc>(),
+                authRepository: context.read<AuthRepository>(),
                 databaseRepository: context.read<DatabaseRepository>())
-              ..add(LoadGroups(
-                  currentUser: context.read<ProfileBloc>().state.user)),
+              ..add(LoadInvites()),
+          ),
+          BlocProvider(
+            create: (context) => GroupBloc(
+                profileBloc: context.read<ProfileBloc>(),
+                inviteBloc: context.read<InviteBloc>(),
+                authBloc: context.read<AuthBloc>(),
+                databaseRepository: context.read<DatabaseRepository>())
+              ..add(
+                  LoadGroups(userId: context.read<AuthBloc>().state.user!.uid)),
           ),
           BlocProvider(
             create: (context) => GroupMemberBloc(
@@ -164,14 +175,6 @@ class _MyAppState extends State<MyApp> {
           BlocProvider(
             create: (context) => DeckCubit(
                 databaseRepository: context.read<DatabaseRepository>()),
-          ),
-          BlocProvider(
-            create: (context) => InviteBloc(
-                authBloc: context.read<AuthBloc>(),
-                profileBloc: context.read<ProfileBloc>(),
-                authRepository: context.read<AuthRepository>(),
-                databaseRepository: context.read<DatabaseRepository>())
-              ..add(LoadInvites()),
           ),
         ],
         child: BlocBuilder<AuthBloc, AuthState>(
