@@ -13,9 +13,14 @@ class GroupFeaturedCategoryLoading extends GroupFeaturedCategoryState {}
 
 class GroupFeaturedCategoryLoaded extends GroupFeaturedCategoryState {
   final String featuredCategoryName;
+  final String suggestedCategory;
   const GroupFeaturedCategoryLoaded({
     required this.featuredCategoryName,
+    required this.suggestedCategory,
   });
+  @override
+  // TODO: implement props
+  List<Object> get props => [featuredCategoryName, suggestedCategory];
 }
 
 class GroupFeaturedCategoryUpdated extends GroupFeaturedCategoryState {}

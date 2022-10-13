@@ -10,6 +10,7 @@ import 'package:inspired_senior_care_app/bloc/cards/card_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/categories/categories_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/deck/deck_cubit.dart';
 import 'package:inspired_senior_care_app/bloc/group/group_bloc.dart';
+import 'package:inspired_senior_care_app/bloc/invite/invite_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/manage/response_interaction_cubit.dart';
 import 'package:inspired_senior_care_app/bloc/manage/view_response_deck_cubit.dart';
 import 'package:inspired_senior_care_app/bloc/member/bloc/bloc/group_member_bloc.dart';
@@ -118,26 +119,39 @@ class _MyAppState extends State<MyApp> {
               ..add(LoadCategories()),
           ),
           BlocProvider(
-            create: (context) => GroupBloc(
+            create: (context) => InviteBloc(
+                authBloc: context.read<AuthBloc>(),
+                profileBloc: context.read<ProfileBloc>(),
+                authRepository: context.read<AuthRepository>(),
                 databaseRepository: context.read<DatabaseRepository>())
-              ..add(LoadGroups(
-                  currentUser: context.read<ProfileBloc>().state.user)),
+              ..add(LoadInvites()),
+          ),
+          BlocProvider(
+            create: (context) => GroupBloc(
+                profileBloc: context.read<ProfileBloc>(),
+                inviteBloc: context.read<InviteBloc>(),
+                authBloc: context.read<AuthBloc>(),
+                databaseRepository: context.read<DatabaseRepository>())
+              ..add(
+                  LoadGroups(userId: context.read<AuthBloc>().state.user!.uid)),
           ),
           BlocProvider(
             create: (context) => GroupMemberBloc(
                 databaseRepository: context.read<DatabaseRepository>()),
           ),
           BlocProvider(
+            create: (context) => GroupFeaturedCategoryCubit(
+                categoriesBloc: context.read<CategoriesBloc>(),
+                databaseRepository: context.read<DatabaseRepository>()),
+          ),
+          BlocProvider(
             create: (context) => FeaturedCategoryCubit(
+                groupFeaturedCategoryCubit:
+                    context.read<GroupFeaturedCategoryCubit>(),
                 authBloc: context.read<AuthBloc>(),
                 categoriesBloc: context.read<CategoriesBloc>(),
                 databaseRepository: context.read<DatabaseRepository>())
               ..loadUserFeaturedCategory(),
-          ),
-          BlocProvider(
-            create: (context) => GroupFeaturedCategoryCubit(
-                categoriesBloc: context.read<CategoriesBloc>(),
-                databaseRepository: context.read<DatabaseRepository>()),
           ),
           BlocProvider(
             create: (context) => MemberBloc(
@@ -175,7 +189,7 @@ class _MyAppState extends State<MyApp> {
               routeInformationProvider: router.routeInformationProvider,
               title: 'Inspired Senior Care App',
               theme: ThemeData(
-                  scaffoldBackgroundColor: Colors.grey.shade200,
+                  scaffoldBackgroundColor: Colors.grey.shade100,
                   inputDecorationTheme: InputDecorationTheme(
                     filled: true,
                     fillColor: Colors.white,
@@ -188,7 +202,14 @@ class _MyAppState extends State<MyApp> {
                     style: ElevatedButton.styleFrom(
                       shape: const StadiumBorder(),
                       fixedSize: const Size(200, 30),
-                      minimumSize: const Size(35, 30),
+                      minimumSize: const Size(25, 30),
+                    ),
+                  ),
+                  outlinedButtonTheme: OutlinedButtonThemeData(
+                    style: OutlinedButton.styleFrom(
+                      shape: const StadiumBorder(),
+                      fixedSize: const Size(200, 30),
+                      minimumSize: const Size(25, 30),
                     ),
                   ),
                   bottomSheetTheme:

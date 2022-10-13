@@ -18,23 +18,27 @@ class NamePlate extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Color userColor = hexToColor(memberColorHex);
-    return ListTile(
-      minLeadingWidth: 70,
-      leading: InitialsIcon(userColor: userColor, memberName: memberName),
-      title: Text(
-        memberName,
-        style: Theme.of(context).textTheme.titleLarge,
-      ),
-      subtitle: Wrap(
-        spacing: 4.0,
-        children: [
-          Text(memberTitle),
-          const Text('•'),
-          Text(
-            user.organization!,
-          )
-        ],
-      ),
+    return Column(
+      children: [
+        ListTile(
+          minLeadingWidth: 70,
+          leading: InitialsIcon(userColor: userColor, memberName: memberName),
+          title: Text(
+            memberName,
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          subtitle: Wrap(
+            spacing: 4.0,
+            children: [
+              Text(memberTitle),
+              const Text('•'),
+              Text(
+                user.organization!,
+              )
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

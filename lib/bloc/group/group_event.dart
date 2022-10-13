@@ -8,9 +8,9 @@ abstract class GroupEvent extends Equatable {
 }
 
 class LoadGroups extends GroupEvent {
-  final User currentUser;
+  final String userId;
   LoadGroups({
-    required this.currentUser,
+    required this.userId,
   });
 }
 

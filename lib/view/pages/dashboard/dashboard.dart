@@ -2,10 +2,10 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:inspired_senior_care_app/bloc/categories/categories_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/group/group_bloc.dart';
-import 'package:inspired_senior_care_app/bloc/invite/invite_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/member/bloc/bloc/group_member_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
 import 'package:inspired_senior_care_app/cubits/groups/featured_category_cubit.dart';
@@ -13,7 +13,6 @@ import 'package:inspired_senior_care_app/cubits/groups/group_featured_category_c
 import 'package:inspired_senior_care_app/data/models/category.dart';
 import 'package:inspired_senior_care_app/data/models/group.dart';
 import 'package:inspired_senior_care_app/data/models/user.dart';
-import 'package:inspired_senior_care_app/data/repositories/database/database_repository.dart';
 import 'package:inspired_senior_care_app/view/pages/dashboard/groups/create_group.dart';
 import 'package:inspired_senior_care_app/view/pages/dashboard/groups/delete_group_dialog.dart';
 import 'package:inspired_senior_care_app/view/pages/dashboard/groups/edit_group.dart';
@@ -306,16 +305,10 @@ class _GroupSectionState extends State<GroupSection> {
                                     const Duration(seconds: 0),
                                     () => showDialog(
                                           context: context,
-                                          builder: (context) => BlocProvider(
-                                            create: (context) => InviteBloc(
-                                                databaseRepository:
-                                                    context.read<
-                                                        DatabaseRepository>()),
-                                            child: AddMemberDialog(
-                                                group: widget.group,
-                                                inviteTextFieldController: widget
-                                                    .inviteTextFieldController),
-                                          ),
+                                          builder: (context) => AddMemberDialog(
+                                              group: widget.group,
+                                              inviteTextFieldController: widget
+                                                  .inviteTextFieldController),
                                         ));
                               },
                               child: Wrap(
@@ -331,16 +324,10 @@ class _GroupSectionState extends State<GroupSection> {
                                     const Duration(seconds: 0),
                                     () => showDialog(
                                           context: context,
-                                          builder: (context) => BlocProvider(
-                                            create: (context) => InviteBloc(
-                                                databaseRepository:
-                                                    context.read<
-                                                        DatabaseRepository>()),
-                                            child: AddManagerDialog(
-                                                group: widget.group,
-                                                inviteTextFieldController: widget
-                                                    .inviteTextFieldController),
-                                          ),
+                                          builder: (context) => AddManagerDialog(
+                                              group: widget.group,
+                                              inviteTextFieldController: widget
+                                                  .inviteTextFieldController),
                                         ));
                               },
                               child: Wrap(
@@ -418,58 +405,6 @@ class _GroupSectionState extends State<GroupSection> {
               ],
             ),
           ),
-          Wrap(
-            runAlignment: WrapAlignment.end,
-            alignment: WrapAlignment.end,
-            spacing: 8.0,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: const [
-              // ElevatedButton.icon(
-              //     style: ElevatedButton.styleFrom(
-              //       foregroundColor: Colors.white,
-              //       fixedSize: const Size(140, 30),
-              //       backgroundColor: Colors.lightGreen,
-              //     ),
-              //     onPressed: () {
-              //       showDialog(
-              //           context: context,
-              //           builder: (_) => AddMemberDialog(
-              //               group: widget.group,
-              //               inviteTextFieldController:
-              //                   widget.inviteTextFieldController));
-              //     },
-              //     icon: const Icon(
-              //       Icons.add_circle_rounded,
-              //       size: 18,
-              //     ),
-              //     label: const Text(
-              //       'Add Member',
-              //     )),
-
-              // ElevatedButton.icon(
-              //     style: ElevatedButton.styleFrom(
-              //       fixedSize: const Size(140, 30),
-              //     ),
-              //     onPressed: () {
-              //       // showDialog(
-              //       //   context: context,
-              //       //   builder: (context) {
-              //       //     return EditGroupDialog(
-              //       //         currentUser: currentUser,
-              //       //         currentGroup: currentGroup);
-              //       //   },
-              //       // );
-              //       print(currentUser.name);
-              //     },
-              //     icon: const Icon(
-              //       Icons.edit,
-              //       size: 18,
-              //     ),
-              //     label: const Text(
-              //       'Edit Group',
-              //     )),
-            ],
-          ),
           Padding(
             padding: const EdgeInsets.only(bottom: 8.0, left: 16.0),
             child: SizedBox(
@@ -478,7 +413,7 @@ class _GroupSectionState extends State<GroupSection> {
                   'Featured Category',
                   style: Theme.of(context)
                       .textTheme
-                      .headline6!
+                      .titleLarge!
                       .copyWith(color: Colors.black87),
                 )),
           ),
@@ -560,42 +495,116 @@ class CurrentCategoryCard extends StatelessWidget {
                 );
               }
               if (state is FeaturedCategoryLoaded) {
-                return Card(
-                  shape: RoundedRectangleBorder(
-                      side: BorderSide(
-                          color: currentCategory.categoryColor.withOpacity(0.8),
-                          width: 1.618),
-                      borderRadius: BorderRadius.circular(12.0)),
-                  elevation: 1.0,
-                  child: SizedBox(
-                    width: 325,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8.0, vertical: 10.0),
-                      child: ListTile(
-                        minLeadingWidth: 40,
-                        // dense: true,
-                        onTap: () {
-                          context
-                              .read<GroupFeaturedCategoryCubit>()
-                              .loadFeaturedCategory(group);
+                return ConstrainedBox(
+                  constraints:
+                      const BoxConstraints(maxHeight: 100, minHeight: 60),
+                  child: InkWell(
+                    onTap: () {
+                      context
+                          .read<GroupFeaturedCategoryCubit>()
+                          .loadFeaturedCategory(group);
 
-                          context.goNamed('choose-category');
-                        },
-
-                        title: Text(
-                          group.featuredCategory!,
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                        //  subtitle: const Text('Creating a healthy environment.'),
-                        trailing: const Icon(Icons.chevron_right_rounded),
-                        leading: SizedBox(
-                          height: 50,
-                          width: 40,
-                          child: CachedNetworkImage(
-                            imageUrl: currentCategory.coverImageUrl,
-                            fit: BoxFit.fitHeight,
-                          ),
+                      context.goNamed('choose-category');
+                    },
+                    child: Card(
+                      shape: RoundedRectangleBorder(
+                          side: BorderSide(
+                              color: currentCategory.categoryColor
+                                  .withOpacity(0.8),
+                              width: 1.618),
+                          borderRadius: BorderRadius.circular(12.0)),
+                      elevation: 1.0,
+                      child: SizedBox(
+                        width: 325,
+                        //height: 100,
+                        child: Flex(
+                          direction: Axis.horizontal,
+                          children: [
+                            Flexible(
+                              child: ClipRRect(
+                                borderRadius: const BorderRadius.only(
+                                  topLeft: Radius.circular(12.0),
+                                  bottomLeft: Radius.circular(12.0),
+                                ),
+                                child: CachedNetworkImage(
+                                  imageUrl: currentCategory.coverImageUrl,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                            Flexible(
+                              flex: 4,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 16.0),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        FittedBox(
+                                          child: Text(
+                                            group.featuredCategory!,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .titleMedium!
+                                                .copyWith(
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                          ),
+                                        ),
+                                        const Padding(
+                                          padding: EdgeInsets.only(right: 12.0),
+                                          child:
+                                              Icon(Icons.chevron_right_rounded),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  group.onSchedule == true
+                                      ? Flexible(
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 16.0),
+                                            child: Wrap(
+                                              alignment: WrapAlignment.start,
+                                              spacing: 6.0,
+                                              crossAxisAlignment:
+                                                  WrapCrossAlignment.center,
+                                              children: const [
+                                                Icon(
+                                                  FontAwesomeIcons
+                                                      .solidCalendarCheck,
+                                                  size: 12.0,
+                                                  color: Colors.blue,
+                                                ),
+                                                Text('On Schedule'),
+                                              ],
+                                            ),
+                                          ),
+                                        )
+                                      : Flexible(
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 16.0,
+                                                top: 4.0,
+                                                right: 4.0),
+                                            child: Text(
+                                              currentCategory.description,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .bodyMedium,
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),

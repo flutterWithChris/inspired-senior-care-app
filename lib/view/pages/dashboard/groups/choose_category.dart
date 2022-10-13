@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:infinite_carousel/infinite_carousel.dart';
 import 'package:inspired_senior_care_app/bloc/categories/categories_bloc.dart';
@@ -162,20 +163,13 @@ class _ChooseCategoryState extends State<ChooseCategory> {
                       padding: const EdgeInsets.symmetric(vertical: 8.0),
                       child: ElevatedButton(
                           onPressed: () {
-                            context
-                                .read<GroupFeaturedCategoryCubit>()
-                                .updateFeaturedCategory(selectedCategory!);
-                            context.read<GroupBloc>().add(UpdateGroup(
-                                manager: context.read<ProfileBloc>().state.user,
-                                group: context
-                                    .read<GroupFeaturedCategoryCubit>()
-                                    .currentGroup
-                                    .copyWith(
-                                        featuredCategory:
-                                            selectedCategory!.name)));
-                            context
-                                .read<FeaturedCategoryCubit>()
-                                .loadUserFeaturedCategory();
+                            showDialog(
+                              context: context,
+                              builder: (context) {
+                                return ChangeCategoryDialog(
+                                    selectedCategory: selectedCategory!);
+                              },
+                            );
                           },
                           child: BlocConsumer<GroupFeaturedCategoryCubit,
                               GroupFeaturedCategoryState>(
@@ -211,6 +205,70 @@ class _ChooseCategoryState extends State<ChooseCategory> {
                             },
                           )),
                     ),
+                    BlocBuilder<GroupFeaturedCategoryCubit,
+                        GroupFeaturedCategoryState>(
+                      builder: (context, state) {
+                        if (state is GroupFeaturedCategoryLoaded) {
+                          return OutlinedButton.icon(
+                            style: OutlinedButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20)),
+                              maximumSize: const Size(300, 50),
+                              fixedSize: const Size(250, 32),
+                            ),
+                            onPressed: () async {
+                              int suggestedCategoryIndex =
+                                  categories.indexWhere((element) =>
+                                      element.name == state.suggestedCategory);
+                              controller.animateToItem(suggestedCategoryIndex);
+                              await Future.delayed(const Duration(seconds: 1));
+                              if (!mounted) return;
+                              context
+                                  .read<GroupFeaturedCategoryCubit>()
+                                  .updateFeaturedCategory(
+                                      state.suggestedCategory,
+                                      context
+                                          .read<GroupFeaturedCategoryCubit>()
+                                          .currentGroup
+                                          .groupId!);
+                              context.read<GroupBloc>().add(UpdateGroup(
+                                  manager:
+                                      context.read<ProfileBloc>().state.user,
+                                  group: context
+                                      .read<GroupFeaturedCategoryCubit>()
+                                      .currentGroup
+                                      .copyWith(
+                                          featuredCategory:
+                                              state.suggestedCategory,
+                                          onSchedule: true)));
+                              context
+                                  .read<FeaturedCategoryCubit>()
+                                  .loadUserFeaturedCategory();
+                            },
+                            // backgroundColor: Colors.white,
+                            icon: const Icon(
+                              FontAwesomeIcons.calendarCheck,
+                              size: 18,
+                            ),
+                            label: Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 4.0),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: const [
+                                  Text(
+                                    'Auto-Select Monthly',
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        } else {
+                          return const SizedBox();
+                        }
+                      },
+                    ),
                   ],
                 ),
               ),
@@ -221,6 +279,76 @@ class _ChooseCategoryState extends State<ChooseCategory> {
           child: Text('Something Went Wrong..'),
         );
       },
+    );
+  }
+}
+
+class ChangeCategoryDialog extends StatelessWidget {
+  final Category selectedCategory;
+  const ChangeCategoryDialog({
+    Key? key,
+    required this.selectedCategory,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      actionsAlignment: MainAxisAlignment.spaceEvenly,
+      titlePadding: const EdgeInsets.fromLTRB(24.0, 24.0, 24.0, 4.0),
+      contentPadding: const EdgeInsets.fromLTRB(24.0, 16.0, 24.0, 16),
+      actionsPadding: const EdgeInsets.only(bottom: 24.0),
+      title: Wrap(
+        spacing: 10.0,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          const Icon(
+            Icons.warning_rounded,
+            color: Colors.orange,
+            size: 20,
+          ),
+          Text(
+            'Change Category?',
+            style: Theme.of(context).textTheme.headline5,
+          ),
+        ],
+      ),
+      content: const Text.rich(TextSpan(children: [
+        TextSpan(
+            text:
+                'Just to be sure you\'re about to manually set the category.'),
+        TextSpan(
+            text: ' It will not auto-update monthly!',
+            style: TextStyle(fontStyle: FontStyle.italic)),
+      ])),
+      actions: [
+        OutlinedButton(
+            style: OutlinedButton.styleFrom(fixedSize: const Size(120, 30)),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: const Text('Cancel')),
+        ElevatedButton(
+            style: ElevatedButton.styleFrom(fixedSize: const Size(120, 30)),
+            onPressed: () {
+              context.read<GroupFeaturedCategoryCubit>().updateFeaturedCategory(
+                  selectedCategory.name,
+                  context
+                      .read<GroupFeaturedCategoryCubit>()
+                      .currentGroup
+                      .groupId!);
+              context.read<GroupBloc>().add(UpdateGroup(
+                  manager: context.read<ProfileBloc>().state.user,
+                  group: context
+                      .read<GroupFeaturedCategoryCubit>()
+                      .currentGroup
+                      .copyWith(
+                          featuredCategory: selectedCategory.name,
+                          onSchedule: false)));
+              context.read<FeaturedCategoryCubit>().loadUserFeaturedCategory();
+              Navigator.pop(context);
+            },
+            child: const Text('I know!')),
+      ],
     );
   }
 }

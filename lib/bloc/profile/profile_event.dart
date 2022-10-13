@@ -26,3 +26,5 @@ class UpdateProfile extends ProfileEvent {
   // TODO: implement props
   List<Object?> get props => [user];
 }
+
+class ResetProfile extends ProfileEvent {}
