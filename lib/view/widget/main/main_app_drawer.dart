@@ -98,7 +98,7 @@ class MainAppDrawer extends StatelessWidget {
                     const Divider(),
                     TextButton.icon(
                         onPressed: () {
-                          context.read<LoginCubit>().signOut();
+                          //   context.read<LoginCubit>().signOut();
                           context.read<AuthBloc>().add(AppLogoutRequested());
                           context.read<ProfileBloc>().add(ResetProfile());
                         },

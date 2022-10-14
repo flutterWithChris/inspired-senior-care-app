@@ -20,7 +20,7 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
   final AuthBloc _authBloc;
   final InviteBloc _inviteBloc;
   final ProfileBloc _profileBloc;
-  StreamSubscription? authSubscription;
+  StreamSubscription? profileSubscription;
   StreamSubscription? _inviteSubscription;
   GroupBloc(
       {required DatabaseRepository databaseRepository,
@@ -34,11 +34,11 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
         super(GroupLoading()) {
     StreamSubscription memberStream;
     StreamSubscription managerStream;
-    authSubscription = authBloc.stream.listen((state) {
-      if (state.authStatus == AuthStatus.authenticated) {
+    profileSubscription = profileBloc.stream.listen((state) {
+      if (state is ProfileLoaded) {
         groups.clear();
 
-        add(LoadGroups(userId: state.user!.uid));
+        add(LoadGroups(userId: state.user.id!));
       }
     });
 
@@ -113,8 +113,10 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
     // },)
     emit(GroupLoading());
     User currentUser = _profileBloc.state.user;
+
     print('***LOADING GROUPS***');
-    int groupCount = currentUser.groups?.length ?? 0;
+    int groupCount =
+        await _databaseRepository.getGroupCount(currentUser.id!) ?? 0;
     print('Group Array Length: $groupCount; User: ${currentUser.name}');
     groups.clear();
     //int groupCount = event.currentUser.groups!.length ?? 0;
@@ -148,7 +150,7 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
   Future<void> close() {
     // TODO: implement close
     _inviteSubscription?.cancel();
-    authSubscription?.cancel();
+    profileSubscription?.cancel();
     return super.close();
   }
 }

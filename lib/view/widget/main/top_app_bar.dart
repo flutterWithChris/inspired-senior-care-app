@@ -233,8 +233,8 @@ class GroupInvite extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Flex(
-        direction: Axis.vertical,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -265,40 +265,38 @@ class GroupInvite extends StatelessWidget {
                 ),
                 Padding(
                   padding: const EdgeInsets.only(right: 1.0),
-                  child: Flexible(
-                    child: Row(mainAxisSize: MainAxisSize.min, children: [
-                      IconButton(
-                        splashRadius: 18,
-                        iconSize: 18,
-                        visualDensity: VisualDensity.compact,
-                        padding: const EdgeInsets.all(0),
-                        onPressed: () {
-                          context
-                              .read<InviteBloc>()
-                              .add(InviteAccepted(invite: thisInvite));
-                        },
-                        icon: Icon(
-                          color: Colors.green.shade400,
-                          Icons.check_circle_rounded,
-                        ),
+                  child: Row(mainAxisSize: MainAxisSize.min, children: [
+                    IconButton(
+                      splashRadius: 18,
+                      iconSize: 18,
+                      visualDensity: VisualDensity.compact,
+                      padding: const EdgeInsets.all(0),
+                      onPressed: () {
+                        context
+                            .read<InviteBloc>()
+                            .add(InviteAccepted(invite: thisInvite));
+                      },
+                      icon: Icon(
+                        color: Colors.green.shade400,
+                        Icons.check_circle_rounded,
                       ),
-                      IconButton(
-                        splashRadius: 18,
-                        iconSize: 18,
-                        visualDensity: VisualDensity.compact,
-                        padding: EdgeInsets.zero,
-                        onPressed: () {
-                          context
-                              .read<InviteBloc>()
-                              .add(InviteDenied(invite: thisInvite));
-                        },
-                        icon: const Icon(
-                          Icons.cancel_rounded,
-                          color: Colors.redAccent,
-                        ),
+                    ),
+                    IconButton(
+                      splashRadius: 18,
+                      iconSize: 18,
+                      visualDensity: VisualDensity.compact,
+                      padding: EdgeInsets.zero,
+                      onPressed: () {
+                        context
+                            .read<InviteBloc>()
+                            .add(InviteDenied(invite: thisInvite));
+                      },
+                      icon: const Icon(
+                        Icons.cancel_rounded,
+                        color: Colors.redAccent,
                       ),
-                    ]),
-                  ),
+                    ),
+                  ]),
                 ),
               ],
             ),
@@ -343,8 +341,8 @@ class DeclinedGroupInvite extends StatelessWidget {
       elevation: 0,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Flex(
-          direction: Axis.vertical,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             FittedBox(
               child: Row(
@@ -388,25 +386,23 @@ class DeclinedGroupInvite extends StatelessWidget {
                   ),
                   Padding(
                     padding: const EdgeInsets.only(right: 1.0, top: 4.0),
-                    child: Flexible(
-                      child: Row(mainAxisSize: MainAxisSize.min, children: [
-                        IconButton(
-                          splashRadius: 18,
-                          iconSize: 18,
-                          visualDensity: VisualDensity.compact,
-                          padding: EdgeInsets.zero,
-                          onPressed: () {
-                            context
-                                .read<InviteBloc>()
-                                .add(InviteDeleted(invite: thisInvite));
-                          },
-                          icon: Icon(
-                            Icons.close,
-                            color: Colors.grey.shade500,
-                          ),
+                    child: Row(mainAxisSize: MainAxisSize.min, children: [
+                      IconButton(
+                        splashRadius: 18,
+                        iconSize: 18,
+                        visualDensity: VisualDensity.compact,
+                        padding: EdgeInsets.zero,
+                        onPressed: () {
+                          context
+                              .read<InviteBloc>()
+                              .add(InviteDeleted(invite: thisInvite));
+                        },
+                        icon: Icon(
+                          Icons.close,
+                          color: Colors.grey.shade500,
                         ),
-                      ]),
-                    ),
+                      ),
+                    ]),
                   ),
                 ],
               ),
@@ -452,8 +448,8 @@ class AcceptedGroupInvite extends StatelessWidget {
       elevation: 0,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Flex(
-          direction: Axis.vertical,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             FittedBox(
               child: Row(
@@ -497,25 +493,23 @@ class AcceptedGroupInvite extends StatelessWidget {
                   ),
                   Padding(
                     padding: const EdgeInsets.only(right: 1.0, top: 4.0),
-                    child: Flexible(
-                      child: Row(mainAxisSize: MainAxisSize.min, children: [
-                        IconButton(
-                          splashRadius: 18,
-                          iconSize: 18,
-                          visualDensity: VisualDensity.compact,
-                          padding: EdgeInsets.zero,
-                          onPressed: () {
-                            context
-                                .read<InviteBloc>()
-                                .add(InviteDeleted(invite: thisInvite));
-                          },
-                          icon: Icon(
-                            Icons.close,
-                            color: Colors.grey.shade500,
-                          ),
+                    child: Row(mainAxisSize: MainAxisSize.min, children: [
+                      IconButton(
+                        splashRadius: 18,
+                        iconSize: 18,
+                        visualDensity: VisualDensity.compact,
+                        padding: EdgeInsets.zero,
+                        onPressed: () {
+                          context
+                              .read<InviteBloc>()
+                              .add(InviteDeleted(invite: thisInvite));
+                        },
+                        icon: Icon(
+                          Icons.close,
+                          color: Colors.grey.shade500,
                         ),
-                      ]),
-                    ),
+                      ),
+                    ]),
                   ),
                 ],
               ),

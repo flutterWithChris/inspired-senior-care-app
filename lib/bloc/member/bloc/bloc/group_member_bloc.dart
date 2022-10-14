@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
@@ -27,17 +27,19 @@ class GroupMemberBloc extends Bloc<GroupMemberEvent, GroupMemberState> {
 
   void _onLoadGroupMembers(
       LoadGroupMembers event, Emitter<GroupMemberState> emit) async {
+    StreamSubscription? userSubscription;
     emit(GroupMembersLoading());
     print('Got ${event.userIds.length} users');
     members.clear();
     for (String userId in event.group.groupMemberIds!) {
-      _databaseRepository.getUser(userId).listen((user) {
+      userSubscription = _databaseRepository.getUser(userId).listen((user) {
         print('${user.name} received from Firebase');
         members.add(user);
       });
     }
     await Future.delayed(const Duration(milliseconds: 500));
     emit(GroupMembersLoaded(groupMembers: members, group: event.group));
+    userSubscription?.cancel();
   }
 
   @override
