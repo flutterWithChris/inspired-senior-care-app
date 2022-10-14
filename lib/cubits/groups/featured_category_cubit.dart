@@ -30,7 +30,7 @@ class FeaturedCategoryCubit extends Cubit<FeaturedCategoryState> {
         _authBloc = authBloc,
         _groupFeaturedCategoryCubit = groupFeaturedCategoryCubit,
         super(FeaturedCategoryLoading()) {
-    _authSubscription = authBloc.stream.listen((event) {
+    _authSubscription = _authBloc.stream.listen((event) {
       if (event.authStatus == AuthStatus.authenticated) {
         _loadUserFeaturedCategory();
       }

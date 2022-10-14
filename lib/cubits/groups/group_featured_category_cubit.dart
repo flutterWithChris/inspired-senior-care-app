@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:inspired_senior_care_app/bloc/categories/categories_bloc.dart';
 import 'package:inspired_senior_care_app/data/models/group.dart';
 import 'package:inspired_senior_care_app/data/repositories/database/database_repository.dart';
 import 'package:jiffy/jiffy.dart';
@@ -15,7 +14,6 @@ class GroupFeaturedCategoryCubit extends Cubit<GroupFeaturedCategoryState> {
 
   GroupFeaturedCategoryCubit({
     required DatabaseRepository databaseRepository,
-    required CategoriesBloc categoriesBloc,
   })  : _databaseRepository = databaseRepository,
         super(GroupFeaturedCategoryLoading());
 

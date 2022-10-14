@@ -17,7 +17,6 @@ part 'group_state.dart';
 class GroupBloc extends Bloc<GroupEvent, GroupState> {
   List<Group> groups = [];
   final DatabaseRepository _databaseRepository;
-  final AuthBloc _authBloc;
   final InviteBloc _inviteBloc;
   final ProfileBloc _profileBloc;
   StreamSubscription? profileSubscription;
@@ -28,12 +27,9 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
       required ProfileBloc profileBloc,
       required AuthBloc authBloc})
       : _databaseRepository = databaseRepository,
-        _authBloc = authBloc,
         _inviteBloc = inviteBloc,
         _profileBloc = profileBloc,
         super(GroupLoading()) {
-    StreamSubscription memberStream;
-    StreamSubscription managerStream;
     profileSubscription = profileBloc.stream.listen((state) {
       if (state is ProfileLoaded) {
         groups.clear();
@@ -115,8 +111,7 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
     User currentUser = _profileBloc.state.user;
 
     print('***LOADING GROUPS***');
-    int groupCount =
-        await _databaseRepository.getGroupCount(currentUser.id!) ?? 0;
+    int groupCount = await _databaseRepository.getGroupCount(currentUser.id!);
     print('Group Array Length: $groupCount; User: ${currentUser.name}');
     groups.clear();
     //int groupCount = event.currentUser.groups!.length ?? 0;

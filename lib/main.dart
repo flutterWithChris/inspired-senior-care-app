@@ -81,11 +81,9 @@ class _MyAppState extends State<MyApp> {
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider(
-          // lazy: false,
           create: (context) => AuthRepository(),
         ),
         RepositoryProvider(
-          // lazy: false,
           create: (context) => DatabaseRepository(),
         ),
         RepositoryProvider(
@@ -114,6 +112,7 @@ class _MyAppState extends State<MyApp> {
           ),
           BlocProvider(
             create: (context) => CategoriesBloc(
+                profileBloc: context.read<ProfileBloc>(),
                 databaseRepository: context.read<DatabaseRepository>(),
                 storageRepository: context.read<StorageRepository>())
               ..add(LoadCategories()),
@@ -141,7 +140,6 @@ class _MyAppState extends State<MyApp> {
           ),
           BlocProvider(
             create: (context) => GroupFeaturedCategoryCubit(
-                categoriesBloc: context.read<CategoriesBloc>(),
                 databaseRepository: context.read<DatabaseRepository>()),
           ),
           BlocProvider(

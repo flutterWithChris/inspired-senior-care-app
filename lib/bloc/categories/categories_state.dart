@@ -4,7 +4,7 @@ part of 'categories_bloc.dart';
 abstract class CategoriesState extends Equatable {
   final List<Category>? categories;
   final List<dynamic>? categoryImageUrls;
-  CategoriesState({
+  const CategoriesState({
     this.categories,
     this.categoryImageUrls,
   });
@@ -16,9 +16,11 @@ abstract class CategoriesState extends Equatable {
 class CategoriesLoading extends CategoriesState {}
 
 class CategoriesLoaded extends CategoriesState {
+  @override
   final List<Category> categories;
+  @override
   final List<dynamic> categoryImageUrls;
-  CategoriesLoaded({
+  const CategoriesLoaded({
     required this.categories,
     this.categoryImageUrls = const [],
   });
