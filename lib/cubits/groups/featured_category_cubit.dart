@@ -80,6 +80,7 @@ class FeaturedCategoryCubit extends Cubit<FeaturedCategoryState> {
   Future<void> close() {
     // TODO: implement close
     _authSubscription?.cancel();
+    _groupCategorySubscription?.cancel();
     return super.close();
   }
 }

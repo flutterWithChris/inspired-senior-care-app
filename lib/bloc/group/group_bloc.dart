@@ -19,7 +19,7 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
   final DatabaseRepository _databaseRepository;
   final InviteBloc _inviteBloc;
   final ProfileBloc _profileBloc;
-  StreamSubscription? profileSubscription;
+  StreamSubscription? _profileSubscription;
   StreamSubscription? _inviteSubscription;
   GroupBloc(
       {required DatabaseRepository databaseRepository,
@@ -30,7 +30,7 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
         _inviteBloc = inviteBloc,
         _profileBloc = profileBloc,
         super(GroupLoading()) {
-    profileSubscription = profileBloc.stream.listen((state) {
+    _profileSubscription = profileBloc.stream.listen((state) {
       if (state is ProfileLoaded) {
         groups.clear();
 
@@ -145,7 +145,7 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
   Future<void> close() {
     // TODO: implement close
     _inviteSubscription?.cancel();
-    profileSubscription?.cancel();
+    _profileSubscription?.cancel();
     return super.close();
   }
 }
