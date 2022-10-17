@@ -156,11 +156,11 @@ class _FeaturedCategoryState extends State<FeaturedCategory> {
                                               radius: 28,
                                               backgroundColor: Colors.white,
                                               child: Text(
-                                                '${(progress / featuredCategory.totalCards! * 100).toStringAsFixed(0)}%',
+                                                '$progress/${featuredCategory.totalCards}',
                                                 style: const TextStyle(
                                                     fontSize: 18,
-                                                    fontWeight:
-                                                        FontWeight.bold),
+                                                    fontWeight: FontWeight.bold,
+                                                    letterSpacing: 0.2),
                                               ),
                                             ),
                                           ),
