@@ -27,6 +27,7 @@ import 'package:inspired_senior_care_app/cubits/login/login_cubit.dart';
 import 'package:inspired_senior_care_app/cubits/response/response_deck_cubit.dart';
 import 'package:inspired_senior_care_app/cubits/settings/cubit/settings_cubit.dart';
 import 'package:inspired_senior_care_app/cubits/signup/signup_cubit.dart';
+import 'package:inspired_senior_care_app/data/models/category.dart';
 import 'package:inspired_senior_care_app/data/repositories/auth/auth_repository.dart';
 import 'package:inspired_senior_care_app/data/repositories/database/database_repository.dart';
 import 'package:inspired_senior_care_app/data/repositories/purchases/purchases_repository.dart';
@@ -304,7 +305,9 @@ class _MyAppState extends State<MyApp> {
           GoRoute(
             name: 'deck-page',
             path: 'deck-page',
-            builder: (context, state) => DeckPage(),
+            builder: (context, state) => DeckPage(
+              category: state.extra as Category,
+            ),
           ),
         ]),
     GoRoute(
