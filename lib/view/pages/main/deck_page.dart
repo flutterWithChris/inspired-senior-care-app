@@ -294,9 +294,9 @@ class CardCounter extends StatelessWidget {
         BlocBuilder<CardBloc, CardState>(
           builder: (context, state) {
             if (state is CardsLoaded) {
-              int currentCard = context.watch<DeckCubit>().currentCardNumber;
+              //int currentCard = context.watch<DeckCubit>().currentCardNumber;
               double percentageComplete =
-                  currentCard / state.category.totalCards!;
+                  (currentCard / state.cardImageUrls.length);
               return SizedBox(
                 height: 60,
                 width: 60,
@@ -304,7 +304,7 @@ class CardCounter extends StatelessWidget {
                   backgroundColor: Colors.grey.shade300,
                   valueColor: AlwaysStoppedAnimation<Color>(
                       state.category.progressColor),
-                  value: currentCard > 1 ? percentageComplete : 0,
+                  value: progress / 100,
                 ),
               );
             }
