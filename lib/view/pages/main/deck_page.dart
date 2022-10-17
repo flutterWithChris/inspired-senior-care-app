@@ -20,13 +20,15 @@ class DeckPage extends StatefulWidget {
 
 class _DeckPageState extends State<DeckPage> {
   bool isSwipeDisabled = true;
-
+  bool isCategoryComplete = false;
   bool isCardZoomed = false;
+  int currentCard = 0;
   InfiniteScrollController deckScrollController = InfiniteScrollController();
 
   @override
   Widget build(BuildContext context) {
-    int currentCardIndex = context.watch<DeckCubit>().currentCardNumber;
+    int currentCard = context.watch<DeckCubit>().currentCardNumber;
+
     final GlobalKey<FormState> shareFieldFormKey = GlobalKey<FormState>();
     // showDialog(
     //     context: context,
@@ -61,9 +63,7 @@ class _DeckPageState extends State<DeckPage> {
                 listener: (context, state) {
                   if (context.read<DeckCubit>().state.status ==
                       DeckStatus.swiped) {
-                    if (currentCardIndex < 12) {
-                      deckScrollController.animateToItem(currentCardIndex);
-                    }
+                    deckScrollController.animateToItem(currentCard);
                   }
                   if (context.read<DeckCubit>().state.status ==
                       DeckStatus.completed) {
@@ -126,6 +126,9 @@ class _DeckPageState extends State<DeckPage> {
               ));
             }
             if (state is CardsLoaded) {
+              if (currentCard == state.category.totalCards) {
+                isSwipeDisabled = false;
+              }
               return SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -177,7 +180,6 @@ class _DeckPageState extends State<DeckPage> {
                                   right: 20,
                                   top: -20,
                                   child: CardCounter(
-                                      currentCard: currentCardIndex,
                                       deckScrollController:
                                           deckScrollController),
                                 ),
@@ -213,10 +215,8 @@ class _DeckPageState extends State<DeckPage> {
 }
 
 class CardCounter extends StatelessWidget {
-  final int currentCard;
   final InfiniteScrollController deckScrollController;
   const CardCounter({
-    required this.currentCard,
     required this.deckScrollController,
     Key? key,
   }) : super(key: key);
@@ -224,7 +224,7 @@ class CardCounter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double progress = 0.0;
-    int currentCardIndex = currentCard;
+    int currentCard = context.watch<DeckCubit>().currentCardNumber;
     return Stack(
       alignment: AlignmentDirectional.center,
       children: [
@@ -234,20 +234,16 @@ class CardCounter extends StatelessWidget {
             if (state is ProfileLoaded) {
               User user = state.user;
               return BlocBuilder<CardBloc, CardState>(
-                buildWhen: (previous, current) =>
-                    previous.category != current.category,
                 builder: (context, state) {
                   if (state is CardsLoaded) {
                     Category currentCategory = state.category;
                     bool categoryStarted =
                         user.progress!.containsKey(currentCategory.name);
-
+                    percentComplete =
+                        (currentCard - 1) / state.cardImageUrls.length;
                     if (categoryStarted) {
                       Map<String, int> progressList =
                           context.watch<ProfileBloc>().state.user.progress!;
-
-                      percentComplete = progressList[currentCategory.name]! /
-                          currentCategory.totalCards!;
                     }
                     // Checking if Category has been started.
                     if (!categoryStarted) {
@@ -256,37 +252,34 @@ class CardCounter extends StatelessWidget {
                     }
                     if (categoryStarted) {
                       progress =
-                          ((context.watch<DeckCubit>().currentCardNumber /
-                                  currentCategory.totalCards!) *
-                              100);
+                          ((currentCard / currentCategory.totalCards!) * 100);
                       Map<String, int> progressList = user.progress!;
-                      currentCardIndex = progressList[currentCategory.name]!;
-                      context
-                          .read<DeckCubit>()
-                          .updateCardNumber(currentCardIndex);
+                      currentCard = progressList[currentCategory.name]!;
+                      context.read<DeckCubit>().updateCardNumber(currentCard);
                       print(
-                          '$currentCardIndex is the Index & progress is: ${(percentComplete * 100)}');
-                      context.read<DeckCubit>().loadDeck(currentCardIndex);
-                      Future.delayed(const Duration(milliseconds: 500), () {
-                        deckScrollController
-                            .animateToItem(currentCardIndex - 1);
-                      });
+                          '$currentCard is the Index & progress is: ${(percentComplete * 100)}');
+                      context.read<DeckCubit>().loadDeck(currentCard);
+                      if (currentCard < currentCategory.totalCards!) {
+                        Future.delayed(const Duration(milliseconds: 500), () {
+                          deckScrollController.animateToItem(currentCard);
+                        });
+                      }
 
                       return CircleAvatar(
                         backgroundColor: Colors.white,
                         radius: 32,
                         child: Text(
-                          '${(percentComplete * 100).toStringAsFixed(0)}%',
+                          '$currentCard/${currentCategory.totalCards}',
                           style: const TextStyle(fontSize: 20),
                         ),
                       );
                     } else {
-                      return const CircleAvatar(
+                      return CircleAvatar(
                         backgroundColor: Colors.white,
                         radius: 32,
                         child: Text(
-                          '0%',
-                          style: TextStyle(fontSize: 20),
+                          '0/${currentCategory.totalCards}',
+                          style: const TextStyle(fontSize: 20),
                         ),
                       );
                     }
@@ -301,10 +294,9 @@ class CardCounter extends StatelessWidget {
         BlocBuilder<CardBloc, CardState>(
           builder: (context, state) {
             if (state is CardsLoaded) {
-              int currentCardIndex =
-                  context.watch<DeckCubit>().currentCardNumber;
+              int currentCard = context.watch<DeckCubit>().currentCardNumber;
               double percentageComplete =
-                  currentCardIndex / state.category.totalCards!;
+                  currentCard / state.category.totalCards!;
               return SizedBox(
                 height: 60,
                 width: 60,
@@ -312,7 +304,7 @@ class CardCounter extends StatelessWidget {
                   backgroundColor: Colors.grey.shade300,
                   valueColor: AlwaysStoppedAnimation<Color>(
                       state.category.progressColor),
-                  value: currentCardIndex > 1 ? percentageComplete : 0,
+                  value: currentCard > 1 ? percentageComplete : 0,
                 ),
               );
             }
@@ -354,8 +346,9 @@ class Deck extends StatelessWidget {
         }
         if (state is CardsLoaded) {
           return InfiniteCarousel.builder(
+            loop: false,
             controller: deckScrollController,
-            velocityFactor: 0.5,
+            velocityFactor: 0.2,
             itemCount: state.cardImageUrls.length,
             itemExtent: 330,
             itemBuilder: (context, itemIndex, realIndex) {
@@ -650,17 +643,17 @@ class SendButton extends StatefulWidget {
 class _SendButtonState extends State<SendButton> {
   @override
   Widget build(BuildContext context) {
-    int currentCardIndex = context.watch<DeckCubit>().currentCardNumber;
+    int currentCard = context.watch<DeckCubit>().currentCardNumber;
     return ElevatedButton.icon(
       style: ElevatedButton.styleFrom(fixedSize: const Size(240, 42)),
       onPressed: () async {
         if (widget.formKey.currentState!.validate()) {
           context.read<ShareBloc>().add(SubmitPressed(
               categoryName: widget.categoryName,
-              cardNumber: currentCardIndex,
+              cardNumber: currentCard + 1,
               response: widget.shareFieldController.text));
 
-          if (currentCardIndex == (widget.category.totalCards)) {
+          if (currentCard == (widget.category.totalCards)) {
             //context.read<DeckCubit>().resetDeck();
             widget.shareFieldController.clear();
             Navigator.pop(context);

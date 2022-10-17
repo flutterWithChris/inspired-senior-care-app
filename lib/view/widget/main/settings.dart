@@ -40,7 +40,7 @@ class SettingsPage extends StatelessWidget {
                     tiles: [
                       SettingsTile.navigation(
                         title: const Text('Email'),
-                        value: Text(currentUser.email!),
+                        value: FittedBox(child: Text(currentUser.email!)),
                         leading: const Icon(Icons.email_rounded),
                         onPressed: (context) {
                           showDialog(
@@ -53,8 +53,35 @@ class SettingsPage extends StatelessWidget {
                       ),
                       SettingsTile.navigation(
                         title: const Text('Name'),
-                        value: Text(currentUser.name!),
+                        value: FittedBox(child: Text(currentUser.name!)),
                         leading: const Icon(Icons.person),
+                        onPressed: (context) {
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              return const ChangeNameDialog();
+                            },
+                          );
+                        },
+                      ),
+                      SettingsTile.navigation(
+                        title: const Text('Title'),
+                        value: FittedBox(child: Text(currentUser.title!)),
+                        leading: const Icon(Icons.badge),
+                        onPressed: (context) {
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              return const ChangeNameDialog();
+                            },
+                          );
+                        },
+                      ),
+                      SettingsTile.navigation(
+                        title: const Text('Organization'),
+                        value:
+                            FittedBox(child: Text(currentUser.organization!)),
+                        leading: const Icon(Icons.work_rounded),
                         onPressed: (context) {
                           showDialog(
                             context: context,
@@ -162,6 +189,7 @@ class _ChangeEmailDialogState extends State<ChangeEmailDialog> {
     User currentUser = context.watch<ProfileBloc>().state.user;
     emailFieldController.text = currentUser.email!;
     return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 24.0),
         child: SizedBox(
@@ -213,6 +241,7 @@ class _ChangeNameDialogState extends State<ChangeNameDialog> {
     User currentUser = context.watch<ProfileBloc>().state.user;
     nameFieldController.text = currentUser.name!;
     return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 24.0),
         child: SizedBox(
@@ -232,13 +261,25 @@ class _ChangeNameDialogState extends State<ChangeNameDialog> {
                 controller: nameFieldController,
                 decoration: const InputDecoration(label: Text('Your Name')),
               ),
-              ElevatedButton(
-                  onPressed: () {
-                    context.read<ProfileBloc>().add(UpdateProfile(
-                        user: currentUser.copyWith(
-                            name: nameFieldController.value.text)));
-                  },
-                  child: const Text('Update Name'))
+              ElevatedButton(onPressed: () {
+                context.read<ProfileBloc>().add(UpdateProfile(
+                    user: currentUser.copyWith(
+                        name: nameFieldController.value.text)));
+                Future.delayed(const Duration(seconds: 1), () {
+                  Navigator.pop(context);
+                });
+              }, child: BlocBuilder<ProfileBloc, ProfileState>(
+                builder: (context, state) {
+                  if (state is ProfileLoading) {
+                    return LoadingAnimationWidget.bouncingBall(
+                        color: Colors.white, size: 18);
+                  }
+                  if (state is ProfileUpdated) {
+                    return const Text('Name Updated!');
+                  }
+                  return const Text('Update Name');
+                },
+              ))
             ],
           ),
         ),

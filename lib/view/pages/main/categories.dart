@@ -174,25 +174,23 @@ class CategoryCard extends StatelessWidget {
                                   builder: (context, state) {
                                     int currentCard = 0;
                                     if (state is ProfileLoaded) {
-                                      bool categoryStarted = state
-                                          .user.progress!
-                                          .containsKey(category.name);
-                                      if (!categoryStarted) {
-                                        currentCard = 0;
-                                      }
-                                      if (categoryStarted) {
-                                        Map<String, int> progressList = context
-                                            .watch<ProfileBloc>()
-                                            .state
-                                            .user
-                                            .progress!;
+                                      int progress = context
+                                              .watch<ProfileBloc>()
+                                              .state
+                                              .user
+                                              .progress?[category.name] ??
+                                          0;
 
-                                        percentComplete =
-                                            progressList[category.name]! /
-                                                category.totalCards!;
-                                      }
+                                      percentComplete = progress > 0
+                                          ? (progress) / category.totalCards!
+                                          : 0;
+
+                                      // print(
+                                      //     '${category.name} Progress is: $percentComplete');
+                                      // return Text(
+                                      //   '${(percentComplete * 100).toStringAsFixed(0)}%',
                                       return Text(
-                                        '${(percentComplete * 100).toStringAsFixed(0)}%',
+                                        '$progress/${category.totalCards}',
                                         style: const TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 14),
