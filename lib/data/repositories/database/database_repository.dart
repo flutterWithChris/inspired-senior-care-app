@@ -152,6 +152,14 @@ class DatabaseRepository extends BaseDatabaseRepository {
         .map((event) => Group.fromSnapshot(event));
   }
 
+  Stream<Group> getGroupMembers(String groupId) {
+    return _firebaseFirestore
+        .collection('groups')
+        .doc(groupId)
+        .snapshots()
+        .map((event) => Group.fromSnapshot(event));
+  }
+
   Future<int> getGroupCount(String userId) {
     return _firebaseFirestore
         .collection('users')
@@ -284,6 +292,34 @@ class DatabaseRepository extends BaseDatabaseRepository {
           return null;
         }
       }).asStream();
+    } catch (e) {
+      print(e);
+    }
+    return null;
+  }
+
+  Stream<List<Invite>?>? listenForInvites() {
+    auth.User? user = _firebaseAuth.currentUser;
+    try {
+      return _firebaseFirestore
+          .collection('invites')
+          .doc(user!.uid)
+          .collection('invites')
+          .snapshots()
+          .map((value) {
+        var docs = value.docs;
+        if (docs.isNotEmpty) {
+          List<Invite> invites = [];
+          for (QueryDocumentSnapshot<Map<String, dynamic>> doc in docs) {
+            Invite thisInvite = Invite.fromSnapshot(doc);
+            invites.add(thisInvite);
+            print('Invite ${thisInvite.inviteId} Fetched***');
+          }
+          return invites;
+        } else {
+          return null;
+        }
+      });
     } catch (e) {
       print(e);
     }

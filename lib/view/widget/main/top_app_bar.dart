@@ -231,96 +231,95 @@ class GroupInvite extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Text(
-                '${thisInvite.inviterName.split(' ')[0]} ',
-                style: Theme.of(context)
-                    .textTheme
-                    .subtitle2!
-                    .copyWith(color: Colors.blue),
-              ),
-              Text(
-                'invited you to:',
-                style: Theme.of(context).textTheme.subtitle2,
-              ),
-            ],
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 0.0, right: 0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+      child: Padding(
+        padding: const EdgeInsets.only(left: 16.0, top: 12.0, bottom: 16.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                FittedBox(
-                  child: Text(
-                    thisInvite.groupName,
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
+                Text(
+                  '${thisInvite.inviterName.split(' ')[0]} ',
+                  style: Theme.of(context)
+                      .textTheme
+                      .subtitle2!
+                      .copyWith(color: Colors.blue),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(right: 1.0),
-                  child: Row(mainAxisSize: MainAxisSize.min, children: [
-                    IconButton(
-                      splashRadius: 18,
-                      iconSize: 18,
-                      visualDensity: VisualDensity.compact,
-                      padding: const EdgeInsets.all(0),
-                      onPressed: () {
-                        context
-                            .read<InviteBloc>()
-                            .add(InviteAccepted(invite: thisInvite));
-                      },
-                      icon: Icon(
-                        color: Colors.green.shade400,
-                        Icons.check_circle_rounded,
-                      ),
-                    ),
-                    IconButton(
-                      splashRadius: 18,
-                      iconSize: 18,
-                      visualDensity: VisualDensity.compact,
-                      padding: EdgeInsets.zero,
-                      onPressed: () {
-                        context
-                            .read<InviteBloc>()
-                            .add(InviteDenied(invite: thisInvite));
-                      },
-                      icon: const Icon(
-                        Icons.cancel_rounded,
-                        color: Colors.redAccent,
-                      ),
-                    ),
-                  ]),
+                Text(
+                  'invited you to:',
+                  style: Theme.of(context).textTheme.subtitle2,
                 ),
               ],
             ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Text(
-                'As a',
-                style: Theme.of(context).textTheme.subtitle2!,
-              ),
-              Text(
-                ' ${thisInvite.inviteType}',
-                style: Theme.of(context).textTheme.subtitle2!.copyWith(
-                      color: Colors.blue,
+            Padding(
+              padding: const EdgeInsets.only(left: 0.0, right: 0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  FittedBox(
+                    child: Text(
+                      thisInvite.groupName,
+                      style: Theme.of(context).textTheme.titleLarge,
                     ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 1.0),
+                    child: Row(mainAxisSize: MainAxisSize.min, children: [
+                      IconButton(
+                        splashRadius: 18,
+                        iconSize: 18,
+                        visualDensity: VisualDensity.compact,
+                        padding: const EdgeInsets.all(0),
+                        onPressed: () {
+                          context
+                              .read<InviteBloc>()
+                              .add(InviteAccepted(invite: thisInvite));
+                        },
+                        icon: Icon(
+                          color: Colors.green.shade400,
+                          Icons.check_circle_rounded,
+                        ),
+                      ),
+                      IconButton(
+                        splashRadius: 18,
+                        iconSize: 18,
+                        visualDensity: VisualDensity.compact,
+                        padding: EdgeInsets.zero,
+                        onPressed: () {
+                          context
+                              .read<InviteBloc>()
+                              .add(InviteDenied(invite: thisInvite));
+                        },
+                        icon: const Icon(
+                          Icons.cancel_rounded,
+                          color: Colors.redAccent,
+                        ),
+                      ),
+                    ]),
+                  ),
+                ],
               ),
-            ],
-          ),
-          const Padding(
-            padding: EdgeInsets.all(8.0),
-            child: Divider(),
-          )
-        ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Text(
+                  'As a',
+                  style: Theme.of(context).textTheme.subtitle2!,
+                ),
+                Text(
+                  ' ${thisInvite.inviteType}',
+                  style: Theme.of(context).textTheme.subtitle2!.copyWith(
+                        color: Colors.blue,
+                      ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

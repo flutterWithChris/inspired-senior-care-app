@@ -17,6 +17,7 @@ import 'package:inspired_senior_care_app/bloc/member/bloc/bloc/group_member_bloc
 import 'package:inspired_senior_care_app/bloc/member/bloc/member_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/onboarding/onboarding_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
+import 'package:inspired_senior_care_app/bloc/purchases/purchases_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/share_bloc/share_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/view_response/response_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/view_response/view_response_cubit.dart';
@@ -28,6 +29,7 @@ import 'package:inspired_senior_care_app/cubits/settings/cubit/settings_cubit.da
 import 'package:inspired_senior_care_app/cubits/signup/signup_cubit.dart';
 import 'package:inspired_senior_care_app/data/repositories/auth/auth_repository.dart';
 import 'package:inspired_senior_care_app/data/repositories/database/database_repository.dart';
+import 'package:inspired_senior_care_app/data/repositories/purchases/purchases_repository.dart';
 import 'package:inspired_senior_care_app/data/repositories/storage/storage_repository.dart';
 import 'package:inspired_senior_care_app/firebase_options.dart';
 
@@ -84,6 +86,9 @@ class _MyAppState extends State<MyApp> {
           create: (context) => AuthRepository(),
         ),
         RepositoryProvider(
+          create: (context) => PurchasesRepository()..initPlatformState(),
+        ),
+        RepositoryProvider(
           create: (context) => DatabaseRepository(),
         ),
         RepositoryProvider(
@@ -106,6 +111,11 @@ class _MyAppState extends State<MyApp> {
           BlocProvider(
               create: (context) =>
                   LoginCubit(authRepository: context.read<AuthRepository>())),
+          BlocProvider(
+              create: (context) => PurchasesBloc(
+                  profileBloc: context.read<ProfileBloc>(),
+                  purchasesRepository: context.read<PurchasesRepository>())
+                ..add(LoadPurchases())),
           BlocProvider(
             create: (context) => ShareBloc(
                 databaseRepository: context.read<DatabaseRepository>()),
@@ -136,6 +146,7 @@ class _MyAppState extends State<MyApp> {
           ),
           BlocProvider(
             create: (context) => GroupMemberBloc(
+                inviteBloc: context.read<InviteBloc>(),
                 databaseRepository: context.read<DatabaseRepository>()),
           ),
           BlocProvider(
