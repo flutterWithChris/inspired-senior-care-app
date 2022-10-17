@@ -13,153 +13,163 @@ class SettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: const PreferredSize(
-            preferredSize: Size.fromHeight(50),
-            child: MainTopAppBar(
-              title: 'Settings',
-            )),
-        bottomNavigationBar: const MainBottomAppBar(),
-        body: BlocBuilder<ProfileBloc, ProfileState>(
-          builder: (context, state) {
-            if (state is ProfileLoading) {
-              return LoadingAnimationWidget.fourRotatingDots(
-                  color: Colors.blue, size: 30);
-            }
-            if (state is ProfileLoaded) {
-              User currentUser = state.user;
-              return SettingsList(
-                // platform: DevicePlatform.iOS,
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 6.0, vertical: 8.0),
-                sections: [
-                  SettingsSection(
-                    // margin: const EdgeInsetsDirectional.all(12.0),
-                    title: const Text('Account'),
-                    tiles: [
-                      SettingsTile.navigation(
-                        title: const Text('Email'),
-                        value: FittedBox(child: Text(currentUser.email!)),
-                        leading: const Icon(Icons.email_rounded),
-                        onPressed: (context) {
-                          showDialog(
-                            context: context,
-                            builder: (context) {
-                              return const ChangeEmailDialog();
-                            },
-                          );
-                        },
+    return Scaffold(
+      appBar: const PreferredSize(
+          preferredSize: Size.fromHeight(50),
+          child: MainTopAppBar(
+            title: 'Settings',
+          )),
+      bottomNavigationBar: const MainBottomAppBar(),
+      body: BlocBuilder<ProfileBloc, ProfileState>(
+        builder: (context, state) {
+          if (state is ProfileLoading) {
+            return LoadingAnimationWidget.fourRotatingDots(
+                color: Colors.blue, size: 30);
+          }
+          if (state is ProfileLoaded) {
+            User currentUser = state.user;
+            return SettingsList(
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 6.0, vertical: 8.0),
+              sections: [
+                SettingsSection(
+                  //margin: const EdgeInsetsDirectional.all(12.0),
+                  title: const Text('Account'),
+                  tiles: [
+                    SettingsTile.navigation(
+                      title: const Padding(
+                        padding: EdgeInsets.only(right: 8.0),
+                        child: Text('Email'),
                       ),
-                      SettingsTile.navigation(
-                        title: const Text('Name'),
-                        value: FittedBox(child: Text(currentUser.name!)),
-                        leading: const Icon(Icons.person),
-                        onPressed: (context) {
-                          showDialog(
-                            context: context,
-                            builder: (context) {
-                              return const ChangeNameDialog();
-                            },
-                          );
-                        },
+                      value: FittedBox(child: Text(currentUser.email!)),
+                      leading: const Icon(Icons.email_rounded),
+                      onPressed: (context) {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return const ChangeEmailDialog();
+                          },
+                        );
+                      },
+                    ),
+                    SettingsTile.navigation(
+                      title: const Padding(
+                        padding: EdgeInsets.only(right: 8.0),
+                        child: Text('Name'),
                       ),
-                      SettingsTile.navigation(
-                        title: const Text('Title'),
-                        value: FittedBox(child: Text(currentUser.title!)),
-                        leading: const Icon(Icons.badge),
-                        onPressed: (context) {
-                          showDialog(
-                            context: context,
-                            builder: (context) {
-                              return const ChangeNameDialog();
-                            },
-                          );
-                        },
+                      value: FittedBox(child: Text(currentUser.name!)),
+                      leading: const Icon(Icons.person),
+                      onPressed: (context) {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return const ChangeNameDialog();
+                          },
+                        );
+                      },
+                    ),
+                    SettingsTile.navigation(
+                      title: const Padding(
+                        padding: EdgeInsets.only(right: 8.0),
+                        child: Text('Title'),
                       ),
-                      SettingsTile.navigation(
-                        title: const Text('Organization'),
-                        value:
-                            FittedBox(child: Text(currentUser.organization!)),
-                        leading: const Icon(Icons.work_rounded),
-                        onPressed: (context) {
-                          showDialog(
-                            context: context,
-                            builder: (context) {
-                              return const ChangeNameDialog();
-                            },
-                          );
-                        },
+                      value: FittedBox(
+                        child: Text(currentUser.title!),
                       ),
-                      SettingsTile.navigation(
-                        title: const Text('Password'),
-                        leading: const Icon(Icons.lock_rounded),
-                        onPressed: (context) {
-                          showDialog(
-                            context: context,
-                            builder: (context) {
-                              return const ChangePasswordDialog();
-                            },
-                          );
-                        },
+                      leading: const Icon(Icons.badge),
+                      onPressed: (context) {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return const ChangeTitleDialog();
+                          },
+                        );
+                      },
+                    ),
+                    SettingsTile.navigation(
+                      title: const Padding(
+                        padding: EdgeInsets.only(right: 8.0),
+                        child: Text('Organization'),
                       ),
-                      SettingsTile.navigation(
-                        title: const Text('Sign Out'),
-                        leading: const Icon(Icons.logout_rounded),
-                        onPressed: (context) {
-                          showDialog(
-                            context: context,
-                            builder: (context) {
-                              return Dialog(
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: const [
-                                    Text('Sign Out?'),
-                                  ],
-                                ),
-                              );
-                            },
-                          );
-                        },
-                      ),
-                      SettingsTile.navigation(
-                        title: const Text('Delete Account'),
-                        leading: const Icon(Icons.delete_forever_rounded),
-                        onPressed: (context) {
-                          showDialog(
-                            context: context,
-                            builder: (context) {
-                              return Dialog(
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: const [
-                                    Text('Delete Account?'),
-                                  ],
-                                ),
-                              );
-                            },
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                  SettingsSection(
-                    title: const Text('Help & Support'),
-                    tiles: [
-                      SettingsTile.navigation(
-                        title: const Text('Report an Issue / Bug'),
-                        leading: const Icon(Icons.report),
-                        trailing: const Icon(Icons.chevron_right_rounded),
-                      ),
-                    ],
-                  ),
-                ],
-              );
-            } else {
-              return const Text('Something Went Wrong');
-            }
-          },
-        ),
+                      value: FittedBox(child: Text(currentUser.organization!)),
+                      leading: const Icon(Icons.work_rounded),
+                      onPressed: (context) {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return const ChangeOrganizationDialog();
+                          },
+                        );
+                      },
+                    ),
+                    SettingsTile.navigation(
+                      title: const Text('Password'),
+                      leading: const Icon(Icons.lock_rounded),
+                      onPressed: (context) {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return const ChangePasswordDialog();
+                          },
+                        );
+                      },
+                    ),
+                    SettingsTile.navigation(
+                      title: const Text('Sign Out'),
+                      leading: const Icon(Icons.logout_rounded),
+                      onPressed: (context) {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return Dialog(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: const [
+                                  Text('Sign Out?'),
+                                ],
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    ),
+                    SettingsTile.navigation(
+                      title: const Text('Delete Account'),
+                      leading: const Icon(Icons.delete_forever_rounded),
+                      onPressed: (context) {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return Dialog(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: const [
+                                  Text('Delete Account?'),
+                                ],
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  ],
+                ),
+                SettingsSection(
+                  title: const Text('Help & Support'),
+                  tiles: [
+                    SettingsTile.navigation(
+                      title: const Text('Report an Issue / Bug'),
+                      leading: const Icon(Icons.report),
+                      trailing: const Icon(Icons.chevron_right_rounded),
+                    ),
+                  ],
+                ),
+              ],
+            );
+          } else {
+            return const Text('Something Went Wrong');
+          }
+        },
       ),
     );
   }
@@ -234,6 +244,135 @@ class ChangeNameDialog extends StatefulWidget {
 }
 
 class _ChangeNameDialogState extends State<ChangeNameDialog> {
+  final TextEditingController nameFieldController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    User currentUser = context.watch<ProfileBloc>().state.user;
+    nameFieldController.text = currentUser.name!;
+    return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 24.0),
+        child: SizedBox(
+          height: 175,
+          child: Column(
+            //mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  'Edit Name',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+              ),
+              TextFormField(
+                controller: nameFieldController,
+                decoration: const InputDecoration(label: Text('Your Name')),
+              ),
+              ElevatedButton(onPressed: () {
+                context.read<ProfileBloc>().add(UpdateProfile(
+                    user: currentUser.copyWith(
+                        name: nameFieldController.value.text)));
+                Future.delayed(const Duration(seconds: 1), () {
+                  Navigator.pop(context);
+                });
+              }, child: BlocBuilder<ProfileBloc, ProfileState>(
+                builder: (context, state) {
+                  if (state is ProfileLoading) {
+                    return LoadingAnimationWidget.bouncingBall(
+                        color: Colors.white, size: 18);
+                  }
+                  if (state is ProfileUpdated) {
+                    return const Text('Name Updated!');
+                  }
+                  return const Text('Update Name');
+                },
+              ))
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class ChangeTitleDialog extends StatefulWidget {
+  const ChangeTitleDialog({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  State<ChangeTitleDialog> createState() => _ChangeTitleDialogState();
+}
+
+class _ChangeTitleDialogState extends State<ChangeTitleDialog> {
+  final TextEditingController titleFieldController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    User currentUser = context.watch<ProfileBloc>().state.user;
+    titleFieldController.text = currentUser.title!;
+    return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 24.0),
+        child: SizedBox(
+          height: 175,
+          child: Column(
+            //mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  'Edit Title',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+              ),
+              TextFormField(
+                controller: titleFieldController,
+                decoration: const InputDecoration(label: Text('Your Name')),
+              ),
+              ElevatedButton(onPressed: () {
+                context.read<ProfileBloc>().add(UpdateProfile(
+                    user: currentUser.copyWith(
+                        title: titleFieldController.value.text)));
+                Future.delayed(const Duration(seconds: 1), () {
+                  Navigator.pop(context);
+                });
+              }, child: BlocBuilder<ProfileBloc, ProfileState>(
+                builder: (context, state) {
+                  if (state is ProfileLoading) {
+                    return LoadingAnimationWidget.bouncingBall(
+                        color: Colors.white, size: 18);
+                  }
+                  if (state is ProfileUpdated) {
+                    return const Text('Title Updated!');
+                  }
+                  return const Text('Update Title');
+                },
+              ))
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class ChangeOrganizationDialog extends StatefulWidget {
+  const ChangeOrganizationDialog({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  State<ChangeOrganizationDialog> createState() =>
+      _ChangeOrganizationDialogState();
+}
+
+class _ChangeOrganizationDialogState extends State<ChangeOrganizationDialog> {
   final TextEditingController nameFieldController = TextEditingController();
 
   @override
