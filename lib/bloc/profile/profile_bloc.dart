@@ -31,17 +31,20 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           : add(ResetProfile());
     });
   }
-  void _onLoadProfile(LoadProfile event, Emitter<ProfileState> emit) {
+  void _onLoadProfile(LoadProfile event, Emitter<ProfileState> emit) async {
     print('User Loading: ${state.user.id}');
-    _databaseRepository.getUser(event.userId).listen((user) {
-      add(UpdateProfile(user: user));
+    await emit.forEach(_databaseRepository.getUser(event.userId),
+        onData: (User user) {
+      return ProfileLoaded(user: user);
     });
   }
 
-  void _onUpdateProfile(UpdateProfile event, Emitter<ProfileState> emit) {
+  void _onUpdateProfile(UpdateProfile event, Emitter<ProfileState> emit) async {
     print(event.user);
     try {
       _databaseRepository.updateUser(event.user);
+      emit(ProfileUpdated());
+      await Future.delayed(const Duration(seconds: 1));
       emit(ProfileLoaded(user: event.user));
     } catch (e) {
       emit(ProfileFailed());

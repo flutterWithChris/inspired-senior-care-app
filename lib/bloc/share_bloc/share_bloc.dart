@@ -13,13 +13,12 @@ class ShareBloc extends Bloc<ShareEvent, ShareState> {
         super(ShareState.initial()) {
     on<ShareEvent>((event, emit) async {
       if (event is SubmitPressed) {
+        emit(ShareState.submitting());
         await _databaseRepository.submitResponse(
           event.categoryName,
           event.cardNumber,
           event.response,
         );
-        emit(ShareState.submitting());
-        await Future.delayed(const Duration(seconds: 1));
         emit(ShareState.submitted());
         await Future.delayed(const Duration(seconds: 1));
         emit(ShareState.initial());

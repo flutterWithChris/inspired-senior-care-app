@@ -19,8 +19,8 @@ class InviteBloc extends Bloc<InviteEvent, InviteState> {
   final AuthRepository _authRepository;
   final AuthBloc _authBloc;
   final ProfileBloc _profileBloc;
-  StreamSubscription? _inviteStream;
-  StreamSubscription? _authStream;
+  StreamSubscription<List<Invite>?>? inviteStream;
+  StreamSubscription? authStream;
 
   InviteBloc({
     required DatabaseRepository databaseRepository,
@@ -32,12 +32,12 @@ class InviteBloc extends Bloc<InviteEvent, InviteState> {
         _profileBloc = profileBloc,
         _authBloc = authBloc,
         super(InviteState.loading()) {
-    _authStream = _authBloc.stream.listen((event) {
-      if (event.authStatus == AuthStatus.authenticated) {
+    authStream = _authBloc.stream.listen((state) {
+      if (state.authStatus == AuthStatus.authenticated) {
         add(LoadInvites());
       }
     });
-    _inviteStream = _databaseRepository.getInvites()!.listen((event) {
+    inviteStream = _databaseRepository.listenForInvites()!.listen((event) {
       if (event != null) {
         add(LoadInvites());
       }
@@ -175,8 +175,8 @@ class InviteBloc extends Bloc<InviteEvent, InviteState> {
   @override
   Future<void> close() {
     // TODO: implement close
-    _authStream?.cancel();
-    _inviteStream?.cancel();
+    authStream?.cancel();
+    inviteStream?.cancel();
     return super.close();
   }
 }

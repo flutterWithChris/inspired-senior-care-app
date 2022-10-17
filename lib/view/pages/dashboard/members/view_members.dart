@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/member/bloc/bloc/group_member_bloc.dart';
-import 'package:inspired_senior_care_app/bloc/member/bloc/member_bloc.dart';
 import 'package:inspired_senior_care_app/data/models/user.dart';
 import 'package:inspired_senior_care_app/view/widget/main/bottom_app_bar.dart';
 import 'package:inspired_senior_care_app/view/widget/main/top_app_bar.dart';
@@ -15,7 +14,7 @@ class ViewMembers extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    context.read<MemberBloc>().add(ResetMember());
+    //context.read<MemberBloc>().add(ResetMember());
     return Scaffold(
       appBar: const PreferredSize(
         preferredSize: Size.fromHeight(50),
@@ -31,7 +30,7 @@ class ViewMembers extends StatelessWidget {
             );
           }
           if (state is GroupMembersLoaded) {
-            if (state.groupMembers.isEmpty) {
+            if (context.watch<GroupMemberBloc>().members.isEmpty) {
               return Center(
                   child: Text(
                 'No Members Yet!',

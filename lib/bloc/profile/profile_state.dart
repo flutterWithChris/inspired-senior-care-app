@@ -27,3 +27,5 @@ class ProfileLoaded extends ProfileState {
 }
 
 class ProfileFailed extends ProfileState {}
+
+class ProfileUpdated extends ProfileState {}
