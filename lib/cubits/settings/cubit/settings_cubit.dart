@@ -1,17 +1,21 @@
 import 'package:bloc/bloc.dart';
 import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
 import 'package:inspired_senior_care_app/data/repositories/auth/auth_repository.dart';
+import 'package:inspired_senior_care_app/data/repositories/database/database_repository.dart';
 import 'package:meta/meta.dart';
 
 part 'settings_state.dart';
 
 class SettingsCubit extends Cubit<SettingsState> {
   final AuthRepository _authRepository;
+  final DatabaseRepository _databaseRepository;
   final ProfileBloc _profileBloc;
   SettingsCubit(
       {required AuthRepository authRepository,
+      required DatabaseRepository databaseRepository,
       required ProfileBloc profileBloc})
       : _authRepository = authRepository,
+        _databaseRepository = databaseRepository,
         _profileBloc = profileBloc,
         super(SettingsLoaded());
   void passwordResetRequest(String email) => _onPasswordResetRequest(email);
@@ -21,6 +25,7 @@ class SettingsCubit extends Cubit<SettingsState> {
       _onChangeOrganizationRequest(organization);
   void changeTitle(String title) => _onChangeTitleRequest(title);
   void loadSettings() => emit(SettingsLoaded());
+  void deleteAccount() => _onDeleteAccountRequest();
 
   void _onPasswordResetRequest(String email) async {
     //  emit(SettingsLoading());
@@ -34,8 +39,19 @@ class SettingsCubit extends Cubit<SettingsState> {
     }
   }
 
+  void _onDeleteAccountRequest() async {
+    try {
+      await _databaseRepository.deleteUser(_profileBloc.state.user);
+      await _authRepository.deleteAccount();
+      emit(SettingsUpdated());
+      await Future.delayed(const Duration(seconds: 1));
+      emit(SettingsLoaded());
+    } catch (e) {
+      print(e);
+    }
+  }
+
   void _onChangeNameRequest(String name) async {
-    // emit(SettingsLoading());
     try {
       _profileBloc.add(
           UpdateProfile(user: _profileBloc.state.user.copyWith(name: name)));
@@ -49,7 +65,6 @@ class SettingsCubit extends Cubit<SettingsState> {
   }
 
   void _onChangeEmailRequest(String email) async {
-    // emit(SettingsLoading());
     try {
       _profileBloc.add(
           UpdateProfile(user: _profileBloc.state.user.copyWith(email: email)));
@@ -63,7 +78,6 @@ class SettingsCubit extends Cubit<SettingsState> {
   }
 
   void _onChangeOrganizationRequest(String organization) async {
-    //emit(SettingsLoading());
     try {
       _profileBloc.add(UpdateProfile(
           user: _profileBloc.state.user.copyWith(organization: organization)));
@@ -76,7 +90,6 @@ class SettingsCubit extends Cubit<SettingsState> {
   }
 
   void _onChangeTitleRequest(String title) async {
-    //  emit(SettingsLoading());
     try {
       _profileBloc.add(
           UpdateProfile(user: _profileBloc.state.user.copyWith(title: title)));

@@ -33,11 +33,9 @@ import 'package:inspired_senior_care_app/data/repositories/database/database_rep
 import 'package:inspired_senior_care_app/data/repositories/purchases/purchases_repository.dart';
 import 'package:inspired_senior_care_app/data/repositories/storage/storage_repository.dart';
 import 'package:inspired_senior_care_app/firebase_options.dart';
-
 import 'package:inspired_senior_care_app/globals.dart';
-import 'package:inspired_senior_care_app/view/pages/dashboard/groups/choose_category.dart';
-
 import 'package:inspired_senior_care_app/view/pages/dashboard/dashboard.dart';
+import 'package:inspired_senior_care_app/view/pages/dashboard/groups/choose_category.dart';
 import 'package:inspired_senior_care_app/view/pages/dashboard/members/view_member.dart';
 import 'package:inspired_senior_care_app/view/pages/dashboard/members/view_members.dart';
 import 'package:inspired_senior_care_app/view/pages/dashboard/members/view_responses/view_responses.dart';
@@ -178,6 +176,7 @@ class _MyAppState extends State<MyApp> {
           ),
           BlocProvider(
             create: (context) => SettingsCubit(
+                databaseRepository: context.read<DatabaseRepository>(),
                 authRepository: context.read<AuthRepository>(),
                 profileBloc: context.read<ProfileBloc>()),
           ),
@@ -330,7 +329,7 @@ class _MyAppState extends State<MyApp> {
           GoRoute(
             name: 'manager-share-deck-page',
             path: 'manager-share-deck-page',
-            builder: (context, state) => ManagerShareDeckPage(),
+            builder: (context, state) => ManagerShareDeckPage(category: state.extra as Category,),
           ),
         ]),
     GoRoute(
