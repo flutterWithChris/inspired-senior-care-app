@@ -71,6 +71,21 @@ class AuthRepository extends BaseAuthRepository {
       snackbarKey.currentState?.showSnackBar(snackBar);
     }
   }
+
+  @override
+  Future<void> requestEmailReset(String email) async {
+    try {
+      await _firebaseAuth.currentUser!.updateEmail(email);
+    } on auth.FirebaseAuthException catch (e) {
+      print('Failed with error code: ${e.code}');
+      print(e.message);
+      final SnackBar snackBar = SnackBar(
+        content: Text(e.message!),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
+    }
+  }
 }
 
 extension on auth.User {

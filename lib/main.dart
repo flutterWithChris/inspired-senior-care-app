@@ -177,6 +177,11 @@ class _MyAppState extends State<MyApp> {
                 storageRepository: context.read<StorageRepository>()),
           ),
           BlocProvider(
+            create: (context) => SettingsCubit(
+                authRepository: context.read<AuthRepository>(),
+                profileBloc: context.read<ProfileBloc>()),
+          ),
+          BlocProvider(
             create: (context) =>
                 SignupCubit(authRepository: context.read<AuthRepository>()),
           ),
@@ -290,11 +295,7 @@ class _MyAppState extends State<MyApp> {
           GoRoute(
             name: 'settings',
             path: 'settings',
-            builder: (context, state) => BlocProvider(
-              create: (context) =>
-                  EditPassCubit(authRepository: context.read<AuthRepository>()),
-              child: const SettingsPage(),
-            ),
+            builder: (context, state) => const SettingsPage(),
           ),
         ]),
     GoRoute(

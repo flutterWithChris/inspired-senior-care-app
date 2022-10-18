@@ -43,7 +43,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     print(event.user);
     try {
       _databaseRepository.updateUser(event.user);
-      emit(ProfileUpdated());
+      //   emit(ProfileUpdated());
       await Future.delayed(const Duration(seconds: 1));
       emit(ProfileLoaded(user: event.user));
     } catch (e) {

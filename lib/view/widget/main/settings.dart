@@ -20,14 +20,16 @@ class SettingsPage extends StatelessWidget {
             title: 'Settings',
           )),
       bottomNavigationBar: const MainBottomAppBar(),
-      body: BlocBuilder<ProfileBloc, ProfileState>(
+      body: BlocBuilder<SettingsCubit, SettingsState>(
         builder: (context, state) {
-          if (state is ProfileLoading) {
-            return LoadingAnimationWidget.fourRotatingDots(
-                color: Colors.blue, size: 30);
+          if (state is SettingsLoading || state is SettingsUpdated) {
+            return Center(
+              child: LoadingAnimationWidget.fourRotatingDots(
+                  color: Colors.blue, size: 30),
+            );
           }
-          if (state is ProfileLoaded) {
-            User currentUser = state.user;
+          if (state is SettingsLoaded) {
+            User currentUser = context.watch<ProfileBloc>().state.user;
             return SettingsList(
               contentPadding:
                   const EdgeInsets.symmetric(horizontal: 6.0, vertical: 8.0),
@@ -219,13 +221,28 @@ class _ChangeEmailDialogState extends State<ChangeEmailDialog> {
                 controller: emailFieldController,
                 decoration: const InputDecoration(label: Text('Your Email')),
               ),
-              ElevatedButton(
-                  onPressed: () {
-                    context.read<ProfileBloc>().add(UpdateProfile(
-                        user: currentUser.copyWith(
-                            email: emailFieldController.value.text)));
-                  },
-                  child: const Text('Update Email'))
+              ElevatedButton(onPressed: () {
+                context
+                    .read<SettingsCubit>()
+                    .changeEmail(emailFieldController.value.text);
+                // context.read<SettingsCubit>().add(UpdateProfile(
+                //     user: currentUser.copyWith(
+                //         email: emailFieldController.value.text)));
+                Future.delayed(const Duration(seconds: 1), () {
+                  Navigator.pop(context);
+                });
+              }, child: BlocBuilder<SettingsCubit, SettingsState>(
+                builder: (context, state) {
+                  if (state is SettingsLoading) {
+                    return LoadingAnimationWidget.bouncingBall(
+                        color: Colors.white, size: 18);
+                  }
+                  if (state is SettingsUpdated) {
+                    return const Text('Email Updated!');
+                  }
+                  return const Text('Update Email');
+                },
+              ))
             ],
           ),
         ),
@@ -272,19 +289,22 @@ class _ChangeNameDialogState extends State<ChangeNameDialog> {
                 decoration: const InputDecoration(label: Text('Your Name')),
               ),
               ElevatedButton(onPressed: () {
-                context.read<ProfileBloc>().add(UpdateProfile(
-                    user: currentUser.copyWith(
-                        name: nameFieldController.value.text)));
+                context
+                    .read<SettingsCubit>()
+                    .changeName(nameFieldController.value.text);
+                // context.read<SettingsCubit>().add(UpdateProfile(
+                //     user: currentUser.copyWith(
+                //         name: nameFieldController.value.text)));
                 Future.delayed(const Duration(seconds: 1), () {
                   Navigator.pop(context);
                 });
-              }, child: BlocBuilder<ProfileBloc, ProfileState>(
+              }, child: BlocBuilder<SettingsCubit, SettingsState>(
                 builder: (context, state) {
-                  if (state is ProfileLoading) {
+                  if (state is SettingsLoading) {
                     return LoadingAnimationWidget.bouncingBall(
                         color: Colors.white, size: 18);
                   }
-                  if (state is ProfileUpdated) {
+                  if (state is SettingsUpdated) {
                     return const Text('Name Updated!');
                   }
                   return const Text('Update Name');
@@ -333,22 +353,25 @@ class _ChangeTitleDialogState extends State<ChangeTitleDialog> {
               ),
               TextFormField(
                 controller: titleFieldController,
-                decoration: const InputDecoration(label: Text('Your Name')),
+                decoration: const InputDecoration(label: Text('Your Title')),
               ),
               ElevatedButton(onPressed: () {
-                context.read<ProfileBloc>().add(UpdateProfile(
-                    user: currentUser.copyWith(
-                        title: titleFieldController.value.text)));
+                context
+                    .read<SettingsCubit>()
+                    .changeTitle(titleFieldController.value.text);
+                // .add(UpdateProfile(
+                //     user: currentUser.copyWith(
+                //         title: titleFieldController.value.text)));
                 Future.delayed(const Duration(seconds: 1), () {
                   Navigator.pop(context);
                 });
-              }, child: BlocBuilder<ProfileBloc, ProfileState>(
+              }, child: BlocBuilder<SettingsCubit, SettingsState>(
                 builder: (context, state) {
-                  if (state is ProfileLoading) {
+                  if (state is SettingsLoading) {
                     return LoadingAnimationWidget.bouncingBall(
                         color: Colors.white, size: 18);
                   }
-                  if (state is ProfileUpdated) {
+                  if (state is SettingsUpdated) {
                     return const Text('Title Updated!');
                   }
                   return const Text('Update Title');
@@ -373,12 +396,13 @@ class ChangeOrganizationDialog extends StatefulWidget {
 }
 
 class _ChangeOrganizationDialogState extends State<ChangeOrganizationDialog> {
-  final TextEditingController nameFieldController = TextEditingController();
+  final TextEditingController organizationFieldController =
+      TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     User currentUser = context.watch<ProfileBloc>().state.user;
-    nameFieldController.text = currentUser.name!;
+    organizationFieldController.text = currentUser.organization!;
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
       child: Padding(
@@ -392,31 +416,35 @@ class _ChangeOrganizationDialogState extends State<ChangeOrganizationDialog> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
-                  'Edit Name',
+                  'Edit Organization',
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
               ),
               TextFormField(
-                controller: nameFieldController,
-                decoration: const InputDecoration(label: Text('Your Name')),
+                controller: organizationFieldController,
+                decoration:
+                    const InputDecoration(label: Text('Your Organization')),
               ),
               ElevatedButton(onPressed: () {
-                context.read<ProfileBloc>().add(UpdateProfile(
-                    user: currentUser.copyWith(
-                        name: nameFieldController.value.text)));
+                context
+                    .read<SettingsCubit>()
+                    .changeOrganization(organizationFieldController.value.text);
+                // context.read<SettingsCubit>().add(UpdateProfile(
+                //     user: currentUser.copyWith(
+                //         name: organizationFieldController.value.text)));
                 Future.delayed(const Duration(seconds: 1), () {
                   Navigator.pop(context);
                 });
-              }, child: BlocBuilder<ProfileBloc, ProfileState>(
+              }, child: BlocBuilder<SettingsCubit, SettingsState>(
                 builder: (context, state) {
-                  if (state is ProfileLoading) {
+                  if (state is SettingsLoading) {
                     return LoadingAnimationWidget.bouncingBall(
                         color: Colors.white, size: 18);
                   }
-                  if (state is ProfileUpdated) {
-                    return const Text('Name Updated!');
+                  if (state is SettingsUpdated) {
+                    return const Text('Organization Updated!');
                   }
-                  return const Text('Update Name');
+                  return const Text('Update Organization');
                 },
               ))
             ],
@@ -456,7 +484,7 @@ class ChangePasswordDialog extends StatelessWidget {
               ),
               ElevatedButton(
                   onPressed: () {
-                    context.read<EditPassCubit>().passwordResetRequest(
+                    context.read<SettingsCubit>().passwordResetRequest(
                         context.read<ProfileBloc>().state.user.email!);
                   },
                   child: const Text('Request Password Reset'))
