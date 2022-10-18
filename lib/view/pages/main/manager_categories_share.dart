@@ -11,11 +11,9 @@ import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/share_bloc/share_bloc.dart';
 import 'package:inspired_senior_care_app/data/models/category.dart';
 import 'package:inspired_senior_care_app/view/pages/IAP/upgrade_page.dart';
-
 import 'package:inspired_senior_care_app/view/widget/main/bottom_app_bar.dart';
 import 'package:inspired_senior_care_app/view/widget/main/main_app_drawer.dart';
 import 'package:inspired_senior_care_app/view/widget/main/top_app_bar.dart';
-
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class ManagerCategoriesShare extends StatelessWidget {
@@ -179,7 +177,7 @@ class CategoryCard extends StatelessWidget {
                   BlocProvider.of<CardBloc>(context)
                       .add(LoadCards(category: category));
 
-                  context.goNamed('manager-share-deck-page');
+                  context.goNamed('manager-share-deck-page', extra: category);
                 },
                 child: Card(
                   child: Container(

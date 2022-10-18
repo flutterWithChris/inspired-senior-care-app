@@ -117,7 +117,7 @@ class _FeaturedCategoryState extends State<FeaturedCategory> {
                   BlocProvider.of<CardBloc>(context)
                       .add(LoadCards(category: featuredCategory));
                   currentUser.type == 'user'
-                      ? context.pushNamed('deck-page')
+                      ? context.pushNamed('deck-page', extra: featuredCategory)
                       : context.pushNamed('manager-deck-page');
                 }),
                 child: Animate(
