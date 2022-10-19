@@ -16,6 +16,8 @@ import 'package:inspired_senior_care_app/view/widget/main/main_app_drawer.dart';
 import 'package:inspired_senior_care_app/view/widget/main/top_app_bar.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
+import '../../../bloc/deck/deck_cubit.dart';
+
 class ManagerCategoriesShare extends StatelessWidget {
   const ManagerCategoriesShare({Key? key}) : super(key: key);
 
@@ -176,7 +178,7 @@ class CategoryCard extends StatelessWidget {
                 onTap: () {
                   BlocProvider.of<CardBloc>(context)
                       .add(LoadCards(category: category));
-
+                  context.read<DeckCubit>().loadDeck(category);
                   context.goNamed('manager-share-deck-page', extra: category);
                 },
                 child: Card(

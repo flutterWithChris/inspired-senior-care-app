@@ -272,7 +272,7 @@ class CardCounter extends StatelessWidget {
                       context.read<DeckCubit>().updateCardNumber(currentCard);
                       print(
                           '$currentCard is the Index & progress is: ${(percentComplete * 100)}');
-                      context.read<DeckCubit>().loadDeck(currentCard);
+
                       if (currentCard < currentCategory.totalCards!) {
                         Future.delayed(const Duration(milliseconds: 500), () {
                           deckScrollController.animateToItem(currentCard);

@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:inspired_senior_care_app/bloc/cards/card_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/categories/categories_bloc.dart';
+import 'package:inspired_senior_care_app/bloc/deck/deck_cubit.dart';
 import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/share_bloc/share_bloc.dart';
 import 'package:inspired_senior_care_app/data/models/category.dart';
@@ -140,7 +141,7 @@ class CategoryCard extends StatelessWidget {
                 onTap: () {
                   BlocProvider.of<CardBloc>(context)
                       .add(LoadCards(category: category));
-
+                  context.read<DeckCubit>().loadDeck(category);
                   context.goNamed('deck-page', extra: category);
                 },
                 child: Card(
@@ -178,23 +179,33 @@ class CategoryCard extends StatelessWidget {
                                               .watch<ProfileBloc>()
                                               .state
                                               .user
-                                              .progress?[category.name] ??
+                                              .progress![category.name] ??
                                           0;
 
                                       percentComplete = progress > 0
-                                          ? (progress) / category.totalCards!
-                                          : 0;
+                                          ? (progress - 1) /
+                                              category.totalCards!
+                                          : 0.0;
 
                                       // print(
                                       //     '${category.name} Progress is: $percentComplete');
                                       // return Text(
                                       //   '${(percentComplete * 100).toStringAsFixed(0)}%',
-                                      return Text(
-                                        '$progress/${category.totalCards}',
-                                        style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 14),
-                                      );
+                                      if (progress > 0) {
+                                        return Text(
+                                          '${(progress - 1)}/${category.totalCards}',
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 14),
+                                        );
+                                      } else {
+                                        return Text(
+                                          '${(0)}/${category.totalCards}',
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 14),
+                                        );
+                                      }
                                     }
                                     return const Text(
                                         'Something Went Wrong...');

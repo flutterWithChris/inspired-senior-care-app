@@ -190,6 +190,7 @@ class _MyAppState extends State<MyApp> {
           ),
           BlocProvider(
             create: (context) => DeckCubit(
+                profileBloc: context.read<ProfileBloc>(),
                 databaseRepository: context.read<DatabaseRepository>()),
           ),
         ],
@@ -329,7 +330,9 @@ class _MyAppState extends State<MyApp> {
           GoRoute(
             name: 'manager-share-deck-page',
             path: 'manager-share-deck-page',
-            builder: (context, state) => ManagerShareDeckPage(category: state.extra as Category,),
+            builder: (context, state) => ManagerShareDeckPage(
+              category: state.extra as Category,
+            ),
           ),
         ]),
     GoRoute(

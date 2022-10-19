@@ -1,5 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
+import 'package:inspired_senior_care_app/data/models/category.dart';
 import 'package:inspired_senior_care_app/data/models/user.dart';
 import 'package:inspired_senior_care_app/data/repositories/database/database_repository.dart';
 import 'package:meta/meta.dart';
@@ -8,12 +10,17 @@ part 'deck_state.dart';
 
 class DeckCubit extends Cubit<DeckState> {
   final DatabaseRepository _databaseRepository;
+  final ProfileBloc _profileBloc;
   int currentCardNumber = 1;
-  DeckCubit({required DatabaseRepository databaseRepository})
+  DeckCubit(
+      {required DatabaseRepository databaseRepository,
+      required ProfileBloc profileBloc})
       : _databaseRepository = databaseRepository,
+        _profileBloc = profileBloc,
         super(DeckState.initial());
-  void loadDeck(int currentCard) {
-    currentCardNumber = currentCard;
+  void loadDeck(Category category) {
+    User currentUser = _profileBloc.state.user;
+    int currentCard = currentUser.progress![category.name] ?? 1;
     emit(DeckState.loaded(currentCard));
   }
 

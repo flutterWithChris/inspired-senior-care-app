@@ -35,7 +35,7 @@ class _DeckPageState extends State<DeckPage> {
             .state
             .user
             .progress![widget.category.name] ==
-        widget.category.totalCards) {
+        widget.category.totalCards! + 1) {
       isSwipeDisabled = false;
       isCategoryComplete = true;
     }
@@ -47,11 +47,6 @@ class _DeckPageState extends State<DeckPage> {
     int currentCard = context.watch<DeckCubit>().currentCardNumber;
 
     final GlobalKey<FormState> shareFieldFormKey = GlobalKey<FormState>();
-    // showDialog(
-    //     context: context,
-    //     builder: (context) {
-    //       return const DeckCompleteDialog();
-    //     });
 
     return Scaffold(
       backgroundColor: Colors.grey.shade200,
@@ -77,21 +72,7 @@ class _DeckPageState extends State<DeckPage> {
               opacity: 1.0,
               duration: const Duration(milliseconds: 1000),
               child: BlocConsumer<CardBloc, CardState>(
-                listener: (context, state) {
-                  if (context.read<DeckCubit>().state.status ==
-                      DeckStatus.swiped) {
-                    deckScrollController.animateToItem(currentCard);
-                  }
-                  if (context.read<DeckCubit>().state.status ==
-                      DeckStatus.completed) {
-                    showDialog(
-                      context: context,
-                      builder: (context) {
-                        return const DeckCompleteDialog();
-                      },
-                    );
-                  }
-                },
+                listener: (context, state) {},
                 builder: (context, state) {
                   if (state is CardsLoaded) {
                     return Visibility(
@@ -145,6 +126,18 @@ class _DeckPageState extends State<DeckPage> {
             // if (currentCard == state.category.totalCards) {
             //   isSwipeDisabled = false;
             // }
+            if (context.read<DeckCubit>().state.status ==
+                DeckStatus.completed) {
+              isCategoryComplete = true;
+              isSwipeDisabled = false;
+              WidgetsBinding.instance.addPostFrameCallback((_) => showDialog(
+                    context: context,
+                    builder: (context) {
+                      return const DeckCompleteDialog();
+                    },
+                  ));
+            }
+
             return SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -254,7 +247,7 @@ class CardCounter extends StatelessWidget {
                     bool categoryStarted =
                         user.progress!.containsKey(currentCategory.name);
                     percentComplete =
-                        (currentCard - 1) / state.cardImageUrls.length;
+                        (currentCard) / state.cardImageUrls.length;
                     if (categoryStarted) {
                       Map<String, int> progressList =
                           context.watch<ProfileBloc>().state.user.progress!;
@@ -266,17 +259,20 @@ class CardCounter extends StatelessWidget {
                     }
                     if (categoryStarted) {
                       progress =
-                          ((currentCard / currentCategory.totalCards!) * 100);
+                          (((currentCard - 1) / currentCategory.totalCards!) *
+                              100);
                       Map<String, int> progressList = user.progress!;
                       currentCard = progressList[currentCategory.name]!;
                       context.read<DeckCubit>().updateCardNumber(currentCard);
                       print(
-                          '$currentCard is the Index & progress is: ${(percentComplete * 100)}');
-                      context.read<DeckCubit>().loadDeck(currentCard);
-                      if (currentCard < currentCategory.totalCards!) {
+                          '$currentCard is the current card & progress is: ${(percentComplete * 100)}');
+
+                      if (currentCard < currentCategory.totalCards! + 1) {
                         Future.delayed(const Duration(milliseconds: 500), () {
                           deckScrollController.animateToItem(currentCard - 1);
                         });
+                      } else {
+                        context.read<DeckCubit>().completeDeck();
                       }
 
                       return CircleAvatar(
@@ -393,7 +389,7 @@ class DeckCompleteDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return Dialog(
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 16.0),
+        padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
         child: Stack(
           clipBehavior: Clip.none,
           alignment: AlignmentDirectional.topEnd,
@@ -421,7 +417,7 @@ class DeckCompleteDialog extends StatelessWidget {
                 ),
               ),
               const Padding(
-                padding: EdgeInsets.symmetric(vertical: 8.0),
+                padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16),
                 child: Text(
                   'You\'ve completed this category. Be proud of yourself!',
                   textAlign: TextAlign.center,
@@ -431,7 +427,7 @@ class DeckCompleteDialog extends StatelessWidget {
                   onPressed: () {
                     Navigator.pop(context);
                   },
-                  child: const Text('Review Deck')),
+                  child: const Text('Unlock Deck')),
             ]),
             Positioned(
               top: -25,
@@ -670,7 +666,7 @@ class _SendButtonState extends State<SendButton> {
               cardNumber: currentCard,
               response: widget.shareFieldController.text));
 
-          if (currentCard == (widget.category.totalCards)) {
+          if (currentCard == (widget.category.totalCards! + 1)) {
             //context.read<DeckCubit>().resetDeck();
             widget.shareFieldController.clear();
             Navigator.pop(context);
@@ -678,6 +674,7 @@ class _SendButtonState extends State<SendButton> {
           } else {
             await Future.delayed(const Duration(seconds: 2));
             if (!mounted) return;
+
             context.read<DeckCubit>().incrementCardNumber(
                 context.read<ProfileBloc>().state.user, widget.categoryName);
             context.read<DeckCubit>().swipeDeck();
