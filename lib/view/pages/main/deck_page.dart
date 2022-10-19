@@ -275,7 +275,7 @@ class CardCounter extends StatelessWidget {
                       context.read<DeckCubit>().loadDeck(currentCard);
                       if (currentCard < currentCategory.totalCards!) {
                         Future.delayed(const Duration(milliseconds: 500), () {
-                          deckScrollController.animateToItem(currentCard);
+                          deckScrollController.animateToItem(currentCard - 1);
                         });
                       }
 
@@ -283,7 +283,7 @@ class CardCounter extends StatelessWidget {
                         backgroundColor: Colors.white,
                         radius: 32,
                         child: Text(
-                          '$currentCard/${currentCategory.totalCards}',
+                          '${(currentCard - 1)}/${currentCategory.totalCards}',
                           style: const TextStyle(fontSize: 20),
                         ),
                       );
@@ -667,7 +667,7 @@ class _SendButtonState extends State<SendButton> {
         if (widget.formKey.currentState!.validate()) {
           context.read<ShareBloc>().add(SubmitPressed(
               categoryName: widget.categoryName,
-              cardNumber: currentCard + 1,
+              cardNumber: currentCard,
               response: widget.shareFieldController.text));
 
           if (currentCard == (widget.category.totalCards)) {

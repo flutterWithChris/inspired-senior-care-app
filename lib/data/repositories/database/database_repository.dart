@@ -128,7 +128,7 @@ class DatabaseRepository extends BaseDatabaseRepository {
         .doc(_firebaseAuth.currentUser!.uid)
         .collection('responses')
         .doc(categoryName)
-        .set({'$cardNumber': response}, SetOptions(merge: true));
+        .set({'${(cardNumber)}': response}, SetOptions(merge: true));
   }
 
   Stream<Response> viewResponse(User user, Category category, int cardNumber) {
