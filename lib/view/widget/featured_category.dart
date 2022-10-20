@@ -173,7 +173,7 @@ class _FeaturedCategoryState extends State<FeaturedCategory> {
                                                   .progressColor,
                                               backgroundColor:
                                                   Colors.grey.shade200,
-                                              value: ((progress /
+                                              value: (((progress - 1) /
                                                   featuredCategory
                                                       .totalCards!)),
                                             ),
