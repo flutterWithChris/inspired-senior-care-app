@@ -145,107 +145,100 @@ class CategoryCard extends StatelessWidget {
                   context.goNamed('deck-page', extra: category);
                 },
                 child: Card(
-                  child: Container(
-                    color: Colors.white,
-                    height: 275,
-                    child: Stack(
-                      alignment: AlignmentDirectional.center,
-                      children: [
-                        Positioned(
-                            top: 15,
-                            child: CachedNetworkImage(
-                              placeholder: (context, url) => Center(
-                                child: LoadingAnimationWidget.inkDrop(
-                                    color: Colors.blueAccent, size: 30.0),
-                              ),
-                              imageUrl: category.coverImageUrl,
-                              height: 250,
-                              fit: BoxFit.fitHeight,
-                            )),
-                        Positioned(
-                          top: 5,
-                          right: 2,
-                          child: Stack(
-                            alignment: AlignmentDirectional.center,
-                            children: [
-                              CircleAvatar(
-                                radius: 23,
-                                backgroundColor: Colors.white,
-                                child: BlocBuilder<ProfileBloc, ProfileState>(
-                                  builder: (context, state) {
-                                    int currentCard = 0;
-                                    if (state is ProfileLoaded) {
-                                      int progress = context
-                                              .watch<ProfileBloc>()
-                                              .state
-                                              .user
-                                              .progress![category.name] ??
-                                          0;
-
-                                      percentComplete = progress > 0
-                                          ? (progress - 1) /
-                                              category.totalCards!
-                                          : 0.0;
-
-                                      // print(
-                                      //     '${category.name} Progress is: $percentComplete');
-                                      // return Text(
-                                      //   '${(percentComplete * 100).toStringAsFixed(0)}%',
-                                      if (progress > 0) {
-                                        return Text(
-                                          '${(progress - 1)}/${category.totalCards}',
-                                          style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 14),
-                                        );
-                                      } else {
-                                        return Text(
-                                          '${(0)}/${category.totalCards}',
-                                          style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 14),
-                                        );
-                                      }
-                                    }
-                                    return const Text(
-                                        'Something Went Wrong...');
-                                  },
-                                ),
-                              ),
-                              BlocBuilder<CategoriesBloc, CategoriesState>(
+                  child: Stack(
+                    alignment: AlignmentDirectional.center,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: CachedNetworkImage(
+                          placeholder: (context, url) => Center(
+                            child: LoadingAnimationWidget.inkDrop(
+                                color: Colors.blueAccent, size: 30.0),
+                          ),
+                          imageUrl: category.coverImageUrl,
+                          height: 250,
+                          fit: BoxFit.fitHeight,
+                        ),
+                      ),
+                      Positioned(
+                        top: 5,
+                        right: 2,
+                        child: Stack(
+                          alignment: AlignmentDirectional.center,
+                          children: [
+                            CircleAvatar(
+                              radius: 23,
+                              backgroundColor: Colors.white,
+                              child: BlocBuilder<ProfileBloc, ProfileState>(
                                 builder: (context, state) {
-                                  if (state is CategoriesLoaded) {
-                                    return SizedBox(
-                                      height: 50,
-                                      width: 50,
-                                      child: BlocBuilder<ShareBloc, ShareState>(
-                                        buildWhen: (previous, current) =>
-                                            previous.status ==
-                                                Status.submitted &&
-                                            current.status == Status.initial,
-                                        builder: (context, state) {
-                                          return CircularProgressIndicator(
-                                            backgroundColor:
-                                                Colors.grey.shade200,
-                                            valueColor:
-                                                AlwaysStoppedAnimation<Color>(
-                                                    category.progressColor),
-                                            value: percentComplete,
-                                          );
-                                        },
-                                      ),
-                                    );
+                                  int currentCard = 0;
+                                  if (state is ProfileLoaded) {
+                                    int progress = context
+                                            .watch<ProfileBloc>()
+                                            .state
+                                            .user
+                                            .currentCard![category.name] ??
+                                        0;
+
+                                    percentComplete = progress > 0
+                                        ? (progress - 1) / category.totalCards!
+                                        : 0.0;
+
+                                    // print(
+                                    //     '${category.name} Progress is: $percentComplete');
+                                    // return Text(
+                                    //   '${(percentComplete * 100).toStringAsFixed(0)}%',
+                                    if (progress > 0) {
+                                      return Text(
+                                        '${(progress - 1)}/${category.totalCards}',
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 14),
+                                      );
+                                    } else {
+                                      return Text(
+                                        '${(0)}/${category.totalCards}',
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 14),
+                                      );
+                                    }
                                   }
-                                  return const Center(
-                                    child: Text('Something Went Wrong...'),
-                                  );
+                                  return const Text('Something Went Wrong...');
                                 },
                               ),
-                            ],
-                          ),
-                        )
-                      ],
-                    ),
+                            ),
+                            BlocBuilder<CategoriesBloc, CategoriesState>(
+                              builder: (context, state) {
+                                if (state is CategoriesLoaded) {
+                                  return SizedBox(
+                                    height: 50,
+                                    width: 50,
+                                    child: BlocBuilder<ShareBloc, ShareState>(
+                                      buildWhen: (previous, current) =>
+                                          previous.status == Status.submitted &&
+                                          current.status == Status.initial,
+                                      builder: (context, state) {
+                                        return CircularProgressIndicator(
+                                          backgroundColor: Colors.grey.shade200,
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                  category.progressColor),
+                                          value: percentComplete,
+                                        );
+                                      },
+                                    ),
+                                  );
+                                }
+                                return const Center(
+                                  child: Text('Something Went Wrong...'),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      )
+                    ],
                   ),
                 ),
               );

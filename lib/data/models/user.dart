@@ -9,7 +9,7 @@ class User {
   final String? title;
   final String? userColor;
   final List<String>? groups;
-  final Map<String, int>? progress;
+  final Map<String, int>? currentCard;
 
   const User({
     this.id,
@@ -20,7 +20,7 @@ class User {
     this.title,
     this.userColor,
     this.groups,
-    this.progress,
+    this.currentCard,
   });
 
   static User fromSnapshot(DocumentSnapshot snap) {
@@ -33,7 +33,7 @@ class User {
       title: snap['title'],
       userColor: snap['userColor'],
       groups: List.from(snap['groups']),
-      progress: Map.from(snap['progress']),
+      currentCard: Map.from(snap['progress']),
     );
 
     return user;
@@ -49,7 +49,7 @@ class User {
       'title': title,
       'userColor': userColor,
       'groups': groups,
-      'progress': progress,
+      'progress': currentCard,
     };
   }
 
@@ -78,7 +78,7 @@ class User {
       title: title ?? this.title,
       userColor: userColor ?? this.userColor,
       groups: groups ?? this.groups,
-      progress: progress ?? this.progress,
+      currentCard: progress ?? currentCard,
     );
   }
 }

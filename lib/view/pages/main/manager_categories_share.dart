@@ -213,7 +213,7 @@ class CategoryCard extends StatelessWidget {
                                     int currentCard = 0;
                                     if (state is ProfileLoaded) {
                                       bool categoryStarted = state
-                                          .user.progress!
+                                          .user.currentCard!
                                           .containsKey(category.name);
                                       if (!categoryStarted) {
                                         currentCard = 0;
@@ -223,7 +223,7 @@ class CategoryCard extends StatelessWidget {
                                             .watch<ProfileBloc>()
                                             .state
                                             .user
-                                            .progress!;
+                                            .currentCard!;
 
                                         percentComplete =
                                             progressList[category.name]! /

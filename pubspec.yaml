@@ -70,6 +70,7 @@ dependencies:
   once: ^1.4.1
   purchases_flutter: ^4.3.0
   dotenv: ^2.0.0
+  zoom_widget: ^2.0.0
 
 
 

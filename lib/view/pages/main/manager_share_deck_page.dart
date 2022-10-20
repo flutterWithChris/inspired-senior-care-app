@@ -34,7 +34,7 @@ class _ManagerShareDeckPageState extends State<ManagerShareDeckPage> {
             .read<ProfileBloc>()
             .state
             .user
-            .progress![widget.category.name] ==
+            .currentCard![widget.category.name] ==
         widget.category.totalCards) {
       isSwipeDisabled = false;
       isCategoryComplete = true;
@@ -252,12 +252,12 @@ class CardCounter extends StatelessWidget {
                   if (state is CardsLoaded) {
                     Category currentCategory = state.category;
                     bool categoryStarted =
-                        user.progress!.containsKey(currentCategory.name);
+                        user.currentCard!.containsKey(currentCategory.name);
                     percentComplete =
                         (currentCard - 1) / state.cardImageUrls.length;
                     if (categoryStarted) {
                       Map<String, int> progressList =
-                          context.watch<ProfileBloc>().state.user.progress!;
+                          context.watch<ProfileBloc>().state.user.currentCard!;
                     }
                     // Checking if Category has been started.
                     if (!categoryStarted) {
@@ -267,7 +267,7 @@ class CardCounter extends StatelessWidget {
                     if (categoryStarted) {
                       progress =
                           ((currentCard / currentCategory.totalCards!) * 100);
-                      Map<String, int> progressList = user.progress!;
+                      Map<String, int> progressList = user.currentCard!;
                       currentCard = progressList[currentCategory.name]!;
                       context.read<DeckCubit>().updateCardNumber(currentCard);
                       print(

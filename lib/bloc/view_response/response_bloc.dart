@@ -20,8 +20,8 @@ class ResponseBloc extends Bloc<ResponseEvent, ResponseState> {
         super(ResponseLoading()) {
     on<FetchResponse>((event, emit) async {
       responses.clear();
-      if (event.user.progress![event.category.name] != null) {
-        int responseCount = event.user.progress![event.category.name] ?? 0;
+      if (event.user.currentCard![event.category.name] != null) {
+        int responseCount = event.user.currentCard![event.category.name] ?? 0;
         for (int i = 1; i < responseCount; i++) {
           _responseStream = _databaseRepository
               .viewResponse(event.user, event.category, i)

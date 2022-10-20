@@ -18,9 +18,9 @@ class PurchasesBloc extends Bloc<PurchasesEvent, PurchasesState> {
     on<PurchasesEvent>((event, emit) async {
       // TODO: implement event handler
       if (event is LoadPurchases) {
-        if (state is PurchasesLoading == false) {
-          emit(PurchasesLoading());
-        }
+        // if (state is PurchasesLoading == false) {
+        //   emit(PurchasesLoading());
+        // }
         try {
           // await purchasesRepository.initPlatformState();
           bool? isSubscribed =

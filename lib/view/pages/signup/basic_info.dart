@@ -149,7 +149,7 @@ class _BasicInfoPageState extends State<BasicInfoPage> {
                                 title: '',
                                 userColor: '',
                                 groups: [],
-                                progress: {});
+                                currentCard: {});
                             // * Pass User to Onboarding Bloc
                             context
                                 .read<OnboardingBloc>()

@@ -85,6 +85,7 @@ class _MyAppState extends State<MyApp> {
           create: (context) => AuthRepository(),
         ),
         RepositoryProvider(
+          lazy: false,
           create: (context) => PurchasesRepository()..initPlatformState(),
         ),
         RepositoryProvider(
@@ -227,8 +228,8 @@ class _MyAppState extends State<MyApp> {
                       minimumSize: const Size(25, 30),
                     ),
                   ),
-                  bottomSheetTheme:
-                      const BottomSheetThemeData(backgroundColor: Colors.white),
+                  bottomSheetTheme: const BottomSheetThemeData(
+                      backgroundColor: Colors.transparent),
                   textTheme: GoogleFonts.breeSerifTextTheme(),
                   //  useMaterial3: true,
 

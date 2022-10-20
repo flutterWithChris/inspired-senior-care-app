@@ -20,7 +20,7 @@ class DeckCubit extends Cubit<DeckState> {
         super(DeckState.initial());
   void loadDeck(Category category) {
     User currentUser = _profileBloc.state.user;
-    int currentCard = currentUser.progress![category.name] ?? 1;
+    int currentCard = currentUser.currentCard![category.name] ?? 1;
     emit(DeckState.loaded(currentCard));
   }
 

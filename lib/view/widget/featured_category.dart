@@ -108,7 +108,8 @@ class _FeaturedCategoryState extends State<FeaturedCategory> {
           Category featuredCategory = categoriesState.categories.singleWhere(
             (category) => category.name == state.featuredCategoryName,
           );
-          int progress = currentUser.progress![state.featuredCategoryName] ?? 0;
+          int progress =
+              currentUser.currentCard![state.featuredCategoryName] ?? 0;
           return Column(
             children: [
               InkWell(
