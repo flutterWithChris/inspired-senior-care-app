@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:go_router/go_router.dart';
 import 'package:infinite_carousel/infinite_carousel.dart';
 import 'package:inspired_senior_care_app/bloc/cards/card_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/deck/deck_cubit.dart';
@@ -42,13 +43,7 @@ class _DeckPageState extends State<DeckPage> {
       isSwipeDisabled = false;
       isCategoryComplete = true;
     }
-    WidgetsBinding.instance.addPostFrameCallback((_) => showDialog(
-          barrierDismissible: false,
-          context: context,
-          builder: (context) {
-            return const PremiumIndividualOfferDialog();
-          },
-        ));
+
     super.initState();
   }
 
@@ -137,8 +132,19 @@ class _DeckPageState extends State<DeckPage> {
                     ));
                   }
                   if (state is CardsLoaded) {
-                    if (currentCard > 1 && isSubscribed == false ||
-                        isSubscribed == null) {}
+                    if (currentCard >=
+                                (widget.category.totalCards! * 0.5).round() &&
+                            isSubscribed == false ||
+                        isSubscribed == null) {
+                      WidgetsBinding.instance
+                          .addPostFrameCallback((_) => showDialog(
+                                barrierDismissible: false,
+                                context: context,
+                                builder: (context) {
+                                  return const PremiumIndividualOfferDialog();
+                                },
+                              ));
+                    }
                     // if (currentCard == state.category.totalCards) {
                     //   isSwipeDisabled = false;
                     // }
@@ -178,7 +184,7 @@ class _DeckPageState extends State<DeckPage> {
                                     alignment: AlignmentDirectional.topEnd,
                                     children: [
                                       SizedBox(
-                                        height: 520,
+                                        height: 500,
                                         //  width: 330,
                                         child: IgnorePointer(
                                           ignoring: isSwipeDisabled,
@@ -344,7 +350,7 @@ class CardCounter extends StatelessWidget {
             if (state is CardsLoaded) {
               //int currentCard = context.watch<DeckCubit>().currentCardNumber;
               double percentageComplete =
-                  (currentCard / state.cardImageUrls.length);
+                  ((currentCard - 1) / state.cardImageUrls.length);
               return SizedBox(
                 height: 60,
                 width: 60,
@@ -352,7 +358,7 @@ class CardCounter extends StatelessWidget {
                   backgroundColor: Colors.grey.shade300,
                   valueColor: AlwaysStoppedAnimation<Color>(
                       state.category.progressColor),
-                  value: progress / 100,
+                  value: percentageComplete,
                 ),
               );
             }
@@ -564,50 +570,51 @@ class _PremiumOfferDialogState extends State<PremiumIndividualOfferDialog> {
                             ),
                           ),
                           SizedBox(
-                            width: 325,
-                            height: 160,
-                            child:
-                                context.watch<ProfileBloc>().state.user.type ==
-                                        'user'
-                                    ? Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 8.0),
-                                        child: IndividualOfferCard(
-                                          packages: packages,
-                                        ),
-                                      )
-                                    : const Padding(
-                                        padding: EdgeInsets.all(8.0),
-                                        child: OrganizationOfferCard(),
-                                      ),
-                          ),
-                          const Padding(
-                            padding: EdgeInsets.only(
+                              width: 325,
+                              height: 150,
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 4.0),
+                                child: IndividualOfferCard(
+                                  packages: packages,
+                                ),
+                              )),
+                          Padding(
+                            padding: const EdgeInsets.only(
                                 left: 24.0, right: 24.0, bottom: 8.0),
+                            child: ElevatedButton(
+                                onPressed: () {
+                                  Package? package = context
+                                      .read<PurchasesBloc>()
+                                      .selectedPackage;
+
+                                  context.read<PurchasesBloc>().add(AddPurchase(
+                                      package: package ?? packages[0]!));
+
+                                  // Navigator.pop(context);
+                                },
+                                child: const Text('Subscribe')),
+                          ),
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 24.0),
                             child: Text(
                               'Subscribe & instantly gain access to the rest of the cards!',
+                              style: Theme.of(context).textTheme.titleMedium,
                               textAlign: TextAlign.center,
                             ),
                           ),
-                          ElevatedButton(
-                              onPressed: () {
-                                Package? package = context
-                                    .read<PurchasesBloc>()
-                                    .selectedPackage;
-
-                                context.read<PurchasesBloc>().add(AddPurchase(
-                                    package: package ?? packages[0]!));
-
-                                // Navigator.pop(context);
-                              },
-                              child: const Text('Subscribe Now')),
                         ]),
-                        const Positioned(
+                        Positioned(
                           top: -25,
                           right: -5,
                           child: SizedBox(
                             height: 40,
-                            child: CloseButton(),
+                            child: CloseButton(
+                              onPressed: () {
+                                context.pop();
+                              },
+                            ),
                           ),
                         ),
                       ],
@@ -1192,23 +1199,20 @@ class InfoCard extends StatelessWidget {
           );
         }
         if (state is CardsLoaded) {
-          return ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 330, maxHeight: 500),
-            child: Card(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20)),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                    vertical: 16.0, horizontal: 16.0),
-                child: CachedNetworkImage(
-                  placeholder: (context, url) => Center(
-                    child: LoadingAnimationWidget.discreteCircle(
-                        color: Colors.blueAccent, size: 30.0),
-                  ),
-                  imageUrl: state.cardImageUrls[cardNumber - 1],
-                  height: 195,
-                  fit: BoxFit.fitHeight,
+          return Card(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            child: Padding(
+              padding:
+                  const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
+              child: CachedNetworkImage(
+                placeholder: (context, url) => Center(
+                  child: LoadingAnimationWidget.discreteCircle(
+                      color: Colors.blueAccent, size: 30.0),
                 ),
+                imageUrl: state.cardImageUrls[cardNumber - 1],
+                // height: 195,
+                fit: BoxFit.fitHeight,
               ),
             ),
           );
