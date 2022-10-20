@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/services.dart';
+import 'package:inspired_senior_care_app/data/models/user.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
 class PurchasesRepository {
@@ -37,11 +38,6 @@ class PurchasesRepository {
   Future<void> makePurchase(Package package) async {
     try {
       CustomerInfo customerInfo = await Purchases.purchasePackage(package);
-      var isPro =
-          customerInfo.entitlements.all["my_entitlement_identifier"]!.isActive;
-      if (isPro) {
-        // Unlock that great "pro" content
-      }
     } on PlatformException catch (e) {
       var errorCode = PurchasesErrorHelper.getErrorCode(e);
       if (errorCode != PurchasesErrorCode.purchaseCancelledError) {
@@ -73,6 +69,36 @@ class PurchasesRepository {
     } on PlatformException catch (e) {
       // Error restoring purchases
       print(e);
+    }
+  }
+
+  Future<void> logoutOfRevCat() async {
+    try {
+      await Purchases.logOut();
+    } on PlatformException catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> loginToRevCat(User user) async {
+    try {
+      await Future.wait([
+        Purchases.logIn(user.id!),
+        Purchases.setEmail(user.email!),
+        Purchases.setDisplayName(user.name!),
+      ]);
+    } on PlatformException catch (e) {
+      print(e);
+    }
+  }
+
+  Future<CustomerInfo?> getCustomerInfo() async {
+    try {
+      CustomerInfo customerInfo = await Purchases.getCustomerInfo();
+      return customerInfo;
+    } on PlatformException catch (e) {
+      print(e);
+      return null;
     }
   }
 }

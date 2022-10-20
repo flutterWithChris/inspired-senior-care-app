@@ -3,9 +3,10 @@ part of 'purchases_bloc.dart';
 @immutable
 abstract class PurchasesState extends Equatable {
   Offerings? offerings;
+  Package? selectedPackage;
   @override
   // TODO: implement props
-  List<Object?> get props => [offerings];
+  List<Object?> get props => [offerings, selectedPackage];
 }
 
 class PurchasesInitial extends PurchasesState {}
@@ -16,9 +17,11 @@ class PurchasesLoaded extends PurchasesState {
   @override
   final Offerings? offerings;
   final bool? isSubscribed;
+  final CustomerInfo? customerInfo;
   PurchasesLoaded({
     this.offerings,
     this.isSubscribed,
+    this.customerInfo,
   });
   @override
   // TODO: implement props

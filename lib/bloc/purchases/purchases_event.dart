@@ -26,3 +26,13 @@ class AddPurchase extends PurchasesEvent {
 class EditPurchase extends PurchasesEvent {}
 
 class RemovePurchase extends PurchasesEvent {}
+
+class SelectPackage extends PurchasesEvent {
+  final Package package;
+  SelectPackage({
+    required this.package,
+  });
+  @override
+  // TODO: implement props
+  List<Object?> get props => [package];
+}

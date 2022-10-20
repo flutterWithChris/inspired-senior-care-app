@@ -49,6 +49,7 @@ import 'package:inspired_senior_care_app/view/pages/main/manager_deck_page.dart'
 import 'package:inspired_senior_care_app/view/pages/main/manager_share_deck_page.dart';
 import 'package:inspired_senior_care_app/view/pages/main/profile.dart';
 import 'package:inspired_senior_care_app/view/pages/signup/signup.dart';
+import 'package:inspired_senior_care_app/view/pages/subscriptions.dart';
 import 'package:inspired_senior_care_app/view/widget/main/settings.dart';
 
 void main() async {
@@ -98,8 +99,9 @@ class _MyAppState extends State<MyApp> {
       child: MultiBlocProvider(
         providers: [
           BlocProvider(
-            create: (context) =>
-                AuthBloc(authRepository: context.read<AuthRepository>()),
+            create: (context) => AuthBloc(
+                purchasesRepository: context.read<PurchasesRepository>(),
+                authRepository: context.read<AuthRepository>()),
           ),
           BlocProvider(
             create: (context) => ProfileBloc(
@@ -340,6 +342,11 @@ class _MyAppState extends State<MyApp> {
       name: 'profile',
       path: '/profile',
       builder: (context, state) => const Profile(),
+    ),
+    GoRoute(
+      name: 'subscriptions',
+      path: '/subscriptions',
+      builder: (context, state) => const SubscriptionsPage(),
     ),
     GoRoute(
         name: 'dashboard',

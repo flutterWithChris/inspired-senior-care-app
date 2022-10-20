@@ -21,7 +21,7 @@ class MainAppDrawer extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 36.0),
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     DrawerHeader(
                         padding: const EdgeInsets.symmetric(horizontal: 0),
@@ -40,15 +40,29 @@ class MainAppDrawer extends StatelessWidget {
                             ),
                           ],
                         )),
-                    ListTile(
-                      onTap: () {
-                        context.goNamed('settings');
-                      },
-                      title: Text(
-                        'Settings',
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                      trailing: const Icon(Icons.chevron_right_rounded),
+                    Column(
+                      children: [
+                        ListTile(
+                          onTap: () {
+                            context.goNamed('settings');
+                          },
+                          title: Text(
+                            'Settings',
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                          trailing: const Icon(Icons.chevron_right_rounded),
+                        ),
+                        ListTile(
+                          onTap: () {
+                            context.pushNamed('subscriptions');
+                          },
+                          title: Text(
+                            'Subscriptions',
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                          trailing: const Icon(Icons.chevron_right_rounded),
+                        ),
+                      ],
                     ),
                     const Divider(),
                     TextButton.icon(
