@@ -57,7 +57,7 @@ class MainAppDrawer extends StatelessWidget {
                             context.pushNamed('subscriptions');
                           },
                           title: Text(
-                            'Subscriptions',
+                            'My Subscriptions',
                             style: Theme.of(context).textTheme.titleMedium,
                           ),
                           trailing: const Icon(Icons.chevron_right_rounded),

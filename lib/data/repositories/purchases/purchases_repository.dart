@@ -49,7 +49,9 @@ class PurchasesRepository {
   Future<bool?> getSubscriptionStatus() async {
     try {
       CustomerInfo customerInfo = await Purchases.getCustomerInfo();
-      if (customerInfo.activeSubscriptions.isNotEmpty) {
+      if (customerInfo.activeSubscriptions.isNotEmpty ||
+          customerInfo.entitlements.all["premium_individual"]!.isActive ||
+          customerInfo.entitlements.all["premium_organization"]!.isActive) {
         // Grant user "pro" access
         return true;
       } else {
@@ -96,6 +98,18 @@ class PurchasesRepository {
     try {
       CustomerInfo customerInfo = await Purchases.getCustomerInfo();
       return customerInfo;
+    } on PlatformException catch (e) {
+      print(e);
+      return null;
+    }
+  }
+
+  Future<List<StoreProduct>?> getProducts(
+      List<String> productIdentifiers) async {
+    try {
+      List<StoreProduct> storeProducts =
+          await Purchases.getProducts(productIdentifiers);
+      return storeProducts;
     } on PlatformException catch (e) {
       print(e);
       return null;

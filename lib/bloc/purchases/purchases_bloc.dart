@@ -38,10 +38,20 @@ class PurchasesBloc extends Bloc<PurchasesEvent, PurchasesState> {
           Offerings? offerings = await purchasesRepository.getOfferings();
           CustomerInfo? customerInfo =
               await purchasesRepository.getCustomerInfo();
+          Map<String, EntitlementInfo> entitlements =
+              customerInfo!.entitlements.active;
+          List<StoreProduct>? products;
+          List<String> productIds = [];
+          for (EntitlementInfo entitlementInfo in entitlements.values) {
+            productIds.add(entitlementInfo.productIdentifier);
+          }
+          products = await purchasesRepository.getProducts(productIds);
+
           emit(PurchasesLoaded(
               offerings: offerings,
               isSubscribed: isSubscribed,
-              customerInfo: customerInfo));
+              customerInfo: customerInfo,
+              products: products));
         } catch (e) {
           print(e);
         }

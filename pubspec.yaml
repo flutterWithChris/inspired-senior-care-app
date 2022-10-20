@@ -71,6 +71,7 @@ dependencies:
   purchases_flutter: ^4.3.0
   dotenv: ^2.0.0
   zoom_widget: ^2.0.0
+  intl: ^0.17.0
 
 
 

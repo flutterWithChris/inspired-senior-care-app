@@ -157,7 +157,7 @@ class _FeaturedCategoryState extends State<FeaturedCategory> {
                                               radius: 28,
                                               backgroundColor: Colors.white,
                                               child: Text(
-                                                '$progress/${featuredCategory.totalCards}',
+                                                '${progress - 1}/${featuredCategory.totalCards}',
                                                 style: const TextStyle(
                                                     fontSize: 18,
                                                     fontWeight: FontWeight.bold,

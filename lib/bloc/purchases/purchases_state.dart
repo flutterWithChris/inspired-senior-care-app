@@ -18,11 +18,9 @@ class PurchasesLoaded extends PurchasesState {
   final Offerings? offerings;
   final bool? isSubscribed;
   final CustomerInfo? customerInfo;
-  PurchasesLoaded({
-    this.offerings,
-    this.isSubscribed,
-    this.customerInfo,
-  });
+  final List<StoreProduct>? products;
+  PurchasesLoaded(
+      {this.offerings, this.isSubscribed, this.customerInfo, this.products});
   @override
   // TODO: implement props
   List<Object?> get props => [offerings];
