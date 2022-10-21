@@ -3,17 +3,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:go_router/go_router.dart';
 import 'package:infinite_carousel/infinite_carousel.dart';
 import 'package:inspired_senior_care_app/bloc/cards/card_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/deck/deck_cubit.dart';
 import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
+import 'package:inspired_senior_care_app/bloc/purchases/purchases_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/share_bloc/share_bloc.dart';
 import 'package:inspired_senior_care_app/data/models/category.dart';
 import 'package:inspired_senior_care_app/data/models/user.dart';
 import 'package:inspired_senior_care_app/view/widget/main/bottom_app_bar.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:purchases_flutter/models/offerings_wrapper.dart';
+import 'package:purchases_flutter/models/package_wrapper.dart';
 
 class DeckPage extends StatefulWidget {
+  final Category category;
+  const DeckPage({super.key, required this.category});
+
   @override
   State<DeckPage> createState() => _DeckPageState();
 }
@@ -24,17 +31,27 @@ class _DeckPageState extends State<DeckPage> {
   bool isCardZoomed = false;
   int currentCard = 0;
   InfiniteScrollController deckScrollController = InfiniteScrollController();
+  @override
+  void initState() {
+    // TODO: implement initState
+    if (context
+            .read<ProfileBloc>()
+            .state
+            .user
+            .currentCard![widget.category.name] ==
+        widget.category.totalCards! + 1) {
+      isSwipeDisabled = false;
+      isCategoryComplete = true;
+    }
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     int currentCard = context.watch<DeckCubit>().currentCardNumber;
 
     final GlobalKey<FormState> shareFieldFormKey = GlobalKey<FormState>();
-    // showDialog(
-    //     context: context,
-    //     builder: (context) {
-    //       return const DeckCompleteDialog();
-    //     });
 
     return Scaffold(
       backgroundColor: Colors.grey.shade200,
@@ -56,159 +73,193 @@ class _DeckPageState extends State<DeckPage> {
                 ),
               );
             }
-            return AnimatedOpacity(
-              opacity: 1.0,
-              duration: const Duration(milliseconds: 1000),
-              child: BlocConsumer<CardBloc, CardState>(
-                listener: (context, state) {
-                  if (context.read<DeckCubit>().state.status ==
-                      DeckStatus.swiped) {
-                    deckScrollController.animateToItem(currentCard);
-                  }
-                  if (context.read<DeckCubit>().state.status ==
-                      DeckStatus.completed) {
-                    showDialog(
-                      context: context,
-                      builder: (context) {
-                        return const DeckCompleteDialog();
-                      },
-                    );
-                  }
-                },
-                builder: (context, state) {
-                  if (state is CardsLoaded) {
-                    return Visibility(
-                      visible: !isCardZoomed,
-                      child: Animate(
-                        effects: const [
-                          SlideEffect(curve: Curves.easeInOutSine)
-                        ],
-                        child: AppBar(
-                          toolbarHeight: 50,
-                          centerTitle: true,
-                          title: Text(state.category.name),
-                          backgroundColor: state.category.categoryColor,
-                        ),
+            return BlocConsumer<CardBloc, CardState>(
+              listener: (context, state) {},
+              builder: (context, state) {
+                if (state is CardsLoaded) {
+                  return Visibility(
+                    visible: !isCardZoomed,
+                    child: Animate(
+                      effects: const [SlideEffect(curve: Curves.easeInOutSine)],
+                      child: AppBar(
+                        toolbarHeight: 50,
+                        centerTitle: true,
+                        title: Text(state.category.name),
+                        backgroundColor: state.category.categoryColor,
                       ),
-                    );
-                  }
-                  return AppBar(
-                    toolbarHeight: 50,
-                    centerTitle: true,
-                    title: LoadingAnimationWidget.prograssiveDots(
-                        color: Colors.white, size: 20),
-                    backgroundColor: Colors.grey,
+                    ),
                   );
-                },
-              ),
+                }
+                return AppBar(
+                  toolbarHeight: 50,
+                  centerTitle: true,
+                  title: LoadingAnimationWidget.prograssiveDots(
+                      color: Colors.white, size: 20),
+                  backgroundColor: Colors.grey,
+                );
+              },
             );
           },
         ),
       ),
       bottomNavigationBar: const MainBottomAppBar(),
-      body: SafeArea(
-        child: BlocConsumer<CardBloc, CardState>(
-          listener: (context, state) async {
-            if (state is CardsLoaded) {}
-          },
-          builder: (context, state) {
-            if (state is CardsLoading) {
-              return Center(
-                  child: Wrap(
-                crossAxisAlignment: WrapCrossAlignment.center,
-                direction: Axis.vertical,
-                spacing: 12,
-                children: [
-                  LoadingAnimationWidget.horizontalRotatingDots(
-                      color: Colors.blueAccent, size: 30),
-                  const Text('Loading Cards...')
-                ],
-              ));
-            }
-            if (state is CardsLoaded) {
-              if (currentCard == state.category.totalCards) {
-                isSwipeDisabled = false;
-              }
-              return SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(top: 36.0),
-                      child: AnimatedSlide(
-                        curve: Curves.easeInOut,
-                        duration: const Duration(milliseconds: 200),
-                        offset: isCardZoomed
-                            ? const Offset(0, -0.45)
-                            : const Offset(0, -0.0),
-                        child: AnimatedScale(
-                          duration: const Duration(milliseconds: 500),
-                          scale: isCardZoomed ? 1.0 : 1.0,
-                          child: Stack(
-                            clipBehavior: Clip.none,
-                            alignment: AlignmentDirectional.topEnd,
-                            children: [
-                              SizedBox(
-                                height: 500,
-                                child: IgnorePointer(
-                                  ignoring: isSwipeDisabled,
-                                  child: BlocListener<DeckCubit, DeckState>(
-                                    listener: (context, state) {
-                                      // TODO: implement listener
-                                      if (state.status ==
-                                          DeckStatus.completed) {
-                                        isSwipeDisabled = false;
-                                      }
-                                      if (state.status == DeckStatus.zoomed) {
-                                        isCardZoomed = true;
-                                      } else if (state.status ==
-                                          DeckStatus.unzoomed) {
-                                        isCardZoomed = false;
-                                      }
-                                    },
-                                    child: Deck(
-                                        deckScrollController:
-                                            deckScrollController),
+      body: BlocBuilder<PurchasesBloc, PurchasesState>(
+        builder: (context, state) {
+          if (state is PurchasesLoading) {
+            return Center(
+              child: LoadingAnimationWidget.discreteCircle(
+                  color: Colors.blue, size: 30),
+            );
+          }
+          if (state is PurchasesLoaded) {
+            {
+              Offerings? offerings = state.offerings;
+              // print(offerings?.all.toString());
+              bool? isSubscribed = state.isSubscribed;
+              return BlocBuilder<CardBloc, CardState>(
+                builder: (context, state) {
+                  if (state is CardsLoading) {
+                    return Center(
+                        child: Wrap(
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      direction: Axis.vertical,
+                      spacing: 12,
+                      children: [
+                        LoadingAnimationWidget.horizontalRotatingDots(
+                            color: Colors.blueAccent, size: 30),
+                        const Text('Loading Cards...')
+                      ],
+                    ));
+                  }
+                  if (state is CardsLoaded) {
+                    if (currentCard >=
+                                (widget.category.totalCards! * 0.5).round() &&
+                            isSubscribed == false ||
+                        isSubscribed == null) {
+                      WidgetsBinding.instance
+                          .addPostFrameCallback((_) => showDialog(
+                                barrierDismissible: false,
+                                context: context,
+                                builder: (context) {
+                                  return const PremiumIndividualOfferDialog();
+                                },
+                              ));
+                    }
+                    // if (currentCard == state.category.totalCards) {
+                    //   isSwipeDisabled = false;
+                    // }
+                    if (context.read<DeckCubit>().state.status ==
+                        DeckStatus.completed) {
+                      isCategoryComplete = true;
+                      isSwipeDisabled = false;
+                      WidgetsBinding.instance
+                          .addPostFrameCallback((_) => showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return const DeckCompleteDialog();
+                                },
+                              ));
+                    }
+
+                    return Flex(
+                      direction: Axis.vertical,
+                      children: [
+                        Flexible(
+                          flex: 4,
+                          child: SingleChildScrollView(
+                            reverse: true,
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: 36.0),
+                              child: AnimatedSlide(
+                                curve: Curves.decelerate,
+                                duration: const Duration(milliseconds: 200),
+                                offset: isCardZoomed
+                                    ? const Offset(0, -0.1)
+                                    : const Offset(0, -0.0),
+                                child: AnimatedScale(
+                                  duration: const Duration(milliseconds: 250),
+                                  scale: isCardZoomed ? 1.1 : 1.0,
+                                  child: Stack(
+                                    clipBehavior: Clip.none,
+                                    alignment: AlignmentDirectional.topEnd,
+                                    children: [
+                                      SizedBox(
+                                        height: 500,
+                                        //  width: 330,
+                                        child: IgnorePointer(
+                                          ignoring: isSwipeDisabled,
+                                          child: BlocListener<DeckCubit,
+                                              DeckState>(
+                                            listener: (context, state) {
+                                              // TODO: implement listener
+                                              if (state.status ==
+                                                  DeckStatus.completed) {
+                                                isSwipeDisabled = false;
+                                              }
+                                              if (state.status ==
+                                                  DeckStatus.zoomed) {
+                                                isCardZoomed = true;
+                                              } else if (state.status ==
+                                                  DeckStatus.unzoomed) {
+                                                isCardZoomed = false;
+                                              }
+                                            },
+                                            child: Deck(
+                                                deckScrollController:
+                                                    deckScrollController),
+                                          ),
+                                        ),
+                                      ),
+                                      Visibility(
+                                        visible: isSwipeDisabled ? true : false,
+                                        child: Positioned(
+                                          right: 20,
+                                          top: -20,
+                                          child: CardCounter(
+                                              deckScrollController:
+                                                  deckScrollController),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
-                              Visibility(
-                                visible: isSwipeDisabled ? true : false,
-                                child: Positioned(
-                                  right: 20,
-                                  top: -20,
-                                  child: CardCounter(
-                                      deckScrollController:
-                                          deckScrollController),
-                                ),
-                              ),
-                            ],
+                            ),
                           ),
                         ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 16.0, bottom: 16.0),
-                      child: Visibility(
-                        visible: isSwipeDisabled ? true : false,
-                        child: ShareButton(
-                            category: state.category,
-                            formKey: shareFieldFormKey,
-                            categoryName: state.category.name),
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            } else {
-              return const Center(
-                child: Text('Something Went Wrong!'),
+                        Flexible(
+                          child: AnimatedOpacity(
+                            duration: const Duration(milliseconds: 100),
+                            opacity: isCardZoomed ? 0 : 1.0,
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                  top: 24.0, bottom: 24.0),
+                              child: Visibility(
+                                visible: isSwipeDisabled ? true : false,
+                                child: ShareButton(
+                                    category: state.category,
+                                    formKey: shareFieldFormKey,
+                                    categoryName: state.category.name),
+                              ),
+                            ),
+                          ),
+                        )
+                      ],
+                    );
+                  } else {
+                    return const Center(
+                      child: Text('Something Went Wrong!'),
+                    );
+                  }
+                },
               );
             }
-          },
-        ),
+          } else {
+            return const Center(
+              child: Text('Something Went Wrong...'),
+            );
+          }
+        },
       ),
     );
   }
@@ -238,12 +289,12 @@ class CardCounter extends StatelessWidget {
                   if (state is CardsLoaded) {
                     Category currentCategory = state.category;
                     bool categoryStarted =
-                        user.progress!.containsKey(currentCategory.name);
+                        user.currentCard!.containsKey(currentCategory.name);
                     percentComplete =
-                        (currentCard - 1) / state.cardImageUrls.length;
+                        (currentCard) / state.cardImageUrls.length;
                     if (categoryStarted) {
                       Map<String, int> progressList =
-                          context.watch<ProfileBloc>().state.user.progress!;
+                          context.watch<ProfileBloc>().state.user.currentCard!;
                     }
                     // Checking if Category has been started.
                     if (!categoryStarted) {
@@ -252,24 +303,27 @@ class CardCounter extends StatelessWidget {
                     }
                     if (categoryStarted) {
                       progress =
-                          ((currentCard / currentCategory.totalCards!) * 100);
-                      Map<String, int> progressList = user.progress!;
+                          (((currentCard - 1) / currentCategory.totalCards!) *
+                              100);
+                      Map<String, int> progressList = user.currentCard!;
                       currentCard = progressList[currentCategory.name]!;
                       context.read<DeckCubit>().updateCardNumber(currentCard);
                       print(
-                          '$currentCard is the Index & progress is: ${(percentComplete * 100)}');
-                      context.read<DeckCubit>().loadDeck(currentCard);
-                      if (currentCard < currentCategory.totalCards!) {
+                          '$currentCard is the current card & progress is: ${(percentComplete * 100)}');
+
+                      if (currentCard < currentCategory.totalCards! + 1) {
                         Future.delayed(const Duration(milliseconds: 500), () {
-                          deckScrollController.animateToItem(currentCard);
+                          deckScrollController.animateToItem(currentCard - 1);
                         });
+                      } else {
+                        context.read<DeckCubit>().completeDeck();
                       }
 
                       return CircleAvatar(
                         backgroundColor: Colors.white,
                         radius: 32,
                         child: Text(
-                          '$currentCard/${currentCategory.totalCards}',
+                          '${(currentCard - 1)}/${currentCategory.totalCards}',
                           style: const TextStyle(fontSize: 20),
                         ),
                       );
@@ -296,7 +350,7 @@ class CardCounter extends StatelessWidget {
             if (state is CardsLoaded) {
               //int currentCard = context.watch<DeckCubit>().currentCardNumber;
               double percentageComplete =
-                  (currentCard / state.cardImageUrls.length);
+                  ((currentCard - 1) / state.cardImageUrls.length);
               return SizedBox(
                 height: 60,
                 width: 60,
@@ -304,7 +358,7 @@ class CardCounter extends StatelessWidget {
                   backgroundColor: Colors.grey.shade300,
                   valueColor: AlwaysStoppedAnimation<Color>(
                       state.category.progressColor),
-                  value: progress / 100,
+                  value: percentageComplete,
                 ),
               );
             }
@@ -346,9 +400,12 @@ class Deck extends StatelessWidget {
         }
         if (state is CardsLoaded) {
           return InfiniteCarousel.builder(
+            //anchor: -20.0,
+            // physics: const PageScrollPhysics(),
+            center: true,
             loop: false,
             controller: deckScrollController,
-            velocityFactor: 0.2,
+            velocityFactor: 0.3,
             itemCount: state.cardImageUrls.length,
             itemExtent: 330,
             itemBuilder: (context, itemIndex, realIndex) {
@@ -376,7 +433,7 @@ class DeckCompleteDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return Dialog(
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 16.0),
+        padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
         child: Stack(
           clipBehavior: Clip.none,
           alignment: AlignmentDirectional.topEnd,
@@ -404,7 +461,7 @@ class DeckCompleteDialog extends StatelessWidget {
                 ),
               ),
               const Padding(
-                padding: EdgeInsets.symmetric(vertical: 8.0),
+                padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16),
                 child: Text(
                   'You\'ve completed this category. Be proud of yourself!',
                   textAlign: TextAlign.center,
@@ -414,7 +471,7 @@ class DeckCompleteDialog extends StatelessWidget {
                   onPressed: () {
                     Navigator.pop(context);
                   },
-                  child: const Text('Review Deck')),
+                  child: const Text('Unlock Deck')),
             ]),
             Positioned(
               top: -25,
@@ -431,6 +488,579 @@ class DeckCompleteDialog extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class PremiumIndividualOfferDialog extends StatefulWidget {
+  const PremiumIndividualOfferDialog({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  State<PremiumIndividualOfferDialog> createState() =>
+      _PremiumOfferDialogState();
+}
+
+double borderTopOffset = 65;
+
+class _PremiumOfferDialogState extends State<PremiumIndividualOfferDialog> {
+  String? selectedOffer;
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocConsumer<PurchasesBloc, PurchasesState>(
+      listener: (context, state) {
+        if (state is PurchasesUpdated) {
+          Navigator.pop(context);
+        }
+      },
+      buildWhen: (previous, current) =>
+          previous.selectedPackage != current.selectedPackage,
+      builder: (context, state) {
+        if (state is PurchasesLoading) {
+          return LoadingAnimationWidget.inkDrop(color: Colors.blue, size: 30.0);
+        }
+        if (state is PurchasesLoaded) {
+          List<Package?> packages = [];
+
+          return Dialog(
+            backgroundColor: Colors.grey.shade100,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            child: Padding(
+              padding:
+                  const EdgeInsets.symmetric(vertical: 36.0, horizontal: 16.0),
+              child: BlocBuilder<PurchasesBloc, PurchasesState>(
+                builder: (context, state) {
+                  if (state is PurchasesLoading) {
+                    return LoadingAnimationWidget.inkDrop(
+                        color: Colors.blue, size: 30.0);
+                  }
+                  if (state is PurchasesLoaded) {
+                    if (context.watch<ProfileBloc>().state.user.type ==
+                        'user') {
+                      packages.addAll([
+                        state.offerings
+                            ?.getOffering('subscriptions')!
+                            .getPackage('Individual (Monthly)'),
+                        state.offerings
+                            ?.getOffering('subscriptions')!
+                            .getPackage('Individual (Yearly)'),
+                      ]);
+                      print('Got ${packages.length} Offerings');
+                    } else if (context.watch<ProfileBloc>().state.user.type ==
+                        'manager') {
+                      packages.addAll([
+                        state.offerings
+                            ?.getOffering('subscriptions')!
+                            .getPackage('Organization (Monthly)'),
+                        state.offerings
+                            ?.getOffering('subscriptions')!
+                            .getPackage('Organization (Annual)')
+                      ]);
+                    }
+
+                    return Stack(
+                      clipBehavior: Clip.none,
+                      alignment: AlignmentDirectional.topEnd,
+                      children: [
+                        Column(mainAxisSize: MainAxisSize.min, children: [
+                          Padding(
+                            padding:
+                                const EdgeInsets.only(top: 12.0, bottom: 8.0),
+                            child: Text(
+                              'Upgrade To Keep Going!',
+                              style: Theme.of(context).textTheme.headline5,
+                            ),
+                          ),
+                          SizedBox(
+                              width: 325,
+                              height: 150,
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 4.0),
+                                child: IndividualOfferCard(
+                                  packages: packages,
+                                ),
+                              )),
+                          Padding(
+                            padding: const EdgeInsets.only(
+                                left: 24.0, right: 24.0, bottom: 8.0),
+                            child: ElevatedButton(
+                                onPressed: () {
+                                  Package? package = context
+                                      .read<PurchasesBloc>()
+                                      .selectedPackage;
+
+                                  context.read<PurchasesBloc>().add(AddPurchase(
+                                      package: package ?? packages[0]!));
+
+                                  // Navigator.pop(context);
+                                },
+                                child: const Text('Subscribe')),
+                          ),
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 24.0),
+                            child: Text(
+                              'Subscribe & instantly gain access to the rest of the cards!',
+                              style: Theme.of(context).textTheme.titleMedium,
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ]),
+                        Positioned(
+                          top: -25,
+                          right: -5,
+                          child: SizedBox(
+                            height: 40,
+                            child: CloseButton(
+                              onPressed: () {
+                                context.pop();
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  } else {
+                    return const Center(
+                      child: Text('Something Went Wrong...'),
+                    );
+                  }
+                },
+              ),
+            ),
+          );
+        } else {
+          return const Center(
+            child: Text('Something Went Wrong...'),
+          );
+        }
+      },
+    );
+  }
+}
+
+class PremiumOrganizationOfferDialog extends StatefulWidget {
+  const PremiumOrganizationOfferDialog({
+    Key? key,
+  }) : super(key: key);
+  @override
+  State<PremiumOrganizationOfferDialog> createState() =>
+      _PremiumOrganizationOfferDialogState();
+}
+
+class _PremiumOrganizationOfferDialogState
+    extends State<PremiumOrganizationOfferDialog> {
+  String? selectedOffer;
+  @override
+  Widget build(BuildContext context) {
+    return BlocConsumer<PurchasesBloc, PurchasesState>(
+      listener: (context, state) {
+        if (state is ProfileUpdated) {
+          Navigator.pop(context);
+        }
+      },
+      builder: (context, state) {
+        if (state is PurchasesLoading) {
+          return LoadingAnimationWidget.inkDrop(color: Colors.blue, size: 30.0);
+        }
+        if (state is PurchasesLoaded) {
+          List<Package?> packages = [];
+          return Dialog(
+            backgroundColor: Colors.grey.shade100,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            child: Padding(
+              padding:
+                  const EdgeInsets.symmetric(vertical: 36.0, horizontal: 16.0),
+              child: BlocBuilder<PurchasesBloc, PurchasesState>(
+                builder: (context, state) {
+                  if (state is PurchasesLoading) {
+                    return LoadingAnimationWidget.inkDrop(
+                        color: Colors.blue, size: 30.0);
+                  }
+                  if (state is PurchasesLoaded) {
+                    if (context.watch<ProfileBloc>().state.user.type ==
+                        'user') {
+                      packages.addAll([
+                        state.offerings
+                            ?.getOffering('subscriptions')!
+                            .getPackage('Individual (Monthly)'),
+                        state.offerings
+                            ?.getOffering('subscriptions')!
+                            .getPackage('Individual (Yearly)'),
+                      ]);
+                      print('Got ${packages.length} Offerings');
+                    } else if (context.watch<ProfileBloc>().state.user.type ==
+                        'manager') {
+                      packages.addAll([
+                        state.offerings
+                            ?.getOffering('subscriptions')!
+                            .getPackage('Organization (Monthly)'),
+                        state.offerings
+                            ?.getOffering('subscriptions')!
+                            .getPackage('Organization (Annual)')
+                      ]);
+                    }
+                    return Stack(
+                      clipBehavior: Clip.none,
+                      alignment: AlignmentDirectional.topEnd,
+                      children: [
+                        Column(mainAxisSize: MainAxisSize.min, children: [
+                          Padding(
+                            padding:
+                                const EdgeInsets.only(top: 12.0, bottom: 8.0),
+                            child: Text(
+                              'Upgrade Organization!',
+                              style: Theme.of(context).textTheme.headline5,
+                            ),
+                          ),
+                          SizedBox(
+                              width: 325,
+                              height: 160,
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 4.0),
+                                child: OrganizationOfferCard(
+                                  packages: packages,
+                                ),
+                              )),
+                          Padding(
+                            padding: const EdgeInsets.only(
+                                left: 24.0, right: 24.0, bottom: 8.0),
+                            child: ElevatedButton(
+                                onPressed: () {
+                                  Package? package = context
+                                      .read<PurchasesBloc>()
+                                      .selectedPackage;
+                                  context.read<PurchasesBloc>().add(AddPurchase(
+                                      package: package ?? packages[0]!));
+                                  // Navigator.pop(context);
+                                },
+                                child: const Text('Subscribe')),
+                          ),
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 24.0),
+                            child: Text(
+                              'Subscribe & instantly gain access to the rest of the cards!',
+                              style: Theme.of(context).textTheme.titleMedium,
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ]),
+                        Positioned(
+                          top: -25,
+                          right: -5,
+                          child: SizedBox(
+                            height: 40,
+                            child: CloseButton(
+                              onPressed: () {
+                                context.pop();
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  } else {
+                    return const Center(
+                      child: Text('Something Went Wrong...'),
+                    );
+                  }
+                },
+              ),
+            ),
+          );
+        } else {
+          return const Center(
+            child: Text('Something Went Wrong...'),
+          );
+        }
+      },
+    );
+  }
+}
+
+int selectedOffer = 0;
+String? selectedTerm;
+
+class IndividualOfferCard extends StatefulWidget {
+  final List<Package?> packages;
+  const IndividualOfferCard({super.key, required this.packages});
+
+  @override
+  State<IndividualOfferCard> createState() => _IndividualOfferCardState();
+}
+
+List<String> menuItemList = ['Monthly', 'Yearly'];
+
+class _IndividualOfferCardState extends State<IndividualOfferCard> {
+  String dropdownValue = menuItemList.first;
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<PurchasesBloc, PurchasesState>(
+      builder: (context, state) {
+        if (state is PurchasesLoading) {
+          return LoadingAnimationWidget.inkDrop(color: Colors.blue, size: 30.0);
+        }
+        if (state is PurchasesLoaded) {
+          return Column(mainAxisSize: MainAxisSize.min, children: [
+            SizedBox(
+              height: 140,
+              width: 280,
+              child: Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16.0),
+                ),
+                elevation: 1.618,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 18.0, vertical: 8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Individual',
+                            style: Theme.of(context).textTheme.titleLarge,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              if (dropdownValue == 'Monthly')
+                                Text(
+                                  '${widget.packages[0]?.storeProduct.priceString}/mo.',
+                                  style:
+                                      Theme.of(context).textTheme.titleMedium,
+                                ),
+                              if (dropdownValue == 'Yearly')
+                                Text(
+                                  '${widget.packages[1]?.storeProduct.priceString}/yr.',
+                                  style:
+                                      Theme.of(context).textTheme.titleMedium,
+                                ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    ListTile(
+                      leading: CircleAvatar(
+                          radius: 18,
+                          backgroundColor: Colors.orange.shade800,
+                          child: const Icon(
+                            Icons.person_rounded,
+                            color: Colors.white,
+                          )),
+                      subtitle: const Text(
+                          'Unlock access to all cards & categories.'),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 16.0, bottom: 8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          DropdownButton<String>(
+                            isDense: true,
+                            underline: const SizedBox(),
+                            borderRadius: BorderRadius.circular(20),
+                            value: dropdownValue,
+                            items: menuItemList
+                                .map<DropdownMenuItem<String>>((String value) {
+                              return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Chip(
+                                    padding: const EdgeInsets.all(4.0),
+                                    backgroundColor: Colors.blueAccent,
+                                    visualDensity: VisualDensity.compact,
+                                    label: Padding(
+                                        padding:
+                                            const EdgeInsets.only(bottom: 4.0),
+                                        child: Text(
+                                          value,
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 12.0,
+                                          ),
+                                        )),
+                                  ));
+                            }).toList(),
+                            onChanged: (String? value) {
+                              // This is called when the user selects an item.
+                              setState(() {
+                                dropdownValue = value!;
+                              });
+                              if (dropdownValue == 'Monthly') {
+                                context.read<PurchasesBloc>().add(SelectPackage(
+                                    package: widget.packages[0]!));
+                                print('Monthly Selected');
+                              } else if (dropdownValue == 'Yearly') {
+                                context.read<PurchasesBloc>().add(SelectPackage(
+                                    package: widget.packages[1]!));
+                                print('Yearly Selected');
+                              }
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            )
+          ]);
+        } else {
+          return const Center(
+            child: Text('Something Went Wrong..'),
+          );
+        }
+      },
+    );
+  }
+}
+
+class OrganizationOfferCard extends StatefulWidget {
+  final List<Package?> packages;
+  const OrganizationOfferCard({super.key, required this.packages});
+
+  @override
+  State<OrganizationOfferCard> createState() => _OrganizationOfferCardState();
+}
+
+List<String> menuItemList2 = ['Monthly', 'Yearly'];
+
+class _OrganizationOfferCardState extends State<OrganizationOfferCard> {
+  String dropdownValue = menuItemList.first;
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<PurchasesBloc, PurchasesState>(
+      builder: (context, state) {
+        if (state is PurchasesLoading) {
+          return LoadingAnimationWidget.inkDrop(color: Colors.blue, size: 30.0);
+        }
+        if (state is PurchasesLoaded) {
+          return Column(mainAxisSize: MainAxisSize.min, children: [
+            SizedBox(
+              height: 145,
+              width: 280,
+              child: Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16.0),
+                ),
+                elevation: 1.618,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 18.0, vertical: 8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Organization',
+                            style: Theme.of(context).textTheme.titleLarge,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              if (dropdownValue == 'Monthly')
+                                Text(
+                                  '${widget.packages[0]?.storeProduct.priceString}/mo.',
+                                  style:
+                                      Theme.of(context).textTheme.titleMedium,
+                                ),
+                              if (dropdownValue == 'Yearly')
+                                Text(
+                                  '${widget.packages[1]?.storeProduct.priceString}/yr.',
+                                  style:
+                                      Theme.of(context).textTheme.titleMedium,
+                                ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    ListTile(
+                      leading: CircleAvatar(
+                          radius: 18,
+                          backgroundColor: Colors.orange.shade800,
+                          child: const Icon(
+                            Icons.person_rounded,
+                            color: Colors.white,
+                          )),
+                      subtitle: const Text(
+                          'Unlock full access for you & all group members.'),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          right: 16.0, bottom: 8.0, top: 8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          DropdownButton<String>(
+                            isDense: true,
+                            underline: const SizedBox(),
+                            borderRadius: BorderRadius.circular(20),
+                            value: dropdownValue,
+                            items: menuItemList2
+                                .map<DropdownMenuItem<String>>((String value) {
+                              return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Chip(
+                                    padding: const EdgeInsets.all(4.0),
+                                    backgroundColor: Colors.blueAccent,
+                                    visualDensity: VisualDensity.compact,
+                                    label: Padding(
+                                        padding:
+                                            const EdgeInsets.only(bottom: 4.0),
+                                        child: Text(
+                                          value,
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 12.0,
+                                          ),
+                                        )),
+                                  ));
+                            }).toList(),
+                            onChanged: (String? value) {
+                              // This is called when the user selects an item.
+                              setState(() {
+                                dropdownValue = value!;
+                              });
+                              if (dropdownValue == 'Monthly') {
+                                context.read<PurchasesBloc>().add(SelectPackage(
+                                    package: widget.packages[0]!));
+                                print('Monthly Selected');
+                              } else if (dropdownValue == 'Yearly') {
+                                context.read<PurchasesBloc>().add(SelectPackage(
+                                    package: widget.packages[1]!));
+                                print('Yearly Selected');
+                              }
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            )
+          ]);
+        } else {
+          return const Center(
+            child: Text('Something Went Wrong..'),
+          );
+        }
+      },
     );
   }
 }
@@ -462,6 +1092,7 @@ class ShareButton extends StatelessWidget {
         deckCubit.zoomDeck();
         // * Shows Bottom Sheet for Response
         var bottomSheet = showBottomSheet(
+          backgroundColor: Colors.transparent,
           context: context,
           builder: (context) {
             return ClipRRect(
@@ -650,10 +1281,10 @@ class _SendButtonState extends State<SendButton> {
         if (widget.formKey.currentState!.validate()) {
           context.read<ShareBloc>().add(SubmitPressed(
               categoryName: widget.categoryName,
-              cardNumber: currentCard + 1,
+              cardNumber: currentCard,
               response: widget.shareFieldController.text));
 
-          if (currentCard == (widget.category.totalCards)) {
+          if (currentCard == (widget.category.totalCards! + 1)) {
             //context.read<DeckCubit>().resetDeck();
             widget.shareFieldController.clear();
             Navigator.pop(context);
@@ -661,6 +1292,7 @@ class _SendButtonState extends State<SendButton> {
           } else {
             await Future.delayed(const Duration(seconds: 2));
             if (!mounted) return;
+
             context.read<DeckCubit>().incrementCardNumber(
                 context.read<ProfileBloc>().state.user, widget.categoryName);
             context.read<DeckCubit>().swipeDeck();
@@ -748,20 +1380,19 @@ class InfoCard extends StatelessWidget {
         }
         if (state is CardsLoaded) {
           return Card(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(25),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                    vertical: 16.0, horizontal: 16.0),
-                child: CachedNetworkImage(
-                  placeholder: (context, url) => Center(
-                    child: LoadingAnimationWidget.discreteCircle(
-                        color: Colors.blueAccent, size: 30.0),
-                  ),
-                  imageUrl: state.cardImageUrls[cardNumber - 1],
-                  height: 195,
-                  fit: BoxFit.fitHeight,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            child: Padding(
+              padding:
+                  const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
+              child: CachedNetworkImage(
+                placeholder: (context, url) => Center(
+                  child: LoadingAnimationWidget.discreteCircle(
+                      color: Colors.blueAccent, size: 30.0),
                 ),
+                imageUrl: state.cardImageUrls[cardNumber - 1],
+                // height: 195,
+                fit: BoxFit.fitHeight,
               ),
             ),
           );

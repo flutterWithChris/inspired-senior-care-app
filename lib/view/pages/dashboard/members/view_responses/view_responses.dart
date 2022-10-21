@@ -198,10 +198,10 @@ class CardCounter extends StatelessWidget {
                     String category = state.category.name;
 
                     bool categoryStarted =
-                        user.progress!.containsKey(currentCategory.name);
+                        user.currentCard!.containsKey(currentCategory.name);
                     if (!categoryStarted) {}
                     if (categoryStarted) {
-                      Map<String, int> progressList = user.progress!;
+                      Map<String, int> progressList = user.currentCard!;
                       int currentCardIndex =
                           progressList[currentCategory.name]!;
 

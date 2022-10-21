@@ -71,6 +71,38 @@ class AuthRepository extends BaseAuthRepository {
       snackbarKey.currentState?.showSnackBar(snackBar);
     }
   }
+
+  @override
+  Future<void> requestEmailReset(String email) async {
+    try {
+      await _firebaseAuth.currentUser!.updateEmail(email);
+    } on auth.FirebaseAuthException catch (e) {
+      print('Failed with error code: ${e.code}');
+      print(e.message);
+      final SnackBar snackBar = SnackBar(
+        content: Text(e.message!),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
+    }
+  }
+
+  @override
+  Future<void> deleteAccount() async {
+    try {
+      // TODO: Reauthenticate user before attempting delete.
+      //await _firebaseAuth.currentUser!.reauthenticateWithCredential(_firebaseAuth.currentUser.);
+      await _firebaseAuth.currentUser!.delete();
+    } on auth.FirebaseAuthException catch (e) {
+      print('Failed with error code: ${e.code}');
+      print(e.message);
+      final SnackBar snackBar = SnackBar(
+        content: Text(e.message!),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
+    }
+  }
 }
 
 extension on auth.User {

@@ -8,157 +8,270 @@ import 'package:inspired_senior_care_app/view/widget/main/top_app_bar.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:settings_ui/settings_ui.dart';
 
+import '../../../bloc/auth/auth_bloc.dart';
+
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: const PreferredSize(
-            preferredSize: Size.fromHeight(50),
-            child: MainTopAppBar(
-              title: 'Settings',
-            )),
-        bottomNavigationBar: const MainBottomAppBar(),
-        body: BlocBuilder<ProfileBloc, ProfileState>(
-          builder: (context, state) {
-            if (state is ProfileLoading) {
-              return LoadingAnimationWidget.fourRotatingDots(
-                  color: Colors.blue, size: 30);
-            }
-            if (state is ProfileLoaded) {
-              User currentUser = state.user;
-              return SettingsList(
-                // platform: DevicePlatform.iOS,
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 6.0, vertical: 8.0),
-                sections: [
-                  SettingsSection(
-                    // margin: const EdgeInsetsDirectional.all(12.0),
-                    title: const Text('Account'),
-                    tiles: [
-                      SettingsTile.navigation(
-                        title: const Text('Email'),
-                        value: FittedBox(child: Text(currentUser.email!)),
-                        leading: const Icon(Icons.email_rounded),
-                        onPressed: (context) {
-                          showDialog(
-                            context: context,
-                            builder: (context) {
-                              return const ChangeEmailDialog();
-                            },
-                          );
-                        },
+    return Scaffold(
+      appBar: const PreferredSize(
+          preferredSize: Size.fromHeight(50),
+          child: MainTopAppBar(
+            title: 'Settings',
+          )),
+      bottomNavigationBar: const MainBottomAppBar(),
+      body: BlocBuilder<SettingsCubit, SettingsState>(
+        builder: (context, state) {
+          if (state is SettingsLoading || state is SettingsUpdated) {
+            return Center(
+              child: LoadingAnimationWidget.fourRotatingDots(
+                  color: Colors.blue, size: 30),
+            );
+          }
+          if (state is SettingsLoaded) {
+            User currentUser = context.watch<ProfileBloc>().state.user;
+            return SettingsList(
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 6.0, vertical: 8.0),
+              sections: [
+                SettingsSection(
+                  //margin: const EdgeInsetsDirectional.all(12.0),
+                  title: const Text('Account'),
+                  tiles: [
+                    SettingsTile.navigation(
+                      title: const Padding(
+                        padding: EdgeInsets.only(right: 8.0),
+                        child: Text('Email'),
                       ),
-                      SettingsTile.navigation(
-                        title: const Text('Name'),
-                        value: FittedBox(child: Text(currentUser.name!)),
-                        leading: const Icon(Icons.person),
-                        onPressed: (context) {
-                          showDialog(
-                            context: context,
-                            builder: (context) {
-                              return const ChangeNameDialog();
-                            },
-                          );
-                        },
+                      value: FittedBox(child: Text(currentUser.email!)),
+                      leading: const Icon(Icons.email_rounded),
+                      onPressed: (context) {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return const ChangeEmailDialog();
+                          },
+                        );
+                      },
+                    ),
+                    SettingsTile.navigation(
+                      title: const Padding(
+                        padding: EdgeInsets.only(right: 8.0),
+                        child: Text('Name'),
                       ),
-                      SettingsTile.navigation(
-                        title: const Text('Title'),
-                        value: FittedBox(child: Text(currentUser.title!)),
-                        leading: const Icon(Icons.badge),
-                        onPressed: (context) {
-                          showDialog(
-                            context: context,
-                            builder: (context) {
-                              return const ChangeNameDialog();
-                            },
-                          );
-                        },
+                      value: FittedBox(child: Text(currentUser.name!)),
+                      leading: const Icon(Icons.person),
+                      onPressed: (context) {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return const ChangeNameDialog();
+                          },
+                        );
+                      },
+                    ),
+                    SettingsTile.navigation(
+                      title: const Padding(
+                        padding: EdgeInsets.only(right: 8.0),
+                        child: Text('Title'),
                       ),
-                      SettingsTile.navigation(
-                        title: const Text('Organization'),
-                        value:
-                            FittedBox(child: Text(currentUser.organization!)),
-                        leading: const Icon(Icons.work_rounded),
-                        onPressed: (context) {
-                          showDialog(
-                            context: context,
-                            builder: (context) {
-                              return const ChangeNameDialog();
-                            },
-                          );
-                        },
+                      value: FittedBox(
+                        child: Text(currentUser.title!),
                       ),
-                      SettingsTile.navigation(
-                        title: const Text('Password'),
-                        leading: const Icon(Icons.lock_rounded),
-                        onPressed: (context) {
-                          showDialog(
-                            context: context,
-                            builder: (context) {
-                              return const ChangePasswordDialog();
-                            },
-                          );
-                        },
+                      leading: const Icon(Icons.badge),
+                      onPressed: (context) {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return const ChangeTitleDialog();
+                          },
+                        );
+                      },
+                    ),
+                    SettingsTile.navigation(
+                      title: const Padding(
+                        padding: EdgeInsets.only(right: 8.0),
+                        child: Text('Organization'),
                       ),
-                      SettingsTile.navigation(
-                        title: const Text('Sign Out'),
-                        leading: const Icon(Icons.logout_rounded),
-                        onPressed: (context) {
-                          showDialog(
-                            context: context,
-                            builder: (context) {
-                              return Dialog(
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: const [
-                                    Text('Sign Out?'),
-                                  ],
-                                ),
-                              );
-                            },
-                          );
-                        },
-                      ),
-                      SettingsTile.navigation(
-                        title: const Text('Delete Account'),
-                        leading: const Icon(Icons.delete_forever_rounded),
-                        onPressed: (context) {
-                          showDialog(
-                            context: context,
-                            builder: (context) {
-                              return Dialog(
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: const [
-                                    Text('Delete Account?'),
-                                  ],
-                                ),
-                              );
-                            },
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                  SettingsSection(
-                    title: const Text('Help & Support'),
-                    tiles: [
-                      SettingsTile.navigation(
-                        title: const Text('Report an Issue / Bug'),
-                        leading: const Icon(Icons.report),
-                        trailing: const Icon(Icons.chevron_right_rounded),
-                      ),
-                    ],
-                  ),
-                ],
-              );
-            } else {
-              return const Text('Something Went Wrong');
-            }
-          },
+                      value: FittedBox(child: Text(currentUser.organization!)),
+                      leading: const Icon(Icons.work_rounded),
+                      onPressed: (context) {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return const ChangeOrganizationDialog();
+                          },
+                        );
+                      },
+                    ),
+                    SettingsTile.navigation(
+                      title: const Text('Password'),
+                      leading: const Icon(Icons.lock_rounded),
+                      onPressed: (context) {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return const ChangePasswordDialog();
+                          },
+                        );
+                      },
+                    ),
+                    SettingsTile.navigation(
+                      title: const Text('Sign Out'),
+                      leading: const Icon(Icons.logout_rounded),
+                      onPressed: (context) {
+                        context.read<AuthBloc>().add(AppLogoutRequested());
+                      },
+                    ),
+                    SettingsTile.navigation(
+                      title: const Text('Delete Account'),
+                      leading: const Icon(Icons.delete_forever_rounded),
+                      onPressed: (context) {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return const DeleteAccountDialog();
+                          },
+                        );
+                      },
+                    ),
+                  ],
+                ),
+                SettingsSection(
+                  title: const Text('Help & Support'),
+                  tiles: [
+                    SettingsTile.navigation(
+                      title: const Text('Report an Issue / Bug'),
+                      leading: const Icon(Icons.report),
+                      trailing: const Icon(Icons.chevron_right_rounded),
+                    ),
+                  ],
+                ),
+              ],
+            );
+          } else {
+            return const Text('Something Went Wrong');
+          }
+        },
+      ),
+    );
+  }
+}
+
+class DeleteAccountDialog extends StatefulWidget {
+  const DeleteAccountDialog({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  State<DeleteAccountDialog> createState() => _DeleteAccountDialogState();
+}
+
+class _DeleteAccountDialogState extends State<DeleteAccountDialog> {
+  final TextEditingController deleteFieldController = TextEditingController();
+  final GlobalKey<FormState> deleteFormKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    User currentUser = context.watch<ProfileBloc>().state.user;
+
+    return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 24.0),
+        child: SizedBox(
+          height: 250,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  'Delete Account Forever?',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+              ),
+              Padding(
+                padding:
+                    const EdgeInsets.only(bottom: 16.0, left: 8.0, right: 8.0),
+                child: Text.rich(
+                  const TextSpan(children: [
+                    TextSpan(
+                      text:
+                          'Are you sure you\'d like to delete your account forever?',
+                    ),
+                    TextSpan(
+                        text: ' This cannot be undone.',
+                        style: TextStyle(fontWeight: FontWeight.bold)),
+                  ]),
+                  style: Theme.of(context).textTheme.bodyMedium,
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              TextFormField(
+                textCapitalization: TextCapitalization.words,
+                keyboardType: TextInputType.name,
+                key: deleteFormKey,
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+                validator: (value) {
+                  if (value != currentUser.name) {
+                    if (value == '' || value == null) {
+                      return 'Please enter your name!';
+                    }
+                    return 'Name doesn\'t match!';
+                  }
+                  return null;
+                },
+                autofocus: true,
+                controller: deleteFieldController,
+                decoration:
+                    InputDecoration(hintText: 'Type "${currentUser.name!}"'),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.redAccent),
+                    onPressed: () {
+                      //deleteFormKey.currentState!.validate();
+                      if (!deleteFormKey.currentState!.validate()) {
+                        print('invalid delete');
+                      } else {
+                        context.read<SettingsCubit>().deleteAccount();
+
+                        Future.delayed(const Duration(seconds: 1), () {
+                          Navigator.pop(context);
+                        });
+                      }
+                    },
+                    icon: const Icon(
+                      Icons.delete_forever_rounded,
+                      size: 20,
+                    ),
+                    label: BlocBuilder<SettingsCubit, SettingsState>(
+                      builder: (context, state) {
+                        if (state is SettingsLoading) {
+                          return LoadingAnimationWidget.bouncingBall(
+                              color: Colors.white, size: 18);
+                        }
+                        if (state is SettingsUpdated) {
+                          return const Text('Account Deleted!');
+                        }
+                        return const Text('Delete Account');
+                      },
+                    )),
+              )
+            ],
+          ),
         ),
       ),
     );
@@ -206,16 +319,32 @@ class _ChangeEmailDialogState extends State<ChangeEmailDialog> {
                 ),
               ),
               TextFormField(
+                keyboardType: TextInputType.emailAddress,
                 controller: emailFieldController,
                 decoration: const InputDecoration(label: Text('Your Email')),
               ),
-              ElevatedButton(
-                  onPressed: () {
-                    context.read<ProfileBloc>().add(UpdateProfile(
-                        user: currentUser.copyWith(
-                            email: emailFieldController.value.text)));
-                  },
-                  child: const Text('Update Email'))
+              ElevatedButton(onPressed: () {
+                context
+                    .read<SettingsCubit>()
+                    .changeEmail(emailFieldController.value.text);
+                // context.read<SettingsCubit>().add(UpdateProfile(
+                //     user: currentUser.copyWith(
+                //         email: emailFieldController.value.text)));
+                Future.delayed(const Duration(seconds: 1), () {
+                  Navigator.pop(context);
+                });
+              }, child: BlocBuilder<SettingsCubit, SettingsState>(
+                builder: (context, state) {
+                  if (state is SettingsLoading) {
+                    return LoadingAnimationWidget.bouncingBall(
+                        color: Colors.white, size: 18);
+                  }
+                  if (state is SettingsUpdated) {
+                    return const Text('Email Updated!');
+                  }
+                  return const Text('Update Email');
+                },
+              ))
             ],
           ),
         ),
@@ -258,26 +387,172 @@ class _ChangeNameDialogState extends State<ChangeNameDialog> {
                 ),
               ),
               TextFormField(
+                textCapitalization: TextCapitalization.words,
+                keyboardType: TextInputType.name,
                 controller: nameFieldController,
                 decoration: const InputDecoration(label: Text('Your Name')),
               ),
               ElevatedButton(onPressed: () {
-                context.read<ProfileBloc>().add(UpdateProfile(
-                    user: currentUser.copyWith(
-                        name: nameFieldController.value.text)));
+                context
+                    .read<SettingsCubit>()
+                    .changeName(nameFieldController.value.text);
+                // context.read<SettingsCubit>().add(UpdateProfile(
+                //     user: currentUser.copyWith(
+                //         name: nameFieldController.value.text)));
                 Future.delayed(const Duration(seconds: 1), () {
                   Navigator.pop(context);
                 });
-              }, child: BlocBuilder<ProfileBloc, ProfileState>(
+              }, child: BlocBuilder<SettingsCubit, SettingsState>(
                 builder: (context, state) {
-                  if (state is ProfileLoading) {
+                  if (state is SettingsLoading) {
                     return LoadingAnimationWidget.bouncingBall(
                         color: Colors.white, size: 18);
                   }
-                  if (state is ProfileUpdated) {
+                  if (state is SettingsUpdated) {
                     return const Text('Name Updated!');
                   }
                   return const Text('Update Name');
+                },
+              ))
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class ChangeTitleDialog extends StatefulWidget {
+  const ChangeTitleDialog({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  State<ChangeTitleDialog> createState() => _ChangeTitleDialogState();
+}
+
+class _ChangeTitleDialogState extends State<ChangeTitleDialog> {
+  final TextEditingController titleFieldController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    User currentUser = context.watch<ProfileBloc>().state.user;
+    titleFieldController.text = currentUser.title!;
+    return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 24.0),
+        child: SizedBox(
+          height: 175,
+          child: Column(
+            //mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  'Edit Title',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+              ),
+              TextFormField(
+                textCapitalization: TextCapitalization.words,
+                keyboardType: TextInputType.text,
+                controller: titleFieldController,
+                decoration: const InputDecoration(label: Text('Your Title')),
+              ),
+              ElevatedButton(onPressed: () {
+                context
+                    .read<SettingsCubit>()
+                    .changeTitle(titleFieldController.value.text);
+                // .add(UpdateProfile(
+                //     user: currentUser.copyWith(
+                //         title: titleFieldController.value.text)));
+                Future.delayed(const Duration(seconds: 1), () {
+                  Navigator.pop(context);
+                });
+              }, child: BlocBuilder<SettingsCubit, SettingsState>(
+                builder: (context, state) {
+                  if (state is SettingsLoading) {
+                    return LoadingAnimationWidget.bouncingBall(
+                        color: Colors.white, size: 18);
+                  }
+                  if (state is SettingsUpdated) {
+                    return const Text('Title Updated!');
+                  }
+                  return const Text('Update Title');
+                },
+              ))
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class ChangeOrganizationDialog extends StatefulWidget {
+  const ChangeOrganizationDialog({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  State<ChangeOrganizationDialog> createState() =>
+      _ChangeOrganizationDialogState();
+}
+
+class _ChangeOrganizationDialogState extends State<ChangeOrganizationDialog> {
+  final TextEditingController organizationFieldController =
+      TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    User currentUser = context.watch<ProfileBloc>().state.user;
+    organizationFieldController.text = currentUser.organization!;
+    return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 24.0),
+        child: SizedBox(
+          height: 175,
+          child: Column(
+            //mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  'Edit Organization',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+              ),
+              TextFormField(
+                textCapitalization: TextCapitalization.words,
+                keyboardType: TextInputType.text,
+                controller: organizationFieldController,
+                decoration:
+                    const InputDecoration(label: Text('Your Organization')),
+              ),
+              ElevatedButton(onPressed: () {
+                context
+                    .read<SettingsCubit>()
+                    .changeOrganization(organizationFieldController.value.text);
+                // context.read<SettingsCubit>().add(UpdateProfile(
+                //     user: currentUser.copyWith(
+                //         name: organizationFieldController.value.text)));
+                Future.delayed(const Duration(seconds: 1), () {
+                  Navigator.pop(context);
+                });
+              }, child: BlocBuilder<SettingsCubit, SettingsState>(
+                builder: (context, state) {
+                  if (state is SettingsLoading) {
+                    return LoadingAnimationWidget.bouncingBall(
+                        color: Colors.white, size: 18);
+                  }
+                  if (state is SettingsUpdated) {
+                    return const Text('Organization Updated!');
+                  }
+                  return const Text('Update Organization');
                 },
               ))
             ],
@@ -296,6 +571,7 @@ class ChangePasswordDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
         child: SizedBox(
@@ -317,7 +593,7 @@ class ChangePasswordDialog extends StatelessWidget {
               ),
               ElevatedButton(
                   onPressed: () {
-                    context.read<EditPassCubit>().passwordResetRequest(
+                    context.read<SettingsCubit>().passwordResetRequest(
                         context.read<ProfileBloc>().state.user.email!);
                   },
                   child: const Text('Request Password Reset'))

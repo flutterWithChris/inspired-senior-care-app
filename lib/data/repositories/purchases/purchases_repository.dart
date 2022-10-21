@@ -37,11 +37,6 @@ class PurchasesRepository {
   Future<void> makePurchase(Package package) async {
     try {
       CustomerInfo customerInfo = await Purchases.purchasePackage(package);
-      var isPro =
-          customerInfo.entitlements.all["my_entitlement_identifier"]!.isActive;
-      if (isPro) {
-        // Unlock that great "pro" content
-      }
     } on PlatformException catch (e) {
       var errorCode = PurchasesErrorHelper.getErrorCode(e);
       if (errorCode != PurchasesErrorCode.purchaseCancelledError) {
@@ -50,11 +45,10 @@ class PurchasesRepository {
     }
   }
 
-  Future<bool?> getSubscriptionStatus() async {
+  Future<bool?> getSubscriptionStatus(CustomerInfo customerInfo) async {
     try {
-      CustomerInfo customerInfo = await Purchases.getCustomerInfo();
-      if (customerInfo
-          .entitlements.all["my_entitlement_identifier"]!.isActive) {
+      if (customerInfo.activeSubscriptions.isNotEmpty ||
+          customerInfo.entitlements.active.isNotEmpty) {
         // Grant user "pro" access
         return true;
       } else {
@@ -67,13 +61,63 @@ class PurchasesRepository {
     return null;
   }
 
-  Future<void> restorePurchases() async {
+  Future<CustomerInfo?> restorePurchases() async {
     try {
       CustomerInfo restoredInfo = await Purchases.restorePurchases();
       // ... check restored customerInfo to see if entitlement is now active
+      if (restoredInfo.activeSubscriptions.isNotEmpty ||
+          restoredInfo.entitlements.active.isNotEmpty) {
+        // Grant user "pro" access
+        return restoredInfo;
+      } else {
+        return null;
+      }
     } on PlatformException catch (e) {
       // Error restoring purchases
+      return null;
       print(e);
+    }
+  }
+
+  Future<void> logoutOfRevCat() async {
+    try {
+      await Purchases.logOut();
+    } on PlatformException catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> loginToRevCat(String userId) async {
+    try {
+      await Purchases.logIn(userId);
+      // await Future.wait([
+      // Purchases.setEmail(user.email!),
+      // Purchases.setDisplayName(user.name!),
+      // ]);
+    } on PlatformException catch (e) {
+      print(e);
+    }
+  }
+
+  Future<CustomerInfo?> getCustomerInfo() async {
+    try {
+      CustomerInfo customerInfo = await Purchases.getCustomerInfo();
+      return customerInfo;
+    } on PlatformException catch (e) {
+      print(e);
+      return null;
+    }
+  }
+
+  Future<List<StoreProduct>?> getProducts(
+      List<String> productIdentifiers) async {
+    try {
+      List<StoreProduct> storeProducts =
+          await Purchases.getProducts(productIdentifiers);
+      return storeProducts;
+    } on PlatformException catch (e) {
+      print(e);
+      return null;
     }
   }
 }

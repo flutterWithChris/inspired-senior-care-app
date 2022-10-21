@@ -27,16 +27,15 @@ import 'package:inspired_senior_care_app/cubits/login/login_cubit.dart';
 import 'package:inspired_senior_care_app/cubits/response/response_deck_cubit.dart';
 import 'package:inspired_senior_care_app/cubits/settings/cubit/settings_cubit.dart';
 import 'package:inspired_senior_care_app/cubits/signup/signup_cubit.dart';
+import 'package:inspired_senior_care_app/data/models/category.dart';
 import 'package:inspired_senior_care_app/data/repositories/auth/auth_repository.dart';
 import 'package:inspired_senior_care_app/data/repositories/database/database_repository.dart';
 import 'package:inspired_senior_care_app/data/repositories/purchases/purchases_repository.dart';
 import 'package:inspired_senior_care_app/data/repositories/storage/storage_repository.dart';
 import 'package:inspired_senior_care_app/firebase_options.dart';
-
 import 'package:inspired_senior_care_app/globals.dart';
-import 'package:inspired_senior_care_app/view/pages/dashboard/groups/choose_category.dart';
-
 import 'package:inspired_senior_care_app/view/pages/dashboard/dashboard.dart';
+import 'package:inspired_senior_care_app/view/pages/dashboard/groups/choose_category.dart';
 import 'package:inspired_senior_care_app/view/pages/dashboard/members/view_member.dart';
 import 'package:inspired_senior_care_app/view/pages/dashboard/members/view_members.dart';
 import 'package:inspired_senior_care_app/view/pages/dashboard/members/view_responses/view_responses.dart';
@@ -50,6 +49,7 @@ import 'package:inspired_senior_care_app/view/pages/main/manager_deck_page.dart'
 import 'package:inspired_senior_care_app/view/pages/main/manager_share_deck_page.dart';
 import 'package:inspired_senior_care_app/view/pages/main/profile.dart';
 import 'package:inspired_senior_care_app/view/pages/signup/signup.dart';
+import 'package:inspired_senior_care_app/view/pages/subscriptions.dart';
 import 'package:inspired_senior_care_app/view/widget/main/settings.dart';
 
 void main() async {
@@ -86,6 +86,7 @@ class _MyAppState extends State<MyApp> {
           create: (context) => AuthRepository(),
         ),
         RepositoryProvider(
+          // lazy: false,
           create: (context) => PurchasesRepository()..initPlatformState(),
         ),
         RepositoryProvider(
@@ -98,11 +99,13 @@ class _MyAppState extends State<MyApp> {
       child: MultiBlocProvider(
         providers: [
           BlocProvider(
-            create: (context) =>
-                AuthBloc(authRepository: context.read<AuthRepository>()),
+            create: (context) => AuthBloc(
+                purchasesRepository: context.read<PurchasesRepository>(),
+                authRepository: context.read<AuthRepository>()),
           ),
           BlocProvider(
             create: (context) => ProfileBloc(
+              purchasesRepository: context.read<PurchasesRepository>(),
               authBloc: context.read<AuthBloc>(),
               databaseRepository: context.read<DatabaseRepository>(),
             )..add(
@@ -113,7 +116,7 @@ class _MyAppState extends State<MyApp> {
                   LoginCubit(authRepository: context.read<AuthRepository>())),
           BlocProvider(
               create: (context) => PurchasesBloc(
-                  profileBloc: context.read<ProfileBloc>(),
+                  authBloc: context.read<AuthBloc>(),
                   purchasesRepository: context.read<PurchasesRepository>())
                 ..add(LoadPurchases())),
           BlocProvider(
@@ -176,6 +179,12 @@ class _MyAppState extends State<MyApp> {
                 storageRepository: context.read<StorageRepository>()),
           ),
           BlocProvider(
+            create: (context) => SettingsCubit(
+                databaseRepository: context.read<DatabaseRepository>(),
+                authRepository: context.read<AuthRepository>(),
+                profileBloc: context.read<ProfileBloc>()),
+          ),
+          BlocProvider(
             create: (context) =>
                 SignupCubit(authRepository: context.read<AuthRepository>()),
           ),
@@ -185,6 +194,7 @@ class _MyAppState extends State<MyApp> {
           ),
           BlocProvider(
             create: (context) => DeckCubit(
+                profileBloc: context.read<ProfileBloc>(),
                 databaseRepository: context.read<DatabaseRepository>()),
           ),
         ],
@@ -221,8 +231,8 @@ class _MyAppState extends State<MyApp> {
                       minimumSize: const Size(25, 30),
                     ),
                   ),
-                  bottomSheetTheme:
-                      const BottomSheetThemeData(backgroundColor: Colors.white),
+                  bottomSheetTheme: const BottomSheetThemeData(
+                      backgroundColor: Colors.transparent),
                   textTheme: GoogleFonts.breeSerifTextTheme(),
                   //  useMaterial3: true,
 
@@ -289,11 +299,7 @@ class _MyAppState extends State<MyApp> {
           GoRoute(
             name: 'settings',
             path: 'settings',
-            builder: (context, state) => BlocProvider(
-              create: (context) =>
-                  EditPassCubit(authRepository: context.read<AuthRepository>()),
-              child: const SettingsPage(),
-            ),
+            builder: (context, state) => const SettingsPage(),
           ),
         ]),
     GoRoute(
@@ -304,7 +310,9 @@ class _MyAppState extends State<MyApp> {
           GoRoute(
             name: 'deck-page',
             path: 'deck-page',
-            builder: (context, state) => DeckPage(),
+            builder: (context, state) => DeckPage(
+              category: state.extra as Category,
+            ),
           ),
         ]),
     GoRoute(
@@ -326,13 +334,20 @@ class _MyAppState extends State<MyApp> {
           GoRoute(
             name: 'manager-share-deck-page',
             path: 'manager-share-deck-page',
-            builder: (context, state) => ManagerShareDeckPage(),
+            builder: (context, state) => ManagerShareDeckPage(
+              category: state.extra as Category,
+            ),
           ),
         ]),
     GoRoute(
       name: 'profile',
       path: '/profile',
       builder: (context, state) => const Profile(),
+    ),
+    GoRoute(
+      name: 'subscriptions',
+      path: '/subscriptions',
+      builder: (context, state) => const SubscriptionsPage(),
     ),
     GoRoute(
         name: 'dashboard',

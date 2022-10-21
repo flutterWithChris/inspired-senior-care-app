@@ -15,13 +15,13 @@ class MainAppDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<ProfileBloc, ProfileState>(builder: (context, state) {
       if (state is ProfileLoaded) {
-        if (state.user.type == 'user') {
+        if (state.user.type == 'user' || state.user.type == 'manager') {
           return Drawer(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 36.0),
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     DrawerHeader(
                         padding: const EdgeInsets.symmetric(horizontal: 0),
@@ -40,15 +40,29 @@ class MainAppDrawer extends StatelessWidget {
                             ),
                           ],
                         )),
-                    ListTile(
-                      onTap: () {
-                        context.goNamed('settings');
-                      },
-                      title: Text(
-                        'Settings',
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                      trailing: const Icon(Icons.chevron_right_rounded),
+                    Column(
+                      children: [
+                        ListTile(
+                          onTap: () {
+                            context.goNamed('settings');
+                          },
+                          title: Text(
+                            'Settings',
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                          trailing: const Icon(Icons.chevron_right_rounded),
+                        ),
+                        ListTile(
+                          onTap: () {
+                            context.pushNamed('subscriptions');
+                          },
+                          title: Text(
+                            'My Subscriptions',
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                          trailing: const Icon(Icons.chevron_right_rounded),
+                        ),
+                      ],
                     ),
                     const Divider(),
                     TextButton.icon(

@@ -5,17 +5,21 @@ import 'package:flutter/cupertino.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 
 import 'package:inspired_senior_care_app/data/repositories/auth/auth_repository.dart';
+import 'package:inspired_senior_care_app/data/repositories/purchases/purchases_repository.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> with ChangeNotifier {
   final AuthRepository _authRepository;
+  final PurchasesRepository _purchasesRepository;
   StreamSubscription<auth.User?>? _userSubscription;
 
   AuthBloc({
     required AuthRepository authRepository,
+    required PurchasesRepository purchasesRepository,
   })  : _authRepository = authRepository,
+        _purchasesRepository = purchasesRepository,
         super(
           authRepository.currentUser != null
               ? AuthState.authenticated(user: authRepository.currentUser!)
@@ -34,8 +38,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> with ChangeNotifier {
     return super.close();
   }
 
-  void _onUserChanged(AuthUserChanged event, Emitter<AuthState> emit) {
-    print('User Authenticated');
+  void _onUserChanged(AuthUserChanged event, Emitter<AuthState> emit) async {
+    if (event.user != null) {
+      print('User Authenticated: ${event.user!.uid}');
+      await _purchasesRepository.loginToRevCat(event.user!.uid);
+    } else {
+      await _purchasesRepository.logoutOfRevCat();
+    }
 
     emit(event.user != null
         ? AuthState.authenticated(user: event.user!)
@@ -43,8 +52,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> with ChangeNotifier {
     notifyListeners();
   }
 
-  void _onLogoutRequested(AppLogoutRequested event, Emitter<AuthState> emit) {
-    print('User Authenticated');
+  void _onLogoutRequested(
+      AppLogoutRequested event, Emitter<AuthState> emit) async {
+    print('User Logged Out');
     unawaited(_authRepository.signOut());
     emit(const AuthState.unauthenticated());
   }

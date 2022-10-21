@@ -9,8 +9,6 @@ abstract class PurchasesEvent extends Equatable {
 
 class LoadPurchases extends PurchasesEvent {}
 
-class RefreshPurchases extends PurchasesEvent {}
-
 class RestorePurchases extends PurchasesEvent {}
 
 class AddPurchase extends PurchasesEvent {
@@ -26,3 +24,13 @@ class AddPurchase extends PurchasesEvent {
 class EditPurchase extends PurchasesEvent {}
 
 class RemovePurchase extends PurchasesEvent {}
+
+class SelectPackage extends PurchasesEvent {
+  final Package package;
+  SelectPackage({
+    required this.package,
+  });
+  @override
+  // TODO: implement props
+  List<Object?> get props => [package];
+}

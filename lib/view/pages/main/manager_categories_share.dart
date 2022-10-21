@@ -11,12 +11,12 @@ import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/share_bloc/share_bloc.dart';
 import 'package:inspired_senior_care_app/data/models/category.dart';
 import 'package:inspired_senior_care_app/view/pages/IAP/upgrade_page.dart';
-
 import 'package:inspired_senior_care_app/view/widget/main/bottom_app_bar.dart';
 import 'package:inspired_senior_care_app/view/widget/main/main_app_drawer.dart';
 import 'package:inspired_senior_care_app/view/widget/main/top_app_bar.dart';
-
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+
+import '../../../bloc/deck/deck_cubit.dart';
 
 class ManagerCategoriesShare extends StatelessWidget {
   const ManagerCategoriesShare({Key? key}) : super(key: key);
@@ -178,8 +178,8 @@ class CategoryCard extends StatelessWidget {
                 onTap: () {
                   BlocProvider.of<CardBloc>(context)
                       .add(LoadCards(category: category));
-
-                  context.goNamed('manager-share-deck-page');
+                  context.read<DeckCubit>().loadDeck(category);
+                  context.goNamed('manager-share-deck-page', extra: category);
                 },
                 child: Card(
                   child: Container(
@@ -213,7 +213,7 @@ class CategoryCard extends StatelessWidget {
                                     int currentCard = 0;
                                     if (state is ProfileLoaded) {
                                       bool categoryStarted = state
-                                          .user.progress!
+                                          .user.currentCard!
                                           .containsKey(category.name);
                                       if (!categoryStarted) {
                                         currentCard = 0;
@@ -223,7 +223,7 @@ class CategoryCard extends StatelessWidget {
                                             .watch<ProfileBloc>()
                                             .state
                                             .user
-                                            .progress!;
+                                            .currentCard!;
 
                                         percentComplete =
                                             progressList[category.name]! /

@@ -43,7 +43,7 @@ class ProgressSection extends StatelessWidget {
         bool categoryStarted = false;
         double categoryProgress = 0.0;
         return SizedBox(
-          height: 1700,
+          height: 1720,
           child: Card(
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(33)),
@@ -71,7 +71,7 @@ class ProgressSection extends StatelessWidget {
                   // print(
                   //     'Progress is: ${currentUser.progress![categories![index]]}');
                   for (Category category in categories)
-                    currentUser.progress?[category.name] == null
+                    currentUser.currentCard?[category.name] == null
                         ? ProgressCategory(
                             message: setMessageNorm(0.0),
                             progress: 0.0,
@@ -81,12 +81,15 @@ class ProgressSection extends StatelessWidget {
                           )
                         : ProgressCategory(
                             message: setMessageNorm(
-                                ((currentUser.progress![category.name]! /
+                                ((((currentUser.currentCard![category.name]!) -
+                                            1) /
                                         category.totalCards!) *
                                     100.0)),
-                            progress: ((currentUser.progress![category.name]! /
-                                    category.totalCards!) *
-                                100.0),
+                            progress:
+                                (((currentUser.currentCard![category.name]! -
+                                            1) /
+                                        category.totalCards!) *
+                                    100.0),
                             category: category,
                             title: category.name,
                             progressColor: category.categoryColor,
@@ -380,11 +383,12 @@ class GroupMemberProgressSection extends StatelessWidget {
                                 member: groupMember,
                                 title: category.name,
                                 progressColor: category.categoryColor,
-                                progress: groupMember.progress!
+                                progress: groupMember.currentCard!
                                             .containsKey(category.name) ==
                                         true
                                     ? calculateProgress(
-                                        groupMember.progress![category.name]!,
+                                        groupMember
+                                            .currentCard![category.name]!,
                                         category.totalCards!)
                                     : 0,
                                 message: 'All Done. Good Job!'),

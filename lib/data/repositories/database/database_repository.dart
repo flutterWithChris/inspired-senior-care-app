@@ -66,6 +66,27 @@ class DatabaseRepository extends BaseDatabaseRepository {
         .then((value) => print('User document Updated**'));
   }
 
+  @override
+  Future<void> deleteUser(User user) {
+    List<String>? groupIds = user.groups;
+    if (groupIds!.isNotEmpty && user.type == 'user') {
+      for (String groupId in groupIds) {
+        _firebaseFirestore.collection('groups').doc(groupId).update({
+          'groupMemberIds': FieldValue.arrayRemove([user.id!])
+        });
+      }
+    }
+    if (groupIds.isNotEmpty && user.type == 'member') {
+      for (String groupId in groupIds) {
+        _firebaseFirestore.collection('groups').doc(groupId).update({
+          'groupManagerIds': FieldValue.arrayRemove([user.id!])
+        });
+      }
+    }
+    _firebaseFirestore.collection('invites').doc(user.id).delete();
+    return _firebaseFirestore.collection('users').doc(user.id).delete();
+  }
+
   Stream<List<Category>?> getCategories() {
     final List<Category> categories = [];
     return _firebaseFirestore.collection('categories').get().then((snap) {
@@ -107,7 +128,7 @@ class DatabaseRepository extends BaseDatabaseRepository {
         .doc(_firebaseAuth.currentUser!.uid)
         .collection('responses')
         .doc(categoryName)
-        .set({'$cardNumber': response}, SetOptions(merge: true));
+        .set({'${(cardNumber)}': response}, SetOptions(merge: true));
   }
 
   Stream<Response> viewResponse(User user, Category category, int cardNumber) {

@@ -108,7 +108,8 @@ class _FeaturedCategoryState extends State<FeaturedCategory> {
           Category featuredCategory = categoriesState.categories.singleWhere(
             (category) => category.name == state.featuredCategoryName,
           );
-          int progress = currentUser.progress![state.featuredCategoryName] ?? 0;
+          int progress =
+              currentUser.currentCard?[state.featuredCategoryName] ?? 1;
           return Column(
             children: [
               InkWell(
@@ -117,7 +118,7 @@ class _FeaturedCategoryState extends State<FeaturedCategory> {
                   BlocProvider.of<CardBloc>(context)
                       .add(LoadCards(category: featuredCategory));
                   currentUser.type == 'user'
-                      ? context.pushNamed('deck-page')
+                      ? context.pushNamed('deck-page', extra: featuredCategory)
                       : context.pushNamed('manager-deck-page');
                 }),
                 child: Animate(
@@ -156,11 +157,11 @@ class _FeaturedCategoryState extends State<FeaturedCategory> {
                                               radius: 28,
                                               backgroundColor: Colors.white,
                                               child: Text(
-                                                '${(progress / featuredCategory.totalCards! * 100).toStringAsFixed(0)}%',
+                                                '${progress - 1}/${featuredCategory.totalCards}',
                                                 style: const TextStyle(
                                                     fontSize: 18,
-                                                    fontWeight:
-                                                        FontWeight.bold),
+                                                    fontWeight: FontWeight.bold,
+                                                    letterSpacing: 0.2),
                                               ),
                                             ),
                                           ),
@@ -172,7 +173,7 @@ class _FeaturedCategoryState extends State<FeaturedCategory> {
                                                   .progressColor,
                                               backgroundColor:
                                                   Colors.grey.shade200,
-                                              value: ((progress /
+                                              value: (((progress - 1) /
                                                   featuredCategory
                                                       .totalCards!)),
                                             ),
