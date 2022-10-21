@@ -27,9 +27,10 @@ class SubscriptionsPage extends StatelessWidget {
                 color: Colors.blue, size: 30.0);
           }
           if (state is PurchasesLoaded) {
-            CustomerInfo customerInfo = state.customerInfo!;
-            Map<String, EntitlementInfo> entitlements =
-                customerInfo.entitlements.active;
+            CustomerInfo? customerInfo =
+                context.watch<PurchasesBloc>().state.customerInfo;
+            print(
+                'Subscriptions ${customerInfo?.allPurchasedProductIdentifiers}');
             return ListView(
               shrinkWrap: true,
               children: [
@@ -44,8 +45,10 @@ class SubscriptionsPage extends StatelessWidget {
                         .copyWith(color: Colors.black87),
                   ),
                 ),
-                if (state.isSubscribed == true)
-                  for (EntitlementInfo entitlementInfo in entitlements.values)
+                if (customerInfo?.allPurchasedProductIdentifiers.isNotEmpty ==
+                    true)
+                  for (EntitlementInfo entitlementInfo
+                      in customerInfo!.entitlements.active.values)
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: SizedBox(
@@ -62,6 +65,22 @@ class SubscriptionsPage extends StatelessWidget {
                                     MainAxisAlignment.spaceEvenly,
                                 children: [
                                   Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        'Created On: ${DateTime.parse(entitlementInfo.originalPurchaseDate).month}-${DateTime.parse(entitlementInfo.originalPurchaseDate).day}-${DateTime.parse(entitlementInfo.originalPurchaseDate).year}',
+                                        style: const TextStyle(
+                                            color: Colors.black54),
+                                      ),
+                                      Text(
+                                        'Expires On: ${DateTime.parse(entitlementInfo.expirationDate!).month}-${DateTime.parse(entitlementInfo.expirationDate!).day}-${DateTime.parse(entitlementInfo.expirationDate!).year}',
+                                        style: const TextStyle(
+                                            color: Colors.black54),
+                                      ),
+                                    ],
+                                  ),
+                                  Row(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     mainAxisAlignment:
@@ -73,7 +92,8 @@ class SubscriptionsPage extends StatelessWidget {
                                             .replaceAll('_', ' ')),
                                         style: Theme.of(context)
                                             .textTheme
-                                            .titleLarge,
+                                            .titleLarge!
+                                            .copyWith(fontSize: 18),
                                       ),
                                       Column(
                                         mainAxisSize: MainAxisSize.min,
@@ -88,7 +108,8 @@ class SubscriptionsPage extends StatelessWidget {
                                                 .capitalize(),
                                             style: Theme.of(context)
                                                 .textTheme
-                                                .titleMedium,
+                                                .titleMedium!
+                                                .copyWith(fontSize: 16),
                                           ),
                                           entitlementInfo.isActive
                                               ? Wrap(
@@ -124,22 +145,12 @@ class SubscriptionsPage extends StatelessWidget {
                                     ],
                                   ),
                                   Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                          'Created On: ${DateTime.parse(entitlementInfo.originalPurchaseDate).month}-${DateTime.parse(entitlementInfo.originalPurchaseDate).day}-${DateTime.parse(entitlementInfo.originalPurchaseDate).year}'),
-                                      Text(
-                                          'Expires On: ${DateTime.parse(entitlementInfo.expirationDate!).month}-${DateTime.parse(entitlementInfo.expirationDate!).day}-${DateTime.parse(entitlementInfo.expirationDate!).year}'),
-                                    ],
-                                  ),
-                                  Row(
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
                                       entitlementInfo.willRenew
                                           ? const Text.rich(
                                               TextSpan(children: [
-                                                TextSpan(text: 'Will Renew: '),
+                                                TextSpan(text: 'Will Renew:  '),
                                                 TextSpan(
                                                     text: 'Yes',
                                                     style: TextStyle(
@@ -147,19 +158,23 @@ class SubscriptionsPage extends StatelessWidget {
                                                             FontWeight.bold))
                                               ]),
                                             )
-                                          : const Text('Will Renew: No'),
+                                          : const Text.rich(
+                                              TextSpan(children: [
+                                                TextSpan(text: 'Will Renew:  '),
+                                                TextSpan(
+                                                    text: 'No',
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold))
+                                              ]),
+                                            )
                                     ],
                                   ),
-                                  Wrap(
-                                    children: [
-                                      ElevatedButton(
-                                          style: ElevatedButton.styleFrom(
-                                              backgroundColor: Colors.red),
-                                          onPressed: () {},
-                                          child:
-                                              const Text('Cancel Subscription'))
-                                    ],
-                                  )
+                                  ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.red),
+                                      onPressed: () {},
+                                      child: const Text('Cancel Subscription'))
                                 ],
                               ),
                             ),
@@ -194,7 +209,7 @@ class SubscriptionsPage extends StatelessWidget {
                                               'user') {
                                             return const PremiumIndividualOfferDialog();
                                           } else {
-                                            return const PremiumIndividualOfferDialog();
+                                            return const PremiumOrganizationOfferDialog();
                                           }
                                         },
                                       );

@@ -16,14 +16,13 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   final DatabaseRepository _databaseRepository;
   List<String> groupNames = [];
   StreamSubscription? _authSubscription;
-  final PurchasesRepository _purchasesRepository;
+
   ProfileBloc({
     required AuthBloc authBloc,
     required DatabaseRepository databaseRepository,
     required PurchasesRepository purchasesRepository,
   })  : _authBloc = authBloc,
         _databaseRepository = databaseRepository,
-        _purchasesRepository = purchasesRepository,
         super(ProfileLoading()) {
     on<LoadProfile>(_onLoadProfile);
     on<UpdateProfile>(_onUpdateProfile);

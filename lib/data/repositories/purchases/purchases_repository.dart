@@ -45,9 +45,8 @@ class PurchasesRepository {
     }
   }
 
-  Future<bool?> getSubscriptionStatus() async {
+  Future<bool?> getSubscriptionStatus(CustomerInfo customerInfo) async {
     try {
-      CustomerInfo customerInfo = await Purchases.getCustomerInfo();
       if (customerInfo.activeSubscriptions.isNotEmpty ||
           customerInfo.entitlements.active.isNotEmpty) {
         // Grant user "pro" access

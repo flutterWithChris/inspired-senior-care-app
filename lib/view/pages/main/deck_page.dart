@@ -509,7 +509,12 @@ class _PremiumOfferDialogState extends State<PremiumIndividualOfferDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<PurchasesBloc, PurchasesState>(
+    return BlocConsumer<PurchasesBloc, PurchasesState>(
+      listener: (context, state) {
+        if (state is PurchasesUpdated) {
+          Navigator.pop(context);
+        }
+      },
       buildWhen: (previous, current) =>
           previous.selectedPackage != current.selectedPackage,
       builder: (context, state) {
@@ -591,6 +596,148 @@ class _PremiumOfferDialogState extends State<PremiumIndividualOfferDialog> {
                                   context.read<PurchasesBloc>().add(AddPurchase(
                                       package: package ?? packages[0]!));
 
+                                  // Navigator.pop(context);
+                                },
+                                child: const Text('Subscribe')),
+                          ),
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 24.0),
+                            child: Text(
+                              'Subscribe & instantly gain access to the rest of the cards!',
+                              style: Theme.of(context).textTheme.titleMedium,
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ]),
+                        Positioned(
+                          top: -25,
+                          right: -5,
+                          child: SizedBox(
+                            height: 40,
+                            child: CloseButton(
+                              onPressed: () {
+                                context.pop();
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  } else {
+                    return const Center(
+                      child: Text('Something Went Wrong...'),
+                    );
+                  }
+                },
+              ),
+            ),
+          );
+        } else {
+          return const Center(
+            child: Text('Something Went Wrong...'),
+          );
+        }
+      },
+    );
+  }
+}
+
+class PremiumOrganizationOfferDialog extends StatefulWidget {
+  const PremiumOrganizationOfferDialog({
+    Key? key,
+  }) : super(key: key);
+  @override
+  State<PremiumOrganizationOfferDialog> createState() =>
+      _PremiumOrganizationOfferDialogState();
+}
+
+class _PremiumOrganizationOfferDialogState
+    extends State<PremiumOrganizationOfferDialog> {
+  String? selectedOffer;
+  @override
+  Widget build(BuildContext context) {
+    return BlocConsumer<PurchasesBloc, PurchasesState>(
+      listener: (context, state) {
+        if (state is ProfileUpdated) {
+          Navigator.pop(context);
+        }
+      },
+      builder: (context, state) {
+        if (state is PurchasesLoading) {
+          return LoadingAnimationWidget.inkDrop(color: Colors.blue, size: 30.0);
+        }
+        if (state is PurchasesLoaded) {
+          List<Package?> packages = [];
+          return Dialog(
+            backgroundColor: Colors.grey.shade100,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            child: Padding(
+              padding:
+                  const EdgeInsets.symmetric(vertical: 36.0, horizontal: 16.0),
+              child: BlocBuilder<PurchasesBloc, PurchasesState>(
+                builder: (context, state) {
+                  if (state is PurchasesLoading) {
+                    return LoadingAnimationWidget.inkDrop(
+                        color: Colors.blue, size: 30.0);
+                  }
+                  if (state is PurchasesLoaded) {
+                    if (context.watch<ProfileBloc>().state.user.type ==
+                        'user') {
+                      packages.addAll([
+                        state.offerings
+                            ?.getOffering('subscriptions')!
+                            .getPackage('Individual (Monthly)'),
+                        state.offerings
+                            ?.getOffering('subscriptions')!
+                            .getPackage('Individual (Yearly)'),
+                      ]);
+                      print('Got ${packages.length} Offerings');
+                    } else if (context.watch<ProfileBloc>().state.user.type ==
+                        'manager') {
+                      packages.addAll([
+                        state.offerings
+                            ?.getOffering('subscriptions')!
+                            .getPackage('Organization (Monthly)'),
+                        state.offerings
+                            ?.getOffering('subscriptions')!
+                            .getPackage('Organization (Annual)')
+                      ]);
+                    }
+                    return Stack(
+                      clipBehavior: Clip.none,
+                      alignment: AlignmentDirectional.topEnd,
+                      children: [
+                        Column(mainAxisSize: MainAxisSize.min, children: [
+                          Padding(
+                            padding:
+                                const EdgeInsets.only(top: 12.0, bottom: 8.0),
+                            child: Text(
+                              'Upgrade Organization!',
+                              style: Theme.of(context).textTheme.headline5,
+                            ),
+                          ),
+                          SizedBox(
+                              width: 325,
+                              height: 160,
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 4.0),
+                                child: OrganizationOfferCard(
+                                  packages: packages,
+                                ),
+                              )),
+                          Padding(
+                            padding: const EdgeInsets.only(
+                                left: 24.0, right: 24.0, bottom: 8.0),
+                            child: ElevatedButton(
+                                onPressed: () {
+                                  Package? package = context
+                                      .read<PurchasesBloc>()
+                                      .selectedPackage;
+                                  context.read<PurchasesBloc>().add(AddPurchase(
+                                      package: package ?? packages[0]!));
                                   // Navigator.pop(context);
                                 },
                                 child: const Text('Subscribe')),
@@ -780,7 +927,8 @@ class _IndividualOfferCardState extends State<IndividualOfferCard> {
 }
 
 class OrganizationOfferCard extends StatefulWidget {
-  const OrganizationOfferCard({super.key});
+  final List<Package?> packages;
+  const OrganizationOfferCard({super.key, required this.packages});
 
   @override
   State<OrganizationOfferCard> createState() => _OrganizationOfferCardState();
@@ -789,99 +937,131 @@ class OrganizationOfferCard extends StatefulWidget {
 List<String> menuItemList2 = ['Monthly', 'Yearly'];
 
 class _OrganizationOfferCardState extends State<OrganizationOfferCard> {
-  String dropdownValue = menuItemList2.first;
+  String dropdownValue = menuItemList.first;
   @override
   Widget build(BuildContext context) {
-    return Column(mainAxisSize: MainAxisSize.min, children: [
-      SizedBox(
-        height: 130,
-        width: 280,
-        child: Card(
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16.0),
-              side: selectedOffer == 1
-                  ? BorderSide(width: 2.0, color: Colors.orange.shade800)
-                  : BorderSide.none),
-          elevation: 1.618,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 18.0, vertical: 8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return BlocBuilder<PurchasesBloc, PurchasesState>(
+      builder: (context, state) {
+        if (state is PurchasesLoading) {
+          return LoadingAnimationWidget.inkDrop(color: Colors.blue, size: 30.0);
+        }
+        if (state is PurchasesLoaded) {
+          return Column(mainAxisSize: MainAxisSize.min, children: [
+            SizedBox(
+              height: 145,
+              width: 280,
+              child: Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16.0),
+                ),
+                elevation: 1.618,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      'Organization',
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                    DropdownButton<String>(
-                      isDense: true,
-                      underline: const SizedBox(),
-                      borderRadius: BorderRadius.circular(20),
-                      value: dropdownValue,
-                      items: menuItemList2
-                          .map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Chip(
-                              backgroundColor: Colors.blueAccent,
-                              visualDensity: VisualDensity.compact,
-                              label: Padding(
-                                padding: const EdgeInsets.only(bottom: 4.0),
-                                child: Text(
-                                  value,
-                                  style: const TextStyle(color: Colors.white),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 18.0, vertical: 8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Organization',
+                            style: Theme.of(context).textTheme.titleLarge,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              if (dropdownValue == 'Monthly')
+                                Text(
+                                  '${widget.packages[0]?.storeProduct.priceString}/mo.',
+                                  style:
+                                      Theme.of(context).textTheme.titleMedium,
                                 ),
-                              )),
-                        );
-                      }).toList(),
-                      onChanged: (String? value) {
-                        // This is called when the user selects an item.
-                        setState(() {
-                          dropdownValue = value!;
-                        });
-                      },
+                              if (dropdownValue == 'Yearly')
+                                Text(
+                                  '${widget.packages[1]?.storeProduct.priceString}/yr.',
+                                  style:
+                                      Theme.of(context).textTheme.titleMedium,
+                                ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    ListTile(
+                      leading: CircleAvatar(
+                          radius: 18,
+                          backgroundColor: Colors.orange.shade800,
+                          child: const Icon(
+                            Icons.person_rounded,
+                            color: Colors.white,
+                          )),
+                      subtitle: const Text(
+                          'Unlock full access for you & all group members.'),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          right: 16.0, bottom: 8.0, top: 8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          DropdownButton<String>(
+                            isDense: true,
+                            underline: const SizedBox(),
+                            borderRadius: BorderRadius.circular(20),
+                            value: dropdownValue,
+                            items: menuItemList2
+                                .map<DropdownMenuItem<String>>((String value) {
+                              return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Chip(
+                                    padding: const EdgeInsets.all(4.0),
+                                    backgroundColor: Colors.blueAccent,
+                                    visualDensity: VisualDensity.compact,
+                                    label: Padding(
+                                        padding:
+                                            const EdgeInsets.only(bottom: 4.0),
+                                        child: Text(
+                                          value,
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 12.0,
+                                          ),
+                                        )),
+                                  ));
+                            }).toList(),
+                            onChanged: (String? value) {
+                              // This is called when the user selects an item.
+                              setState(() {
+                                dropdownValue = value!;
+                              });
+                              if (dropdownValue == 'Monthly') {
+                                context.read<PurchasesBloc>().add(SelectPackage(
+                                    package: widget.packages[0]!));
+                                print('Monthly Selected');
+                              } else if (dropdownValue == 'Yearly') {
+                                context.read<PurchasesBloc>().add(SelectPackage(
+                                    package: widget.packages[1]!));
+                                print('Yearly Selected');
+                              }
+                            },
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
               ),
-              ListTile(
-                leading: CircleAvatar(
-                    radius: 18,
-                    backgroundColor: Colors.blue.shade400,
-                    child: const Icon(
-                      Icons.group_rounded,
-                      color: Colors.white,
-                    )),
-                subtitle: const Text(
-                    'Unlock full access to cards for all group members.'),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(right: 16.0, bottom: 8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    if (dropdownValue == 'Monthly')
-                      Text(
-                        '\$9.99/mo.',
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                    if (dropdownValue == 'Yearly')
-                      Text(
-                        '\$99.99/yr.',
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      )
-    ]);
+            )
+          ]);
+        } else {
+          return const Center(
+            child: Text('Something Went Wrong..'),
+          );
+        }
+      },
+    );
   }
 }
 

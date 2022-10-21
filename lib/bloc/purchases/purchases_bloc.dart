@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
+import 'package:inspired_senior_care_app/bloc/auth/auth_bloc.dart';
 import 'package:inspired_senior_care_app/data/repositories/purchases/purchases_repository.dart';
 import 'package:meta/meta.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
@@ -13,16 +13,18 @@ part 'purchases_state.dart';
 class PurchasesBloc extends Bloc<PurchasesEvent, PurchasesState> {
   Package? selectedPackage;
   final PurchasesRepository purchasesRepository;
-  final ProfileBloc _profileBloc;
-  StreamSubscription? profileStateStream;
+  final AuthBloc _authBloc;
+  StreamSubscription? authStateStream;
   PurchasesBloc(
       {required this.purchasesRepository,
-      required ProfileBloc profileBloc,
+      required AuthBloc authBloc,
       this.selectedPackage})
-      : _profileBloc = profileBloc,
+      : _authBloc = authBloc,
         super(PurchasesLoading()) {
-    profileStateStream = _profileBloc.stream.listen((state) async {
-      if (state is ProfileLoaded) {}
+    authStateStream = _authBloc.stream.listen((state) async {
+      if (state.authStatus == AuthStatus.authenticated) {
+        add(LoadPurchases());
+      }
     });
     on<PurchasesEvent>((event, emit) async {
       // TODO: implement event handler
@@ -30,21 +32,20 @@ class PurchasesBloc extends Bloc<PurchasesEvent, PurchasesState> {
         if (state is PurchasesLoading == false) {
           emit(PurchasesLoading());
         }
-        CustomerInfo? customerInfo =
-            await purchasesRepository.getCustomerInfo();
+
         try {
+          CustomerInfo? customerInfo =
+              await purchasesRepository.getCustomerInfo();
           bool? isSubscribed =
-              await purchasesRepository.getSubscriptionStatus();
+              await purchasesRepository.getSubscriptionStatus(customerInfo!);
           Offerings? offerings = await purchasesRepository.getOfferings();
 
           Map<String, EntitlementInfo> entitlements =
-              customerInfo!.entitlements.active;
+              customerInfo.entitlements.active;
           List<StoreProduct>? products;
-          List<String> productIds = [];
-          for (EntitlementInfo entitlementInfo in entitlements.values) {
-            productIds.add(entitlementInfo.productIdentifier);
-          }
-          products = await purchasesRepository.getProducts(productIds);
+
+          products = await purchasesRepository
+              .getProducts(customerInfo.allPurchasedProductIdentifiers);
 
           emit(PurchasesLoaded(
               offerings: offerings,
@@ -81,7 +82,7 @@ class PurchasesBloc extends Bloc<PurchasesEvent, PurchasesState> {
   @override
   Future<void> close() {
     // TODO: implement close
-    profileStateStream?.cancel();
+    authStateStream?.cancel();
     return super.close();
   }
 }
