@@ -35,8 +35,8 @@ class SubscriptionsPage extends StatelessWidget {
               shrinkWrap: true,
               children: [
                 Padding(
-                  padding: const EdgeInsets.only(
-                      left: 16.0, top: 16.0, bottom: 16.0),
+                  padding:
+                      const EdgeInsets.only(left: 16.0, top: 16.0, bottom: 0),
                   child: Text(
                     'My Subscriptions',
                     style: Theme.of(context)
@@ -52,7 +52,7 @@ class SubscriptionsPage extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: SizedBox(
-                          height: 175,
+                          height: 160,
                           width: 300,
                           child: Card(
                             shape: RoundedRectangleBorder(
@@ -170,16 +170,34 @@ class SubscriptionsPage extends StatelessWidget {
                                             )
                                     ],
                                   ),
-                                  ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                          backgroundColor: Colors.red),
-                                      onPressed: () {},
-                                      child: const Text('Cancel Subscription'))
                                 ],
                               ),
                             ),
                           )),
                     ),
+                state.isSubscribed == false
+                    ? Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            SizedBox(
+                              height: 40,
+                              child: FittedBox(
+                                child: TextButton.icon(
+                                    onPressed: () {
+                                      context
+                                          .read<PurchasesBloc>()
+                                          .add(RestorePurchases());
+                                    },
+                                    icon: const Icon(Icons.refresh_rounded),
+                                    label: const Text('Restore Purchases')),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : const SizedBox(),
                 if (state.isSubscribed == false)
                   Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -217,7 +235,22 @@ class SubscriptionsPage extends StatelessWidget {
                                     child: const Text('Subscribe Now'))
                               ]),
                         )),
-                  )
+                  ),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 8, horizontal: 24),
+                  child: SizedBox(
+                    height: 50,
+                    child: Text(
+                      'To manage a subscription visit Google Play Store or iOS subscription settings.',
+                      style: Theme.of(context)
+                          .textTheme
+                          .subtitle2!
+                          .copyWith(color: Colors.black.withOpacity(0.7)),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                )
               ],
             );
           } else {

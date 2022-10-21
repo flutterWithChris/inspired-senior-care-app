@@ -9,8 +9,6 @@ abstract class PurchasesEvent extends Equatable {
 
 class LoadPurchases extends PurchasesEvent {}
 
-class RefreshPurchases extends PurchasesEvent {}
-
 class RestorePurchases extends PurchasesEvent {}
 
 class AddPurchase extends PurchasesEvent {

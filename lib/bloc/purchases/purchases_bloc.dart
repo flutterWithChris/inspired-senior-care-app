@@ -66,11 +66,9 @@ class PurchasesBloc extends Bloc<PurchasesEvent, PurchasesState> {
       if (event is RemovePurchase) {}
       if (event is RestorePurchases) {
         emit(PurchasesLoading());
-        await purchasesRepository.restorePurchases();
+        CustomerInfo? customerInfo =
+            await purchasesRepository.restorePurchases();
         emit(PurchasesUpdated());
-        add(LoadPurchases());
-      }
-      if (event is RefreshPurchases) {
         add(LoadPurchases());
       }
       if (event is SelectPackage) {

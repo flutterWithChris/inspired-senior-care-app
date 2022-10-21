@@ -61,12 +61,20 @@ class PurchasesRepository {
     return null;
   }
 
-  Future<void> restorePurchases() async {
+  Future<CustomerInfo?> restorePurchases() async {
     try {
       CustomerInfo restoredInfo = await Purchases.restorePurchases();
       // ... check restored customerInfo to see if entitlement is now active
+      if (restoredInfo.activeSubscriptions.isNotEmpty ||
+          restoredInfo.entitlements.active.isNotEmpty) {
+        // Grant user "pro" access
+        return restoredInfo;
+      } else {
+        return null;
+      }
     } on PlatformException catch (e) {
       // Error restoring purchases
+      return null;
       print(e);
     }
   }
