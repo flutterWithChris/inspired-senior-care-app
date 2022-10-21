@@ -22,9 +22,7 @@ class PurchasesBloc extends Bloc<PurchasesEvent, PurchasesState> {
       : _profileBloc = profileBloc,
         super(PurchasesLoading()) {
     profileStateStream = _profileBloc.stream.listen((state) async {
-      if (state is ProfileLoaded) {
-        await purchasesRepository.loginToRevCat(_profileBloc.state.user);
-      }
+      if (state is ProfileLoaded) {}
     });
     on<PurchasesEvent>((event, emit) async {
       // TODO: implement event handler
@@ -32,12 +30,13 @@ class PurchasesBloc extends Bloc<PurchasesEvent, PurchasesState> {
         if (state is PurchasesLoading == false) {
           emit(PurchasesLoading());
         }
+        CustomerInfo? customerInfo =
+            await purchasesRepository.getCustomerInfo();
         try {
           bool? isSubscribed =
               await purchasesRepository.getSubscriptionStatus();
           Offerings? offerings = await purchasesRepository.getOfferings();
-          CustomerInfo? customerInfo =
-              await purchasesRepository.getCustomerInfo();
+
           Map<String, EntitlementInfo> entitlements =
               customerInfo!.entitlements.active;
           List<StoreProduct>? products;

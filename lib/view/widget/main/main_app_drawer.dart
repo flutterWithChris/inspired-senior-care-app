@@ -15,7 +15,7 @@ class MainAppDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<ProfileBloc, ProfileState>(builder: (context, state) {
       if (state is ProfileLoaded) {
-        if (state.user.type == 'user') {
+        if (state.user.type == 'user' || state.user.type == 'manager') {
           return Drawer(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 36.0),

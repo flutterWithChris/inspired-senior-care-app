@@ -38,8 +38,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> with ChangeNotifier {
     return super.close();
   }
 
-  void _onUserChanged(AuthUserChanged event, Emitter<AuthState> emit) {
-    print('User Authenticated');
+  void _onUserChanged(AuthUserChanged event, Emitter<AuthState> emit) async {
+    if (event.user != null) {
+      print('User Authenticated: ${event.user!.uid}');
+      await _purchasesRepository.loginToRevCat(event.user!.uid);
+    } else {
+      await _purchasesRepository.logoutOfRevCat();
+    }
 
     emit(event.user != null
         ? AuthState.authenticated(user: event.user!)
@@ -49,8 +54,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> with ChangeNotifier {
 
   void _onLogoutRequested(
       AppLogoutRequested event, Emitter<AuthState> emit) async {
-    print('User Authenticated');
-    await _purchasesRepository.logoutOfRevCat();
+    print('User Logged Out');
     unawaited(_authRepository.signOut());
     emit(const AuthState.unauthenticated());
   }

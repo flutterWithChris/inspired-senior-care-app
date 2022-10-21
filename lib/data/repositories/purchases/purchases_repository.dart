@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/services.dart';
-import 'package:inspired_senior_care_app/data/models/user.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
 class PurchasesRepository {
@@ -50,8 +49,7 @@ class PurchasesRepository {
     try {
       CustomerInfo customerInfo = await Purchases.getCustomerInfo();
       if (customerInfo.activeSubscriptions.isNotEmpty ||
-          customerInfo.entitlements.all["premium_individual"]!.isActive ||
-          customerInfo.entitlements.all["premium_organization"]!.isActive) {
+          customerInfo.entitlements.active.isNotEmpty) {
         // Grant user "pro" access
         return true;
       } else {
@@ -82,13 +80,13 @@ class PurchasesRepository {
     }
   }
 
-  Future<void> loginToRevCat(User user) async {
+  Future<void> loginToRevCat(String userId) async {
     try {
-      await Future.wait([
-        Purchases.logIn(user.id!),
-        Purchases.setEmail(user.email!),
-        Purchases.setDisplayName(user.name!),
-      ]);
+      await Purchases.logIn(userId);
+      // await Future.wait([
+      // Purchases.setEmail(user.email!),
+      // Purchases.setDisplayName(user.name!),
+      // ]);
     } on PlatformException catch (e) {
       print(e);
     }

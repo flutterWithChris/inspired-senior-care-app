@@ -86,7 +86,7 @@ class _MyAppState extends State<MyApp> {
           create: (context) => AuthRepository(),
         ),
         RepositoryProvider(
-          lazy: false,
+          // lazy: false,
           create: (context) => PurchasesRepository()..initPlatformState(),
         ),
         RepositoryProvider(
@@ -105,6 +105,7 @@ class _MyAppState extends State<MyApp> {
           ),
           BlocProvider(
             create: (context) => ProfileBloc(
+              purchasesRepository: context.read<PurchasesRepository>(),
               authBloc: context.read<AuthBloc>(),
               databaseRepository: context.read<DatabaseRepository>(),
             )..add(

@@ -109,7 +109,7 @@ class _FeaturedCategoryState extends State<FeaturedCategory> {
             (category) => category.name == state.featuredCategoryName,
           );
           int progress =
-              currentUser.currentCard![state.featuredCategoryName] ?? 0;
+              currentUser.currentCard?[state.featuredCategoryName] ?? 0;
           return Column(
             children: [
               InkWell(

@@ -5,6 +5,7 @@ import 'package:equatable/equatable.dart';
 import 'package:inspired_senior_care_app/bloc/auth/auth_bloc.dart';
 import 'package:inspired_senior_care_app/data/models/user.dart';
 import 'package:inspired_senior_care_app/data/repositories/database/database_repository.dart';
+import 'package:inspired_senior_care_app/data/repositories/purchases/purchases_repository.dart';
 import 'package:meta/meta.dart';
 
 part 'profile_event.dart';
@@ -15,11 +16,14 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   final DatabaseRepository _databaseRepository;
   List<String> groupNames = [];
   StreamSubscription? _authSubscription;
+  final PurchasesRepository _purchasesRepository;
   ProfileBloc({
     required AuthBloc authBloc,
     required DatabaseRepository databaseRepository,
+    required PurchasesRepository purchasesRepository,
   })  : _authBloc = authBloc,
         _databaseRepository = databaseRepository,
+        _purchasesRepository = purchasesRepository,
         super(ProfileLoading()) {
     on<LoadProfile>(_onLoadProfile);
     on<UpdateProfile>(_onUpdateProfile);
@@ -33,6 +37,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   }
   void _onLoadProfile(LoadProfile event, Emitter<ProfileState> emit) async {
     print('User Loading: ${state.user.id}');
+
     await emit.forEach(_databaseRepository.getUser(event.userId),
         onData: (User user) {
       return ProfileLoaded(user: user);
