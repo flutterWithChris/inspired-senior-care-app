@@ -183,7 +183,7 @@ class _DeckPageState extends State<DeckPage> {
                     'Condition 1: ${currentCard >= (widget.category.totalCards! / 2).round()}');
                 print(
                     'Condition 2: ${(isSubscribed == false || isSubscribed == null)}');
-                if (currentCard >= (widget.category.totalCards! / 2).round() &&
+                if (currentCard >= (widget.category.totalCards! / 3).round() &&
                     (isSubscribed == false || isSubscribed == null)) {
                   print('Satisfied Conditions***');
                   print('Is Subscribed: $isSubscribed');

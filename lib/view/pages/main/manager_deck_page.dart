@@ -240,7 +240,7 @@ class Deck extends StatelessWidget {
             itemCount: state.cardImageUrls.length,
             itemExtent: 320,
             onIndexChanged: (p0) {
-              if ((p0 + 1) > (state.category.totalCards! / 2).round() &&
+              if ((p0 + 1) > (state.category.totalCards! / 3).round() &&
                   (isSubscribed == null || isSubscribed == false)) {
                 WidgetsBinding.instance.addPostFrameCallback((_) => showDialog(
                       barrierDismissible: false,
