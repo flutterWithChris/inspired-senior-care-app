@@ -3,8 +3,11 @@ part of 'purchases_bloc.dart';
 @immutable
 abstract class PurchasesState extends Equatable {
   Offerings? offerings;
+
+  bool? isSubscribed;
   Package? selectedPackage;
   CustomerInfo? customerInfo;
+
   @override
   // TODO: implement props
   List<Object?> get props => [offerings, selectedPackage, customerInfo];

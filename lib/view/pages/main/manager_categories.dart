@@ -71,11 +71,14 @@ class ManagerCategories extends StatelessWidget {
                       children: [
                         Text(
                           'All Categories',
-                          style: Theme.of(context).textTheme.headline4,
+                          style: Theme.of(context)
+                              .textTheme
+                              .headline4!
+                              .copyWith(color: Colors.black87, fontSize: 32),
                         ),
                         SizedBox(
                           height: 40,
-                          width: 120,
+                          width: 140,
                           child: FittedBox(
                             child: PopupMenuButton(
                               position: PopupMenuPosition.under,
@@ -91,10 +94,10 @@ class ManagerCategories extends StatelessWidget {
                                 ];
                               },
                               child: IgnorePointer(
-                                child: OutlinedButton.icon(
+                                child: ElevatedButton.icon(
                                     style: ElevatedButton.styleFrom(
                                         minimumSize: const Size(0, 0),
-                                        fixedSize: const Size(120, 42)),
+                                        fixedSize: const Size(140, 42)),
                                     onPressed: () {},
                                     label: const Text('View Mode'),
                                     icon: const Icon(
@@ -183,21 +186,17 @@ class CategoryCard extends StatelessWidget {
                   child: Container(
                     color: Colors.white,
                     height: 275,
-                    child: Stack(
-                      alignment: AlignmentDirectional.center,
-                      children: [
-                        Positioned(
-                            top: 15,
-                            child: CachedNetworkImage(
-                              placeholder: (context, url) => Center(
-                                child: LoadingAnimationWidget.inkDrop(
-                                    color: Colors.blueAccent, size: 30.0),
-                              ),
-                              imageUrl: category.coverImageUrl,
-                              height: 250,
-                              fit: BoxFit.fitHeight,
-                            )),
-                      ],
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: CachedNetworkImage(
+                        placeholder: (context, url) => Center(
+                          child: LoadingAnimationWidget.inkDrop(
+                              color: Colors.blueAccent, size: 30.0),
+                        ),
+                        imageUrl: category.coverImageUrl,
+                        height: 250,
+                        fit: BoxFit.fitHeight,
+                      ),
                     ),
                   ),
                 ),

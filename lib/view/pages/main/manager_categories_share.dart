@@ -7,6 +7,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:inspired_senior_care_app/bloc/cards/card_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/categories/categories_bloc.dart';
+import 'package:inspired_senior_care_app/bloc/deck/deck_cubit.dart';
 import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/share_bloc/share_bloc.dart';
 import 'package:inspired_senior_care_app/data/models/category.dart';
@@ -15,8 +16,6 @@ import 'package:inspired_senior_care_app/view/widget/main/bottom_app_bar.dart';
 import 'package:inspired_senior_care_app/view/widget/main/main_app_drawer.dart';
 import 'package:inspired_senior_care_app/view/widget/main/top_app_bar.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-
-import '../../../bloc/deck/deck_cubit.dart';
 
 class ManagerCategoriesShare extends StatelessWidget {
   const ManagerCategoriesShare({Key? key}) : super(key: key);
@@ -49,7 +48,7 @@ class ManagerCategoriesShare extends StatelessWidget {
                     const SizedBox(
                       height: 8.0,
                     ),
-                    const Text('Loading Manager...')
+                    const Text('Loading Categories...')
                   ],
                 ),
               );
@@ -66,49 +65,52 @@ class ManagerCategoriesShare extends StatelessWidget {
                 physics: const ScrollPhysics(),
                 shrinkWrap: true,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 24.0, horizontal: 8.0),
-                        child: Text(
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 24.0, horizontal: 8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
                           'All Categories',
-                          style: Theme.of(context).textTheme.headlineMedium,
+                          style: Theme.of(context)
+                              .textTheme
+                              .headline4!
+                              .copyWith(color: Colors.black87, fontSize: 32),
                         ),
-                      ),
-                      SizedBox(
-                        height: 40,
-                        width: 120,
-                        child: FittedBox(
-                          child: PopupMenuButton(
-                            position: PopupMenuPosition.under,
-                            itemBuilder: (context) {
-                              return [
-                                PopupMenuItem(
-                                  child: const Text('View Mode'),
-                                  onTap: () {
-                                    context.goNamed('manager-categories');
-                                  },
-                                )
-                              ];
-                            },
-                            child: IgnorePointer(
-                              child: OutlinedButton.icon(
-                                  style: OutlinedButton.styleFrom(
-                                      minimumSize: const Size(0, 0),
-                                      fixedSize: const Size(130, 40)),
-                                  onPressed: () {},
-                                  label: const Text('Share Mode'),
-                                  icon: const Icon(
-                                    FontAwesomeIcons.shareNodes,
-                                    size: 12.0,
-                                  )),
+                        SizedBox(
+                          height: 40,
+                          width: 130,
+                          child: FittedBox(
+                            child: PopupMenuButton(
+                              position: PopupMenuPosition.under,
+                              itemBuilder: (context) {
+                                return [
+                                  PopupMenuItem(
+                                    child: const Text('View Mode'),
+                                    onTap: () {
+                                      context.goNamed('manager-categories');
+                                    },
+                                  )
+                                ];
+                              },
+                              child: IgnorePointer(
+                                child: ElevatedButton.icon(
+                                    style: ElevatedButton.styleFrom(
+                                        minimumSize: const Size(0, 0),
+                                        fixedSize: const Size(140, 42)),
+                                    onPressed: () {},
+                                    label: const Text('Share Mode'),
+                                    icon: const Icon(
+                                      FontAwesomeIcons.share,
+                                      size: 12.0,
+                                    )),
+                              ),
                             ),
                           ),
-                        ),
-                      )
-                    ],
+                        )
+                      ],
+                    ),
                   ),
                   LayoutBuilder(builder: (context, constraints) {
                     int crossAxisCount = constraints.maxWidth > 500 ? 4 : 2;
@@ -179,102 +181,103 @@ class CategoryCard extends StatelessWidget {
                   BlocProvider.of<CardBloc>(context)
                       .add(LoadCards(category: category));
                   context.read<DeckCubit>().loadDeck(category);
-                  context.goNamed('manager-share-deck-page', extra: category);
+                  context.pushNamed('deck-page', extra: category);
                 },
                 child: Card(
-                  child: Container(
-                    color: Colors.white,
-                    height: 275,
-                    child: Stack(
-                      alignment: AlignmentDirectional.center,
-                      children: [
-                        Positioned(
-                            top: 15,
-                            child: CachedNetworkImage(
-                              placeholder: (context, url) => Center(
-                                child: LoadingAnimationWidget.inkDrop(
-                                    color: Colors.blueAccent, size: 30.0),
-                              ),
-                              imageUrl: category.coverImageUrl,
-                              height: 250,
-                              fit: BoxFit.fitHeight,
-                            )),
-                        Positioned(
-                          top: 5,
-                          right: 2,
-                          child: Stack(
-                            alignment: AlignmentDirectional.center,
-                            children: [
-                              CircleAvatar(
-                                radius: 23,
-                                backgroundColor: Colors.white,
-                                child: BlocBuilder<ProfileBloc, ProfileState>(
-                                  builder: (context, state) {
-                                    int currentCard = 0;
-                                    if (state is ProfileLoaded) {
-                                      bool categoryStarted = state
-                                          .user.currentCard!
-                                          .containsKey(category.name);
-                                      if (!categoryStarted) {
-                                        currentCard = 0;
-                                      }
-                                      if (categoryStarted) {
-                                        Map<String, int> progressList = context
+                  child: Stack(
+                    alignment: AlignmentDirectional.center,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: CachedNetworkImage(
+                          placeholder: (context, url) => Center(
+                            child: LoadingAnimationWidget.inkDrop(
+                                color: Colors.blueAccent, size: 30.0),
+                          ),
+                          imageUrl: category.coverImageUrl,
+                          height: 250,
+                          fit: BoxFit.fitHeight,
+                        ),
+                      ),
+                      Positioned(
+                        top: 5,
+                        right: 2,
+                        child: Stack(
+                          alignment: AlignmentDirectional.center,
+                          children: [
+                            CircleAvatar(
+                              radius: 23,
+                              backgroundColor: Colors.white,
+                              child: BlocBuilder<ProfileBloc, ProfileState>(
+                                builder: (context, state) {
+                                  int currentCard = 0;
+                                  if (state is ProfileLoaded) {
+                                    int progress = context
                                             .watch<ProfileBloc>()
                                             .state
                                             .user
-                                            .currentCard!;
+                                            .currentCard![category.name] ??
+                                        0;
 
-                                        percentComplete =
-                                            progressList[category.name]! /
-                                                category.totalCards!;
-                                      }
+                                    percentComplete = progress > 0
+                                        ? (progress - 1) / category.totalCards!
+                                        : 0.0;
+
+                                    // print(
+                                    //     '${category.name} Progress is: $percentComplete');
+                                    // return Text(
+                                    //   '${(percentComplete * 100).toStringAsFixed(0)}%',
+                                    if (progress > 0) {
                                       return Text(
-                                        '${(percentComplete * 100).toStringAsFixed(0)}%',
+                                        '${(progress - 1)}/${category.totalCards}',
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 14),
+                                      );
+                                    } else {
+                                      return Text(
+                                        '${(0)}/${category.totalCards}',
                                         style: const TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 14),
                                       );
                                     }
-                                    return const Text(
-                                        'Something Went Wrong...');
-                                  },
-                                ),
-                              ),
-                              BlocBuilder<CategoriesBloc, CategoriesState>(
-                                builder: (context, state) {
-                                  if (state is CategoriesLoaded) {
-                                    return SizedBox(
-                                      height: 50,
-                                      width: 50,
-                                      child: BlocBuilder<ShareBloc, ShareState>(
-                                        buildWhen: (previous, current) =>
-                                            previous.status ==
-                                                Status.submitted &&
-                                            current.status == Status.initial,
-                                        builder: (context, state) {
-                                          return CircularProgressIndicator(
-                                            backgroundColor:
-                                                Colors.grey.shade200,
-                                            valueColor:
-                                                AlwaysStoppedAnimation<Color>(
-                                                    category.progressColor),
-                                            value: percentComplete,
-                                          );
-                                        },
-                                      ),
-                                    );
                                   }
-                                  return const Center(
-                                    child: Text('Something Went Wrong...'),
-                                  );
+                                  return const Text('Something Went Wrong...');
                                 },
                               ),
-                            ],
-                          ),
-                        )
-                      ],
-                    ),
+                            ),
+                            BlocBuilder<CategoriesBloc, CategoriesState>(
+                              builder: (context, state) {
+                                if (state is CategoriesLoaded) {
+                                  return SizedBox(
+                                    height: 50,
+                                    width: 50,
+                                    child: BlocBuilder<ShareBloc, ShareState>(
+                                      buildWhen: (previous, current) =>
+                                          previous.status == Status.submitted &&
+                                          current.status == Status.initial,
+                                      builder: (context, state) {
+                                        return CircularProgressIndicator(
+                                          backgroundColor: Colors.grey.shade200,
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                  category.progressColor),
+                                          value: percentComplete,
+                                        );
+                                      },
+                                    ),
+                                  );
+                                }
+                                return const Center(
+                                  child: Text('Something Went Wrong...'),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      )
+                    ],
                   ),
                 ),
               );
