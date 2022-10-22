@@ -13,6 +13,7 @@ import 'package:inspired_senior_care_app/view/widget/main/bottom_app_bar.dart';
 import 'package:inspired_senior_care_app/view/widget/main/main_app_drawer.dart';
 
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:once/once.dart';
 
 import '../../widget/main/top_app_bar.dart';
 
@@ -54,6 +55,13 @@ class ManagerCategories extends StatelessWidget {
             if (state is CategoriesLoaded) {
               List<Category> allCategories = state.categories;
               int categoryCount = state.categoryImageUrls.length;
+              // Shuffle Categories Weekly
+              Once.runWeekly(
+                'shuffleCategories',
+                callback: () {
+                  allCategories.shuffle();
+                },
+              );
               final List<CategoryCard> categoryCards = [
                 for (Category category in allCategories)
                   CategoryCard(category: category),

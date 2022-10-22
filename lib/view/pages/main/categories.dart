@@ -17,6 +17,7 @@ import 'package:inspired_senior_care_app/view/widget/main/main_app_drawer.dart';
 import 'package:inspired_senior_care_app/view/widget/main/top_app_bar.dart';
 
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:once/once.dart';
 
 class Categories extends StatelessWidget {
   const Categories({Key? key}) : super(key: key);
@@ -55,6 +56,13 @@ class Categories extends StatelessWidget {
             }
             if (state is CategoriesLoaded) {
               List<Category> allCategories = state.categories;
+              // Shuffle Categories Weekly
+              Once.runWeekly(
+                'shuffleCategories',
+                callback: () {
+                  allCategories.shuffle();
+                },
+              );
               int categoryCount = state.categoryImageUrls.length;
               final List<CategoryCard> categoryCards = [
                 for (Category category in allCategories)
