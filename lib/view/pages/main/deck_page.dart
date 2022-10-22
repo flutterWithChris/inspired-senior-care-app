@@ -14,7 +14,6 @@ import 'package:inspired_senior_care_app/data/models/category.dart';
 import 'package:inspired_senior_care_app/data/models/user.dart';
 import 'package:inspired_senior_care_app/view/widget/main/bottom_app_bar.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:purchases_flutter/models/offerings_wrapper.dart';
 import 'package:purchases_flutter/models/package_wrapper.dart';
 
 class DeckPage extends StatefulWidget {
@@ -104,8 +103,7 @@ class _DeckPageState extends State<DeckPage> {
                   ),
                 );
               }
-              return BlocConsumer<CardBloc, CardState>(
-                listener: (context, state) {},
+              return BlocBuilder<CardBloc, CardState>(
                 builder: (context, state) {
                   if (state is CardsLoaded) {
                     return Visibility(
@@ -147,8 +145,6 @@ class _DeckPageState extends State<DeckPage> {
             );
           }
           if (state is PurchasesLoaded) {
-            Offerings? offerings = state.offerings;
-            // print(offerings?.all.toString());
             bool? isSubscribed =
                 context.watch<PurchasesBloc>().state.isSubscribed;
 
@@ -183,10 +179,10 @@ class _DeckPageState extends State<DeckPage> {
                             ));
                   }
                 }
-                // print(
-                //     'Condition 1: ${currentCard >= (widget.category.totalCards! / 2).round()}');
-                // print(
-                //     'Condition 2: ${(isSubscribed == false || isSubscribed == null)}');
+                print(
+                    'Condition 1: ${currentCard >= (widget.category.totalCards! / 2).round()}');
+                print(
+                    'Condition 2: ${(isSubscribed == false || isSubscribed == null)}');
                 if (currentCard >= (widget.category.totalCards! / 2).round() &&
                     (isSubscribed == false || isSubscribed == null)) {
                   print('Satisfied Conditions***');
@@ -560,7 +556,7 @@ class _PremiumOfferDialogState extends State<PremiumIndividualOfferDialog> {
     return BlocConsumer<PurchasesBloc, PurchasesState>(
       listener: (context, state) {
         if (state is PurchasesUpdated) {
-          Navigator.pop(context);
+          context.pop();
         }
       },
       builder: (context, state) {
@@ -622,7 +618,7 @@ class _PremiumOfferDialogState extends State<PremiumIndividualOfferDialog> {
                           ),
                           SizedBox(
                               width: 325,
-                              height: 150,
+                              height: 160,
                               child: Padding(
                                 padding:
                                     const EdgeInsets.symmetric(vertical: 4.0),
@@ -658,11 +654,20 @@ class _PremiumOfferDialogState extends State<PremiumIndividualOfferDialog> {
                         ]),
                         Positioned(
                           top: -25,
-                          right: -5,
-                          child: SizedBox(
-                            height: 40,
-                            child: CloseButton(
-                              onPressed: () {},
+                          right: 0,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 6.0, vertical: 6.0),
+                            child: CircleAvatar(
+                              backgroundColor: Colors.black45,
+                              radius: 16,
+                              child: FittedBox(
+                                child: CloseButton(
+                                  onPressed: () {
+                                    context.pop();
+                                  },
+                                ),
+                              ),
                             ),
                           ),
                         ),
@@ -798,13 +803,20 @@ class _PremiumOrganizationOfferDialogState
                         ]),
                         Positioned(
                           top: -25,
-                          right: -5,
-                          child: SizedBox(
-                            height: 40,
-                            child: CloseButton(
-                              onPressed: () {
-                                context.pop();
-                              },
+                          right: 0,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 6.0, vertical: 6.0),
+                            child: CircleAvatar(
+                              backgroundColor: Colors.black45,
+                              radius: 16,
+                              child: FittedBox(
+                                child: CloseButton(
+                                  onPressed: () {
+                                    context.pop();
+                                  },
+                                ),
+                              ),
                             ),
                           ),
                         ),
