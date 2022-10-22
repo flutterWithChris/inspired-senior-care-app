@@ -1,11 +1,12 @@
 import 'dart:io';
 
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/services.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
 class PurchasesRepository {
   Future<void> initPlatformState() async {
-    await Purchases.setDebugLogsEnabled(true);
+    // await Purchases.setDebugLogsEnabled(true);
 
     PurchasesConfiguration? configuration;
 
@@ -17,7 +18,12 @@ class PurchasesRepository {
           PurchasesConfiguration("appl_lhPFnQjvipbdcvvGNKqqNlfiFle");
     }
 
-    await Purchases.configure(configuration!);
+    try {
+      await Purchases.configure(configuration!);
+    } catch (e) {
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
+    }
   }
 
   Future<Offerings?> getOfferings() async {
@@ -30,6 +36,8 @@ class PurchasesRepository {
       }
     } on PlatformException catch (e) {
       print(e);
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
     }
     return null;
   }
@@ -41,6 +49,8 @@ class PurchasesRepository {
       var errorCode = PurchasesErrorHelper.getErrorCode(e);
       if (errorCode != PurchasesErrorCode.purchaseCancelledError) {
         print(e);
+        (e, stack) =>
+            FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
       }
     }
   }
@@ -57,6 +67,8 @@ class PurchasesRepository {
     } on PlatformException catch (e) {
       // Error fetching purchaser info
       print(e);
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
     }
     return null;
   }
@@ -74,6 +86,8 @@ class PurchasesRepository {
       }
     } on PlatformException catch (e) {
       // Error restoring purchases
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
       return null;
       print(e);
     }
@@ -83,6 +97,8 @@ class PurchasesRepository {
     try {
       await Purchases.logOut();
     } on PlatformException catch (e) {
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
       print(e);
     }
   }
@@ -95,6 +111,8 @@ class PurchasesRepository {
       // Purchases.setDisplayName(user.name!),
       // ]);
     } on PlatformException catch (e) {
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
       print(e);
     }
   }
@@ -104,6 +122,8 @@ class PurchasesRepository {
       CustomerInfo customerInfo = await Purchases.getCustomerInfo();
       return customerInfo;
     } on PlatformException catch (e) {
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
       print(e);
       return null;
     }
@@ -116,6 +136,8 @@ class PurchasesRepository {
           await Purchases.getProducts(productIdentifiers);
       return storeProducts;
     } on PlatformException catch (e) {
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
       print(e);
       return null;
     }
