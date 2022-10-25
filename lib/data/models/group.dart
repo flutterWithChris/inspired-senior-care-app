@@ -7,6 +7,8 @@ class Group {
   final List<String>? groupManagerIds;
   final String? featuredCategory;
   final bool? onSchedule;
+  final bool? isSubscribed;
+  final String? groupOwnerId;
 
   const Group(
       {this.groupName,
@@ -14,35 +16,40 @@ class Group {
       this.groupMemberIds,
       this.groupManagerIds,
       this.featuredCategory,
+      this.isSubscribed,
+      this.groupOwnerId,
       this.onSchedule});
 
-  Group copyWith({
-    String? groupName,
-    String? groupId,
-    List<String>? groupMemberIds,
-    List<String>? groupManagerIds,
-    String? featuredCategory,
-    bool? onSchedule,
-  }) {
+  Group copyWith(
+      {String? groupName,
+      String? groupId,
+      List<String>? groupMemberIds,
+      List<String>? groupManagerIds,
+      String? featuredCategory,
+      bool? isSubscribed,
+      bool? onSchedule,
+      String? groupOwnerId}) {
     return Group(
-      groupName: groupName ?? this.groupName,
-      groupId: groupId ?? this.groupId,
-      groupMemberIds: groupMemberIds ?? this.groupMemberIds,
-      groupManagerIds: groupManagerIds ?? this.groupManagerIds,
-      featuredCategory: featuredCategory ?? this.featuredCategory,
-      onSchedule: onSchedule ?? this.onSchedule,
-    );
+        groupName: groupName ?? this.groupName,
+        groupId: groupId ?? this.groupId,
+        groupMemberIds: groupMemberIds ?? this.groupMemberIds,
+        groupManagerIds: groupManagerIds ?? this.groupManagerIds,
+        featuredCategory: featuredCategory ?? this.featuredCategory,
+        onSchedule: onSchedule ?? this.onSchedule,
+        groupOwnerId: groupOwnerId ?? this.groupOwnerId,
+        isSubscribed: isSubscribed ?? this.isSubscribed);
   }
 
   static Group fromSnapshot(DocumentSnapshot snap) {
     Group group = Group(
-      groupName: snap['groupName'],
-      groupId: snap['groupId'],
-      groupMemberIds: List.from(snap['groupMemberIds']),
-      groupManagerIds: List.from(snap['groupManagerIds']),
-      featuredCategory: snap['featuredCategory'],
-      onSchedule: snap['onSchedule'],
-    );
+        groupName: snap['groupName'],
+        groupId: snap['groupId'],
+        groupMemberIds: List.from(snap['groupMemberIds']),
+        groupManagerIds: List.from(snap['groupManagerIds']),
+        featuredCategory: snap['featuredCategory'],
+        onSchedule: snap['onSchedule'],
+        groupOwnerId: snap['groupOwnerId'],
+        isSubscribed: snap['isSubscribed']);
 
     return group;
   }
@@ -55,6 +62,8 @@ class Group {
       'groupManagerIds': groupManagerIds,
       'featuredCategory': featuredCategory,
       'onSchedule': onSchedule,
+      'groupOwnerId': groupOwnerId,
+      'isSubscribed': isSubscribed,
     };
   }
 

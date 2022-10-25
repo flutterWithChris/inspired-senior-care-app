@@ -121,6 +121,63 @@ class DatabaseRepository extends BaseDatabaseRepository {
         .then((value) => value.data()!['featuredCategory']);
   }
 
+  Future<Map<Group?, bool?>?> getGroupSubscriptionStatus(String userId) async {
+    List<dynamic> groupIds = await _firebaseFirestore
+        .collection('users')
+        .doc(userId)
+        .get()
+        .then((value) => value.data()?['groups']);
+
+    if (groupIds.isNotEmpty) {
+      List<Group> groups = [];
+      for (String groupId in groupIds) {
+        Group group = await _firebaseFirestore
+            .collection('groups')
+            .doc(groupId)
+            .get()
+            .then((value) => Group.fromSnapshot(value));
+        groups.add(group);
+      }
+      if (groups.any((group) => group.isSubscribed == true)) {
+        Group subscribedGroup =
+            groups.firstWhere((group) => group.isSubscribed == true);
+        return {subscribedGroup: true};
+      } else {
+        return null;
+      }
+    } else {
+      return null;
+    }
+  }
+
+  Future<void> setGroupSubscriptionStatus(List<String> groupIds) async {
+    for (String groupId in groupIds) {
+      await _firebaseFirestore
+          .collection('groups')
+          .doc(groupId)
+          .set({'isSubscribed': true}, SetOptions(merge: true));
+    }
+  }
+
+  Future<void> resetGroupSubscriptionStatus(String userId) async {
+    List<Group> groups = [];
+    await _firebaseFirestore
+        .collection('groups')
+        .where('groupOwnerId', isEqualTo: userId)
+        .get()
+        .then((value) {
+      for (QueryDocumentSnapshot<Map<String, dynamic>> doc in value.docs) {
+        groups.add(Group.fromSnapshot(doc));
+      }
+    });
+    for (Group group in groups) {
+      await _firebaseFirestore
+          .collection('groups')
+          .doc(group.groupId)
+          .set({'isSubscribed': false}, SetOptions(merge: true));
+    }
+  }
+
   Future<void> submitResponse(
       String categoryName, int cardNumber, String response) {
     return _firebaseFirestore

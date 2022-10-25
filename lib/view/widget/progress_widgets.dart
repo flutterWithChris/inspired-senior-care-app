@@ -191,7 +191,6 @@ class ProgressCategory extends StatefulWidget {
 class _ProgressCategoryState extends State<ProgressCategory> {
   @override
   Widget build(BuildContext context) {
-    print('PRogress is now ${widget.progress}');
     return SizedBox(
       height: 125,
       child: Column(

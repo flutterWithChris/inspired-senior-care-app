@@ -119,6 +119,8 @@ class _MyAppState extends State<MyApp> {
                   LoginCubit(authRepository: context.read<AuthRepository>())),
           BlocProvider(
               create: (context) => PurchasesBloc(
+                  profileBloc: context.read<ProfileBloc>(),
+                  databaseRepository: context.read<DatabaseRepository>(),
                   authBloc: context.read<AuthBloc>(),
                   purchasesRepository: context.read<PurchasesRepository>())
                 ..add(LoadPurchases())),

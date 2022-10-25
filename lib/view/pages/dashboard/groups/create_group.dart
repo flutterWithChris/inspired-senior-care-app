@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/group/group_bloc.dart';
+import 'package:inspired_senior_care_app/bloc/purchases/purchases_bloc.dart';
 import 'package:inspired_senior_care_app/data/models/group.dart';
 import 'package:inspired_senior_care_app/data/models/user.dart';
 
@@ -67,51 +68,60 @@ class _CreateGroupDialogState extends State<CreateGroupDialog> {
                     },
                   )),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12.0),
-              child: ElevatedButton.icon(
-                  onPressed: () {
-                    print('Group Created: ${groupNameController.text}');
-                    // * Create a New Group
-                    Group newGroup = Group(
-                        groupName: groupNameController.text,
-                        groupId: '',
-                        onSchedule: true,
-                        featuredCategory: '',
-                        groupMemberIds: [],
-                        groupManagerIds: [currentUser.id!]);
-                    BlocProvider.of<GroupBloc>(context).add(
-                        CreateGroup(group: newGroup, manager: currentUser));
-                    // * Add new group to list
-                    //  sampleGroupList.add(newGroup);
-                  },
-                  icon: const Icon(
-                    Icons.group_add_rounded,
-                    size: 20.0,
-                  ),
-                  label: BlocConsumer<GroupBloc, GroupState>(
-                    listenWhen: (previous, current) => previous != current,
-                    listener: (context, state) {
-                      if (state is GroupCreated) {
-                        Future.delayed(const Duration(seconds: 1));
-                        Navigator.pop(context);
-                        // TODO: Dispose?
-                      }
-                    },
-                    builder: (context, state) {
-                      // TODO: Error Handling
-                      if (state is GroupLoaded) {
-                        return const Text('Create Group');
-                      }
-                      if (state is GroupSubmitting) {
-                        return const Text('Submitting...');
-                      }
-                      if (state is GroupCreated) {
-                        return const Text('Group Created!');
-                      }
-                      return const Text('Something\'s Wrong!');
-                    },
-                  )),
+            BlocBuilder<PurchasesBloc, PurchasesState>(
+              builder: (context, state) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12.0),
+                  child: ElevatedButton.icon(
+                      onPressed: () {
+                        print('Group Created: ${groupNameController.text}');
+                        // * Create a New Group
+                        Group newGroup = Group(
+                            groupName: groupNameController.text,
+                            groupId: '',
+                            groupOwnerId: currentUser.id,
+                            onSchedule: true,
+                            featuredCategory: '',
+                            isSubscribed: context
+                                .watch<PurchasesBloc>()
+                                .state
+                                .isSubscribed,
+                            groupMemberIds: [],
+                            groupManagerIds: [currentUser.id!]);
+                        BlocProvider.of<GroupBloc>(context).add(
+                            CreateGroup(group: newGroup, manager: currentUser));
+                        // * Add new group to list
+                        //  sampleGroupList.add(newGroup);
+                      },
+                      icon: const Icon(
+                        Icons.group_add_rounded,
+                        size: 20.0,
+                      ),
+                      label: BlocConsumer<GroupBloc, GroupState>(
+                        listenWhen: (previous, current) => previous != current,
+                        listener: (context, state) {
+                          if (state is GroupCreated) {
+                            Future.delayed(const Duration(seconds: 1));
+                            Navigator.pop(context);
+                            // TODO: Dispose?
+                          }
+                        },
+                        builder: (context, state) {
+                          // TODO: Error Handling
+                          if (state is GroupLoaded) {
+                            return const Text('Create Group');
+                          }
+                          if (state is GroupSubmitting) {
+                            return const Text('Submitting...');
+                          }
+                          if (state is GroupCreated) {
+                            return const Text('Group Created!');
+                          }
+                          return const Text('Something\'s Wrong!');
+                        },
+                      )),
+                );
+              },
             ),
           ],
         ),
