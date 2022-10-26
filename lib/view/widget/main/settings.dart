@@ -32,6 +32,107 @@ class SettingsPage extends StatelessWidget {
           }
           if (state is SettingsLoaded) {
             User currentUser = context.watch<ProfileBloc>().state.user;
+            List<AbstractSettingsTile> mainSettingsTiles = [
+              SettingsTile.navigation(
+                title: const Padding(
+                  padding: EdgeInsets.only(right: 8.0),
+                  child: Text('Email'),
+                ),
+                value: Text(currentUser.email!),
+                leading: const Icon(Icons.email_rounded),
+                onPressed: (context) {
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return const ChangeEmailDialog();
+                    },
+                  );
+                },
+              ),
+              SettingsTile.navigation(
+                title: const Padding(
+                  padding: EdgeInsets.only(right: 8.0),
+                  child: Text('Name'),
+                ),
+                value: Text(currentUser.name!),
+                leading: const Icon(Icons.person),
+                onPressed: (context) {
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return const ChangeNameDialog();
+                    },
+                  );
+                },
+              ),
+              SettingsTile.navigation(
+                title: const Padding(
+                  padding: EdgeInsets.only(right: 8.0),
+                  child: Text('Title'),
+                ),
+                value: Text(currentUser.title!),
+                leading: const Icon(Icons.badge),
+                onPressed: (context) {
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return const ChangeTitleDialog();
+                    },
+                  );
+                },
+              ),
+              SettingsTile.navigation(
+                title: const Text('Password'),
+                leading: const Icon(Icons.lock_rounded),
+                onPressed: (context) {
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return const ChangePasswordDialog();
+                    },
+                  );
+                },
+              ),
+              SettingsTile.navigation(
+                title: const Text('Sign Out'),
+                leading: const Icon(Icons.logout_rounded),
+                onPressed: (context) {
+                  context.read<AuthBloc>().add(AppLogoutRequested());
+                },
+              ),
+              SettingsTile.navigation(
+                title: const Text('Delete Account'),
+                leading: const Icon(Icons.delete_forever_rounded),
+                onPressed: (context) {
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return const DeleteAccountDialog();
+                    },
+                  );
+                },
+              ),
+            ];
+            if (currentUser.type == 'manager') {
+              mainSettingsTiles.insert(
+                  3,
+                  SettingsTile.navigation(
+                    title: const Padding(
+                      padding: EdgeInsets.only(right: 8.0),
+                      child: Text('Organization'),
+                    ),
+                    value: Text(currentUser.organization ?? 'nope'),
+                    leading: const Icon(Icons.work_rounded),
+                    onPressed: (context) {
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return const ChangeOrganizationDialog();
+                        },
+                      );
+                    },
+                  ));
+            }
             return SettingsList(
               contentPadding:
                   const EdgeInsets.symmetric(horizontal: 6.0, vertical: 8.0),
@@ -39,105 +140,7 @@ class SettingsPage extends StatelessWidget {
                 SettingsSection(
                   //margin: const EdgeInsetsDirectional.all(12.0),
                   title: const Text('Account'),
-                  tiles: [
-                    SettingsTile.navigation(
-                      title: const Padding(
-                        padding: EdgeInsets.only(right: 8.0),
-                        child: Text('Email'),
-                      ),
-                      value: FittedBox(child: Text(currentUser.email!)),
-                      leading: const Icon(Icons.email_rounded),
-                      onPressed: (context) {
-                        showDialog(
-                          context: context,
-                          builder: (context) {
-                            return const ChangeEmailDialog();
-                          },
-                        );
-                      },
-                    ),
-                    SettingsTile.navigation(
-                      title: const Padding(
-                        padding: EdgeInsets.only(right: 8.0),
-                        child: Text('Name'),
-                      ),
-                      value: FittedBox(child: Text(currentUser.name!)),
-                      leading: const Icon(Icons.person),
-                      onPressed: (context) {
-                        showDialog(
-                          context: context,
-                          builder: (context) {
-                            return const ChangeNameDialog();
-                          },
-                        );
-                      },
-                    ),
-                    SettingsTile.navigation(
-                      title: const Padding(
-                        padding: EdgeInsets.only(right: 8.0),
-                        child: Text('Title'),
-                      ),
-                      value: FittedBox(
-                        child: Text(currentUser.title!),
-                      ),
-                      leading: const Icon(Icons.badge),
-                      onPressed: (context) {
-                        showDialog(
-                          context: context,
-                          builder: (context) {
-                            return const ChangeTitleDialog();
-                          },
-                        );
-                      },
-                    ),
-                    SettingsTile.navigation(
-                      title: const Padding(
-                        padding: EdgeInsets.only(right: 8.0),
-                        child: Text('Organization'),
-                      ),
-                      value: FittedBox(child: Text(currentUser.organization!)),
-                      leading: const Icon(Icons.work_rounded),
-                      onPressed: (context) {
-                        showDialog(
-                          context: context,
-                          builder: (context) {
-                            return const ChangeOrganizationDialog();
-                          },
-                        );
-                      },
-                    ),
-                    SettingsTile.navigation(
-                      title: const Text('Password'),
-                      leading: const Icon(Icons.lock_rounded),
-                      onPressed: (context) {
-                        showDialog(
-                          context: context,
-                          builder: (context) {
-                            return const ChangePasswordDialog();
-                          },
-                        );
-                      },
-                    ),
-                    SettingsTile.navigation(
-                      title: const Text('Sign Out'),
-                      leading: const Icon(Icons.logout_rounded),
-                      onPressed: (context) {
-                        context.read<AuthBloc>().add(AppLogoutRequested());
-                      },
-                    ),
-                    SettingsTile.navigation(
-                      title: const Text('Delete Account'),
-                      leading: const Icon(Icons.delete_forever_rounded),
-                      onPressed: (context) {
-                        showDialog(
-                          context: context,
-                          builder: (context) {
-                            return const DeleteAccountDialog();
-                          },
-                        );
-                      },
-                    ),
-                  ],
+                  tiles: mainSettingsTiles,
                 ),
                 SettingsSection(
                   title: const Text('Help & Support'),
