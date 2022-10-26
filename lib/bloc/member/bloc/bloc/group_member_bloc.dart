@@ -22,7 +22,7 @@ class GroupMemberBloc extends Bloc<GroupMemberEvent, GroupMemberState> {
       required InviteBloc inviteBloc})
       : _databaseRepository = databaseRepository,
         _inviteBloc = inviteBloc,
-        super(GroupMemberInitial()) {
+        super(GroupMembersLoading()) {
     on<LoadGroupMembers>(_onLoadGroupMembers);
     on<UpdateGroupMembers>((event, emit) async {
       emit(GroupMembersLoading());
@@ -37,17 +37,19 @@ class GroupMemberBloc extends Bloc<GroupMemberEvent, GroupMemberState> {
     members.clear();
     emit(GroupMembersLoading());
     print('Got ${event.userIds.length} users');
-    await emit.forEach(_databaseRepository.getGroup(event.group.groupId!),
-        onData: (Group group) {
+    _databaseRepository.getGroup(event.group.groupId!).listen((group) {
       currentGroup = group;
       for (String userId in group.groupMemberIds!) {
-        _databaseRepository.getUser(userId).listen((user) {
-          print('${user.name} received from Firebase');
-          members.add(user);
-        });
+        _databaseRepository.getUser(userId).listen(
+          (user) async {
+            print('${user.name} received from Firebase');
+            members.add(user);
+          },
+        );
       }
-      return GroupMembersLoaded(groupMembers: members, group: group);
     });
+    await Future.delayed(const Duration(milliseconds: 300));
+    emit(GroupMembersLoaded(groupMembers: members, group: event.group));
   }
 
   @override
