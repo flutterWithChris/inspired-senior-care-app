@@ -72,6 +72,7 @@ dependencies:
   dotenv: ^2.0.0
   zoom_widget: ^2.0.0
   intl: ^0.17.0
+  upgrader: ^4.8.1
 
 
 

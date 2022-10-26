@@ -3,6 +3,7 @@ import 'package:inspired_senior_care_app/view/widget/featured_category.dart';
 import 'package:inspired_senior_care_app/view/widget/main/bottom_app_bar.dart';
 import 'package:inspired_senior_care_app/view/widget/main/main_app_drawer.dart';
 import 'package:inspired_senior_care_app/view/widget/main/top_app_bar.dart';
+import 'package:upgrader/upgrader.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -14,29 +15,34 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      drawer: const MainAppDrawer(),
-      bottomNavigationBar: const MainBottomAppBar(),
-      appBar: const PreferredSize(
-        preferredSize: Size.fromHeight(60),
-        child: MainTopAppBar(),
+    return UpgradeAlert(
+      upgrader: Upgrader(
+        shouldPopScope: () => true,
       ),
-      body: SingleChildScrollView(
-        reverse: true,
-        physics: const NeverScrollableScrollPhysics(),
-        child: Center(
-          child: Column(
-            //   mainAxisAlignment: MainAxisAlignment.center,
-            children: const <Widget>[
-              Padding(
-                padding: EdgeInsets.only(top: 24, bottom: 30.0),
-                child: Text(
-                  'Monthly Category',
-                  style: TextStyle(fontSize: 30),
+      child: Scaffold(
+        drawer: const MainAppDrawer(),
+        bottomNavigationBar: const MainBottomAppBar(),
+        appBar: const PreferredSize(
+          preferredSize: Size.fromHeight(60),
+          child: MainTopAppBar(),
+        ),
+        body: SingleChildScrollView(
+          reverse: true,
+          physics: const NeverScrollableScrollPhysics(),
+          child: Center(
+            child: Column(
+              //   mainAxisAlignment: MainAxisAlignment.center,
+              children: const <Widget>[
+                Padding(
+                  padding: EdgeInsets.only(top: 24, bottom: 30.0),
+                  child: Text(
+                    'Monthly Category',
+                    style: TextStyle(fontSize: 30),
+                  ),
                 ),
-              ),
-              FeaturedCategory(),
-            ],
+                FeaturedCategory(),
+              ],
+            ),
           ),
         ),
       ),

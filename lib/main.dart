@@ -72,15 +72,6 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   late AuthBloc bloc;
-  late OnboardingBloc _onboardingBloc;
-
-  @override
-  void initState() {
-    // TODO: implement initState
-
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     return MultiRepositoryProvider(
