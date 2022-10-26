@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
+import 'package:inspired_senior_care_app/data/models/bug_report.dart';
 import 'package:inspired_senior_care_app/data/models/category.dart';
 import 'package:inspired_senior_care_app/data/models/group.dart';
 import 'package:inspired_senior_care_app/data/models/response.dart';
@@ -451,6 +452,17 @@ class DatabaseRepository extends BaseDatabaseRepository {
           .update({
         'groupManagerIds': FieldValue.arrayRemove([user.id]),
       });
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> sendBugReport(BugReport bugReport) async {
+    try {
+      await _firebaseFirestore
+          .collection('bug-reports')
+          .doc()
+          .set(bugReport.toMap());
     } catch (e) {
       print(e);
     }

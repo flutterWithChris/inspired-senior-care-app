@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -147,9 +149,12 @@ class SettingsPage extends StatelessWidget {
                   title: const Text('Help & Support'),
                   tiles: [
                     SettingsTile.navigation(
+                      onPressed: (context) => showDialog(
+                          context: context,
+                          builder: (context) =>
+                              ReportBugDialog(currentUser: currentUser)),
                       title: const Text('Report an Issue / Bug'),
                       leading: const Icon(Icons.report),
-                      trailing: const Icon(Icons.chevron_right_rounded),
                     ),
                   ],
                 ),
@@ -727,6 +732,99 @@ class ChangePasswordDialog extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class ReportBugDialog extends StatefulWidget {
+  final User currentUser;
+  const ReportBugDialog({super.key, required this.currentUser});
+
+  @override
+  State<ReportBugDialog> createState() => _ReportBugDialogState();
+}
+
+class _ReportBugDialogState extends State<ReportBugDialog> {
+  final TextEditingController bugReportTextFieldController =
+      TextEditingController();
+  final GlobalKey<FormState> bugFormKey = GlobalKey<FormState>();
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          Text(
+            'Report a Bug/Issue.',
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          const SizedBox(
+            height: 8.0,
+          ),
+          const Text(
+            'Having trouble with the app? Let us know what went wrong!',
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(
+            height: 8.0,
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Form(
+              key: bugFormKey,
+              child: TextFormField(
+                controller: bugReportTextFieldController,
+                validator: (value) {
+                  if (value == null) {
+                    return 'Can\'t submit empty report!';
+                  } else {
+                    return null;
+                  }
+                },
+                minLines: 4,
+                maxLines: 6,
+              ),
+            ),
+          ),
+          ElevatedButton(
+              onPressed: () {
+                if (!bugFormKey.currentState!.validate()) {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text('Can\'t submit empty report!'),
+                    backgroundColor: Colors.redAccent,
+                  ));
+                } else {
+                  context.read<SettingsCubit>().sendBugReport(
+                      bugReportTextFieldController.value.text,
+                      Platform.operatingSystem,
+                      widget.currentUser.name!,
+                      widget.currentUser.email!);
+                }
+              },
+              // icon: const Icon(Icons.send_rounded),
+              child: BlocConsumer<SettingsCubit, SettingsState>(
+                listener: (context, state) async {
+                  if (state is SettingsUpdated) {
+                    await Future.delayed(const Duration(seconds: 2));
+                    if (!mounted) return;
+                    Navigator.pop(context);
+                  }
+                },
+                builder: (context, state) {
+                  if (state is SettingsLoading) {
+                    return LoadingAnimationWidget.bouncingBall(
+                        color: Colors.white, size: 18);
+                  }
+                  if (state is SettingsUpdated) {
+                    return const Text('Bug Report Sent!');
+                  }
+                  return const Text('Send Report');
+                },
+              ))
+        ]),
       ),
     );
   }

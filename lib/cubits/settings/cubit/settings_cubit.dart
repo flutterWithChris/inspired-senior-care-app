@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
+import 'package:inspired_senior_care_app/data/models/bug_report.dart';
 import 'package:inspired_senior_care_app/data/repositories/auth/auth_repository.dart';
 import 'package:inspired_senior_care_app/data/repositories/database/database_repository.dart';
 import 'package:meta/meta.dart';
@@ -28,6 +29,21 @@ class SettingsCubit extends Cubit<SettingsState> {
   void loadSettings() => emit(SettingsLoaded());
   void deleteAccount(String email, String password) =>
       _onDeleteAccountRequest(email, password);
+  void sendBugReport(
+          String report, String deviceType, String userId, String userEmail) =>
+      _onSendBugReport(report, deviceType, userId, userEmail);
+
+  void _onSendBugReport(
+      String report, String deviceType, String userId, String userEmail) async {
+    await _databaseRepository.sendBugReport(BugReport(
+        report: report,
+        deviceType: deviceType,
+        userId: userId,
+        userEmail: userEmail));
+    emit(SettingsUpdated());
+    await Future.delayed(const Duration(seconds: 2));
+    emit(SettingsLoaded());
+  }
 
   void _onPasswordResetRequest(String email) async {
     //  emit(SettingsLoading());

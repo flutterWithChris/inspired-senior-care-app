@@ -4,7 +4,6 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:inspired_senior_care_app/bloc/invite/invite_bloc.dart';
-import 'package:inspired_senior_care_app/cubits/login/login_cubit.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 import '../../../data/models/invite.dart';
@@ -23,18 +22,18 @@ class MainTopAppBar extends StatelessWidget {
       foregroundColor: Colors.black87,
       centerTitle: true,
       toolbarHeight: 60,
-      actions: [
-        TextButton.icon(
-            onPressed: () {
-              context.read<LoginCubit>().signOut();
-            },
-            icon: const Icon(Icons.logout_rounded),
-            label: const Text('Logout')),
-        const Padding(
-          padding: EdgeInsets.only(right: 8.0),
-          child: InboxButton(),
-        )
-      ],
+      // actions: [
+      //   TextButton.icon(
+      //       onPressed: () {
+      //         context.read<LoginCubit>().signOut();
+      //       },
+      //       icon: const Icon(Icons.logout_rounded),
+      //       label: const Text('Logout')),
+      //   const Padding(
+      //     padding: EdgeInsets.only(right: 8.0),
+      //     child: InboxButton(),
+      //   )
+      // ],
       title: title != null
           ? Text(title!)
           : Image.asset(
