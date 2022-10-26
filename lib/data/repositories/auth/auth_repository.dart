@@ -41,8 +41,6 @@ class AuthRepository extends BaseAuthRepository {
       final auth.User? user = credential.user;
       return user;
     } on auth.FirebaseAuthException catch (e) {
-      print('Failed with error code: ${e.code}');
-      print(e.message);
       final SnackBar snackBar = SnackBar(
         content: Text(e.message!),
         backgroundColor: Colors.redAccent,
@@ -58,7 +56,6 @@ class AuthRepository extends BaseAuthRepository {
     required String password,
   }) async {
     try {
-      print('Sign in attempted....$email');
       final credential = await _firebaseAuth.signInWithEmailAndPassword(
           email: email, password: password);
       await _firebaseAuth.currentUser!
@@ -66,8 +63,6 @@ class AuthRepository extends BaseAuthRepository {
       final auth.User? user = credential.user;
       return user;
     } on auth.FirebaseAuthException catch (e) {
-      print('Failed with error code: ${e.code}');
-      print(e.message);
       final SnackBar snackBar = SnackBar(
         content: Text(e.message!),
         backgroundColor: Colors.redAccent,
@@ -86,9 +81,8 @@ class AuthRepository extends BaseAuthRepository {
   Future<void> requestPasswordReset(String email) async {
     try {
       await _firebaseAuth.sendPasswordResetEmail(email: email);
+      // TODO: Confirm Password reset.
     } on auth.FirebaseAuthException catch (e) {
-      print('Failed with error code: ${e.code}');
-      print(e.message);
       final SnackBar snackBar = SnackBar(
         content: Text(e.message!),
         backgroundColor: Colors.redAccent,
@@ -106,8 +100,6 @@ class AuthRepository extends BaseAuthRepository {
       await _firebaseAuth.currentUser!.reauthenticateWithCredential(credential);
       await _firebaseAuth.currentUser!.updateEmail(newEmail);
     } on auth.FirebaseAuthException catch (e) {
-      print('Failed with error code: ${e.code}');
-      print(e.message);
       final SnackBar snackBar = SnackBar(
         content: Text(e.message!),
         backgroundColor: Colors.redAccent,
@@ -125,8 +117,6 @@ class AuthRepository extends BaseAuthRepository {
       await _firebaseAuth.currentUser!.reauthenticateWithCredential(credential);
       await _firebaseAuth.currentUser!.delete();
     } on auth.FirebaseAuthException catch (e) {
-      print('Failed with error code: ${e.code}');
-      print(e.message);
       final SnackBar snackBar = SnackBar(
         content: Text(e.message!),
         backgroundColor: Colors.redAccent,

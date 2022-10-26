@@ -53,9 +53,7 @@ class SettingsCubit extends Cubit<SettingsState> {
       emit(SettingsUpdated());
       await Future.delayed(const Duration(seconds: 1));
       emit(SettingsLoaded());
-    } catch (e) {
-      print(e);
-    }
+    } catch (e) {}
   }
 
   void _onDeleteAccountRequest(String email, String password) async {
@@ -65,9 +63,7 @@ class SettingsCubit extends Cubit<SettingsState> {
       emit(SettingsUpdated());
       await Future.delayed(const Duration(seconds: 1));
       emit(SettingsLoaded());
-    } catch (e) {
-      print(e);
-    }
+    } catch (e) {}
   }
 
   void _onChangeNameRequest(String name) async {
@@ -104,9 +100,7 @@ class SettingsCubit extends Cubit<SettingsState> {
       emit(SettingsUpdated());
       await Future.delayed(const Duration(seconds: 1));
       loadSettings();
-    } catch (e) {
-      print(e);
-    }
+    } catch (e) {}
   }
 
   void _onChangeTitleRequest(String title) async {

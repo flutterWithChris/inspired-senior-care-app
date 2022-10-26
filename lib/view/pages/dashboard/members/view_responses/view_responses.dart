@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -304,9 +305,12 @@ class _DeckState extends State<Deck> {
               }
               if (state is ResponseLoaded) {
                 return InfiniteCarousel.builder(
+                  physics:
+                      const InfiniteScrollPhysics(parent: PageScrollPhysics()),
                   loop: false,
+                  scrollBehavior: const CupertinoScrollBehavior(),
                   controller: widget.deckScrollController,
-                  velocityFactor: 0.3,
+                  velocityFactor: 0.25,
                   itemCount: state.responses?.length ?? 1,
                   itemExtent: 330,
                   onIndexChanged: (p0) {
@@ -366,7 +370,7 @@ class DeckCompleteDialog extends StatelessWidget {
                 padding: const EdgeInsets.only(top: 12.0),
                 child: Text(
                   'All Done. Congrats!',
-                  style: Theme.of(context).textTheme.headline5,
+                  style: Theme.of(context).textTheme.headlineSmall,
                 ),
               ),
               Padding(
@@ -628,9 +632,9 @@ class ShareTextField extends StatefulWidget {
 }
 
 class _ShareTextFieldState extends State<ShareTextField> {
+  bool reachedCharacterLimit = false;
   @override
   Widget build(BuildContext context) {
-    bool reachedCharacterLimit = false;
     return BlocBuilder<CardBloc, CardState>(
       builder: (context, state) {
         /* if(state is CardsFailed) {
@@ -657,108 +661,106 @@ class _ShareTextFieldState extends State<ShareTextField> {
               }
               if (state is ResponseLoaded) {
                 List<Response> responses = state.responses!;
-                return Container(
-                    height: 150,
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(15)),
-                        boxShadow: [
-                          BoxShadow(
-                              blurRadius: 10,
-                              color: Colors.grey.shade300,
-                              spreadRadius: 5),
-                        ]),
-                    child: InfiniteCarousel.builder(
-                      velocityFactor: 0.3,
-                      controller: widget.textFieldScrollController,
-                      loop: false,
-                      itemCount: responses.length,
-                      itemExtent: 360,
-                      onIndexChanged: (p0) {
-                        widget.deckScrollController.animateToItem(p0,
-                            curve: Curves.easeOutQuad,
-                            duration: const Duration(seconds: 1));
-                        context.read<ResponseDeckCubit>().scrollDeck(p0);
-                      },
-                      itemBuilder: (context, itemIndex, realIndex) {
-                        print('Response Count: ${responses.length}');
-                        print('Item Index: $itemIndex');
-                        print('Real Index: $realIndex');
-                        final ScrollController textFieldScrollController =
-                            ScrollController();
+                return SizedBox(
+                  height: 160,
+                  child: InfiniteCarousel.builder(
+                    physics: const InfiniteScrollPhysics(
+                        parent: PageScrollPhysics()),
+                    velocityFactor: 0.25,
+                    controller: widget.textFieldScrollController,
+                    loop: false,
+                    itemCount: responses.length,
+                    itemExtent: 380,
+                    onIndexChanged: (p0) {
+                      widget.deckScrollController.animateToItem(p0,
+                          curve: Curves.easeOutQuad,
+                          duration: const Duration(seconds: 1));
+                      context.read<ResponseDeckCubit>().scrollDeck(p0);
+                    },
+                    itemBuilder: (context, itemIndex, realIndex) {
+                      final ScrollController textFieldScrollController =
+                          ScrollController();
 
-                        return Container(
-                          height: 50,
-                          alignment: Alignment.center,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 10),
-                          margin: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 10),
-                          decoration: BoxDecoration(
-                            color: Colors.grey.shade300,
-                            borderRadius: BorderRadius.circular(10),
+                      return Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Container(
+                          height: 140,
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.all(Radius.circular(15)),
                           ),
-                          child:
-                              BlocBuilder<ResponseDeckCubit, ResponseDeckState>(
-                            buildWhen: (previous, current) =>
-                                current.status != previous.status,
-                            builder: (context, state) {
-                              if (state.status == ScrollStatus.scrolled ||
-                                  state.status == ScrollStatus.stopped) {
-                                if (realIndex - 1 > responses.length) {
-                                  widget.shareFieldController.text =
-                                      'No Response Submitted Yet!';
-                                } else {
-                                  String currentResponse = responses
-                                      .elementAt((state.index))
-                                      .response;
-                                  widget.shareFieldController.text =
-                                      currentResponse;
+                          child: Container(
+                            height: 50,
+                            alignment: Alignment.center,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 10),
+                            margin: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade300,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: BlocBuilder<ResponseDeckCubit,
+                                ResponseDeckState>(
+                              buildWhen: (previous, current) =>
+                                  current.status != previous.status,
+                              builder: (context, state) {
+                                String currentResponse = '';
+                                if (state.status == ScrollStatus.scrolled ||
+                                    state.status == ScrollStatus.stopped) {
+                                  if (realIndex - 1 > responses.length) {
+                                    widget.shareFieldController.text =
+                                        'No Response Submitted Yet!';
+                                  } else {
+                                    currentResponse = responses
+                                        .elementAt((state.index))
+                                        .response;
+                                    widget.shareFieldController.text =
+                                        currentResponse;
+                                  }
+                                  return TextField(
+                                    controller: widget.shareFieldController,
+                                    autofocus: false,
+                                    readOnly: true,
+                                    textAlignVertical: TextAlignVertical.top,
+                                    textAlign: TextAlign.start,
+                                    minLines: 4,
+                                    maxLines: 4,
+                                    decoration: const InputDecoration.collapsed(
+                                        hintText: 'Share your response..'),
+                                  );
                                 }
-                                return TextField(
-                                  controller: widget.shareFieldController,
-                                  autofocus: false,
-                                  readOnly: true,
-                                  textAlignVertical: TextAlignVertical.top,
-                                  textAlign: TextAlign.start,
-                                  minLines: 4,
-                                  maxLines: 4,
-                                  decoration: const InputDecoration.collapsed(
-                                      hintText: 'Share your response..'),
+                                widget.shareFieldController.text =
+                                    responses[0].response;
+
+                                return Scrollbar(
+                                  radius: const Radius.circular(12.0),
+                                  controller: textFieldScrollController,
+                                  child: TextField(
+                                    scrollPhysics:
+                                        const BouncingScrollPhysics(),
+                                    style: const TextStyle(
+                                        overflow: TextOverflow.ellipsis),
+                                    scrollController: textFieldScrollController,
+                                    controller: widget.shareFieldController,
+                                    autofocus: false,
+                                    readOnly: true,
+                                    textAlignVertical: TextAlignVertical.top,
+                                    textAlign: TextAlign.start,
+                                    minLines: 4,
+                                    maxLines: 4,
+                                    decoration: const InputDecoration.collapsed(
+                                        hintText: 'Share your response..'),
+                                  ),
                                 );
-                              }
-                              widget.shareFieldController.text =
-                                  responses[0].response;
-                              if (widget.shareFieldController.text.characters
-                                      .length >
-                                  100) {
-                                reachedCharacterLimit = true;
-                              }
-                              return Scrollbar(
-                                radius: const Radius.circular(12.0),
-                                controller: textFieldScrollController,
-                                thumbVisibility: reachedCharacterLimit,
-                                // trackVisibility: reachedCharacterLimit,
-                                child: TextField(
-                                  onChanged: (value) {},
-                                  scrollController: textFieldScrollController,
-                                  controller: widget.shareFieldController,
-                                  autofocus: false,
-                                  readOnly: true,
-                                  textAlignVertical: TextAlignVertical.top,
-                                  textAlign: TextAlign.start,
-                                  minLines: 4,
-                                  maxLines: 4,
-                                  decoration: const InputDecoration.collapsed(
-                                      hintText: 'Share your response..'),
-                                ),
-                              );
-                            },
+                              },
+                            ),
                           ),
-                        );
-                      },
-                    ));
+                        ),
+                      );
+                    },
+                  ),
+                );
               } else {
                 return const Center(
                   child: Text('Someting Went Wrong'),
@@ -891,19 +893,22 @@ class InfoCard extends StatelessWidget {
           );
         }
         if (state is CardsLoaded) {
-          return Card(
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12.0)),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16.0),
-              child: CachedNetworkImage(
-                placeholder: (context, url) => Center(
-                  child: LoadingAnimationWidget.discreteCircle(
-                      color: Colors.blueAccent, size: 30.0),
+          return SizedBox(
+            width: 330,
+            child: Card(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.0)),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                child: CachedNetworkImage(
+                  placeholder: (context, url) => Center(
+                    child: LoadingAnimationWidget.discreteCircle(
+                        color: Colors.blueAccent, size: 30.0),
+                  ),
+                  imageUrl: state.cardImageUrls[cardNumber - 1],
+                  height: 195,
+                  fit: BoxFit.fitHeight,
                 ),
-                imageUrl: state.cardImageUrls[cardNumber - 1],
-                height: 195,
-                fit: BoxFit.fitHeight,
               ),
             ),
           );

@@ -153,15 +153,9 @@ class _DeckPageState extends State<DeckPage> {
                             ));
                   }
                 }
-                print(
-                    'Condition 1: ${currentCard >= (widget.category.totalCards! / 2).round()}');
-                print(
-                    'Condition 2: ${(isSubscribed == false || isSubscribed == null)}');
+
                 if (currentCard >= (widget.category.totalCards! / 3).round() &&
                     (isSubscribed == false || isSubscribed == null)) {
-                  print('Satisfied Conditions***');
-                  print('Is Subscribed: $isSubscribed');
-                  print('Current Card Is: $currentCard');
                   WidgetsBinding.instance
                       .addPostFrameCallback((_) async => await showDialog(
                             barrierDismissible: false,
@@ -189,11 +183,11 @@ class _DeckPageState extends State<DeckPage> {
                   direction: Axis.vertical,
                   children: [
                     Flexible(
-                      flex: 4,
+                      flex: 5,
                       child: SingleChildScrollView(
                         reverse: true,
                         child: Padding(
-                          padding: const EdgeInsets.only(top: 36.0),
+                          padding: const EdgeInsets.only(top: 40.0),
                           child: AnimatedSlide(
                             curve: Curves.decelerate,
                             duration: const Duration(milliseconds: 200),
@@ -461,7 +455,7 @@ class DeckCompleteDialog extends StatelessWidget {
                 padding: const EdgeInsets.only(top: 12.0),
                 child: Text(
                   'All Done. Congrats!',
-                  style: Theme.of(context).textTheme.headline5,
+                  style: Theme.of(context).textTheme.headlineSmall,
                 ),
               ),
               Padding(
@@ -587,7 +581,7 @@ class _PremiumOfferDialogState extends State<PremiumIndividualOfferDialog> {
                                 const EdgeInsets.only(top: 12.0, bottom: 8.0),
                             child: Text(
                               'Upgrade To Keep Going!',
-                              style: Theme.of(context).textTheme.headline5,
+                              style: Theme.of(context).textTheme.headlineSmall,
                             ),
                           ),
                           SizedBox(
@@ -738,7 +732,7 @@ class _PremiumOrganizationOfferDialogState
                                 const EdgeInsets.only(top: 12.0, bottom: 8.0),
                             child: Text(
                               'Upgrade Organization!',
-                              style: Theme.of(context).textTheme.headline5,
+                              style: Theme.of(context).textTheme.headlineSmall,
                             ),
                           ),
                           SizedBox(
