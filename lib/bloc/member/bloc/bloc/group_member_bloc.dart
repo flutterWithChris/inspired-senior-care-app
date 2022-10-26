@@ -34,11 +34,11 @@ class GroupMemberBloc extends Bloc<GroupMemberEvent, GroupMemberState> {
 
   void _onLoadGroupMembers(
       LoadGroupMembers event, Emitter<GroupMemberState> emit) async {
+    members.clear();
     emit(GroupMembersLoading());
     print('Got ${event.userIds.length} users');
     await emit.forEach(_databaseRepository.getGroup(event.group.groupId!),
         onData: (Group group) {
-      members.clear();
       currentGroup = group;
       for (String userId in group.groupMemberIds!) {
         _databaseRepository.getUser(userId).listen((user) {
