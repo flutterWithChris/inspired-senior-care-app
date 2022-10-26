@@ -800,8 +800,9 @@ class _ReportBugDialogState extends State<ReportBugDialog> {
                   context.read<SettingsCubit>().sendBugReport(
                       bugReportTextFieldController.value.text,
                       Platform.operatingSystem,
-                      widget.currentUser.name!,
-                      widget.currentUser.email!);
+                      widget.currentUser.id!,
+                      widget.currentUser.email!,
+                      widget.currentUser.name!);
                 }
               },
               // icon: const Icon(Icons.send_rounded),

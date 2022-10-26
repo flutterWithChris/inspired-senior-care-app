@@ -29,17 +29,18 @@ class SettingsCubit extends Cubit<SettingsState> {
   void loadSettings() => emit(SettingsLoaded());
   void deleteAccount(String email, String password) =>
       _onDeleteAccountRequest(email, password);
-  void sendBugReport(
-          String report, String deviceType, String userId, String userEmail) =>
-      _onSendBugReport(report, deviceType, userId, userEmail);
+  void sendBugReport(String report, String deviceType, String userId,
+          String userEmail, String userName) =>
+      _onSendBugReport(report, deviceType, userId, userEmail, userName);
 
-  void _onSendBugReport(
-      String report, String deviceType, String userId, String userEmail) async {
+  void _onSendBugReport(String report, String deviceType, String userId,
+      String userEmail, String userName) async {
     await _databaseRepository.sendBugReport(BugReport(
         report: report,
         deviceType: deviceType,
         userId: userId,
-        userEmail: userEmail));
+        userEmail: userEmail,
+        userName: userName));
     emit(SettingsUpdated());
     await Future.delayed(const Duration(seconds: 2));
     emit(SettingsLoaded());
