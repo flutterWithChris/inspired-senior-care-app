@@ -47,17 +47,10 @@ class _BasicInfoPageState extends State<BasicInfoPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 12.0),
+                        padding: const EdgeInsets.symmetric(vertical: 24.0),
                         child: Text(
                           'First the basics.',
-                          style: Theme.of(context).textTheme.headline4,
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 16.0),
-                        child: Text(
-                          'Email Sign Up.',
-                          style: Theme.of(context).textTheme.headline5,
+                          style: Theme.of(context).textTheme.headlineMedium,
                         ),
                       ),
                       SizedBox(
@@ -117,8 +110,9 @@ class _BasicInfoPageState extends State<BasicInfoPage> {
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 8.0),
                         child: SizedBox(
-                          height: 70,
+                          height: 80,
                           child: FlutterPwValidator(
+                              defaultColor: Colors.black26,
                               width: 300,
                               height: 50,
                               minLength: 6,
