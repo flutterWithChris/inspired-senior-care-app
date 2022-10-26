@@ -34,7 +34,6 @@ class _DeckPageState extends State<DeckPage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     if (context
             .read<ProfileBloc>()
             .state
@@ -51,31 +50,6 @@ class _DeckPageState extends State<DeckPage> {
             .currentCard![widget.category.name] ??
         0;
     isSubscribed = context.read<PurchasesBloc>().state.isSubscribed;
-    print('Init Is Subscribed: $isSubscribed');
-    print('Init Current Card Is: $currentCard');
-    // if (currentCard >= (widget.category.totalCards! / 2).round() &&
-    //     (isSubscribed == false || isSubscribed == null)) {
-    //   print('Is Subscribed: $isSubscribed');
-    //   WidgetsBinding.instance.addPostFrameCallback((_) => showDialog(
-    //         barrierDismissible: false,
-    //         context: context,
-    //         builder: (context) {
-    //           return WillPopScope(
-    //               onWillPop: () {
-    //                 context.read<ProfileBloc>().state.user.type == 'user'
-    //                     ? Navigator.popUntil(
-    //                         context, ModalRoute.withName('categories'))
-    //                     : Navigator.popUntil(context,
-    //                         ModalRoute.withName('manager-categories-share'));
-
-    //                 return Future.value(false);
-    //               },
-    //               child: context.read<ProfileBloc>().state.user.type == 'user'
-    //                   ? const PremiumIndividualOfferDialog()
-    //                   : const PremiumOrganizationOfferDialog());
-    //         },
-    //       ));
-    // }
     super.initState();
   }
 
