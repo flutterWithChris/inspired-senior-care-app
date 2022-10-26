@@ -98,9 +98,13 @@ class AuthRepository extends BaseAuthRepository {
   }
 
   @override
-  Future<void> requestEmailReset(String email) async {
+  Future<void> changeEmail(
+      String oldEmail, String newEmail, String password) async {
     try {
-      await _firebaseAuth.currentUser!.updateEmail(email);
+      final credential = auth.EmailAuthProvider.credential(
+          email: oldEmail, password: password);
+      await _firebaseAuth.currentUser!.reauthenticateWithCredential(credential);
+      await _firebaseAuth.currentUser!.updateEmail(newEmail);
     } on auth.FirebaseAuthException catch (e) {
       print('Failed with error code: ${e.code}');
       print(e.message);

@@ -19,7 +19,8 @@ class SettingsCubit extends Cubit<SettingsState> {
         _profileBloc = profileBloc,
         super(SettingsLoaded());
   void passwordResetRequest(String email) => _onPasswordResetRequest(email);
-  void changeEmail(String email) => _onChangeEmailRequest(email);
+  void changeEmail(String oldEmail, String newEmail, String password) =>
+      _onChangeEmailRequest(oldEmail, newEmail, password);
   void changeName(String name) => _onChangeNameRequest(name);
   void changeOrganization(String organization) =>
       _onChangeOrganizationRequest(organization);
@@ -65,11 +66,12 @@ class SettingsCubit extends Cubit<SettingsState> {
     }
   }
 
-  void _onChangeEmailRequest(String email) async {
+  void _onChangeEmailRequest(
+      String oldEmail, String newEmail, String password) async {
     try {
-      _profileBloc.add(
-          UpdateProfile(user: _profileBloc.state.user.copyWith(email: email)));
-      await _authRepository.currentUser!.updateEmail(email);
+      _profileBloc.add(UpdateProfile(
+          user: _profileBloc.state.user.copyWith(email: newEmail)));
+      await _authRepository.changeEmail(oldEmail, newEmail, password);
       emit(SettingsUpdated());
       await Future.delayed(const Duration(seconds: 1));
       loadSettings();
