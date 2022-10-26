@@ -22,18 +22,18 @@ class MainTopAppBar extends StatelessWidget {
       foregroundColor: Colors.black87,
       centerTitle: true,
       toolbarHeight: 60,
-      actions: const [
-        // TextButton.icon(
-        //     onPressed: () {
-        //       context.read<LoginCubit>().signOut();
-        //     },
-        //     icon: const Icon(Icons.logout_rounded),
-        //     label: const Text('Logout'))
-        Padding(
-          padding: EdgeInsets.only(right: 8.0),
-          child: InboxButton(),
-        )
-      ],
+      // actions: [
+      //   TextButton.icon(
+      //       onPressed: () {
+      //         context.read<LoginCubit>().signOut();
+      //       },
+      //       icon: const Icon(Icons.logout_rounded),
+      //       label: const Text('Logout')),
+      //   const Padding(
+      //     padding: EdgeInsets.only(right: 8.0),
+      //     child: InboxButton(),
+      //   )
+      // ],
       title: title != null
           ? Text(title!)
           : Image.asset(
@@ -204,7 +204,7 @@ class InviteList extends StatelessWidget {
                         'No Invites!',
                         style: Theme.of(context)
                             .textTheme
-                            .subtitle2!
+                            .titleSmall!
                             .copyWith(color: Colors.grey.shade600),
                       ),
                     ),
@@ -245,12 +245,12 @@ class GroupInvite extends StatelessWidget {
                   '${thisInvite.inviterName.split(' ')[0]} ',
                   style: Theme.of(context)
                       .textTheme
-                      .subtitle2!
+                      .titleSmall!
                       .copyWith(color: Colors.blue),
                 ),
                 Text(
                   'invited you to:',
-                  style: Theme.of(context).textTheme.subtitle2,
+                  style: Theme.of(context).textTheme.titleSmall,
                 ),
               ],
             ),
@@ -308,11 +308,11 @@ class GroupInvite extends StatelessWidget {
               children: [
                 Text(
                   'As a',
-                  style: Theme.of(context).textTheme.subtitle2!,
+                  style: Theme.of(context).textTheme.titleSmall!,
                 ),
                 Text(
                   ' ${thisInvite.inviteType}',
-                  style: Theme.of(context).textTheme.subtitle2!.copyWith(
+                  style: Theme.of(context).textTheme.titleSmall!.copyWith(
                         color: Colors.blue,
                       ),
                 ),
@@ -361,12 +361,12 @@ class DeclinedGroupInvite extends StatelessWidget {
                       text: '${thisInvite.inviterName.split(' ')[0]} ',
                       style: Theme.of(context)
                           .textTheme
-                          .subtitle2!
+                          .titleSmall!
                           .copyWith(color: Colors.blue),
                     ),
                     TextSpan(
                       text: 'declined your invite to:',
-                      style: Theme.of(context).textTheme.subtitle2,
+                      style: Theme.of(context).textTheme.titleSmall,
                     ),
                   ])),
                 ],
@@ -468,12 +468,12 @@ class AcceptedGroupInvite extends StatelessWidget {
                       text: '${thisInvite.inviterName.split(' ')[0]} ',
                       style: Theme.of(context)
                           .textTheme
-                          .subtitle2!
+                          .titleSmall!
                           .copyWith(color: Colors.blue),
                     ),
                     TextSpan(
                       text: 'accepted your invite to:',
-                      style: Theme.of(context).textTheme.subtitle2,
+                      style: Theme.of(context).textTheme.titleSmall,
                     ),
                   ])),
                 ],

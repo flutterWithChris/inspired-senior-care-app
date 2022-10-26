@@ -28,7 +28,7 @@ class ManagerShareDeckPage extends StatefulWidget {
 class _ManagerShareDeckPageState extends State<ManagerShareDeckPage> {
   bool isSwipeDisabled = true;
   bool isCategoryComplete = false;
-  bool isCardZoomed = false;
+
   int currentCard = 0;
   InfiniteScrollController deckScrollController = InfiniteScrollController();
 
@@ -50,7 +50,7 @@ class _ManagerShareDeckPageState extends State<ManagerShareDeckPage> {
   @override
   Widget build(BuildContext context) {
     int currentCard = context.watch<DeckCubit>().currentCardNumber;
-
+    bool isCardZoomed = false;
     final InfiniteScrollController deckScrollController =
         InfiniteScrollController();
 
@@ -63,7 +63,9 @@ class _ManagerShareDeckPageState extends State<ManagerShareDeckPage> {
         preferredSize: const Size.fromHeight(50),
         child: BlocConsumer<DeckCubit, DeckState>(
           listener: (context, state) {
-            if (state.status == DeckStatus.zoomed) {}
+            if (state.status == DeckStatus.zoomed) {
+              print('Deck Zoomed');
+            }
           },
           builder: (context, state) {
             if (state.status == DeckStatus.zoomed) {
@@ -183,11 +185,11 @@ class _ManagerShareDeckPageState extends State<ManagerShareDeckPage> {
                       direction: Axis.vertical,
                       children: [
                         Flexible(
-                          flex: 4,
+                          flex: 5,
                           child: SingleChildScrollView(
                             reverse: true,
                             child: Padding(
-                              padding: const EdgeInsets.only(top: 36.0),
+                              padding: const EdgeInsets.only(top: 40.0),
                               child: AnimatedSlide(
                                 curve: Curves.decelerate,
                                 duration: const Duration(milliseconds: 200),
@@ -248,17 +250,17 @@ class _ManagerShareDeckPageState extends State<ManagerShareDeckPage> {
                         Flexible(
                           child: AnimatedOpacity(
                             duration: const Duration(milliseconds: 100),
-                            opacity: isCardZoomed ? 0 : 1.0,
+                            opacity: context.watch<DeckCubit>().state.status ==
+                                    DeckStatus.zoomed
+                                ? 0
+                                : 1.0,
                             child: Padding(
                               padding: const EdgeInsets.only(
                                   top: 24.0, bottom: 24.0),
-                              child: Visibility(
-                                visible: isSwipeDisabled ? true : false,
-                                child: ShareButton(
-                                    category: state.category,
-                                    formKey: shareFieldFormKey,
-                                    categoryName: state.category.name),
-                              ),
+                              child: ShareButton(
+                                  category: state.category,
+                                  formKey: shareFieldFormKey,
+                                  categoryName: state.category.name),
                             ),
                           ),
                         )
@@ -430,7 +432,7 @@ class Deck extends StatelessWidget {
         if (state is CardsLoaded) {
           return InfiniteCarousel.builder(
             //anchor: -20.0,
-            // physics: const PageScrollPhysics(),
+            physics: const InfiniteScrollPhysics(parent: PageScrollPhysics()),
             center: true,
             loop: false,
             controller: deckScrollController,
@@ -472,7 +474,7 @@ class DeckCompleteDialog extends StatelessWidget {
                 padding: const EdgeInsets.only(top: 12.0),
                 child: Text(
                   'All Done. Congrats!',
-                  style: Theme.of(context).textTheme.headline5,
+                  style: Theme.of(context).textTheme.headlineSmall,
                 ),
               ),
               Padding(
@@ -600,7 +602,7 @@ class _PremiumOfferDialogState extends State<PremiumIndividualOfferDialog> {
                                 const EdgeInsets.only(top: 12.0, bottom: 8.0),
                             child: Text(
                               'Upgrade To Keep Going!',
-                              style: Theme.of(context).textTheme.headline5,
+                              style: Theme.of(context).textTheme.headlineSmall,
                             ),
                           ),
                           SizedBox(
@@ -745,7 +747,7 @@ class _PremiumOrganizationOfferDialogState
                                 const EdgeInsets.only(top: 12.0, bottom: 8.0),
                             child: Text(
                               'Upgrade Organization!',
-                              style: Theme.of(context).textTheme.headline5,
+                              style: Theme.of(context).textTheme.headlineSmall,
                             ),
                           ),
                           SizedBox(
@@ -1118,8 +1120,8 @@ class ShareButton extends StatelessWidget {
       ),
       onPressed: () {
         // * Zoom Deck on Press
-        var deckCubit = context.read<DeckCubit>();
-        deckCubit.zoomDeck();
+        context.read<DeckCubit>().zoomDeck();
+
         // * Shows Bottom Sheet for Response
         var bottomSheet = showBottomSheet(
           backgroundColor: Colors.transparent,
@@ -1159,7 +1161,7 @@ class ShareButton extends StatelessWidget {
         );
         Container();
         bottomSheet.closed.then((value) {
-          deckCubit.unzoomDeck();
+          context.read<DeckCubit>().unzoomDeck();
         });
       },
     );
@@ -1181,10 +1183,10 @@ class ViewResponsesButton extends StatelessWidget {
         FontAwesomeIcons.eye,
         size: 16,
       ),
-      onPressed: () {
+      onPressed: () async {
         // * Zoom Deck on Press
-        var deckCubit = context.read<DeckCubit>();
-        deckCubit.zoomDeck();
+
+        context.read<DeckCubit>().zoomDeck();
         // * Shows Bottom Sheet for Response
         var viewResponseBottomSheet = showBottomSheet(
           context: context,
@@ -1220,8 +1222,8 @@ class ViewResponsesButton extends StatelessWidget {
           },
         );
         Container();
-        viewResponseBottomSheet.closed.then((value) {
-          deckCubit.unzoomDeck();
+        await viewResponseBottomSheet.closed.then((value) {
+          context.read<DeckCubit>().unzoomDeck();
         });
       },
     );

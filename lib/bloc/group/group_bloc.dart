@@ -91,9 +91,7 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
       await Future.delayed(const Duration(seconds: 1));
       emit(GroupLoading());
       add(LoadGroups(userId: event.manager.id!));
-    } catch (e) {
-      print(e);
-    }
+    } catch (e) {}
   }
 
   void _onUpdateGroup(UpdateGroup event, Emitter<GroupState> emit) async {
@@ -128,7 +126,6 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
             : await emit.forEach(
                 _databaseRepository.getManagerGroups(currentUser.id!),
                 onData: (List<Group> data) {
-                  print('Bloc received ${data.length} groups***');
                   return GroupLoaded(myGroups: data);
                 },
               );

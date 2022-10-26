@@ -166,46 +166,29 @@ class _RemoveMemberDialogState extends State<RemoveMemberDialog> {
           User user = state.user;
           Group group = state.group;
           return Dialog(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    'Remove Member?',
-                    style: Theme.of(context).textTheme.headline5,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 8.0),
-                  child: Text('Type ${user.name} to confirm.'),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Form(
-                    key: removeMemberForm,
-                    child: TextFormField(
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      validator: (value) {
-                        if (value != user.name) {
-                          return 'Name doesn\'t match!';
-                        } else {
-                          return null;
-                        }
-                      },
-                      controller: textFieldController,
-                      decoration: InputDecoration(hintText: '${user.name}'),
+            child: Padding(
+              padding:
+                  const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      'Remove Member?',
+                      style: Theme.of(context).textTheme.headline5,
                     ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.redAccent),
-                      onPressed: () async {
-                        if (removeMemberForm.currentState!.validate()) {
-                          print('Remove Member Fired');
+                  const Padding(
+                    padding: EdgeInsets.only(bottom: 8.0),
+                    child: Text('This cannot be undone.'),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.redAccent),
+                        onPressed: () async {
                           context.read<MemberBloc>().add(
                               RemoveMemberFromGroup(group: group, user: user));
                           List<String> updatedMembers = group.groupMemberIds!
@@ -217,45 +200,43 @@ class _RemoveMemberDialogState extends State<RemoveMemberDialog> {
                               const Duration(milliseconds: 1000));
                           if (!mounted) return;
                           context.goNamed('dashboard');
-                        } else {
-                          print('Form not valid');
-                        }
-                      },
-                      child: BlocConsumer<MemberBloc, MemberState>(
-                        listener: (context, state) async {
-                          if (state is MemberRemoved) {
-                            // context.pop();
-                          }
                         },
-                        builder: (context, state) {
-                          if (state is MemberFailed) {
-                            return const Text('Error Removing Member!');
-                          }
-                          if (state is MemberLoading) {
-                            return LoadingAnimationWidget.fourRotatingDots(
-                                color: Colors.blue, size: 15);
-                          }
-                          if (state is MemberLoaded) {
-                            return const Text('Confirm Removal');
-                          }
-                          if (state is MemberRemoved) {
-                            return Wrap(
-                              spacing: 8.0,
-                              crossAxisAlignment: WrapCrossAlignment.center,
-                              children: const [
-                                Text('Member Removed!'),
-                                Icon(Icons.check_circle_rounded),
-                              ],
-                            );
-                          } else {
-                            return const Center(
-                              child: Text('Something Went Wrong!'),
-                            );
-                          }
-                        },
-                      )),
-                ),
-              ],
+                        child: BlocConsumer<MemberBloc, MemberState>(
+                          listener: (context, state) async {
+                            if (state is MemberRemoved) {
+                              // context.pop();
+                            }
+                          },
+                          builder: (context, state) {
+                            if (state is MemberFailed) {
+                              return const Text('Error Removing Member!');
+                            }
+                            if (state is MemberLoading) {
+                              return LoadingAnimationWidget.fourRotatingDots(
+                                  color: Colors.blue, size: 15);
+                            }
+                            if (state is MemberLoaded) {
+                              return const Text('Confirm Removal');
+                            }
+                            if (state is MemberRemoved) {
+                              return Wrap(
+                                spacing: 8.0,
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                children: const [
+                                  Text('Member Removed!'),
+                                  Icon(Icons.check_circle_rounded),
+                                ],
+                              );
+                            } else {
+                              return const Center(
+                                child: Text('Something Went Wrong!'),
+                              );
+                            }
+                          },
+                        )),
+                  ),
+                ],
+              ),
             ),
           );
         } else {

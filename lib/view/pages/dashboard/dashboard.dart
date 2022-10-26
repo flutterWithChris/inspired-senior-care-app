@@ -313,8 +313,12 @@ class _GroupSectionState extends State<GroupSection> {
                               },
                               child: Wrap(
                                 spacing: 6.0,
+                                crossAxisAlignment: WrapCrossAlignment.center,
                                 children: const [
-                                  Icon(Icons.group_add_rounded),
+                                  Icon(
+                                    Icons.group_add_rounded,
+                                    size: 18,
+                                  ),
                                   Text('Add Member'),
                                 ],
                               )),
@@ -331,9 +335,13 @@ class _GroupSectionState extends State<GroupSection> {
                                         ));
                               },
                               child: Wrap(
-                                spacing: 6.0,
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                spacing: 8.0,
                                 children: const [
-                                  Icon(Icons.add_moderator_rounded),
+                                  Icon(
+                                    Icons.add_moderator_rounded,
+                                    size: 18,
+                                  ),
                                   Text('Add Manager'),
                                 ],
                               )),
@@ -358,9 +366,13 @@ class _GroupSectionState extends State<GroupSection> {
                                 );
                               },
                               child: Wrap(
-                                spacing: 6.0,
+                                spacing: 8.0,
+                                crossAxisAlignment: WrapCrossAlignment.center,
                                 children: const [
-                                  Icon(Icons.edit),
+                                  Icon(
+                                    Icons.edit,
+                                    size: 18,
+                                  ),
                                   Text('Rename'),
                                 ],
                               )),
@@ -376,9 +388,13 @@ class _GroupSectionState extends State<GroupSection> {
                                 );
                               },
                               child: Wrap(
-                                spacing: 6.0,
+                                spacing: 8.0,
+                                crossAxisAlignment: WrapCrossAlignment.center,
                                 children: const [
-                                  Icon(Icons.delete_forever_rounded),
+                                  Icon(
+                                    Icons.delete_forever_rounded,
+                                    size: 18,
+                                  ),
                                   Text('Delete Group'),
                                 ],
                               )),
@@ -391,9 +407,13 @@ class _GroupSectionState extends State<GroupSection> {
                                 context.goNamed('view-group-members');
                               },
                               child: Wrap(
-                                spacing: 6.0,
+                                spacing: 8.0,
+                                crossAxisAlignment: WrapCrossAlignment.center,
                                 children: const [
-                                  Icon(Icons.group),
+                                  Icon(
+                                    Icons.group,
+                                    size: 18,
+                                  ),
                                   Text('Edit Members'),
                                 ],
                               )),

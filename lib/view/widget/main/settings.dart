@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
@@ -32,6 +35,107 @@ class SettingsPage extends StatelessWidget {
           }
           if (state is SettingsLoaded) {
             User currentUser = context.watch<ProfileBloc>().state.user;
+            List<AbstractSettingsTile> mainSettingsTiles = [
+              SettingsTile.navigation(
+                title: const Padding(
+                  padding: EdgeInsets.only(right: 8.0),
+                  child: Text('Email'),
+                ),
+                value: Text(currentUser.email!),
+                leading: const Icon(Icons.email_rounded),
+                onPressed: (context) {
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return const ChangeEmailDialog();
+                    },
+                  );
+                },
+              ),
+              SettingsTile.navigation(
+                title: const Padding(
+                  padding: EdgeInsets.only(right: 8.0),
+                  child: Text('Name'),
+                ),
+                value: Text(currentUser.name!),
+                leading: const Icon(Icons.person),
+                onPressed: (context) {
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return const ChangeNameDialog();
+                    },
+                  );
+                },
+              ),
+              SettingsTile.navigation(
+                title: const Padding(
+                  padding: EdgeInsets.only(right: 8.0),
+                  child: Text('Title'),
+                ),
+                value: Text(currentUser.title!),
+                leading: const Icon(Icons.badge),
+                onPressed: (context) {
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return const ChangeTitleDialog();
+                    },
+                  );
+                },
+              ),
+              SettingsTile.navigation(
+                title: const Text('Password'),
+                leading: const Icon(Icons.lock_rounded),
+                onPressed: (context) {
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return const ChangePasswordDialog();
+                    },
+                  );
+                },
+              ),
+              SettingsTile.navigation(
+                title: const Text('Sign Out'),
+                leading: const Icon(Icons.logout_rounded),
+                onPressed: (context) {
+                  context.read<AuthBloc>().add(AppLogoutRequested());
+                },
+              ),
+              SettingsTile.navigation(
+                title: const Text('Delete Account'),
+                leading: const Icon(Icons.delete_forever_rounded),
+                onPressed: (context) {
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return const DeleteAccountDialog();
+                    },
+                  );
+                },
+              ),
+            ];
+            if (currentUser.type == 'manager') {
+              mainSettingsTiles.insert(
+                  3,
+                  SettingsTile.navigation(
+                    title: const Padding(
+                      padding: EdgeInsets.only(right: 8.0),
+                      child: Text('Organization'),
+                    ),
+                    value: Text(currentUser.organization ?? 'nope'),
+                    leading: const Icon(Icons.work_rounded),
+                    onPressed: (context) {
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return const ChangeOrganizationDialog();
+                        },
+                      );
+                    },
+                  ));
+            }
             return SettingsList(
               contentPadding:
                   const EdgeInsets.symmetric(horizontal: 6.0, vertical: 8.0),
@@ -39,113 +143,18 @@ class SettingsPage extends StatelessWidget {
                 SettingsSection(
                   //margin: const EdgeInsetsDirectional.all(12.0),
                   title: const Text('Account'),
-                  tiles: [
-                    SettingsTile.navigation(
-                      title: const Padding(
-                        padding: EdgeInsets.only(right: 8.0),
-                        child: Text('Email'),
-                      ),
-                      value: FittedBox(child: Text(currentUser.email!)),
-                      leading: const Icon(Icons.email_rounded),
-                      onPressed: (context) {
-                        showDialog(
-                          context: context,
-                          builder: (context) {
-                            return const ChangeEmailDialog();
-                          },
-                        );
-                      },
-                    ),
-                    SettingsTile.navigation(
-                      title: const Padding(
-                        padding: EdgeInsets.only(right: 8.0),
-                        child: Text('Name'),
-                      ),
-                      value: FittedBox(child: Text(currentUser.name!)),
-                      leading: const Icon(Icons.person),
-                      onPressed: (context) {
-                        showDialog(
-                          context: context,
-                          builder: (context) {
-                            return const ChangeNameDialog();
-                          },
-                        );
-                      },
-                    ),
-                    SettingsTile.navigation(
-                      title: const Padding(
-                        padding: EdgeInsets.only(right: 8.0),
-                        child: Text('Title'),
-                      ),
-                      value: FittedBox(
-                        child: Text(currentUser.title!),
-                      ),
-                      leading: const Icon(Icons.badge),
-                      onPressed: (context) {
-                        showDialog(
-                          context: context,
-                          builder: (context) {
-                            return const ChangeTitleDialog();
-                          },
-                        );
-                      },
-                    ),
-                    SettingsTile.navigation(
-                      title: const Padding(
-                        padding: EdgeInsets.only(right: 8.0),
-                        child: Text('Organization'),
-                      ),
-                      value: FittedBox(child: Text(currentUser.organization!)),
-                      leading: const Icon(Icons.work_rounded),
-                      onPressed: (context) {
-                        showDialog(
-                          context: context,
-                          builder: (context) {
-                            return const ChangeOrganizationDialog();
-                          },
-                        );
-                      },
-                    ),
-                    SettingsTile.navigation(
-                      title: const Text('Password'),
-                      leading: const Icon(Icons.lock_rounded),
-                      onPressed: (context) {
-                        showDialog(
-                          context: context,
-                          builder: (context) {
-                            return const ChangePasswordDialog();
-                          },
-                        );
-                      },
-                    ),
-                    SettingsTile.navigation(
-                      title: const Text('Sign Out'),
-                      leading: const Icon(Icons.logout_rounded),
-                      onPressed: (context) {
-                        context.read<AuthBloc>().add(AppLogoutRequested());
-                      },
-                    ),
-                    SettingsTile.navigation(
-                      title: const Text('Delete Account'),
-                      leading: const Icon(Icons.delete_forever_rounded),
-                      onPressed: (context) {
-                        showDialog(
-                          context: context,
-                          builder: (context) {
-                            return const DeleteAccountDialog();
-                          },
-                        );
-                      },
-                    ),
-                  ],
+                  tiles: mainSettingsTiles,
                 ),
                 SettingsSection(
                   title: const Text('Help & Support'),
                   tiles: [
                     SettingsTile.navigation(
+                      onPressed: (context) => showDialog(
+                          context: context,
+                          builder: (context) =>
+                              ReportBugDialog(currentUser: currentUser)),
                       title: const Text('Report an Issue / Bug'),
                       leading: const Icon(Icons.report),
-                      trailing: const Icon(Icons.chevron_right_rounded),
                     ),
                   ],
                 ),
@@ -170,16 +179,11 @@ class DeleteAccountDialog extends StatefulWidget {
 }
 
 class _DeleteAccountDialogState extends State<DeleteAccountDialog> {
-  final TextEditingController deleteFieldController = TextEditingController();
+  final TextEditingController emailFieldController = TextEditingController();
+  final TextEditingController passwordFieldController = TextEditingController();
   final GlobalKey<FormState> deleteFormKey = GlobalKey<FormState>();
 
-  @override
-  void initState() {
-    // TODO: implement initState
-
-    super.initState();
-  }
-
+  bool hidePassword = true;
   @override
   Widget build(BuildContext context) {
     User currentUser = context.watch<ProfileBloc>().state.user;
@@ -189,88 +193,124 @@ class _DeleteAccountDialogState extends State<DeleteAccountDialog> {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 24.0),
         child: SizedBox(
-          height: 250,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  'Delete Account Forever?',
-                  style: Theme.of(context).textTheme.titleLarge,
+          height: 360,
+          child: Form(
+            key: deleteFormKey,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    'Delete Account Forever?',
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
                 ),
-              ),
-              Padding(
-                padding:
-                    const EdgeInsets.only(bottom: 16.0, left: 8.0, right: 8.0),
-                child: Text.rich(
-                  const TextSpan(children: [
-                    TextSpan(
-                      text:
-                          'Are you sure you\'d like to delete your account forever?',
-                    ),
-                    TextSpan(
-                        text: ' This cannot be undone.',
-                        style: TextStyle(fontWeight: FontWeight.bold)),
-                  ]),
-                  style: Theme.of(context).textTheme.bodyMedium,
-                  textAlign: TextAlign.center,
+                Padding(
+                  padding: const EdgeInsets.only(
+                      bottom: 16.0, left: 8.0, right: 8.0),
+                  child: Text.rich(
+                    const TextSpan(children: [
+                      TextSpan(
+                        text:
+                            'Are you sure you\'d like to delete your account forever?',
+                      ),
+                      TextSpan(
+                          text: ' This cannot be undone.',
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                    ]),
+                    style: Theme.of(context).textTheme.bodyMedium,
+                    textAlign: TextAlign.center,
+                  ),
                 ),
-              ),
-              TextFormField(
-                textCapitalization: TextCapitalization.words,
-                keyboardType: TextInputType.name,
-                key: deleteFormKey,
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                validator: (value) {
-                  if (value != currentUser.name) {
-                    if (value == '' || value == null) {
-                      return 'Please enter your name!';
-                    }
-                    return 'Name doesn\'t match!';
-                  }
-                  return null;
-                },
-                autofocus: true,
-                controller: deleteFieldController,
-                decoration:
-                    InputDecoration(hintText: 'Type "${currentUser.name!}"'),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.redAccent),
-                    onPressed: () {
-                      //deleteFormKey.currentState!.validate();
-                      if (!deleteFormKey.currentState!.validate()) {
-                        print('invalid delete');
-                      } else {
-                        context.read<SettingsCubit>().deleteAccount();
-
-                        Future.delayed(const Duration(seconds: 1), () {
-                          Navigator.pop(context);
-                        });
+                TextFormField(
+                  keyboardType: TextInputType.emailAddress,
+                  // autovalidateMode: AutovalidateMode.onUserInteraction,
+                  validator: (value) {
+                    if (value != currentUser.email) {
+                      if (value == '' || value == null) {
+                        return 'Please enter your email!';
                       }
-                    },
-                    icon: const Icon(
-                      Icons.delete_forever_rounded,
-                      size: 20,
-                    ),
-                    label: BlocBuilder<SettingsCubit, SettingsState>(
-                      builder: (context, state) {
-                        if (state is SettingsLoading) {
-                          return LoadingAnimationWidget.bouncingBall(
-                              color: Colors.white, size: 18);
+                      return 'Email doesn\'t match!';
+                    }
+                    return null;
+                  },
+                  autofocus: true,
+                  controller: emailFieldController,
+                  decoration: const InputDecoration(
+                      label: Text('Email Address'),
+                      prefixIcon: Icon(Icons.email_rounded)),
+                ),
+                const SizedBox(
+                  height: 8.0,
+                ),
+                TextFormField(
+                  obscureText: hidePassword,
+                  //   key: deleteFormKey,
+                  //  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  validator: (value) {
+                    if (value == '' || value == null) {
+                      return 'Please enter your password!';
+                    }
+                    return null;
+                  },
+
+                  controller: passwordFieldController,
+                  decoration: InputDecoration(
+                      suffixIcon: IconButton(
+                          onPressed: () {
+                            setState(() {
+                              hidePassword = !hidePassword;
+                            });
+                          },
+                          icon: hidePassword
+                              ? const Icon(Icons.visibility_off_rounded)
+                              : const Icon(Icons.visibility_rounded)),
+                      label: const Text('Password'),
+                      prefixIcon: const Icon(Icons.lock_rounded)),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.redAccent),
+                      onPressed: () {
+                        //deleteFormKey.currentState!.validate();
+                        if (!deleteFormKey.currentState!.validate()) {
+                          ScaffoldMessenger.of(context)
+                              .showSnackBar(const SnackBar(
+                            content: Text('Invalid Login!'),
+                            backgroundColor: Colors.redAccent,
+                          ));
+                        } else {
+                          context.read<SettingsCubit>().deleteAccount(
+                              emailFieldController.value.text,
+                              passwordFieldController.value.text);
+
+                          Future.delayed(const Duration(seconds: 1), () {
+                            Navigator.pop(context);
+                          });
                         }
-                        if (state is SettingsUpdated) {
-                          return const Text('Account Deleted!');
-                        }
-                        return const Text('Delete Account');
                       },
-                    )),
-              )
-            ],
+                      icon: const Icon(
+                        Icons.delete_forever_rounded,
+                        size: 20,
+                      ),
+                      label: BlocBuilder<SettingsCubit, SettingsState>(
+                        builder: (context, state) {
+                          if (state is SettingsLoading) {
+                            return LoadingAnimationWidget.bouncingBall(
+                                color: Colors.white, size: 18);
+                          }
+                          if (state is SettingsUpdated) {
+                            return const Text('Account Deleted!');
+                          }
+                          return const Text('Delete Account');
+                        },
+                      )),
+                )
+              ],
+            ),
           ),
         ),
       ),
@@ -288,7 +328,11 @@ class ChangeEmailDialog extends StatefulWidget {
 }
 
 class _ChangeEmailDialogState extends State<ChangeEmailDialog> {
-  final TextEditingController emailFieldController = TextEditingController();
+  final TextEditingController oldEmailFieldController = TextEditingController();
+  final TextEditingController newEmailFieldController = TextEditingController();
+  final TextEditingController passwordFieldController = TextEditingController();
+  bool hidePassword = true;
+  final GlobalKey<FormState> emailChangeFormKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -300,52 +344,140 @@ class _ChangeEmailDialogState extends State<ChangeEmailDialog> {
   @override
   Widget build(BuildContext context) {
     User currentUser = context.watch<ProfileBloc>().state.user;
-    emailFieldController.text = currentUser.email!;
+    //oldEmailFieldController.text = currentUser.email!;
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 24.0),
+        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
         child: SizedBox(
-          height: 175,
-          child: Column(
-            //mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  'Edit Email',
-                  style: Theme.of(context).textTheme.titleLarge,
+          height: 400,
+          child: Form(
+            key: emailChangeFormKey,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    'Change Email?',
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
                 ),
-              ),
-              TextFormField(
-                keyboardType: TextInputType.emailAddress,
-                controller: emailFieldController,
-                decoration: const InputDecoration(label: Text('Your Email')),
-              ),
-              ElevatedButton(onPressed: () {
-                context
-                    .read<SettingsCubit>()
-                    .changeEmail(emailFieldController.value.text);
-                // context.read<SettingsCubit>().add(UpdateProfile(
-                //     user: currentUser.copyWith(
-                //         email: emailFieldController.value.text)));
-                Future.delayed(const Duration(seconds: 1), () {
-                  Navigator.pop(context);
-                });
-              }, child: BlocBuilder<SettingsCubit, SettingsState>(
-                builder: (context, state) {
-                  if (state is SettingsLoading) {
-                    return LoadingAnimationWidget.bouncingBall(
-                        color: Colors.white, size: 18);
-                  }
-                  if (state is SettingsUpdated) {
-                    return const Text('Email Updated!');
-                  }
-                  return const Text('Update Email');
-                },
-              ))
-            ],
+                Padding(
+                  padding: const EdgeInsets.only(
+                      bottom: 16.0, left: 8.0, right: 8.0),
+                  child: Text.rich(
+                    const TextSpan(children: [
+                      TextSpan(
+                        text: 'Enter details to change email.',
+                      ),
+                    ]),
+                    style: Theme.of(context).textTheme.bodyMedium,
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                TextFormField(
+                  keyboardType: TextInputType.emailAddress,
+                  // autovalidateMode: AutovalidateMode.onUserInteraction,
+                  validator: (value) {
+                    if (value != currentUser.email) {
+                      if (value == '' || value == null) {
+                        return 'Please enter your email!';
+                      }
+                      return 'Email doesn\'t match!';
+                    }
+                    return null;
+                  },
+                  autofocus: true,
+                  controller: oldEmailFieldController,
+                  decoration: const InputDecoration(
+                      label: Text('Current Email Address'),
+                      prefixIcon: Icon(Icons.email_rounded)),
+                ),
+                const SizedBox(
+                  height: 8.0,
+                ),
+                TextFormField(
+                  keyboardType: TextInputType.emailAddress,
+                  // autovalidateMode: AutovalidateMode.onUserInteraction,
+                  validator: (value) =>
+                      value != null && !EmailValidator.validate(value)
+                          ? 'Enter a valid email!'
+                          : null,
+                  controller: newEmailFieldController,
+                  decoration: const InputDecoration(
+                      label: Text('New Email Address'),
+                      prefixIcon: Icon(Icons.email_rounded)),
+                ),
+                const SizedBox(
+                  height: 8.0,
+                ),
+                TextFormField(
+                  obscureText: hidePassword,
+                  //   key: deleteFormKey,
+                  //  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  validator: (value) {
+                    if (value == '' || value == null) {
+                      return 'Please enter your password!';
+                    }
+                    return null;
+                  },
+
+                  controller: passwordFieldController,
+                  decoration: InputDecoration(
+                      suffixIcon: IconButton(
+                          onPressed: () {
+                            setState(() {
+                              hidePassword = !hidePassword;
+                            });
+                          },
+                          icon: hidePassword
+                              ? const Icon(Icons.visibility_off_rounded)
+                              : const Icon(Icons.visibility_rounded)),
+                      label: const Text('Password'),
+                      prefixIcon: const Icon(Icons.lock_rounded)),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ElevatedButton.icon(
+                      onPressed: () {
+                        //deleteFormKey.currentState!.validate();
+                        if (!emailChangeFormKey.currentState!.validate()) {
+                          ScaffoldMessenger.of(context)
+                              .showSnackBar(const SnackBar(
+                            content: Text('Invalid Login!'),
+                            backgroundColor: Colors.redAccent,
+                          ));
+                        } else {
+                          context.read<SettingsCubit>().changeEmail(
+                              oldEmailFieldController.value.text,
+                              newEmailFieldController.value.text,
+                              passwordFieldController.value.text);
+
+                          Future.delayed(const Duration(seconds: 1), () {
+                            Navigator.pop(context);
+                          });
+                        }
+                      },
+                      icon: const Icon(
+                        Icons.email_rounded,
+                        size: 20,
+                      ),
+                      label: BlocBuilder<SettingsCubit, SettingsState>(
+                        builder: (context, state) {
+                          if (state is SettingsLoading) {
+                            return LoadingAnimationWidget.bouncingBall(
+                                color: Colors.white, size: 18);
+                          }
+                          if (state is SettingsUpdated) {
+                            return const Text('Email Updated!');
+                          }
+                          return const Text('Update Email');
+                        },
+                      )),
+                )
+              ],
+            ),
           ),
         ),
       ),
@@ -600,6 +732,100 @@ class ChangePasswordDialog extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class ReportBugDialog extends StatefulWidget {
+  final User currentUser;
+  const ReportBugDialog({super.key, required this.currentUser});
+
+  @override
+  State<ReportBugDialog> createState() => _ReportBugDialogState();
+}
+
+class _ReportBugDialogState extends State<ReportBugDialog> {
+  final TextEditingController bugReportTextFieldController =
+      TextEditingController();
+  final GlobalKey<FormState> bugFormKey = GlobalKey<FormState>();
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          Text(
+            'Report a Bug/Issue.',
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          const SizedBox(
+            height: 8.0,
+          ),
+          const Text(
+            'Having trouble with the app? Let us know what went wrong!',
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(
+            height: 8.0,
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Form(
+              key: bugFormKey,
+              child: TextFormField(
+                controller: bugReportTextFieldController,
+                validator: (value) {
+                  if (value == null) {
+                    return 'Can\'t submit empty report!';
+                  } else {
+                    return null;
+                  }
+                },
+                minLines: 4,
+                maxLines: 6,
+              ),
+            ),
+          ),
+          ElevatedButton(
+              onPressed: () {
+                if (!bugFormKey.currentState!.validate()) {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text('Can\'t submit empty report!'),
+                    backgroundColor: Colors.redAccent,
+                  ));
+                } else {
+                  context.read<SettingsCubit>().sendBugReport(
+                      bugReportTextFieldController.value.text,
+                      Platform.operatingSystem,
+                      widget.currentUser.id!,
+                      widget.currentUser.email!,
+                      widget.currentUser.name!);
+                }
+              },
+              // icon: const Icon(Icons.send_rounded),
+              child: BlocConsumer<SettingsCubit, SettingsState>(
+                listener: (context, state) async {
+                  if (state is SettingsUpdated) {
+                    await Future.delayed(const Duration(seconds: 2));
+                    if (!mounted) return;
+                    Navigator.pop(context);
+                  }
+                },
+                builder: (context, state) {
+                  if (state is SettingsLoading) {
+                    return LoadingAnimationWidget.bouncingBall(
+                        color: Colors.white, size: 18);
+                  }
+                  if (state is SettingsUpdated) {
+                    return const Text('Bug Report Sent!');
+                  }
+                  return const Text('Send Report');
+                },
+              ))
+        ]),
       ),
     );
   }

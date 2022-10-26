@@ -14,7 +14,7 @@ class ViewMembers extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    //context.read<MemberBloc>().add(ResetMember());
+    // context.read<MemberBloc>().add(ResetMember());
     return Scaffold(
       appBar: const PreferredSize(
         preferredSize: Size.fromHeight(50),
@@ -30,7 +30,7 @@ class ViewMembers extends StatelessWidget {
             );
           }
           if (state is GroupMembersLoaded) {
-            if (context.watch<GroupMemberBloc>().members.isEmpty) {
+            if (state.groupMembers.isEmpty) {
               return Center(
                   child: Text(
                 'No Members Yet!',

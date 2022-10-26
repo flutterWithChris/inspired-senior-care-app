@@ -60,20 +60,19 @@ class _ProfileInfoState extends State<ProfileInfo> {
                 child: Form(
                   key: formKey,
                   child: ListView(
-                    // mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 12.0),
                         child: Text(
                           'You\'re Almost Done!',
-                          style: Theme.of(context).textTheme.headline4,
+                          style: Theme.of(context).textTheme.headlineMedium,
                         ),
                       ),
                       Padding(
                         padding: const EdgeInsets.all(12.0),
                         child: Text(
                           'What\'s Your Name?',
-                          style: Theme.of(context).textTheme.headline5,
+                          style: Theme.of(context).textTheme.headlineSmall,
                         ),
                       ),
                       SizedBox(
@@ -82,6 +81,8 @@ class _ProfileInfoState extends State<ProfileInfo> {
                           builder: (context, state) {
                             if (state is OnboardingLoaded) {
                               return TextFormField(
+                                textCapitalization: TextCapitalization.words,
+                                keyboardType: TextInputType.name,
                                 controller: nameFieldController,
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
@@ -89,10 +90,6 @@ class _ProfileInfoState extends State<ProfileInfo> {
                                   }
                                   return null;
                                 },
-                                // onChanged: (value) {
-                                //   context.read<OnboardingBloc>().add(UpdateUser(
-                                //       user: state.user.copyWith(name: value)));
-                                // },
                                 decoration: const InputDecoration(
                                     label: Text('Your Name')),
                               );
@@ -105,7 +102,7 @@ class _ProfileInfoState extends State<ProfileInfo> {
                         padding: const EdgeInsets.all(12.0),
                         child: Text(
                           'What\'s Your Title?',
-                          style: Theme.of(context).textTheme.headline5,
+                          style: Theme.of(context).textTheme.headlineSmall,
                         ),
                       ),
                       SizedBox(
@@ -114,6 +111,7 @@ class _ProfileInfoState extends State<ProfileInfo> {
                           builder: (context, state) {
                             if (state is OnboardingLoaded) {
                               return TextFormField(
+                                textCapitalization: TextCapitalization.words,
                                 controller: titleFieldController,
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
@@ -121,10 +119,6 @@ class _ProfileInfoState extends State<ProfileInfo> {
                                   }
                                   return null;
                                 },
-                                // onChanged: (value) {
-                                //   context.read<OnboardingBloc>().add(UpdateUser(
-                                //       user: state.user.copyWith(title: value)));
-                                // },
                                 decoration: const InputDecoration(
                                     label: Text('Your Title'),
                                     hintText: 'Nurse, Home Attendant, Manager'),
@@ -134,42 +128,50 @@ class _ProfileInfoState extends State<ProfileInfo> {
                           },
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.all(12.0),
-                        child: Text(
-                          'Where Do You Work?',
-                          style: Theme.of(context).textTheme.headline5,
-                        ),
-                      ),
-                      SizedBox(
-                        width: 325,
-                        child: BlocBuilder<OnboardingBloc, OnboardingState>(
-                          builder: (context, state) {
-                            if (state is OnboardingLoaded) {
-                              return TextFormField(
-                                controller: organizationFieldController,
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Please Enter an Organization';
-                                  }
-                                  return null;
-                                },
-                                //                           onChanged: (value) {
-                                //   context.read<OnboardingBloc>().add(UpdateUser(
-                                //       user: state.user
-                                //           .copyWith(organization: value)));
-                                // },    controller: organizationFieldController,
-
-                                decoration: const InputDecoration(
-                                    label: Text('Your Organization'),
-                                    hintText:
-                                        'Chicago Senior Living, Oasis Care, etc..'),
-                              );
-                            }
-                            return const Text("Something went wrong!");
-                          },
-                        ),
-                      ),
+                      state.user.type == 'manager'
+                          ? Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(12.0),
+                                  child: Text(
+                                    'Where Do You Work?',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headlineSmall,
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 325,
+                                  child: BlocBuilder<OnboardingBloc,
+                                      OnboardingState>(
+                                    builder: (context, state) {
+                                      if (state is OnboardingLoaded) {
+                                        return TextFormField(
+                                          textCapitalization:
+                                              TextCapitalization.words,
+                                          controller:
+                                              organizationFieldController,
+                                          validator: (value) {
+                                            if (value == null ||
+                                                value.isEmpty) {
+                                              return 'Please Enter an Organization';
+                                            }
+                                            return null;
+                                          },
+                                          decoration: const InputDecoration(
+                                              label: Text('Your Organization'),
+                                              hintText:
+                                                  'Chicago Senior Living, Oasis Care, etc..'),
+                                        );
+                                      }
+                                      return const Text(
+                                          "Something went wrong!");
+                                    },
+                                  ),
+                                ),
+                              ],
+                            )
+                          : const SizedBox(),
                       Padding(
                         padding: const EdgeInsets.only(top: 12.0),
                         child: Card(
@@ -185,13 +187,15 @@ class _ProfileInfoState extends State<ProfileInfo> {
                                   borderRadius: 22,
                                   heading: Text(
                                     'Choose a Color',
-                                    style:
-                                        Theme.of(context).textTheme.headline5,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headlineSmall,
                                   ),
                                   subheading: Text(
                                     'Pick a Shade',
-                                    style:
-                                        Theme.of(context).textTheme.headline5,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headlineSmall,
                                   ),
                                 );
                               }

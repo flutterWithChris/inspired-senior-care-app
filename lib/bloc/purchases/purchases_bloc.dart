@@ -47,25 +47,25 @@ class PurchasesBloc extends Bloc<PurchasesEvent, PurchasesState> {
         try {
           // Check Revenue Cat for Subscription Status
           CustomerInfo? customerInfo =
-              await purchasesRepository.getCustomerInfo();
+              await _purchasesRepository.getCustomerInfo();
           User currentUser = _profileBloc.state.user;
           print('Checking groups for: ${_profileBloc.state.user.name}');
 
           bool? isSubscribed =
-              await purchasesRepository.getSubscriptionStatus(customerInfo!);
-          Offerings? offerings = await purchasesRepository.getOfferings();
+              await _purchasesRepository.getSubscriptionStatus(customerInfo!);
+          Offerings? offerings = await _purchasesRepository.getOfferings();
           List<StoreProduct>? products;
 
           // Subscription type 0 = self, 1 = group-inherited.
           int subscriptionType = 0;
           Group? subscribedGroup;
 
-          // Set groups to unsubscribed if no subscription active for owned groupa
+          // Set managers groups to unsubscribed if no subscription active
           if (isSubscribed != true && currentUser.type == 'manager') {
             _databaseRepository.resetGroupSubscriptionStatus(currentUser.id!);
           }
 
-          // Check if groups are subscribed for organization access
+          // Check if user groups are subscribed for organization access
           if (isSubscribed != true) {
             Map<Group?, bool?>? groupMap = await _databaseRepository
                 .getGroupSubscriptionStatus(_authBloc.state.user!.uid);
@@ -76,7 +76,7 @@ class PurchasesBloc extends Bloc<PurchasesEvent, PurchasesState> {
             }
           }
 
-          products = await purchasesRepository
+          products = await _purchasesRepository
               .getProducts(customerInfo.allPurchasedProductIdentifiers);
 
           emit(PurchasesLoaded(
@@ -92,7 +92,7 @@ class PurchasesBloc extends Bloc<PurchasesEvent, PurchasesState> {
       }
       if (event is AddPurchase) {
         emit(PurchasesLoading());
-        await purchasesRepository.makePurchase(event.package);
+        await _purchasesRepository.makePurchase(event.package);
         emit(PurchasesUpdated());
         User currentUser = _profileBloc.state.user;
         if (currentUser.type == 'manager') {
@@ -105,7 +105,7 @@ class PurchasesBloc extends Bloc<PurchasesEvent, PurchasesState> {
       if (event is RestorePurchases) {
         emit(PurchasesLoading());
         CustomerInfo? customerInfo =
-            await purchasesRepository.restorePurchases();
+            await _purchasesRepository.restorePurchases();
         emit(PurchasesUpdated());
         add(LoadPurchases());
       }

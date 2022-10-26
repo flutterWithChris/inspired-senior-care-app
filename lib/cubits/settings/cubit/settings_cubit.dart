@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
+import 'package:inspired_senior_care_app/data/models/bug_report.dart';
 import 'package:inspired_senior_care_app/data/repositories/auth/auth_repository.dart';
 import 'package:inspired_senior_care_app/data/repositories/database/database_repository.dart';
 import 'package:meta/meta.dart';
@@ -19,13 +20,31 @@ class SettingsCubit extends Cubit<SettingsState> {
         _profileBloc = profileBloc,
         super(SettingsLoaded());
   void passwordResetRequest(String email) => _onPasswordResetRequest(email);
-  void changeEmail(String email) => _onChangeEmailRequest(email);
+  void changeEmail(String oldEmail, String newEmail, String password) =>
+      _onChangeEmailRequest(oldEmail, newEmail, password);
   void changeName(String name) => _onChangeNameRequest(name);
   void changeOrganization(String organization) =>
       _onChangeOrganizationRequest(organization);
   void changeTitle(String title) => _onChangeTitleRequest(title);
   void loadSettings() => emit(SettingsLoaded());
-  void deleteAccount() => _onDeleteAccountRequest();
+  void deleteAccount(String email, String password) =>
+      _onDeleteAccountRequest(email, password);
+  void sendBugReport(String report, String deviceType, String userId,
+          String userEmail, String userName) =>
+      _onSendBugReport(report, deviceType, userId, userEmail, userName);
+
+  void _onSendBugReport(String report, String deviceType, String userId,
+      String userEmail, String userName) async {
+    await _databaseRepository.sendBugReport(BugReport(
+        report: report,
+        deviceType: deviceType,
+        userId: userId,
+        userEmail: userEmail,
+        userName: userName));
+    emit(SettingsUpdated());
+    await Future.delayed(const Duration(seconds: 2));
+    emit(SettingsLoaded());
+  }
 
   void _onPasswordResetRequest(String email) async {
     //  emit(SettingsLoading());
@@ -34,21 +53,17 @@ class SettingsCubit extends Cubit<SettingsState> {
       emit(SettingsUpdated());
       await Future.delayed(const Duration(seconds: 1));
       emit(SettingsLoaded());
-    } catch (e) {
-      print(e);
-    }
+    } catch (e) {}
   }
 
-  void _onDeleteAccountRequest() async {
+  void _onDeleteAccountRequest(String email, String password) async {
     try {
       await _databaseRepository.deleteUser(_profileBloc.state.user);
-      await _authRepository.deleteAccount();
+      await _authRepository.deleteAccount(email, password);
       emit(SettingsUpdated());
       await Future.delayed(const Duration(seconds: 1));
       emit(SettingsLoaded());
-    } catch (e) {
-      print(e);
-    }
+    } catch (e) {}
   }
 
   void _onChangeNameRequest(String name) async {
@@ -64,11 +79,12 @@ class SettingsCubit extends Cubit<SettingsState> {
     }
   }
 
-  void _onChangeEmailRequest(String email) async {
+  void _onChangeEmailRequest(
+      String oldEmail, String newEmail, String password) async {
     try {
-      _profileBloc.add(
-          UpdateProfile(user: _profileBloc.state.user.copyWith(email: email)));
-      await _authRepository.currentUser!.updateEmail(email);
+      _profileBloc.add(UpdateProfile(
+          user: _profileBloc.state.user.copyWith(email: newEmail)));
+      await _authRepository.changeEmail(oldEmail, newEmail, password);
       emit(SettingsUpdated());
       await Future.delayed(const Duration(seconds: 1));
       loadSettings();
@@ -84,9 +100,7 @@ class SettingsCubit extends Cubit<SettingsState> {
       emit(SettingsUpdated());
       await Future.delayed(const Duration(seconds: 1));
       loadSettings();
-    } catch (e) {
-      print(e);
-    }
+    } catch (e) {}
   }
 
   void _onChangeTitleRequest(String title) async {

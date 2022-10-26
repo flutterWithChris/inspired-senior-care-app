@@ -41,8 +41,28 @@ class AuthRepository extends BaseAuthRepository {
       final auth.User? user = credential.user;
       return user;
     } on auth.FirebaseAuthException catch (e) {
-      print('Failed with error code: ${e.code}');
-      print(e.message);
+      final SnackBar snackBar = SnackBar(
+        content: Text(e.message!),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
+    }
+    return null;
+  }
+
+  @override
+  Future<auth.User?> reauthenticate({
+    required String email,
+    required String password,
+  }) async {
+    try {
+      final credential = await _firebaseAuth.signInWithEmailAndPassword(
+          email: email, password: password);
+      await _firebaseAuth.currentUser!
+          .reauthenticateWithCredential(credential.credential!);
+      final auth.User? user = credential.user;
+      return user;
+    } on auth.FirebaseAuthException catch (e) {
       final SnackBar snackBar = SnackBar(
         content: Text(e.message!),
         backgroundColor: Colors.redAccent,
@@ -61,9 +81,8 @@ class AuthRepository extends BaseAuthRepository {
   Future<void> requestPasswordReset(String email) async {
     try {
       await _firebaseAuth.sendPasswordResetEmail(email: email);
+      // TODO: Confirm Password reset.
     } on auth.FirebaseAuthException catch (e) {
-      print('Failed with error code: ${e.code}');
-      print(e.message);
       final SnackBar snackBar = SnackBar(
         content: Text(e.message!),
         backgroundColor: Colors.redAccent,
@@ -73,12 +92,14 @@ class AuthRepository extends BaseAuthRepository {
   }
 
   @override
-  Future<void> requestEmailReset(String email) async {
+  Future<void> changeEmail(
+      String oldEmail, String newEmail, String password) async {
     try {
-      await _firebaseAuth.currentUser!.updateEmail(email);
+      final credential = auth.EmailAuthProvider.credential(
+          email: oldEmail, password: password);
+      await _firebaseAuth.currentUser!.reauthenticateWithCredential(credential);
+      await _firebaseAuth.currentUser!.updateEmail(newEmail);
     } on auth.FirebaseAuthException catch (e) {
-      print('Failed with error code: ${e.code}');
-      print(e.message);
       final SnackBar snackBar = SnackBar(
         content: Text(e.message!),
         backgroundColor: Colors.redAccent,
@@ -88,14 +109,14 @@ class AuthRepository extends BaseAuthRepository {
   }
 
   @override
-  Future<void> deleteAccount() async {
+  Future<void> deleteAccount(String email, String password) async {
     try {
       // TODO: Reauthenticate user before attempting delete.
-      //await _firebaseAuth.currentUser!.reauthenticateWithCredential(_firebaseAuth.currentUser.);
+      final credential =
+          auth.EmailAuthProvider.credential(email: email, password: password);
+      await _firebaseAuth.currentUser!.reauthenticateWithCredential(credential);
       await _firebaseAuth.currentUser!.delete();
     } on auth.FirebaseAuthException catch (e) {
-      print('Failed with error code: ${e.code}');
-      print(e.message);
       final SnackBar snackBar = SnackBar(
         content: Text(e.message!),
         backgroundColor: Colors.redAccent,

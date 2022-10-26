@@ -21,23 +21,24 @@ class NamePlate extends StatelessWidget {
     return Column(
       children: [
         ListTile(
-          minLeadingWidth: 70,
-          leading: InitialsIcon(userColor: userColor, memberName: memberName),
-          title: Text(
-            memberName,
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
-          subtitle: Wrap(
-            spacing: 4.0,
-            children: [
-              Text(memberTitle),
-              const Text('•'),
-              Text(
-                user.organization!,
-              )
-            ],
-          ),
-        ),
+            minLeadingWidth: 70,
+            leading: InitialsIcon(userColor: userColor, memberName: memberName),
+            title: Text(
+              memberName,
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            subtitle: Wrap(
+              spacing: 4.0,
+              children: [
+                Text(memberTitle),
+                user.organization != '' ? const Text('•') : const SizedBox(),
+                user.organization != ''
+                    ? Text(
+                        user.organization!,
+                      )
+                    : const SizedBox(),
+              ],
+            )),
       ],
     );
   }

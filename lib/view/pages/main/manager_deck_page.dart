@@ -235,6 +235,7 @@ class Deck extends StatelessWidget {
           bool? isSubscribed =
               context.watch<PurchasesBloc>().state.isSubscribed;
           return InfiniteCarousel.builder(
+            physics: const InfiniteScrollPhysics(parent: PageScrollPhysics()),
             controller: deckScrollController,
             velocityFactor: 0.3,
             itemCount: state.cardImageUrls.length,
@@ -293,7 +294,7 @@ class DeckCompleteDialog extends StatelessWidget {
                 padding: const EdgeInsets.only(top: 12.0),
                 child: Text(
                   'All Done. Congrats!',
-                  style: Theme.of(context).textTheme.headline5,
+                  style: Theme.of(context).textTheme.headlineSmall,
                 ),
               ),
               Padding(
