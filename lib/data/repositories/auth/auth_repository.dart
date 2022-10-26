@@ -53,6 +53,31 @@ class AuthRepository extends BaseAuthRepository {
   }
 
   @override
+  Future<auth.User?> reauthenticate({
+    required String email,
+    required String password,
+  }) async {
+    try {
+      print('Sign in attempted....$email');
+      final credential = await _firebaseAuth.signInWithEmailAndPassword(
+          email: email, password: password);
+      await _firebaseAuth.currentUser!
+          .reauthenticateWithCredential(credential.credential!);
+      final auth.User? user = credential.user;
+      return user;
+    } on auth.FirebaseAuthException catch (e) {
+      print('Failed with error code: ${e.code}');
+      print(e.message);
+      final SnackBar snackBar = SnackBar(
+        content: Text(e.message!),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
+    }
+    return null;
+  }
+
+  @override
   Future<void> signOut() async {
     await _firebaseAuth.signOut();
   }
@@ -88,10 +113,12 @@ class AuthRepository extends BaseAuthRepository {
   }
 
   @override
-  Future<void> deleteAccount() async {
+  Future<void> deleteAccount(String email, String password) async {
     try {
       // TODO: Reauthenticate user before attempting delete.
-      //await _firebaseAuth.currentUser!.reauthenticateWithCredential(_firebaseAuth.currentUser.);
+      final credential =
+          auth.EmailAuthProvider.credential(email: email, password: password);
+      await _firebaseAuth.currentUser!.reauthenticateWithCredential(credential);
       await _firebaseAuth.currentUser!.delete();
     } on auth.FirebaseAuthException catch (e) {
       print('Failed with error code: ${e.code}');

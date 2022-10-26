@@ -173,16 +173,11 @@ class DeleteAccountDialog extends StatefulWidget {
 }
 
 class _DeleteAccountDialogState extends State<DeleteAccountDialog> {
-  final TextEditingController deleteFieldController = TextEditingController();
+  final TextEditingController emailFieldController = TextEditingController();
+  final TextEditingController passwordFieldController = TextEditingController();
   final GlobalKey<FormState> deleteFormKey = GlobalKey<FormState>();
 
-  @override
-  void initState() {
-    // TODO: implement initState
-
-    super.initState();
-  }
-
+  bool hidePassword = true;
   @override
   Widget build(BuildContext context) {
     User currentUser = context.watch<ProfileBloc>().state.user;
@@ -192,88 +187,124 @@ class _DeleteAccountDialogState extends State<DeleteAccountDialog> {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 24.0),
         child: SizedBox(
-          height: 250,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  'Delete Account Forever?',
-                  style: Theme.of(context).textTheme.titleLarge,
+          height: 360,
+          child: Form(
+            key: deleteFormKey,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    'Delete Account Forever?',
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
                 ),
-              ),
-              Padding(
-                padding:
-                    const EdgeInsets.only(bottom: 16.0, left: 8.0, right: 8.0),
-                child: Text.rich(
-                  const TextSpan(children: [
-                    TextSpan(
-                      text:
-                          'Are you sure you\'d like to delete your account forever?',
-                    ),
-                    TextSpan(
-                        text: ' This cannot be undone.',
-                        style: TextStyle(fontWeight: FontWeight.bold)),
-                  ]),
-                  style: Theme.of(context).textTheme.bodyMedium,
-                  textAlign: TextAlign.center,
+                Padding(
+                  padding: const EdgeInsets.only(
+                      bottom: 16.0, left: 8.0, right: 8.0),
+                  child: Text.rich(
+                    const TextSpan(children: [
+                      TextSpan(
+                        text:
+                            'Are you sure you\'d like to delete your account forever?',
+                      ),
+                      TextSpan(
+                          text: ' This cannot be undone.',
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                    ]),
+                    style: Theme.of(context).textTheme.bodyMedium,
+                    textAlign: TextAlign.center,
+                  ),
                 ),
-              ),
-              TextFormField(
-                textCapitalization: TextCapitalization.words,
-                keyboardType: TextInputType.name,
-                key: deleteFormKey,
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                validator: (value) {
-                  if (value != currentUser.name) {
-                    if (value == '' || value == null) {
-                      return 'Please enter your name!';
-                    }
-                    return 'Name doesn\'t match!';
-                  }
-                  return null;
-                },
-                autofocus: true,
-                controller: deleteFieldController,
-                decoration:
-                    InputDecoration(hintText: 'Type "${currentUser.name!}"'),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.redAccent),
-                    onPressed: () {
-                      //deleteFormKey.currentState!.validate();
-                      if (!deleteFormKey.currentState!.validate()) {
-                        print('invalid delete');
-                      } else {
-                        context.read<SettingsCubit>().deleteAccount();
-
-                        Future.delayed(const Duration(seconds: 1), () {
-                          Navigator.pop(context);
-                        });
+                TextFormField(
+                  keyboardType: TextInputType.emailAddress,
+                  // autovalidateMode: AutovalidateMode.onUserInteraction,
+                  validator: (value) {
+                    if (value != currentUser.email) {
+                      if (value == '' || value == null) {
+                        return 'Please enter your email!';
                       }
-                    },
-                    icon: const Icon(
-                      Icons.delete_forever_rounded,
-                      size: 20,
-                    ),
-                    label: BlocBuilder<SettingsCubit, SettingsState>(
-                      builder: (context, state) {
-                        if (state is SettingsLoading) {
-                          return LoadingAnimationWidget.bouncingBall(
-                              color: Colors.white, size: 18);
+                      return 'Email doesn\'t match!';
+                    }
+                    return null;
+                  },
+                  autofocus: true,
+                  controller: emailFieldController,
+                  decoration: const InputDecoration(
+                      label: Text('Email Address'),
+                      prefixIcon: Icon(Icons.email_rounded)),
+                ),
+                const SizedBox(
+                  height: 8.0,
+                ),
+                TextFormField(
+                  obscureText: hidePassword,
+                  //   key: deleteFormKey,
+                  //  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  validator: (value) {
+                    if (value == '' || value == null) {
+                      return 'Please enter your password!';
+                    }
+                    return null;
+                  },
+
+                  controller: passwordFieldController,
+                  decoration: InputDecoration(
+                      suffixIcon: IconButton(
+                          onPressed: () {
+                            setState(() {
+                              hidePassword = !hidePassword;
+                            });
+                          },
+                          icon: hidePassword
+                              ? const Icon(Icons.visibility_off_rounded)
+                              : const Icon(Icons.visibility_rounded)),
+                      label: const Text('Password'),
+                      prefixIcon: const Icon(Icons.lock_rounded)),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.redAccent),
+                      onPressed: () {
+                        //deleteFormKey.currentState!.validate();
+                        if (!deleteFormKey.currentState!.validate()) {
+                          ScaffoldMessenger.of(context)
+                              .showSnackBar(const SnackBar(
+                            content: Text('Invalid Login!'),
+                            backgroundColor: Colors.redAccent,
+                          ));
+                        } else {
+                          context.read<SettingsCubit>().deleteAccount(
+                              emailFieldController.value.text,
+                              passwordFieldController.value.text);
+
+                          Future.delayed(const Duration(seconds: 1), () {
+                            Navigator.pop(context);
+                          });
                         }
-                        if (state is SettingsUpdated) {
-                          return const Text('Account Deleted!');
-                        }
-                        return const Text('Delete Account');
                       },
-                    )),
-              )
-            ],
+                      icon: const Icon(
+                        Icons.delete_forever_rounded,
+                        size: 20,
+                      ),
+                      label: BlocBuilder<SettingsCubit, SettingsState>(
+                        builder: (context, state) {
+                          if (state is SettingsLoading) {
+                            return LoadingAnimationWidget.bouncingBall(
+                                color: Colors.white, size: 18);
+                          }
+                          if (state is SettingsUpdated) {
+                            return const Text('Account Deleted!');
+                          }
+                          return const Text('Delete Account');
+                        },
+                      )),
+                )
+              ],
+            ),
           ),
         ),
       ),

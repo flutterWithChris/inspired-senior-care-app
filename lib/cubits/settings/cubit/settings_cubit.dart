@@ -25,7 +25,8 @@ class SettingsCubit extends Cubit<SettingsState> {
       _onChangeOrganizationRequest(organization);
   void changeTitle(String title) => _onChangeTitleRequest(title);
   void loadSettings() => emit(SettingsLoaded());
-  void deleteAccount() => _onDeleteAccountRequest();
+  void deleteAccount(String email, String password) =>
+      _onDeleteAccountRequest(email, password);
 
   void _onPasswordResetRequest(String email) async {
     //  emit(SettingsLoading());
@@ -39,10 +40,10 @@ class SettingsCubit extends Cubit<SettingsState> {
     }
   }
 
-  void _onDeleteAccountRequest() async {
+  void _onDeleteAccountRequest(String email, String password) async {
     try {
       await _databaseRepository.deleteUser(_profileBloc.state.user);
-      await _authRepository.deleteAccount();
+      await _authRepository.deleteAccount(email, password);
       emit(SettingsUpdated());
       await Future.delayed(const Duration(seconds: 1));
       emit(SettingsLoaded());
