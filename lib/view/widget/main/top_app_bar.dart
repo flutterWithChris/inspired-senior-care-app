@@ -22,18 +22,12 @@ class MainTopAppBar extends StatelessWidget {
       foregroundColor: Colors.black87,
       centerTitle: true,
       toolbarHeight: 60,
-      // actions: [
-      //   TextButton.icon(
-      //       onPressed: () {
-      //         context.read<LoginCubit>().signOut();
-      //       },
-      //       icon: const Icon(Icons.logout_rounded),
-      //       label: const Text('Logout')),
-      //   const Padding(
-      //     padding: EdgeInsets.only(right: 8.0),
-      //     child: InboxButton(),
-      //   )
-      // ],
+      actions: const [
+        Padding(
+          padding: EdgeInsets.only(right: 8.0),
+          child: InboxButton(),
+        )
+      ],
       title: title != null
           ? Text(title!)
           : Image.asset(
