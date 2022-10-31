@@ -305,7 +305,6 @@ class _CardCounterState extends State<CardCounter> {
   void initState() {
     super.initState();
     User currentUser = context.read<ProfileBloc>().state.user;
-
     bool categoryStarted =
         currentUser.currentCard!.containsKey(widget.category.name);
     if (categoryStarted) {
@@ -316,7 +315,6 @@ class _CardCounterState extends State<CardCounter> {
 
   @override
   Widget build(BuildContext context) {
-    // currentCard = context.watch<DeckCubit>().state.currentCardNumber!;
     Category category = widget.category;
     return Stack(
       alignment: AlignmentDirectional.center,
@@ -331,34 +329,20 @@ class _CardCounterState extends State<CardCounter> {
                   if (state is CardsLoaded) {
                     bool categoryStarted =
                         user.currentCard!.containsKey(category.name);
-
-                    // Checking if Category has been started.
-                    if (!categoryStarted) {
-                      percentageComplete = 0.0;
-                    }
+                    percentageComplete =
+                        (currentCard - 1) / widget.category.totalCards!;
+                    // * Checking if Category has been started.
                     if (categoryStarted) {
-                      percentageComplete =
-                          (currentCard - 1) / widget.category.totalCards!;
-
-                      // percentageComplete = currentCard > 0
-                      //     ? ((currentCard - 1) / category.totalCards!)
-                      //     : 0;
-
-                      Map<String, int> progressList = user.currentCard!;
-                      // currentCard = progressList[category.name]!;
                       context.read<DeckCubit>().updateCardNumber(currentCard);
-                      print(
-                          '$currentCard is the current card & progress is: ${(percentageComplete)}');
-
                       if (currentCard < category.totalCards! + 1) {
-                        Future.delayed(const Duration(milliseconds: 500), () {
-                          widget.deckScrollController
+                        Future.delayed(const Duration(milliseconds: 500),
+                            () async {
+                          await widget.deckScrollController
                               .animateToItem(currentCard - 1);
                         });
                       } else {
                         context.read<DeckCubit>().completeDeck();
                       }
-
                       return CircleAvatar(
                         backgroundColor: Colors.white,
                         radius: 32,
@@ -385,17 +369,23 @@ class _CardCounterState extends State<CardCounter> {
             return const Text('?');
           },
         ),
-        SizedBox(
-          height: 60,
-          width: 60,
-          child: CircularProgressIndicator(
-            backgroundColor: Colors.grey.shade300,
-            valueColor: AlwaysStoppedAnimation<Color>(
-                context.watch<CardBloc>().state.category!.progressColor),
-            value: percentageComplete == 0
-                ? 0.0
-                : ((currentCard - 1) / category.totalCards!),
-          ),
+        BlocBuilder<DeckCubit, DeckState>(
+          buildWhen: (previous, current) =>
+              previous.currentCardNumber != current.currentCardNumber,
+          builder: (context, state) {
+            return SizedBox(
+              height: 60,
+              width: 60,
+              child: CircularProgressIndicator(
+                backgroundColor: Colors.grey.shade300,
+                valueColor: AlwaysStoppedAnimation<Color>(
+                    context.watch<CardBloc>().state.category!.progressColor),
+                value: percentageComplete == 0
+                    ? 0.0
+                    : ((currentCard - 1) / category.totalCards!),
+              ),
+            );
+          },
         )
       ],
     );

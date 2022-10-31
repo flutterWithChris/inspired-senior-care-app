@@ -113,7 +113,7 @@ class _ManagerDeckPageState extends State<ManagerDeckPage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Padding(
-                      padding: const EdgeInsets.only(top: 60.0),
+                      padding: const EdgeInsets.only(top: 40.0),
                       child: SizedBox(
                         height: 525,
                         child: BlocListener<DeckCubit, DeckState>(

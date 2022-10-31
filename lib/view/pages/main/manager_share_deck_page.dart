@@ -49,7 +49,6 @@ class _ManagerShareDeckPageState extends State<ManagerShareDeckPage> {
 
   @override
   Widget build(BuildContext context) {
-    // int currentCard = context.watch<DeckCubit>().currentCardNumber;
     bool isCardZoomed = false;
     final InfiniteScrollController deckScrollController =
         InfiniteScrollController();
@@ -309,7 +308,6 @@ class _CardCounterState extends State<CardCounter> {
   void initState() {
     super.initState();
     User currentUser = context.read<ProfileBloc>().state.user;
-
     bool categoryStarted =
         currentUser.currentCard!.containsKey(widget.category.name);
     if (categoryStarted) {
@@ -326,47 +324,32 @@ class _CardCounterState extends State<CardCounter> {
       children: [
         BlocBuilder<ProfileBloc, ProfileState>(
           builder: (context, state) {
-            double percentageComplete = 0.0;
             if (state is ProfileLoaded) {
               User user = state.user;
               return BlocBuilder<CardBloc, CardState>(
                   builder: (context, state) {
+                currentCard = context.watch<DeckCubit>().currentCardNumber;
                 if (state is CardsLoaded) {
                   Category currentCategory =
                       context.watch<CardBloc>().state.category!;
                   bool categoryStarted =
                       user.currentCard!.containsKey(currentCategory.name);
-                  // percentComplete =
-                  //     (currentCard - 1) / state.cardImageUrls.length;
-
-                  // Checking if Category has been started.
+                  // * Checking if Category has been started.
                   if (!categoryStarted) {
                     percentageComplete = 0.0;
                     currentCard = 0;
-                    print('Category NOT STARTED');
                   }
                   if (categoryStarted) {
                     int currentCard =
                         context.watch<DeckCubit>().currentCardNumber;
-
-                    Map<String, int> progressList = user.currentCard!;
-                    currentCard = progressList[currentCategory.name]!;
                     context.read<DeckCubit>().updateCardNumber(currentCard);
-                    print(
-                        '$currentCard is the Index & progress is: ${(percentageComplete * 100)}');
-
                     if (currentCard < currentCategory.totalCards!) {
-                      Future.delayed(const Duration(milliseconds: 500), () {
-                        widget.deckScrollController.animateToItem(currentCard);
+                      Future.delayed(const Duration(milliseconds: 500),
+                          () async {
+                        await widget.deckScrollController
+                            .animateToItem(currentCard);
                       });
-
-                      // (((currentCard - 1) / currentCategory.totalCards!) * 100);
-                      // Map<String, int> progressList = user.currentCard!;
-                      // currentCard = progressList[currentCategory.name]!;
                       context.read<DeckCubit>().updateCardNumber(currentCard);
-                      print(
-                          '$currentCard is the current card & progress is: ${(percentageComplete * 100)}');
-
                       if (currentCard < currentCategory.totalCards! + 1) {
                         Future.delayed(const Duration(milliseconds: 500), () {
                           widget.deckScrollController
@@ -404,20 +387,23 @@ class _CardCounterState extends State<CardCounter> {
             return const Text('?');
           },
         ),
-
-        //int currentCard = context.watch<DeckCubit>().currentCardNumber;
-
-        SizedBox(
-          height: 60,
-          width: 60,
-          child: CircularProgressIndicator(
-            backgroundColor: Colors.grey.shade300,
-            valueColor: AlwaysStoppedAnimation<Color>(
-                context.watch<CardBloc>().state.category!.progressColor),
-            value: percentageComplete == 0
-                ? 0.0
-                : ((currentCard - 1) / category.totalCards!),
-          ),
+        BlocBuilder<DeckCubit, DeckState>(
+          buildWhen: (previous, current) =>
+              previous.currentCardNumber != current.currentCardNumber,
+          builder: (context, state) {
+            return SizedBox(
+              height: 60,
+              width: 60,
+              child: CircularProgressIndicator(
+                backgroundColor: Colors.grey.shade300,
+                valueColor: AlwaysStoppedAnimation<Color>(
+                    context.watch<CardBloc>().state.category!.progressColor),
+                value: percentageComplete == 0
+                    ? 0.0
+                    : ((currentCard - 1) / category.totalCards!),
+              ),
+            );
+          },
         )
       ],
     );
