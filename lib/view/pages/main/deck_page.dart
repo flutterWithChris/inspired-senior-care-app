@@ -1255,6 +1255,7 @@ class ShareTextField extends StatelessWidget {
         child: Form(
           key: formKey,
           child: TextFormField(
+            textCapitalization: TextCapitalization.sentences,
             validator: (value) {
               if (value!.isEmpty) {
                 return 'Enter a response!';
