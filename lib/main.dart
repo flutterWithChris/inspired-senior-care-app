@@ -255,7 +255,7 @@ class _MyAppState extends State<MyApp> {
     refreshListenable: GoRouterRefreshStream(bloc.stream),
     redirect: (context, state) async {
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      var initScreen = prefs.getInt("initScreen");
+      int? initScreen = prefs.getInt("initScreen");
       bool isLoggingIn = state.location == '/login';
       bool loggedIn = bloc.state.authStatus == AuthStatus.authenticated;
       bool isOnboarding = state.location == '/login/signup';
