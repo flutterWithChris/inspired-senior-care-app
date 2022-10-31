@@ -45,9 +45,8 @@ class CategoriesBloc extends Bloc<CategoriesEvent, CategoriesState> {
     await emit.forEach(
       _databaseRepository.getCategories(),
       onData: (List<Category>? categories) {
-        print('Got ${categories!.length} categories from Firestore***');
         return CategoriesLoaded(
-            categories: categories, categoryImageUrls: cardImages);
+            categories: categories!, categoryImageUrls: cardImages);
       },
       onError: (error, stackTrace) {
         return CategoriesFailed();

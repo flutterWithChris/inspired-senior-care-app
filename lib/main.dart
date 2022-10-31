@@ -52,10 +52,15 @@ import 'package:inspired_senior_care_app/view/pages/main/profile.dart';
 import 'package:inspired_senior_care_app/view/pages/signup/signup.dart';
 import 'package:inspired_senior_care_app/view/pages/subscriptions.dart';
 import 'package:inspired_senior_care_app/view/widget/main/settings.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  var initScreen = prefs.getInt("initScreen");
+  // await prefs.remove('initScreen');
+  // print('initScreen $initScreen');
   // Pass all uncaught errors from the framework to Crashlytics.
   FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
   runApp(const MyApp());
@@ -248,16 +253,20 @@ class _MyAppState extends State<MyApp> {
     debugLogDiagnostics: true,
     // errorPageBuilder: ,
     refreshListenable: GoRouterRefreshStream(bloc.stream),
-    redirect: (context, state) {
+    redirect: (context, state) async {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      var initScreen = prefs.getInt("initScreen");
       bool isLoggingIn = state.location == '/login';
       bool loggedIn = bloc.state.authStatus == AuthStatus.authenticated;
       bool isOnboarding = state.location == '/login/signup';
       // TODO: Create Onboarding Completed SharedPrefs Value ***
-      bool completedOnboarding = false;
+      bool completedOnboarding = initScreen == 1;
 
       if (!loggedIn) {
         return isLoggingIn
-            ? null
+            ? completedOnboarding
+                ? null
+                : '/login/signup'
             : isOnboarding
                 ? null
                 : '/login';
@@ -265,12 +274,7 @@ class _MyAppState extends State<MyApp> {
 
       final isLoggedIn = state.location == '/';
 
-      //if (!completedOnboarding) return '/login/signup';
-
-      //  if (loggedIn && completedOnboarding == false) return null;
-
       if (loggedIn && isLoggingIn) return isLoggedIn ? null : '/';
-      //  if (loggedIn && isOnboarding) return isLoggedIn ? null : '/';
 
       return null;
     },

@@ -35,8 +35,6 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     });
   }
   void _onLoadProfile(LoadProfile event, Emitter<ProfileState> emit) async {
-    print('User Loading: ${state.user.id}');
-
     await emit.forEach(_databaseRepository.getUser(event.userId),
         onData: (User user) {
       return ProfileLoaded(user: user);
@@ -44,7 +42,6 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   }
 
   void _onUpdateProfile(UpdateProfile event, Emitter<ProfileState> emit) async {
-    print(event.user);
     try {
       _databaseRepository.updateUser(event.user);
       //   emit(ProfileUpdated());

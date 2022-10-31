@@ -11,7 +11,6 @@ enum DeckStatus {
   completed
 }
 
-@immutable
 class DeckState extends Equatable {
   int? currentCardNumber;
   final DeckStatus? status;

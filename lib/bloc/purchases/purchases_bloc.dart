@@ -44,51 +44,46 @@ class PurchasesBloc extends Bloc<PurchasesEvent, PurchasesState> {
           emit(PurchasesLoading());
         }
 
-        try {
-          // Check Revenue Cat for Subscription Status
-          CustomerInfo? customerInfo =
-              await _purchasesRepository.getCustomerInfo();
-          User currentUser = _profileBloc.state.user;
-          print('Checking groups for: ${_profileBloc.state.user.name}');
+        // Check Revenue Cat for Subscription Status
+        CustomerInfo? customerInfo =
+            await _purchasesRepository.getCustomerInfo();
+        User currentUser = _profileBloc.state.user;
 
-          bool? isSubscribed =
-              await _purchasesRepository.getSubscriptionStatus(customerInfo!);
-          Offerings? offerings = await _purchasesRepository.getOfferings();
-          List<StoreProduct>? products;
+        bool? isSubscribed =
+            await _purchasesRepository.getSubscriptionStatus(customerInfo!);
+        Offerings? offerings = await _purchasesRepository.getOfferings();
+        List<StoreProduct>? products;
 
-          // Subscription type 0 = self, 1 = group-inherited.
-          int subscriptionType = 0;
-          Group? subscribedGroup;
+        // Subscription type 0 = self, 1 = group-inherited.
+        int subscriptionType = 0;
+        Group? subscribedGroup;
 
-          // Set managers groups to unsubscribed if no subscription active
-          if (isSubscribed != true && currentUser.type == 'manager') {
-            _databaseRepository.resetGroupSubscriptionStatus(currentUser.id!);
-          }
-
-          // Check if user groups are subscribed for organization access
-          if (isSubscribed != true) {
-            Map<Group?, bool?>? groupMap = await _databaseRepository
-                .getGroupSubscriptionStatus(_authBloc.state.user!.uid);
-            if (groupMap != null && groupMap.containsValue(true)) {
-              subscriptionType = 1;
-              isSubscribed = true;
-              subscribedGroup = groupMap.keys.first;
-            }
-          }
-
-          products = await _purchasesRepository
-              .getProducts(customerInfo.allPurchasedProductIdentifiers);
-
-          emit(PurchasesLoaded(
-              offerings: offerings,
-              isSubscribed: isSubscribed,
-              customerInfo: customerInfo,
-              subscribedGroup: subscribedGroup ?? subscribedGroup,
-              subscriptionType: subscriptionType,
-              products: products));
-        } catch (e) {
-          print(e);
+        // Set managers groups to unsubscribed if no subscription active
+        if (isSubscribed != true && currentUser.type == 'manager') {
+          _databaseRepository.resetGroupSubscriptionStatus(currentUser.id!);
         }
+
+        // Check if user groups are subscribed for organization access
+        if (isSubscribed != true) {
+          Map<Group?, bool?>? groupMap = await _databaseRepository
+              .getGroupSubscriptionStatus(_authBloc.state.user!.uid);
+          if (groupMap != null && groupMap.containsValue(true)) {
+            subscriptionType = 1;
+            isSubscribed = true;
+            subscribedGroup = groupMap.keys.first;
+          }
+        }
+
+        products = await _purchasesRepository
+            .getProducts(customerInfo.allPurchasedProductIdentifiers);
+
+        emit(PurchasesLoaded(
+            offerings: offerings,
+            isSubscribed: isSubscribed,
+            customerInfo: customerInfo,
+            subscribedGroup: subscribedGroup ?? subscribedGroup,
+            subscriptionType: subscriptionType,
+            products: products));
       }
       if (event is AddPurchase) {
         emit(PurchasesLoading());
@@ -111,7 +106,6 @@ class PurchasesBloc extends Bloc<PurchasesEvent, PurchasesState> {
       }
       if (event is SelectPackage) {
         selectedPackage = event.package;
-        print('Selected Package: $event.package');
       }
     });
   }

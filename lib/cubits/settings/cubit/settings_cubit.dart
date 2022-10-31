@@ -1,9 +1,10 @@
 import 'package:bloc/bloc.dart';
+import 'package:flutter/material.dart';
 import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
 import 'package:inspired_senior_care_app/data/models/bug_report.dart';
 import 'package:inspired_senior_care_app/data/repositories/auth/auth_repository.dart';
 import 'package:inspired_senior_care_app/data/repositories/database/database_repository.dart';
-import 'package:meta/meta.dart';
+import 'package:inspired_senior_care_app/globals.dart';
 
 part 'settings_state.dart';
 
@@ -75,7 +76,11 @@ class SettingsCubit extends Cubit<SettingsState> {
       await Future.delayed(const Duration(seconds: 1));
       loadSettings();
     } catch (e) {
-      print(e);
+      final SnackBar snackBar = SnackBar(
+        content: Text(e.toString()),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
     }
   }
 
@@ -89,7 +94,11 @@ class SettingsCubit extends Cubit<SettingsState> {
       await Future.delayed(const Duration(seconds: 1));
       loadSettings();
     } catch (e) {
-      print(e);
+      final SnackBar snackBar = SnackBar(
+        content: Text(e.toString()),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
     }
   }
 
@@ -100,7 +109,13 @@ class SettingsCubit extends Cubit<SettingsState> {
       emit(SettingsUpdated());
       await Future.delayed(const Duration(seconds: 1));
       loadSettings();
-    } catch (e) {}
+    } catch (e) {
+      final SnackBar snackBar = SnackBar(
+        content: Text(e.toString()),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
+    }
   }
 
   void _onChangeTitleRequest(String title) async {
@@ -111,7 +126,11 @@ class SettingsCubit extends Cubit<SettingsState> {
       await Future.delayed(const Duration(seconds: 1));
       loadSettings();
     } catch (e) {
-      print(e);
+      final SnackBar snackBar = SnackBar(
+        content: Text(e.toString()),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
     }
   }
 }

@@ -25,7 +25,13 @@ class AuthRepository extends BaseAuthRepository {
           email: email, password: password);
       final auth.User? user = credential.user;
       return user;
-    } catch (_) {}
+    } on auth.FirebaseAuthException catch (e) {
+      final SnackBar snackBar = SnackBar(
+        content: Text(e.message!),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
+    }
     return null;
   }
 
@@ -35,7 +41,6 @@ class AuthRepository extends BaseAuthRepository {
     required String password,
   }) async {
     try {
-      print('Sign in attempted....$email');
       final credential = await _firebaseAuth.signInWithEmailAndPassword(
           email: email, password: password);
       final auth.User? user = credential.user;
@@ -111,7 +116,6 @@ class AuthRepository extends BaseAuthRepository {
   @override
   Future<void> deleteAccount(String email, String password) async {
     try {
-      // TODO: Reauthenticate user before attempting delete.
       final credential =
           auth.EmailAuthProvider.credential(email: email, password: password);
       await _firebaseAuth.currentUser!.reauthenticateWithCredential(credential);

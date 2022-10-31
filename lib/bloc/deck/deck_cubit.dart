@@ -4,7 +4,7 @@ import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
 import 'package:inspired_senior_care_app/data/models/category.dart';
 import 'package:inspired_senior_care_app/data/models/user.dart';
 import 'package:inspired_senior_care_app/data/repositories/database/database_repository.dart';
-import 'package:meta/meta.dart';
+
 
 part 'deck_state.dart';
 
