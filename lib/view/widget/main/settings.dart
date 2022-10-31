@@ -37,11 +37,13 @@ class SettingsPage extends StatelessWidget {
             User currentUser = context.watch<ProfileBloc>().state.user;
             List<AbstractSettingsTile> mainSettingsTiles = [
               SettingsTile.navigation(
-                title: const Padding(
-                  padding: EdgeInsets.only(right: 8.0),
-                  child: Text('Email'),
-                ),
-                value: Text(currentUser.email!),
+                title: const Text('Email'),
+                value: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 180),
+                    child: FittedBox(
+                        alignment: Alignment.centerRight,
+                        fit: BoxFit.scaleDown,
+                        child: Text(currentUser.email!))),
                 leading: const Icon(Icons.email_rounded),
                 onPressed: (context) {
                   showDialog(
@@ -57,7 +59,15 @@ class SettingsPage extends StatelessWidget {
                   padding: EdgeInsets.only(right: 8.0),
                   child: Text('Name'),
                 ),
-                value: Text(currentUser.name!),
+                value: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 180),
+                    child: FittedBox(
+                        alignment: Alignment.centerRight,
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          currentUser.name!,
+                          textAlign: TextAlign.end,
+                        ))),
                 leading: const Icon(Icons.person),
                 onPressed: (context) {
                   showDialog(
@@ -73,7 +83,12 @@ class SettingsPage extends StatelessWidget {
                   padding: EdgeInsets.only(right: 8.0),
                   child: Text('Title'),
                 ),
-                value: Text(currentUser.title!),
+                value: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 180),
+                    child: FittedBox(
+                        alignment: Alignment.centerRight,
+                        fit: BoxFit.scaleDown,
+                        child: Text(currentUser.title!))),
                 leading: const Icon(Icons.badge),
                 onPressed: (context) {
                   showDialog(
@@ -124,7 +139,13 @@ class SettingsPage extends StatelessWidget {
                       padding: EdgeInsets.only(right: 8.0),
                       child: Text('Organization'),
                     ),
-                    value: Text(currentUser.organization ?? 'nope'),
+                    value: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 180),
+                      child: FittedBox(
+                          alignment: Alignment.centerRight,
+                          fit: BoxFit.scaleDown,
+                          child: Text(currentUser.organization ?? 'nope')),
+                    ),
                     leading: const Icon(Icons.work_rounded),
                     onPressed: (context) {
                       showDialog(
@@ -344,7 +365,7 @@ class _ChangeEmailDialogState extends State<ChangeEmailDialog> {
   @override
   Widget build(BuildContext context) {
     User currentUser = context.watch<ProfileBloc>().state.user;
-    //oldEmailFieldController.text = currentUser.email!;
+    oldEmailFieldController.text = currentUser.email!;
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
       child: Padding(
@@ -388,7 +409,7 @@ class _ChangeEmailDialogState extends State<ChangeEmailDialog> {
                     }
                     return null;
                   },
-                  autofocus: true,
+                  autofocus: false,
                   controller: oldEmailFieldController,
                   decoration: const InputDecoration(
                       label: Text('Current Email Address'),
@@ -399,6 +420,7 @@ class _ChangeEmailDialogState extends State<ChangeEmailDialog> {
                 ),
                 TextFormField(
                   keyboardType: TextInputType.emailAddress,
+                  autofocus: true,
                   // autovalidateMode: AutovalidateMode.onUserInteraction,
                   validator: (value) =>
                       value != null && !EmailValidator.validate(value)
@@ -519,6 +541,7 @@ class _ChangeNameDialogState extends State<ChangeNameDialog> {
                 ),
               ),
               TextFormField(
+                autofocus: true,
                 textCapitalization: TextCapitalization.words,
                 keyboardType: TextInputType.name,
                 controller: nameFieldController,
@@ -588,6 +611,7 @@ class _ChangeTitleDialogState extends State<ChangeTitleDialog> {
                 ),
               ),
               TextFormField(
+                autofocus: true,
                 textCapitalization: TextCapitalization.words,
                 keyboardType: TextInputType.text,
                 controller: titleFieldController,
@@ -659,6 +683,7 @@ class _ChangeOrganizationDialogState extends State<ChangeOrganizationDialog> {
                 ),
               ),
               TextFormField(
+                autofocus: true,
                 textCapitalization: TextCapitalization.words,
                 keyboardType: TextInputType.text,
                 controller: organizationFieldController,

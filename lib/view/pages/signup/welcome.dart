@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class WelcomePage extends StatelessWidget {
+class WelcomePage extends StatefulWidget {
   final PageController pageController;
   const WelcomePage({
     Key? key,
     required this.pageController,
   }) : super(key: key);
 
+  @override
+  State<WelcomePage> createState() => _WelcomePageState();
+}
+
+class _WelcomePageState extends State<WelcomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,15 +33,15 @@ class WelcomePage extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8.0),
                   child: Text('Welcome!',
-                      style: Theme.of(context).textTheme.headline2),
+                      style: Theme.of(context).textTheme.displayMedium),
                 ),
                 const Text(
                     'Learn the what\'s, why\'s, & how\'s of senior care.'),
                 Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 18.0),
+                  padding: const EdgeInsets.only(top: 18),
                   child: ElevatedButton(
                     onPressed: () {
-                      pageController.nextPage(
+                      widget.pageController.nextPage(
                           duration: const Duration(milliseconds: 500),
                           curve: Curves.easeInOut);
                     },
@@ -43,6 +50,22 @@ class WelcomePage extends StatelessWidget {
                     child: const Text('Get Started'),
                   ),
                 ),
+                TextButton(
+                    onPressed: () async {
+                      SharedPreferences prefs =
+                          await SharedPreferences.getInstance();
+                      await prefs.setInt('initScreen', 1);
+                      if (!mounted) return;
+                      context.goNamed('login');
+                    },
+                    child: const Text.rich(
+                      TextSpan(children: [
+                        TextSpan(text: 'Have an account?'),
+                        TextSpan(
+                            text: ' Sign in.',
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                      ]),
+                    ))
               ],
             ),
           ),

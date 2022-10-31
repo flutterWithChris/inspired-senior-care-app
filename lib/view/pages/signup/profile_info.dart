@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:inspired_senior_care_app/bloc/onboarding/onboarding_bloc.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileInfo extends StatefulWidget {
   final PageController pageController;
@@ -179,6 +180,9 @@ class _ProfileInfoState extends State<ProfileInfo> {
                             builder: (context, state) {
                               if (state is OnboardingLoaded) {
                                 return ColorPicker(
+                                  pickersEnabled: const {
+                                    ColorPickerType.accent: false
+                                  },
                                   color: screenPickerColor,
                                   onColorChanged: (Color selectedColor) {
                                     setState(() =>
@@ -186,13 +190,13 @@ class _ProfileInfoState extends State<ProfileInfo> {
                                   },
                                   borderRadius: 22,
                                   heading: Text(
-                                    'Choose a Color',
+                                    'Choose a Profile Color',
                                     style: Theme.of(context)
                                         .textTheme
                                         .headlineSmall,
                                   ),
                                   subheading: Text(
-                                    'Pick a Shade',
+                                    'Change Shade',
                                     style: Theme.of(context)
                                         .textTheme
                                         .headlineSmall,
@@ -220,7 +224,7 @@ class _ProfileInfoState extends State<ProfileInfo> {
                         ),
                       ),
                       ElevatedButton(
-                          onPressed: () {
+                          onPressed: () async {
                             if (formKey.currentState!.validate() == true) {
                               context.read<OnboardingBloc>().add(UpdateUser(
                                   user: state.user.copyWith(
@@ -229,6 +233,11 @@ class _ProfileInfoState extends State<ProfileInfo> {
                                       organization: organizationFieldController
                                           .value.text,
                                       userColor: screenPickerColor.hex)));
+                              // Set onboarding shared prefs value to true AKA 1
+                              SharedPreferences prefs =
+                                  await SharedPreferences.getInstance();
+                              prefs.setInt('initScreen', 1);
+                              if (!mounted) return;
                               context.go('/');
                             }
                           },

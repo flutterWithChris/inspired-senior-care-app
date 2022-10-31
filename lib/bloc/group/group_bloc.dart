@@ -108,9 +108,8 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
     emit(GroupLoading());
     User currentUser = _profileBloc.state.user;
 
-    print('***LOADING GROUPS***');
     int groupCount = await _databaseRepository.getGroupCount(currentUser.id!);
-    print('Group Array Length: $groupCount; User: ${currentUser.name}');
+
     groups.clear();
     //int groupCount = event.currentUser.groups!.length ?? 0;
     if (groupCount > 0) {
@@ -119,7 +118,6 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
             ? await emit.forEach(
                 _databaseRepository.getMemberGroups(currentUser.id!),
                 onData: (List<Group> data) {
-                  print('Bloc received ${data.length} groups***');
                   return GroupLoaded(myGroups: data);
                 },
               )
@@ -130,7 +128,6 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
                 },
               );
 
-        print('Adding ${currentUser.groups![i]}');
         await Future.delayed(const Duration(milliseconds: 500));
       }
     } else {

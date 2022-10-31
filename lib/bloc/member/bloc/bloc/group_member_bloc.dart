@@ -36,13 +36,12 @@ class GroupMemberBloc extends Bloc<GroupMemberEvent, GroupMemberState> {
       LoadGroupMembers event, Emitter<GroupMemberState> emit) async {
     members.clear();
     emit(GroupMembersLoading());
-    print('Got ${event.userIds.length} users');
+
     _databaseRepository.getGroup(event.group.groupId!).listen((group) {
       currentGroup = group;
       for (String userId in group.groupMemberIds!) {
         _databaseRepository.getUser(userId).listen(
           (user) async {
-            print('${user.name} received from Firebase');
             members.add(user);
           },
         );

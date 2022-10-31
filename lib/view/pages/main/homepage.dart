@@ -34,7 +34,7 @@ class _MyHomePageState extends State<MyHomePage> {
               //   mainAxisAlignment: MainAxisAlignment.center,
               children: const <Widget>[
                 Padding(
-                  padding: EdgeInsets.only(top: 24, bottom: 30.0),
+                  padding: EdgeInsets.only(top: 24, bottom: 24.0),
                   child: Text(
                     'Monthly Category',
                     style: TextStyle(fontSize: 30),

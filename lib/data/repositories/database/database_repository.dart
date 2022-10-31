@@ -1,11 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/material.dart';
 import 'package:inspired_senior_care_app/data/models/bug_report.dart';
 import 'package:inspired_senior_care_app/data/models/category.dart';
 import 'package:inspired_senior_care_app/data/models/group.dart';
 import 'package:inspired_senior_care_app/data/models/response.dart';
 import 'package:inspired_senior_care_app/data/models/user.dart';
 import 'package:inspired_senior_care_app/data/repositories/database/base_database_repository.dart';
+import 'package:inspired_senior_care_app/globals.dart';
 
 import '../../models/invite.dart';
 
@@ -219,7 +222,13 @@ class DatabaseRepository extends BaseDatabaseRepository {
       });
       await _firebaseFirestore.collection('groups').doc(group.groupId).delete();
     } catch (e) {
-      print(e);
+      final SnackBar snackBar = SnackBar(
+        content: Text(e.toString()),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
     }
   }
 
@@ -261,7 +270,6 @@ class DatabaseRepository extends BaseDatabaseRepository {
         .where('groupManagerIds', arrayContains: userId)
         .snapshots()
         .map((snapshot) {
-      print('Fetching Groups from Firebase');
       return snapshot.docs.map((doc) => Group.fromSnapshot(doc)).toList();
     });
   }
@@ -272,7 +280,6 @@ class DatabaseRepository extends BaseDatabaseRepository {
         .where('groupMemberIds', arrayContains: userId)
         .snapshots()
         .map((snapshot) {
-      print('Fetching Groups from Firebase');
       return snapshot.docs.map((doc) => Group.fromSnapshot(doc)).toList();
     });
   }
@@ -281,8 +288,7 @@ class DatabaseRepository extends BaseDatabaseRepository {
     return _firebaseFirestore
         .collection('groups')
         .doc(group.groupId)
-        .update(group.toMap())
-        .then((value) => print('Group Updated!'));
+        .update(group.toMap());
   }
 
   Future<void> addMemberToGroup(
@@ -296,7 +302,13 @@ class DatabaseRepository extends BaseDatabaseRepository {
         'groupMemberIds': FieldValue.arrayUnion([userId])
       });
     } catch (e) {
-      print(e);
+      final SnackBar snackBar = SnackBar(
+        content: Text(e.toString()),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
     }
   }
 
@@ -309,7 +321,13 @@ class DatabaseRepository extends BaseDatabaseRepository {
         'groupMemberIds': FieldValue.arrayUnion([userId])
       });
     } catch (e) {
-      print(e);
+      final SnackBar snackBar = SnackBar(
+        content: Text(e.toString()),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
     }
   }
 
@@ -326,7 +344,13 @@ class DatabaseRepository extends BaseDatabaseRepository {
       var docId = documentSnapshot.reference.id;
       docRef.set({'inviteId': docId}, SetOptions(merge: true));
     } catch (e) {
-      print(e);
+      final SnackBar snackBar = SnackBar(
+        content: Text(e.toString()),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
     }
     return;
   }

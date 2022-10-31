@@ -1,9 +1,9 @@
 import 'dart:async';
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
-
+import 'package:flutter/cupertino.dart';
 import 'package:inspired_senior_care_app/data/repositories/auth/auth_repository.dart';
 import 'package:inspired_senior_care_app/data/repositories/purchases/purchases_repository.dart';
 
@@ -40,7 +40,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> with ChangeNotifier {
 
   void _onUserChanged(AuthUserChanged event, Emitter<AuthState> emit) async {
     if (event.user != null) {
-      print('User Authenticated: ${event.user!.uid}');
       await _purchasesRepository.loginToRevCat(event.user!.uid);
     } else {
       await _purchasesRepository.logoutOfRevCat();
@@ -54,7 +53,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> with ChangeNotifier {
 
   void _onLogoutRequested(
       AppLogoutRequested event, Emitter<AuthState> emit) async {
-    print('User Logged Out');
     unawaited(_authRepository.signOut());
     emit(const AuthState.unauthenticated());
   }
