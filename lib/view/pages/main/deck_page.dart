@@ -211,7 +211,9 @@ class _DeckPageState extends State<DeckPage> {
                                           // TODO: implement listener
                                           if (state.status ==
                                               DeckStatus.completed) {
-                                            isSwipeDisabled = false;
+                                            setState(() {
+                                              isSwipeDisabled = false;
+                                            });
                                           }
                                           if (state.status ==
                                               DeckStatus.zoomed) {
