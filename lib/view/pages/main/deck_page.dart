@@ -215,10 +215,14 @@ class _DeckPageState extends State<DeckPage> {
                                           }
                                           if (state.status ==
                                               DeckStatus.zoomed) {
-                                            isCardZoomed = true;
+                                            setState(() {
+                                              isCardZoomed = true;
+                                            });
                                           } else if (state.status ==
                                               DeckStatus.unzoomed) {
-                                            isCardZoomed = false;
+                                            setState(() {
+                                              isCardZoomed = false;
+                                            });
                                           }
                                         },
                                         child: Deck(
@@ -251,13 +255,10 @@ class _DeckPageState extends State<DeckPage> {
                         child: Padding(
                           padding:
                               const EdgeInsets.only(top: 24.0, bottom: 24.0),
-                          child: Visibility(
-                            visible: isSwipeDisabled ? true : false,
-                            child: ShareButton(
-                                category: state.category,
-                                formKey: shareFieldFormKey,
-                                categoryName: state.category.name),
-                          ),
+                          child: ShareButton(
+                              category: state.category,
+                              formKey: shareFieldFormKey,
+                              categoryName: state.category.name),
                         ),
                       ),
                     )
