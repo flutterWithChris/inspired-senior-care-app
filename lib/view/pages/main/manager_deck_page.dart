@@ -15,8 +15,14 @@ import 'package:inspired_senior_care_app/view/widget/main/bottom_app_bar.dart';
 
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
-class ManagerDeckPage extends StatelessWidget {
+class ManagerDeckPage extends StatefulWidget {
+  @override
+  State<ManagerDeckPage> createState() => _ManagerDeckPageState();
+}
+
+class _ManagerDeckPageState extends State<ManagerDeckPage> {
   bool isCardZoomed = false;
+
   final InfiniteScrollController deckScrollController =
       InfiniteScrollController();
 
@@ -241,7 +247,7 @@ class Deck extends StatelessWidget {
             itemCount: state.cardImageUrls.length,
             itemExtent: 320,
             onIndexChanged: (p0) {
-              if ((p0 + 1) > (state.category.totalCards! / 3).round() &&
+              if ((p0) > (state.category.totalCards! / 2).round() &&
                   (isSubscribed == null || isSubscribed == false)) {
                 WidgetsBinding.instance.addPostFrameCallback((_) => showDialog(
                       barrierDismissible: false,

@@ -5,7 +5,6 @@ import 'package:inspired_senior_care_app/data/models/category.dart';
 import 'package:inspired_senior_care_app/data/models/user.dart';
 import 'package:inspired_senior_care_app/data/repositories/database/database_repository.dart';
 
-
 part 'deck_state.dart';
 
 class DeckCubit extends Cubit<DeckState> {
@@ -20,8 +19,8 @@ class DeckCubit extends Cubit<DeckState> {
         super(DeckState.initial());
   void loadDeck(Category category) {
     User currentUser = _profileBloc.state.user;
-    int currentCard = currentUser.currentCard![category.name] ?? 1;
-    emit(DeckState.loaded(currentCard));
+    currentCardNumber = currentUser.currentCard![category.name] ?? 1;
+    emit(DeckState.loaded(currentCardNumber));
   }
 
   void resetDeck() => emit(DeckState.loaded(1));

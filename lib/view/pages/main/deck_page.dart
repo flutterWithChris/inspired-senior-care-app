@@ -56,6 +56,7 @@ class _DeckPageState extends State<DeckPage> {
   @override
   Widget build(BuildContext context) {
     final GlobalKey<FormState> shareFieldFormKey = GlobalKey<FormState>();
+    currentCard = context.watch<DeckCubit>().currentCardNumber;
 
     return Scaffold(
         backgroundColor: Colors.grey.shade200,
@@ -154,7 +155,8 @@ class _DeckPageState extends State<DeckPage> {
                   }
                 }
 
-                if (currentCard >= (widget.category.totalCards! / 3).round() &&
+                if (currentCard - 1 >=
+                        (widget.category.totalCards! / 2).round() &&
                     (isSubscribed == false || isSubscribed == null)) {
                   WidgetsBinding.instance
                       .addPostFrameCallback((_) async => await showDialog(
@@ -183,68 +185,68 @@ class _DeckPageState extends State<DeckPage> {
                   direction: Axis.vertical,
                   children: [
                     Flexible(
-                      flex: 5,
+                      flex: 6,
                       child: SingleChildScrollView(
+                        physics: const BouncingScrollPhysics(),
+                        clipBehavior: Clip.antiAlias,
+                        padding: const EdgeInsets.only(top: 40),
                         reverse: true,
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 40.0),
-                          child: AnimatedSlide(
-                            curve: Curves.decelerate,
-                            duration: const Duration(milliseconds: 200),
-                            offset: isCardZoomed
-                                ? const Offset(0, -0.1)
-                                : const Offset(0, -0.0),
-                            child: AnimatedScale(
-                              duration: const Duration(milliseconds: 250),
-                              scale: isCardZoomed ? 1.1 : 1.0,
-                              child: Stack(
-                                clipBehavior: Clip.none,
-                                alignment: AlignmentDirectional.topEnd,
-                                children: [
-                                  SizedBox(
-                                    height: 500,
-                                    //  width: 330,
-                                    child: IgnorePointer(
-                                      ignoring: isSwipeDisabled,
-                                      child: BlocListener<DeckCubit, DeckState>(
-                                        listener: (context, state) {
-                                          // TODO: implement listener
-                                          if (state.status ==
-                                              DeckStatus.completed) {
-                                            setState(() {
-                                              isSwipeDisabled = false;
-                                            });
-                                          }
-                                          if (state.status ==
-                                              DeckStatus.zoomed) {
-                                            setState(() {
-                                              isCardZoomed = true;
-                                            });
-                                          } else if (state.status ==
-                                              DeckStatus.unzoomed) {
-                                            setState(() {
-                                              isCardZoomed = false;
-                                            });
-                                          }
-                                        },
-                                        child: Deck(
-                                            deckScrollController:
-                                                deckScrollController),
-                                      ),
-                                    ),
-                                  ),
-                                  Visibility(
-                                    visible: isSwipeDisabled ? true : false,
-                                    child: Positioned(
-                                      right: 20,
-                                      top: -20,
-                                      child: CardCounter(
+                        child: AnimatedSlide(
+                          curve: Curves.decelerate,
+                          duration: const Duration(milliseconds: 200),
+                          offset: isCardZoomed
+                              ? const Offset(0, -0.1)
+                              : const Offset(0, -0.0),
+                          child: AnimatedScale(
+                            duration: const Duration(milliseconds: 250),
+                            scale: isCardZoomed ? 1.1 : 1.0,
+                            child: Stack(
+                              clipBehavior: Clip.none,
+                              alignment: AlignmentDirectional.topEnd,
+                              children: [
+                                SizedBox(
+                                  height: 500,
+                                  //  width: 330,
+                                  child: IgnorePointer(
+                                    ignoring: isSwipeDisabled,
+                                    child: BlocListener<DeckCubit, DeckState>(
+                                      listener: (context, state) {
+                                        // TODO: implement listener
+                                        if (state.status ==
+                                            DeckStatus.completed) {
+                                          setState(() {
+                                            isSwipeDisabled = false;
+                                          });
+                                        }
+                                        if (state.status == DeckStatus.zoomed) {
+                                          setState(() {
+                                            isCardZoomed = true;
+                                          });
+                                        } else if (state.status ==
+                                            DeckStatus.unzoomed) {
+                                          setState(() {
+                                            isCardZoomed = false;
+                                          });
+                                        }
+                                      },
+                                      child: Deck(
                                           deckScrollController:
                                               deckScrollController),
                                     ),
                                   ),
-                                ],
-                              ),
+                                ),
+                                Visibility(
+                                  visible: isSwipeDisabled ? true : false,
+                                  child: Positioned(
+                                    right: 20,
+                                    top: -20,
+                                    child: CardCounter(
+                                        category: widget.category,
+                                        deckScrollController:
+                                            deckScrollController),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
@@ -256,8 +258,9 @@ class _DeckPageState extends State<DeckPage> {
                         opacity: isCardZoomed ? 0 : 1.0,
                         child: Padding(
                           padding:
-                              const EdgeInsets.only(top: 24.0, bottom: 24.0),
+                              const EdgeInsets.only(top: 16.0, bottom: 24.0),
                           child: ShareButton(
+                              currentCard: currentCard,
                               category: state.category,
                               formKey: shareFieldFormKey,
                               categoryName: state.category.name),
@@ -281,55 +284,76 @@ class _DeckPageState extends State<DeckPage> {
   }
 }
 
-class CardCounter extends StatelessWidget {
+class CardCounter extends StatefulWidget {
   final InfiniteScrollController deckScrollController;
+  final Category category;
   const CardCounter({
+    required this.category,
     required this.deckScrollController,
     Key? key,
   }) : super(key: key);
 
   @override
+  State<CardCounter> createState() => _CardCounterState();
+}
+
+class _CardCounterState extends State<CardCounter> {
+  double percentageComplete = 0.0;
+  int currentCard = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    User currentUser = context.read<ProfileBloc>().state.user;
+
+    bool categoryStarted =
+        currentUser.currentCard!.containsKey(widget.category.name);
+    if (categoryStarted) {
+      currentCard = currentUser.currentCard![widget.category.name]!;
+      percentageComplete = (currentCard - 1) / widget.category.totalCards!;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    double progress = 0.0;
-    int currentCard = context.watch<DeckCubit>().currentCardNumber;
+    // currentCard = context.watch<DeckCubit>().state.currentCardNumber!;
+    Category category = widget.category;
     return Stack(
       alignment: AlignmentDirectional.center,
       children: [
         BlocBuilder<ProfileBloc, ProfileState>(
           builder: (context, state) {
-            double percentComplete = 0.0;
             if (state is ProfileLoaded) {
               User user = state.user;
               return BlocBuilder<CardBloc, CardState>(
                 builder: (context, state) {
+                  currentCard = context.watch<DeckCubit>().currentCardNumber;
                   if (state is CardsLoaded) {
-                    Category currentCategory = state.category;
                     bool categoryStarted =
-                        user.currentCard!.containsKey(currentCategory.name);
-                    percentComplete =
-                        (currentCard) / state.cardImageUrls.length;
-                    if (categoryStarted) {
-                      Map<String, int> progressList =
-                          context.watch<ProfileBloc>().state.user.currentCard!;
-                    }
+                        user.currentCard!.containsKey(category.name);
+
                     // Checking if Category has been started.
                     if (!categoryStarted) {
-                      percentComplete = 0.0;
-                      progress = 0.0;
+                      percentageComplete = 0.0;
                     }
                     if (categoryStarted) {
-                      progress =
-                          (((currentCard - 1) / currentCategory.totalCards!) *
-                              100);
+                      percentageComplete =
+                          (currentCard - 1) / widget.category.totalCards!;
+
+                      // percentageComplete = currentCard > 0
+                      //     ? ((currentCard - 1) / category.totalCards!)
+                      //     : 0;
+
                       Map<String, int> progressList = user.currentCard!;
-                      currentCard = progressList[currentCategory.name]!;
+                      // currentCard = progressList[category.name]!;
                       context.read<DeckCubit>().updateCardNumber(currentCard);
                       print(
-                          '$currentCard is the current card & progress is: ${(percentComplete * 100)}');
+                          '$currentCard is the current card & progress is: ${(percentageComplete)}');
 
-                      if (currentCard < currentCategory.totalCards! + 1) {
+                      if (currentCard < category.totalCards! + 1) {
                         Future.delayed(const Duration(milliseconds: 500), () {
-                          deckScrollController.animateToItem(currentCard - 1);
+                          widget.deckScrollController
+                              .animateToItem(currentCard - 1);
                         });
                       } else {
                         context.read<DeckCubit>().completeDeck();
@@ -339,7 +363,7 @@ class CardCounter extends StatelessWidget {
                         backgroundColor: Colors.white,
                         radius: 32,
                         child: Text(
-                          '${(currentCard - 1)}/${currentCategory.totalCards}',
+                          '${(currentCard - 1)}/${category.totalCards}',
                           style: const TextStyle(fontSize: 20),
                         ),
                       );
@@ -348,7 +372,7 @@ class CardCounter extends StatelessWidget {
                         backgroundColor: Colors.white,
                         radius: 32,
                         child: Text(
-                          '0/${currentCategory.totalCards}',
+                          '0/${category.totalCards}',
                           style: const TextStyle(fontSize: 20),
                         ),
                       );
@@ -361,25 +385,17 @@ class CardCounter extends StatelessWidget {
             return const Text('?');
           },
         ),
-        BlocBuilder<CardBloc, CardState>(
-          builder: (context, state) {
-            if (state is CardsLoaded) {
-              //int currentCard = context.watch<DeckCubit>().currentCardNumber;
-              double percentageComplete =
-                  ((currentCard - 1) / state.cardImageUrls.length);
-              return SizedBox(
-                height: 60,
-                width: 60,
-                child: CircularProgressIndicator(
-                  backgroundColor: Colors.grey.shade300,
-                  valueColor: AlwaysStoppedAnimation<Color>(
-                      state.category.progressColor),
-                  value: percentageComplete,
-                ),
-              );
-            }
-            return const Text('Something Went Wrong..');
-          },
+        SizedBox(
+          height: 60,
+          width: 60,
+          child: CircularProgressIndicator(
+            backgroundColor: Colors.grey.shade300,
+            valueColor: AlwaysStoppedAnimation<Color>(
+                context.watch<CardBloc>().state.category!.progressColor),
+            value: percentageComplete == 0
+                ? 0.0
+                : ((currentCard - 1) / category.totalCards!),
+          ),
         )
       ],
     );
@@ -1093,6 +1109,7 @@ class _OrganizationOfferCardState extends State<OrganizationOfferCard> {
 }
 
 class ShareButton extends StatelessWidget {
+  final int currentCard;
   final Category category;
   final GlobalKey<FormState> formKey;
   final String categoryName;
@@ -1100,6 +1117,7 @@ class ShareButton extends StatelessWidget {
 
   ShareButton(
       {required this.category,
+      required this.currentCard,
       required this.categoryName,
       required this.formKey,
       super.key});
@@ -1144,6 +1162,7 @@ class ShareButton extends StatelessWidget {
                         shareFieldController: shareFieldController,
                       ),
                       SendButton(
+                        currentCard: currentCard,
                         category: category,
                         formKey: formKey,
                         categoryName: categoryName,
@@ -1282,6 +1301,7 @@ class ShareTextField extends StatelessWidget {
 }
 
 class SendButton extends StatefulWidget {
+  final int currentCard;
   final Category category;
   final GlobalKey<FormState> formKey;
   final String categoryName;
@@ -1289,6 +1309,7 @@ class SendButton extends StatefulWidget {
 
   const SendButton(
       {required this.category,
+      required this.currentCard,
       required this.categoryName,
       required this.shareFieldController,
       required this.formKey,
@@ -1302,17 +1323,17 @@ class SendButton extends StatefulWidget {
 class _SendButtonState extends State<SendButton> {
   @override
   Widget build(BuildContext context) {
-    int currentCard = context.watch<DeckCubit>().currentCardNumber;
+    //int currentCard = context.watch<DeckCubit>().currentCardNumber;
     return ElevatedButton.icon(
       style: ElevatedButton.styleFrom(fixedSize: const Size(240, 42)),
       onPressed: () async {
         if (widget.formKey.currentState!.validate()) {
           context.read<ShareBloc>().add(SubmitPressed(
               categoryName: widget.categoryName,
-              cardNumber: currentCard,
+              cardNumber: widget.currentCard,
               response: widget.shareFieldController.text));
 
-          if (currentCard == (widget.category.totalCards! + 1)) {
+          if (widget.currentCard == (widget.category.totalCards! + 1)) {
             //context.read<DeckCubit>().resetDeck();
             widget.shareFieldController.clear();
             Navigator.pop(context);
