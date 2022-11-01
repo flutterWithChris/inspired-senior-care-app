@@ -241,9 +241,7 @@ class Deck extends StatelessWidget {
           bool? isSubscribed =
               context.watch<PurchasesBloc>().state.isSubscribed;
           return InfiniteCarousel.builder(
-            physics: const InfiniteScrollPhysics(parent: PageScrollPhysics()),
             controller: deckScrollController,
-            velocityFactor: 0.23,
             itemCount: state.cardImageUrls.length,
             itemExtent: 320,
             onIndexChanged: (p0) {
