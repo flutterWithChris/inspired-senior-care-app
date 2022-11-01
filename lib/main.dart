@@ -292,16 +292,18 @@ class _MyAppState extends State<MyApp> {
           ),
         ]),
     GoRoute(
+      name: 'settings',
+      path: '/settings',
+      builder: (context, state) => const SettingsPage(),
+    ),
+    GoRoute(
         name: 'home',
         path: '/',
-        builder: (context, state) => const MyHomePage(),
-        routes: [
-          GoRoute(
-            name: 'settings',
-            path: 'settings',
-            builder: (context, state) => const SettingsPage(),
-          ),
-        ]),
+        builder: (context, state) {
+          Globals().index = 1;
+          return const MyHomePage();
+        },
+        routes: const []),
     GoRoute(
         name: 'categories',
         path: '/categories',

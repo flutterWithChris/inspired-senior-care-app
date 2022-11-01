@@ -42,7 +42,7 @@ class MainAppDrawer extends StatelessWidget {
                     children: [
                       ListTile(
                         onTap: () {
-                          context.goNamed('settings');
+                          context.pushNamed('settings');
                         },
                         title: Text(
                           'Settings',

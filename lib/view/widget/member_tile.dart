@@ -39,8 +39,10 @@ class GroupMemberTile extends StatelessWidget {
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           onTap: () {
-            context.read<MemberBloc>().add(LoadMember(userId: memberId, group: currentGroup));
-            context.goNamed('view-member');
+            context
+                .read<MemberBloc>()
+                .add(LoadMember(userId: memberId, group: currentGroup));
+            context.pushNamed('view-member');
           },
           dense: true,
           minLeadingWidth: 50,

@@ -421,8 +421,7 @@ class Deck extends StatelessWidget {
         }
         if (state is CardsLoaded) {
           return InfiniteCarousel.builder(
-            //anchor: -20.0,
-            // physics: const PageScrollPhysics(),
+            physics: const InfiniteScrollPhysics(parent: PageScrollPhysics()),
             center: true,
             loop: false,
             controller: deckScrollController,

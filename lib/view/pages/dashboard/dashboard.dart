@@ -105,8 +105,9 @@ class _DashboardState extends State<Dashboard> {
                                   ),
                                   Text(
                                     'My Groups',
-                                    style:
-                                        Theme.of(context).textTheme.headline5,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headlineSmall,
                                   ),
                                 ],
                               ),
@@ -284,9 +285,14 @@ class _GroupSectionState extends State<GroupSection> {
                     child: FittedBox(
                       child: Text(
                         currentGroup.groupName!,
-                        style: Theme.of(context).textTheme.headline4!.copyWith(
-                            color:
-                                Theme.of(context).textTheme.bodyMedium!.color),
+                        style: Theme.of(context)
+                            .textTheme
+                            .headlineMedium!
+                            .copyWith(
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium!
+                                    .color),
                       ),
                     ),
                   ),
@@ -404,7 +410,7 @@ class _GroupSectionState extends State<GroupSection> {
                                     LoadGroupMembers(
                                         userIds: widget.group.groupMemberIds!,
                                         group: currentGroup));
-                                context.goNamed('view-group-members');
+                                context.pushNamed('view-group-members');
                               },
                               child: Wrap(
                                 spacing: 8.0,
