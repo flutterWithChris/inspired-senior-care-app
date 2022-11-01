@@ -424,7 +424,7 @@ class Deck extends StatelessWidget {
             center: true,
             loop: false,
             controller: deckScrollController,
-            velocityFactor: 0.3,
+            velocityFactor: 0.23,
             itemCount: state.cardImageUrls.length,
             itemExtent: 330,
             itemBuilder: (context, itemIndex, realIndex) {

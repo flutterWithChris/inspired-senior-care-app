@@ -310,7 +310,7 @@ class _DeckState extends State<Deck> {
                   loop: false,
                   scrollBehavior: const CupertinoScrollBehavior(),
                   controller: widget.deckScrollController,
-                  velocityFactor: 0.25,
+                  velocityFactor: 0.23,
                   itemCount: state.responses?.length ?? 1,
                   itemExtent: 330,
                   onIndexChanged: (p0) {
@@ -666,7 +666,7 @@ class _ShareTextFieldState extends State<ShareTextField> {
                   child: InfiniteCarousel.builder(
                     physics: const InfiniteScrollPhysics(
                         parent: PageScrollPhysics()),
-                    velocityFactor: 0.25,
+                    velocityFactor: 0.23,
                     controller: widget.textFieldScrollController,
                     loop: false,
                     itemCount: responses.length,
