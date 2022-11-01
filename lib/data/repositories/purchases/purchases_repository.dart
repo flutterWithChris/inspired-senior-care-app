@@ -67,6 +67,25 @@ class PurchasesRepository {
     }
   }
 
+  Future<bool?> isUserAnonymous() async {
+    try {
+      bool isAnonymous = await Purchases.isAnonymous;
+      return isAnonymous;
+    } on PlatformException catch (e) {
+      var errorCode = PurchasesErrorHelper.getErrorCode(e);
+      String revCatErrorMessage = formatErrorMessage(errorCode.name);
+
+      final SnackBar snackBar = SnackBar(
+        content: Text(revCatErrorMessage),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
+      return null;
+    }
+  }
+
   Future<CustomerInfo?> makePurchase(Package package) async {
     try {
       CustomerInfo customerInfo = await Purchases.purchasePackage(package);
