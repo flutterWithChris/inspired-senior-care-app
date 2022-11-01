@@ -629,20 +629,19 @@ class InfoCard extends StatelessWidget {
         }
         if (state is CardsLoaded) {
           return Card(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(25),
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16),
-                child: CachedNetworkImage(
-                  placeholder: (context, url) => Center(
-                    child: LoadingAnimationWidget.discreteCircle(
-                        color: Colors.blueAccent, size: 30.0),
-                  ),
-                  imageUrl: state.cardImageUrls[cardNumber - 1],
-                  //height: 195,
-                  fit: BoxFit.fitHeight,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12.0)),
+            child: Padding(
+              padding:
+                  const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16),
+              child: CachedNetworkImage(
+                placeholder: (context, url) => Center(
+                  child: LoadingAnimationWidget.discreteCircle(
+                      color: Colors.blueAccent, size: 30.0),
                 ),
+                imageUrl: state.cardImageUrls[cardNumber - 1],
+                //height: 195,
+                fit: BoxFit.fitHeight,
               ),
             ),
           );

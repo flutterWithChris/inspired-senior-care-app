@@ -831,7 +831,7 @@ class InfoCard extends StatelessWidget {
         if (state is CardsLoaded) {
           return Card(
             shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             child: Padding(
               padding:
                   const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),

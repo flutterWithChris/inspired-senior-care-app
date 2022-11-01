@@ -81,7 +81,7 @@ class ManagerCategories extends StatelessWidget {
                           'All Categories',
                           style: Theme.of(context)
                               .textTheme
-                              .headline4!
+                              .headlineMedium!
                               .copyWith(color: Colors.black87, fontSize: 32),
                         ),
                         SizedBox(
@@ -191,20 +191,18 @@ class CategoryCard extends StatelessWidget {
                   context.goNamed('manager-deck-page');
                 },
                 child: Card(
-                  child: Container(
-                    color: Colors.white,
-                    height: 275,
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: CachedNetworkImage(
-                        placeholder: (context, url) => Center(
-                          child: LoadingAnimationWidget.inkDrop(
-                              color: Colors.blueAccent, size: 30.0),
-                        ),
-                        imageUrl: category.coverImageUrl,
-                        height: 250,
-                        fit: BoxFit.fitHeight,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.0)),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: CachedNetworkImage(
+                      placeholder: (context, url) => Center(
+                        child: LoadingAnimationWidget.inkDrop(
+                            color: Colors.blueAccent, size: 30.0),
                       ),
+                      imageUrl: category.coverImageUrl,
+                      height: 250,
+                      fit: BoxFit.fitHeight,
                     ),
                   ),
                 ),
@@ -247,6 +245,8 @@ class LockedCategoryCard extends StatelessWidget {
         builder: (context) => const UpgradePage(),
       ),
       child: Card(
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
         child: Container(
           color: Colors.white,
           height: 275,

@@ -153,6 +153,8 @@ class CategoryCard extends StatelessWidget {
                   context.pushNamed('deck-page', extra: category);
                 },
                 child: Card(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.0)),
                   child: Stack(
                     alignment: AlignmentDirectional.center,
                     children: [

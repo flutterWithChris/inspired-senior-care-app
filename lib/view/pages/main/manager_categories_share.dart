@@ -83,7 +83,7 @@ class ManagerCategoriesShare extends StatelessWidget {
                           'All Categories',
                           style: Theme.of(context)
                               .textTheme
-                              .headline4!
+                              .headlineMedium!
                               .copyWith(color: Colors.black87, fontSize: 32),
                         ),
                         SizedBox(
@@ -192,6 +192,8 @@ class CategoryCard extends StatelessWidget {
                   context.pushNamed('deck-page', extra: category);
                 },
                 child: Card(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.0)),
                   child: Stack(
                     alignment: AlignmentDirectional.center,
                     children: [
