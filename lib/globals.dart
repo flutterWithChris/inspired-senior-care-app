@@ -1,6 +1,15 @@
 import 'package:flutter/material.dart';
 
-class Globals {}
+class Globals {
+  Globals._internal();
+  static final Globals _globals = Globals._internal();
+  factory Globals() {
+    return _globals;
+  }
+  int currentIndex = 0;
+  set index(int index) => currentIndex = index;
+  int get getIndex => currentIndex;
+}
 
 final GlobalKey<ScaffoldMessengerState> snackbarKey =
     GlobalKey<ScaffoldMessengerState>();

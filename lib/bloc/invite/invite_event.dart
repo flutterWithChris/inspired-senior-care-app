@@ -3,11 +3,14 @@ part of 'invite_bloc.dart';
 @immutable
 abstract class InviteEvent extends Equatable {
   final Invite? invite;
+  final String? emailAddress;
+  final Group? group;
   const InviteEvent({
     this.invite,
+    this.emailAddress,
+    this.group,
   });
   @override
-  // TODO: implement props
   List<Object?> get props => [invite];
 }
 
@@ -21,7 +24,6 @@ class ManagerInviteSent extends InviteEvent {
     required this.group,
   });
   @override
-  // TODO: implement props
   List<Object?> get props => [emailAddress, group];
 }
 
@@ -33,13 +35,11 @@ class MemberInviteSent extends InviteEvent {
     required this.group,
   });
   @override
-  // TODO: implement props
   List<Object?> get props => [emailAddress, group];
 }
 
 class InviteReceived extends InviteEvent {
   @override
-  // TODO: implement props
   List<Object?> get props => throw UnimplementedError();
 }
 
@@ -50,7 +50,6 @@ class InviteDeleted extends InviteEvent {
     required this.invite,
   });
   @override
-  // TODO: implement props
   List<Object?> get props => [invite];
 }
 
@@ -61,7 +60,6 @@ class InviteAccepted extends InviteEvent {
     required this.invite,
   });
   @override
-  // TODO: implement props
   List<Object?> get props => [invite];
 }
 

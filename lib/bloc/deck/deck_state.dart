@@ -53,6 +53,5 @@ class DeckState extends Equatable {
   }
 
   @override
-  // TODO: implement props
   List<DeckStatus?> get props => [status];
 }

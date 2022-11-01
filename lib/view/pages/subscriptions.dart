@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/purchases/purchases_bloc.dart';
 import 'package:inspired_senior_care_app/globals.dart';
-import 'package:inspired_senior_care_app/view/pages/main/deck_page.dart';
+import 'package:inspired_senior_care_app/view/pages/IAP/premium_individual_dialog.dart';
+import 'package:inspired_senior_care_app/view/pages/IAP/premium_org_dialog.dart';
 import 'package:inspired_senior_care_app/view/widget/main/bottom_app_bar.dart';
 import 'package:inspired_senior_care_app/view/widget/main/top_app_bar.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -31,8 +32,7 @@ class SubscriptionsPage extends StatelessWidget {
           if (state is PurchasesLoaded) {
             CustomerInfo? customerInfo =
                 context.watch<PurchasesBloc>().state.customerInfo;
-            print(
-                'Subscriptions ${customerInfo?.allPurchasedProductIdentifiers}');
+
             return ListView(shrinkWrap: true, children: [
               Padding(
                 padding:
@@ -41,7 +41,7 @@ class SubscriptionsPage extends StatelessWidget {
                   'My Subscriptions',
                   style: Theme.of(context)
                       .textTheme
-                      .headline4!
+                      .headlineMedium!
                       .copyWith(color: Colors.black87),
                 ),
               ),
@@ -244,7 +244,7 @@ class SubscriptionsPage extends StatelessWidget {
                                         'Group: ${state.subscribedGroup!.groupName}',
                                         style: Theme.of(context)
                                             .textTheme
-                                            .subtitle2!
+                                            .titleSmall!
                                             .copyWith(
                                                 color: Colors.grey.shade600),
                                       )
@@ -327,7 +327,7 @@ class SubscriptionsPage extends StatelessWidget {
                           'To manage a subscription visit Google Play Store or iOS subscription settings.',
                           style: Theme.of(context)
                               .textTheme
-                              .subtitle2!
+                              .titleSmall!
                               .copyWith(color: Colors.black.withOpacity(0.7)),
                           textAlign: TextAlign.center,
                         ),
@@ -344,7 +344,7 @@ class SubscriptionsPage extends StatelessWidget {
                           'The group owner has access to manage this subscription.',
                           style: Theme.of(context)
                               .textTheme
-                              .subtitle2!
+                              .titleSmall!
                               .copyWith(color: Colors.black.withOpacity(0.7)),
                           textAlign: TextAlign.center,
                         ),

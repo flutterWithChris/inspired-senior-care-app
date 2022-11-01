@@ -53,7 +53,7 @@ class _ChooseCategoryState extends State<ChooseCategory> {
                       padding: const EdgeInsets.symmetric(vertical: 16.0),
                       child: Text(
                         'Change Featured Category:',
-                        style: Theme.of(context).textTheme.headline5,
+                        style: Theme.of(context).textTheme.headlineSmall,
                       ),
                     ),
                     Center(
@@ -126,7 +126,6 @@ class _ChooseCategoryState extends State<ChooseCategory> {
                                     onIndexChanged: (p0) {
                                       selectedCategory = categories[p0];
                                     },
-                                    //
                                     itemCount: categories.length,
                                     itemExtent: 175,
                                     itemBuilder:
@@ -308,7 +307,7 @@ class ChangeCategoryDialog extends StatelessWidget {
           ),
           Text(
             'Change Category?',
-            style: Theme.of(context).textTheme.headline5,
+            style: Theme.of(context).textTheme.headlineSmall,
           ),
         ],
       ),

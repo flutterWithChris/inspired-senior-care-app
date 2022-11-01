@@ -56,8 +56,6 @@ class ViewMembers extends StatelessWidget {
                         shrinkWrap: true,
                         itemCount: state.groupMembers.length,
                         itemBuilder: (context, index) {
-                          print(
-                              'Building list of ${state.groupMembers.length} members');
                           User user = state.groupMembers[index];
 
                           return GroupMemberTile(

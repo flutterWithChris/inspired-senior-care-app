@@ -1,5 +1,4 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -156,17 +155,17 @@ class _ViewResponsesState extends State<ViewResponses> {
                           ),
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 30.0),
-                        child: Visibility(
-                          visible: isSwipeDisabled ? true : false,
-                          child: ViewResponsesButton(
-                            textFieldScrollController:
-                                textFieldScrollController,
-                            deckScrollController: deckScrollController,
-                          ),
-                        ),
-                      ),
+                      // Padding(
+                      //   padding: const EdgeInsets.symmetric(vertical: 30.0),
+                      //   child: Visibility(
+                      //     visible: isSwipeDisabled ? true : false,
+                      //     child: ViewResponsesButton(
+                      //       textFieldScrollController:
+                      //           textFieldScrollController,
+                      //       deckScrollController: deckScrollController,
+                      //     ),
+                      //   ),
+                      // ),
                     ],
                   ),
                 );
@@ -305,12 +304,9 @@ class _DeckState extends State<Deck> {
               }
               if (state is ResponseLoaded) {
                 return InfiniteCarousel.builder(
-                  physics:
-                      const InfiniteScrollPhysics(parent: PageScrollPhysics()),
                   loop: false,
-                  scrollBehavior: const CupertinoScrollBehavior(),
                   controller: widget.deckScrollController,
-                  velocityFactor: 0.25,
+                  velocityFactor: 0.23,
                   itemCount: state.responses?.length ?? 1,
                   itemExtent: 330,
                   onIndexChanged: (p0) {
@@ -423,12 +419,13 @@ class ShareButton extends StatelessWidget {
   final InfiniteScrollController deckScrollController;
   final InfiniteScrollController textFieldScrollController;
   final String categoryName;
-  final TextEditingController shareFieldController = TextEditingController();
+  final TextEditingController shareFieldController;
 
-  ShareButton(
+  const ShareButton(
       {required this.deckScrollController,
       required this.categoryName,
       required this.textFieldScrollController,
+      required this.shareFieldController,
       super.key});
 
   @override
@@ -465,15 +462,15 @@ class ShareButton extends StatelessWidget {
                           color: Colors.grey.shade400,
                         ),
                       ),
-                      ShareTextField(
-                        textFieldScrollController: textFieldScrollController,
-                        deckScrollController: deckScrollController,
-                        shareFieldController: shareFieldController,
-                      ),
-                      SendButton(
-                        categoryName: categoryName,
-                        shareFieldController: shareFieldController,
-                      ),
+                      // ShareTextField(
+                      //   textFieldScrollController: textFieldScrollController,
+                      //   deckScrollController: deckScrollController,
+                      //   shareFieldController: shareFieldController,
+                      // ),
+                      // SendButton(
+                      //   categoryName: categoryName,
+                      //   shareFieldController: shareFieldController,
+                      // ),
                     ]),
               ),
             );
@@ -535,7 +532,6 @@ class ViewResponsesButton extends StatelessWidget {
                       ShareTextField(
                         textFieldScrollController: textFieldScrollController,
                         deckScrollController: deckScrollController,
-                        shareFieldController: shareFieldController,
                       ),
                       BlocBuilder<ResponseInteractionCubit,
                           ResponseInteractionState>(
@@ -586,9 +582,8 @@ class ViewResponsesButton extends StatelessWidget {
 class ViewResponsesSheet extends StatelessWidget {
   final InfiniteScrollController deckScrollController;
   final InfiniteScrollController textFieldScrollController;
-  final TextEditingController shareFieldController = TextEditingController();
 
-  ViewResponsesSheet(
+  const ViewResponsesSheet(
       {required this.deckScrollController,
       required this.textFieldScrollController,
       super.key});
@@ -607,7 +602,6 @@ class ViewResponsesSheet extends StatelessWidget {
               ShareTextField(
                 textFieldScrollController: textFieldScrollController,
                 deckScrollController: deckScrollController,
-                shareFieldController: shareFieldController,
               ),
             ]),
       ),
@@ -616,13 +610,11 @@ class ViewResponsesSheet extends StatelessWidget {
 }
 
 class ShareTextField extends StatefulWidget {
-  final TextEditingController shareFieldController;
   final InfiniteScrollController deckScrollController;
   final InfiniteScrollController textFieldScrollController;
 
   const ShareTextField({
     required this.deckScrollController,
-    required this.shareFieldController,
     required this.textFieldScrollController,
     Key? key,
   }) : super(key: key);
@@ -632,6 +624,7 @@ class ShareTextField extends StatefulWidget {
 }
 
 class _ShareTextFieldState extends State<ShareTextField> {
+  final TextEditingController shareFieldController = TextEditingController();
   bool reachedCharacterLimit = false;
   @override
   Widget build(BuildContext context) {
@@ -647,7 +640,9 @@ class _ShareTextFieldState extends State<ShareTextField> {
           );
         }
         if (state is CardsLoaded) {
-          Category currentCategory = state.category;
+          final ScrollController textFieldVerticalScrollController =
+              ScrollController();
+
           return BlocBuilder<ResponseBloc, ResponseState>(
             builder: (context, state) {
               if (state is ResponseLoading) {
@@ -664,13 +659,11 @@ class _ShareTextFieldState extends State<ShareTextField> {
                 return SizedBox(
                   height: 160,
                   child: InfiniteCarousel.builder(
-                    physics: const InfiniteScrollPhysics(
-                        parent: PageScrollPhysics()),
-                    velocityFactor: 0.25,
+                    velocityFactor: 0.23,
                     controller: widget.textFieldScrollController,
                     loop: false,
                     itemCount: responses.length,
-                    itemExtent: 380,
+                    itemExtent: 340,
                     onIndexChanged: (p0) {
                       widget.deckScrollController.animateToItem(p0,
                           curve: Curves.easeOutQuad,
@@ -678,9 +671,6 @@ class _ShareTextFieldState extends State<ShareTextField> {
                       context.read<ResponseDeckCubit>().scrollDeck(p0);
                     },
                     itemBuilder: (context, itemIndex, realIndex) {
-                      final ScrollController textFieldScrollController =
-                          ScrollController();
-
                       return Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Container(
@@ -709,17 +699,16 @@ class _ShareTextFieldState extends State<ShareTextField> {
                                 if (state.status == ScrollStatus.scrolled ||
                                     state.status == ScrollStatus.stopped) {
                                   if (realIndex - 1 > responses.length) {
-                                    widget.shareFieldController.text =
+                                    shareFieldController.text =
                                         'No Response Submitted Yet!';
                                   } else {
                                     currentResponse = responses
                                         .elementAt((state.index))
                                         .response;
-                                    widget.shareFieldController.text =
-                                        currentResponse;
+                                    shareFieldController.text = currentResponse;
                                   }
                                   return TextField(
-                                    controller: widget.shareFieldController,
+                                    controller: shareFieldController,
                                     autofocus: false,
                                     readOnly: true,
                                     textAlignVertical: TextAlignVertical.top,
@@ -730,19 +719,20 @@ class _ShareTextFieldState extends State<ShareTextField> {
                                         hintText: 'Share your response..'),
                                   );
                                 }
-                                widget.shareFieldController.text =
+                                shareFieldController.text =
                                     responses[0].response;
 
                                 return Scrollbar(
                                   radius: const Radius.circular(12.0),
-                                  controller: textFieldScrollController,
+                                  controller: textFieldVerticalScrollController,
                                   child: TextField(
                                     scrollPhysics:
                                         const BouncingScrollPhysics(),
                                     style: const TextStyle(
                                         overflow: TextOverflow.ellipsis),
-                                    scrollController: textFieldScrollController,
-                                    controller: widget.shareFieldController,
+                                    scrollController:
+                                        textFieldVerticalScrollController,
+                                    controller: shareFieldController,
                                     autofocus: false,
                                     readOnly: true,
                                     textAlignVertical: TextAlignVertical.top,

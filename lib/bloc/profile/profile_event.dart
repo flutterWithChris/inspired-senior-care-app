@@ -1,10 +1,10 @@
 part of 'profile_bloc.dart';
 
-@immutable
 abstract class ProfileEvent extends Equatable {
+  String? userId;
+  User? user;
   @override
-  // TODO: implement props
-  List<Object?> get props => throw UnimplementedError();
+  List<Object?> get props => [user, userId];
 }
 
 class LoadProfile extends ProfileEvent {
@@ -13,7 +13,6 @@ class LoadProfile extends ProfileEvent {
     required this.userId,
   });
   @override
-  // TODO: implement props
   List<Object?> get props => [userId];
 }
 
@@ -23,7 +22,6 @@ class UpdateProfile extends ProfileEvent {
     required this.user,
   });
   @override
-  // TODO: implement props
   List<Object?> get props => [user];
 }
 

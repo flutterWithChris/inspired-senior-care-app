@@ -1,6 +1,5 @@
 part of 'group_member_bloc.dart';
 
-@immutable
 abstract class GroupMemberState extends Equatable {
   final List<User>? groupMembers;
   final Group? group;

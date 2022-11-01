@@ -39,9 +39,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> with ChangeNotifier {
   }
 
   void _onUserChanged(AuthUserChanged event, Emitter<AuthState> emit) async {
+    bool? isUserAnonymous = await _purchasesRepository.isUserAnonymous();
     if (event.user != null) {
       await _purchasesRepository.loginToRevCat(event.user!.uid);
-    } else {
+    } else if (isUserAnonymous == false) {
       await _purchasesRepository.logoutOfRevCat();
     }
 

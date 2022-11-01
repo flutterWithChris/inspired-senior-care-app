@@ -150,9 +150,11 @@ class CategoryCard extends StatelessWidget {
                   BlocProvider.of<CardBloc>(context)
                       .add(LoadCards(category: category));
                   context.read<DeckCubit>().loadDeck(category);
-                  context.goNamed('deck-page', extra: category);
+                  context.pushNamed('deck-page', extra: category);
                 },
                 child: Card(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.0)),
                   child: Stack(
                     alignment: AlignmentDirectional.center,
                     children: [

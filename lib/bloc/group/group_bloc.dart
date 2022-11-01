@@ -137,7 +137,6 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
 
   @override
   Future<void> close() {
-    // TODO: implement close
     _inviteSubscription?.cancel();
     _profileSubscription?.cancel();
     return super.close();

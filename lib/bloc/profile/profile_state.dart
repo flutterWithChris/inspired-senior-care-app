@@ -7,7 +7,6 @@ abstract class ProfileState extends Equatable {
     this.user = User.empty,
   });
   @override
-  // TODO: implement props
   List<Object?> get props => [user];
 }
 
@@ -21,8 +20,7 @@ class ProfileLoaded extends ProfileState {
   const ProfileLoaded({
     required this.user,
   });
-  @override
-  // TODO: implement props
+  @override //
   List<Object?> get props => [user];
 }
 

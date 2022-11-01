@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
+import 'package:inspired_senior_care_app/globals.dart';
 
 class MainBottomAppBar extends StatefulWidget {
   const MainBottomAppBar({Key? key}) : super(key: key);
@@ -12,8 +13,6 @@ class MainBottomAppBar extends StatefulWidget {
 }
 
 class _BottomAppBarState extends State<MainBottomAppBar> {
-  static int currentIndex = 1;
-
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ProfileBloc, ProfileState>(
@@ -26,7 +25,8 @@ class _BottomAppBarState extends State<MainBottomAppBar> {
             return BottomNavigationBar(
                 onTap: (index) {
                   setState(() {
-                    currentIndex = index;
+                    Globals().index = index;
+                    //  currentIndex = index;
                   });
                   switch (index) {
                     case 0:
@@ -48,15 +48,13 @@ class _BottomAppBarState extends State<MainBottomAppBar> {
                       break;
                   }
                 },
-                currentIndex: currentIndex,
+                currentIndex: Globals().getIndex,
                 items: const [
                   BottomNavigationBarItem(
                       label: 'Categories',
                       icon: Icon(FontAwesomeIcons.layerGroup)),
                   BottomNavigationBarItem(
                       label: 'Home', icon: Icon(Icons.home)),
-                  /*   BottomNavigationBarItem(
-                  label: 'Profile', icon: Icon(Icons.person_outline_rounded)),*/
                   BottomNavigationBarItem(
                       label: 'Dashboard', icon: Icon(Icons.dashboard_rounded)),
                 ]);
@@ -65,7 +63,8 @@ class _BottomAppBarState extends State<MainBottomAppBar> {
             return BottomNavigationBar(
                 onTap: (index) {
                   setState(() {
-                    currentIndex = index;
+                    Globals().index = index;
+                    // currentIndex = index;
                   });
                   switch (index) {
                     case 0:
@@ -87,15 +86,13 @@ class _BottomAppBarState extends State<MainBottomAppBar> {
                       break;
                   }
                 },
-                currentIndex: currentIndex,
+                currentIndex: Globals().getIndex,
                 items: const [
                   BottomNavigationBarItem(
                       label: 'Categories',
                       icon: Icon(FontAwesomeIcons.layerGroup)),
                   BottomNavigationBarItem(
                       label: 'Home', icon: Icon(Icons.home)),
-                  /*   BottomNavigationBarItem(
-                  label: 'Profile', icon: Icon(Icons.person_outline_rounded)),*/
                   BottomNavigationBarItem(
                       label: 'Profile', icon: Icon(Icons.person)),
                 ]);

@@ -10,7 +10,7 @@ import 'package:inspired_senior_care_app/bloc/purchases/purchases_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/share_bloc/share_bloc.dart';
 import 'package:inspired_senior_care_app/data/models/category.dart';
 import 'package:inspired_senior_care_app/data/models/user.dart';
-import 'package:inspired_senior_care_app/view/pages/main/deck_page.dart';
+import 'package:inspired_senior_care_app/view/pages/IAP/premium_org_dialog.dart';
 import 'package:inspired_senior_care_app/view/widget/main/bottom_app_bar.dart';
 
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -241,9 +241,7 @@ class Deck extends StatelessWidget {
           bool? isSubscribed =
               context.watch<PurchasesBloc>().state.isSubscribed;
           return InfiniteCarousel.builder(
-            physics: const InfiniteScrollPhysics(parent: PageScrollPhysics()),
             controller: deckScrollController,
-            velocityFactor: 0.3,
             itemCount: state.cardImageUrls.length,
             itemExtent: 320,
             onIndexChanged: (p0) {
@@ -631,20 +629,19 @@ class InfoCard extends StatelessWidget {
         }
         if (state is CardsLoaded) {
           return Card(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(25),
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16),
-                child: CachedNetworkImage(
-                  placeholder: (context, url) => Center(
-                    child: LoadingAnimationWidget.discreteCircle(
-                        color: Colors.blueAccent, size: 30.0),
-                  ),
-                  imageUrl: state.cardImageUrls[cardNumber - 1],
-                  //height: 195,
-                  fit: BoxFit.fitHeight,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12.0)),
+            child: Padding(
+              padding:
+                  const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16),
+              child: CachedNetworkImage(
+                placeholder: (context, url) => Center(
+                  child: LoadingAnimationWidget.discreteCircle(
+                      color: Colors.blueAccent, size: 30.0),
                 ),
+                imageUrl: state.cardImageUrls[cardNumber - 1],
+                //height: 195,
+                fit: BoxFit.fitHeight,
               ),
             ),
           );

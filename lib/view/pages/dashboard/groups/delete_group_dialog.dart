@@ -97,8 +97,6 @@ class _DeleteGroupDialogState extends State<DeleteGroupDialog> {
                   onPressed: isButtonDisabled
                       ? null
                       : () {
-                          print('Group Created: ');
-
                           BlocProvider.of<GroupBloc>(context).add(DeleteGroup(
                               group: widget.currentGroup,
                               manager: widget.currentUser));

@@ -9,7 +9,6 @@ abstract class CategoriesState extends Equatable {
     this.categoryImageUrls,
   });
   @override
-  // TODO: implement props
   List<Object?> get props => [categories, categoryImageUrls];
 }
 
@@ -25,7 +24,6 @@ class CategoriesLoaded extends CategoriesState {
     this.categoryImageUrls = const [],
   });
   @override
-  // TODO: implement props
   List<Object?> get props => [categories, categoryImageUrls];
 }
 

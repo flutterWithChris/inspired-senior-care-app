@@ -10,14 +10,12 @@ part 'card_event.dart';
 part 'card_state.dart';
 
 class CardBloc extends Bloc<CardEvent, CardState> {
-  final DatabaseRepository _databaseRepository;
   final StorageRepository _storageRepository;
   StreamSubscription? _databaseSubscription;
   CardBloc(
       {required DatabaseRepository databaseRepository,
       required StorageRepository storageRepository})
-      : _databaseRepository = databaseRepository,
-        _storageRepository = storageRepository,
+      : _storageRepository = storageRepository,
         super(CardsInitial()) {
     on<LoadCards>(_onCardsLoaded);
     on<ResetCards>((event, emit) => emit(CardsInitial()));

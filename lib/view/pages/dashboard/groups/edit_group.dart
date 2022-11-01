@@ -66,7 +66,6 @@ class EditGroupDialog extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: ElevatedButton(
                   onPressed: () {
-                    print('Group Created: ');
                     // * Create a New Group
                     Group editedGroup = currentGroup.copyWith(
                         groupName: groupNameController.text);

@@ -694,9 +694,6 @@ class _ChangeOrganizationDialogState extends State<ChangeOrganizationDialog> {
                 context
                     .read<SettingsCubit>()
                     .changeOrganization(organizationFieldController.value.text);
-                // context.read<SettingsCubit>().add(UpdateProfile(
-                //     user: currentUser.copyWith(
-                //         name: organizationFieldController.value.text)));
                 Future.delayed(const Duration(seconds: 1), () {
                   Navigator.pop(context);
                 });
@@ -733,28 +730,65 @@ class ChangePasswordDialog extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
         child: SizedBox(
           height: 175,
-          child: Column(
-            //mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  'Edit Password',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-              ),
-              const Text(
-                'To reset your password you\'ll need to request a password reset email.',
-                textAlign: TextAlign.center,
-              ),
-              ElevatedButton(
-                  onPressed: () {
-                    context.read<SettingsCubit>().passwordResetRequest(
-                        context.read<ProfileBloc>().state.user.email!);
-                  },
-                  child: const Text('Request Password Reset'))
-            ],
+          child: BlocConsumer<SettingsCubit, SettingsState>(
+            listener: (context, state) async {
+              if (state is SettingsUpdated) {
+                await Future.delayed(
+                    const Duration(seconds: 3), () => Navigator.pop(context));
+              }
+            },
+            builder: (context, state) {
+              if (state is SettingsLoading) {
+                return LoadingAnimationWidget.bouncingBall(
+                    color: Colors.blue, size: 20.0);
+              }
+              if (state is SettingsUpdated) {
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        'Reset Email Requested!',
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                    ),
+                    const Text(
+                      'Check your email for a password reset email & follow the instructions.',
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                );
+              }
+              if (state is SettingsLoaded) {
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        'Edit Password',
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                    ),
+                    const Text(
+                      'To reset your password you\'ll need to request a password reset email.',
+                      textAlign: TextAlign.center,
+                    ),
+                    ElevatedButton(
+                        onPressed: () {
+                          context.read<SettingsCubit>().passwordResetRequest(
+                              context.read<ProfileBloc>().state.user.email!);
+                        },
+                        child: const Text('Request Password Reset'))
+                  ],
+                );
+              } else {
+                return const Center(
+                  child: Text('Something Went Wrong...'),
+                );
+              }
+            },
           ),
         ),
       ),
@@ -801,6 +835,8 @@ class _ReportBugDialogState extends State<ReportBugDialog> {
             child: Form(
               key: bugFormKey,
               child: TextFormField(
+                autofocus: true,
+                textCapitalization: TextCapitalization.sentences,
                 controller: bugReportTextFieldController,
                 validator: (value) {
                   if (value == null) {

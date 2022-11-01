@@ -2,9 +2,9 @@ part of 'categories_bloc.dart';
 
 @immutable
 abstract class CategoriesEvent extends Equatable {
+  List<dynamic>? categoryImageUrls;
   @override
-  // TODO: implement props
-  List<Object?> get props => throw UnimplementedError();
+  List<Object?> get props => [categoryImageUrls];
 }
 
 class LoadCategories extends CategoriesEvent {}
@@ -16,6 +16,5 @@ class UpdateCategories extends CategoriesEvent {
   });
 
   @override
-  // TODO: implement props
   List<Object?> get props => [categoryImageUrls];
 }

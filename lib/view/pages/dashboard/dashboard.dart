@@ -105,8 +105,9 @@ class _DashboardState extends State<Dashboard> {
                                   ),
                                   Text(
                                     'My Groups',
-                                    style:
-                                        Theme.of(context).textTheme.headline5,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headlineSmall,
                                   ),
                                 ],
                               ),
@@ -117,7 +118,6 @@ class _DashboardState extends State<Dashboard> {
                         BlocBuilder<GroupBloc, GroupState>(
                           // * Rebuild when groups updated.
                           builder: (context, state) {
-                            print(state.toString());
                             if (state is GroupLoading ||
                                 state is GroupUpdated ||
                                 state is GroupCreated ||
@@ -284,9 +284,14 @@ class _GroupSectionState extends State<GroupSection> {
                     child: FittedBox(
                       child: Text(
                         currentGroup.groupName!,
-                        style: Theme.of(context).textTheme.headline4!.copyWith(
-                            color:
-                                Theme.of(context).textTheme.bodyMedium!.color),
+                        style: Theme.of(context)
+                            .textTheme
+                            .headlineMedium!
+                            .copyWith(
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium!
+                                    .color),
                       ),
                     ),
                   ),
@@ -404,7 +409,7 @@ class _GroupSectionState extends State<GroupSection> {
                                     LoadGroupMembers(
                                         userIds: widget.group.groupMemberIds!,
                                         group: currentGroup));
-                                context.goNamed('view-group-members');
+                                context.pushNamed('view-group-members');
                               },
                               child: Wrap(
                                 spacing: 8.0,
@@ -461,7 +466,6 @@ class _GroupSectionState extends State<GroupSection> {
                         context.goNamed('view-group-members');
                       },
                       child: const Text('View Group Members'));
-                  print('Current Group Is: ${widget.group.groupName}');
                 }
                 return const Text('Something Went Wrong!');
               },
