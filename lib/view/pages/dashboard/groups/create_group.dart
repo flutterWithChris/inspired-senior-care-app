@@ -34,7 +34,7 @@ class _CreateGroupDialogState extends State<CreateGroupDialog> {
               padding: const EdgeInsets.only(top: 8.0, bottom: 24.0),
               child: Text(
                 'Create a Group',
-                style: Theme.of(context).textTheme.headline4!.copyWith(
+                style: Theme.of(context).textTheme.headlineMedium!.copyWith(
                     color: Theme.of(context).textTheme.bodyMedium!.color),
               ),
             ),
@@ -74,7 +74,6 @@ class _CreateGroupDialogState extends State<CreateGroupDialog> {
                   padding: const EdgeInsets.symmetric(vertical: 12.0),
                   child: ElevatedButton.icon(
                       onPressed: () {
-                        print('Group Created: ${groupNameController.text}');
                         // * Create a New Group
                         Group newGroup = Group(
                             groupName: groupNameController.text,

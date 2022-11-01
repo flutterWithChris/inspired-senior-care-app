@@ -118,7 +118,6 @@ class _DashboardState extends State<Dashboard> {
                         BlocBuilder<GroupBloc, GroupState>(
                           // * Rebuild when groups updated.
                           builder: (context, state) {
-                            print(state.toString());
                             if (state is GroupLoading ||
                                 state is GroupUpdated ||
                                 state is GroupCreated ||
@@ -467,7 +466,6 @@ class _GroupSectionState extends State<GroupSection> {
                         context.goNamed('view-group-members');
                       },
                       child: const Text('View Group Members'));
-                  print('Current Group Is: ${widget.group.groupName}');
                 }
                 return const Text('Something Went Wrong!');
               },

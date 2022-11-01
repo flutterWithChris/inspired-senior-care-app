@@ -22,12 +22,9 @@ class SignupCubit extends Cubit<SignupState> {
   Future<void> signupWithCredentials() async {
     if (!state.isValid) return;
     emit(state.copyWith(status: SignupStatus.submitting));
-    try {
-      var user = await _authRepository.signUp(
-          email: state.email, password: state.password);
-      emit(state.copyWith(status: SignupStatus.success, user: user));
-    } catch (_) {
-      print('Something went wrong signing in!');
-    }
+
+    var user = await _authRepository.signUp(
+        email: state.email, password: state.password);
+    emit(state.copyWith(status: SignupStatus.success, user: user));
   }
 }

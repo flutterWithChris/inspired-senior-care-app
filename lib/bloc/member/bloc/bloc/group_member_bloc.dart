@@ -6,7 +6,6 @@ import 'package:inspired_senior_care_app/bloc/invite/invite_bloc.dart';
 import 'package:inspired_senior_care_app/data/models/group.dart';
 import 'package:inspired_senior_care_app/data/models/user.dart';
 import 'package:inspired_senior_care_app/data/repositories/database/database_repository.dart';
-import 'package:meta/meta.dart';
 
 part 'group_member_event.dart';
 part 'group_member_state.dart';

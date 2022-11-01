@@ -1,6 +1,5 @@
 part of 'group_member_bloc.dart';
 
-@immutable
 abstract class GroupMemberEvent extends Equatable {}
 
 class LoadGroupMembers extends GroupMemberEvent {

@@ -18,201 +18,379 @@ class DatabaseRepository extends BaseDatabaseRepository {
 
   @override
   Stream<User> getUser(String userId) {
-    return _firebaseFirestore
-        .collection('users')
-        .doc(userId)
-        .snapshots()
-        .map((event) => User.fromSnapshot(event));
+    try {
+      return _firebaseFirestore
+          .collection('users')
+          .doc(userId)
+          .snapshots()
+          .map((event) => User.fromSnapshot(event));
+    } on FirebaseException catch (e) {
+      final SnackBar snackBar = SnackBar(
+        content: Text(e.message.toString()),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
+      throw Exception();
+    }
   }
 
   @override
   Stream<User?> getUserByEmail(String emailAddress) {
-    return _firebaseFirestore
-        .collection('users')
-        .where('email', isEqualTo: emailAddress)
-        .limit(1)
-        .snapshots()
-        .map((event) => User.fromSnapshot(event.docs.first));
+    try {
+      return _firebaseFirestore
+          .collection('users')
+          .where('email', isEqualTo: emailAddress)
+          .limit(1)
+          .snapshots()
+          .map((event) => User.fromSnapshot(event.docs.first));
+    } on FirebaseException catch (e) {
+      final SnackBar snackBar = SnackBar(
+        content: Text(e.message.toString()),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
+      throw Exception();
+    }
   }
 
   @override
   Stream<List<User>>? getUsers(List<String> userIds) {
     for (String userId in userIds) {
-      return _firebaseFirestore
-          .collection('users')
-          .doc(userId)
-          .snapshots()
-          .map((event) => User.fromSnapshot(event))
-          .toList()
-          .asStream();
+      try {
+        return _firebaseFirestore
+            .collection('users')
+            .doc(userId)
+            .snapshots()
+            .map((event) => User.fromSnapshot(event))
+            .toList()
+            .asStream();
+      } on FirebaseException catch (e) {
+        final SnackBar snackBar = SnackBar(
+          content: Text(e.message.toString()),
+          backgroundColor: Colors.redAccent,
+        );
+        snackbarKey.currentState?.showSnackBar(snackBar);
+        (e, stack) =>
+            FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
+        return null;
+      }
     }
     return null;
   }
 
   @override
   Future<void> createUser(User user) async {
-    await _firebaseFirestore.collection('users').doc(user.id).set(user.toMap());
+    try {
+      await _firebaseFirestore
+          .collection('users')
+          .doc(user.id)
+          .set(user.toMap());
 
-    await _firebaseFirestore
-        .collection('users')
-        .doc(user.id)
-        .collection('responses')
-        .doc()
-        .set({});
+      await _firebaseFirestore
+          .collection('users')
+          .doc(user.id)
+          .collection('responses')
+          .doc()
+          .set({});
+    } on FirebaseException catch (e) {
+      final SnackBar snackBar = SnackBar(
+        content: Text(e.message.toString()),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
+      throw Exception();
+    }
   }
 
   @override
-  Future<void> updateUser(User user) {
-    return _firebaseFirestore
-        .collection('users')
-        .doc(user.id)
-        .update(user.toMap())
-        .then((value) => print('User document Updated**'));
+  Future<void> updateUser(User user) async {
+    try {
+      return await _firebaseFirestore
+          .collection('users')
+          .doc(user.id)
+          .update(user.toMap());
+    } on FirebaseException catch (e) {
+      final SnackBar snackBar = SnackBar(
+        content: Text(e.message.toString()),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
+      throw Exception();
+    }
   }
 
   @override
-  Future<void> deleteUser(User user) {
-    List<String>? groupIds = user.groups;
-    if (groupIds!.isNotEmpty && user.type == 'user') {
-      for (String groupId in groupIds) {
-        _firebaseFirestore.collection('groups').doc(groupId).update({
-          'groupMemberIds': FieldValue.arrayRemove([user.id!])
-        });
+  Future<void> deleteUser(User user) async {
+    try {
+      List<String>? groupIds = user.groups;
+      if (groupIds!.isNotEmpty && user.type == 'user') {
+        for (String groupId in groupIds) {
+          await _firebaseFirestore.collection('groups').doc(groupId).update({
+            'groupMemberIds': FieldValue.arrayRemove([user.id!])
+          });
+        }
       }
-    }
-    if (groupIds.isNotEmpty && user.type == 'member') {
-      for (String groupId in groupIds) {
-        _firebaseFirestore.collection('groups').doc(groupId).update({
-          'groupManagerIds': FieldValue.arrayRemove([user.id!])
-        });
+      if (groupIds.isNotEmpty && user.type == 'member') {
+        for (String groupId in groupIds) {
+          await _firebaseFirestore.collection('groups').doc(groupId).update({
+            'groupManagerIds': FieldValue.arrayRemove([user.id!])
+          });
+        }
       }
+      _firebaseFirestore.collection('invites').doc(user.id).delete();
+      return await _firebaseFirestore.collection('users').doc(user.id).delete();
+    } on FirebaseException catch (e) {
+      final SnackBar snackBar = SnackBar(
+        content: Text(e.message.toString()),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
+      throw Exception();
     }
-    _firebaseFirestore.collection('invites').doc(user.id).delete();
-    return _firebaseFirestore.collection('users').doc(user.id).delete();
   }
 
   Stream<List<Category>?> getCategories() {
-    final List<Category> categories = [];
-    return _firebaseFirestore.collection('categories').get().then((snap) {
-      for (int i = 0; i < snap.docs.length; i++) {
-        categories.add(Category.fromSnapshot(snap.docs[i]));
-      }
-      return categories;
-    }).asStream();
+    try {
+      final List<Category> categories = [];
+      return _firebaseFirestore.collection('categories').get().then((snap) {
+        for (int i = 0; i < snap.docs.length; i++) {
+          categories.add(Category.fromSnapshot(snap.docs[i]));
+        }
+        return categories;
+      }).asStream();
+    } on FirebaseException catch (e) {
+      final SnackBar snackBar = SnackBar(
+        content: Text(e.message.toString()),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
+      throw Exception();
+    }
   }
 
   Stream<Category> getCategory(String categoryName) {
-    final List<Category> categories = [];
-    return _firebaseFirestore
-        .collection('categories')
-        .where({'categoryName': categoryName})
-        .snapshots()
-        .map((snap) => Category.fromSnapshot(snap.docs.first));
+    try {
+      return _firebaseFirestore
+          .collection('categories')
+          .where({'categoryName': categoryName})
+          .snapshots()
+          .map((snap) => Category.fromSnapshot(snap.docs.first));
+    } on FirebaseException catch (e) {
+      final SnackBar snackBar = SnackBar(
+        content: Text(e.message.toString()),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
+      throw Exception();
+    }
   }
 
-  Future<void> setGroupFeaturedCategory(String groupId, String categoryName) {
-    return _firebaseFirestore
-        .collection('groups')
-        .doc(groupId)
-        .update({'featuredCategory': categoryName});
+  Future<void> setGroupFeaturedCategory(
+      String groupId, String categoryName) async {
+    try {
+      return await _firebaseFirestore
+          .collection('groups')
+          .doc(groupId)
+          .update({'featuredCategory': categoryName});
+    } on FirebaseException catch (e) {
+      final SnackBar snackBar = SnackBar(
+        content: Text(e.message.toString()),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
+      throw Exception();
+    }
   }
 
-  Future<String> getGroupFeaturedCategory(String groupId) {
-    return _firebaseFirestore
-        .collection('groups')
-        .doc(groupId)
-        .get()
-        .then((value) => value.data()!['featuredCategory']);
+  Future<String> getGroupFeaturedCategory(String groupId) async {
+    try {
+      return await _firebaseFirestore
+          .collection('groups')
+          .doc(groupId)
+          .get()
+          .then((value) => value.data()!['featuredCategory']);
+    } on FirebaseException catch (e) {
+      final SnackBar snackBar = SnackBar(
+        content: Text(e.message.toString()),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
+      throw Exception();
+    }
   }
 
   Future<Map<Group?, bool?>?> getGroupSubscriptionStatus(String userId) async {
-    List<dynamic> groupIds = await _firebaseFirestore
-        .collection('users')
-        .doc(userId)
-        .get()
-        .then((value) => value.data()?['groups']);
+    try {
+      List<dynamic> groupIds = await _firebaseFirestore
+          .collection('users')
+          .doc(userId)
+          .get()
+          .then((value) => value.data()?['groups']);
 
-    if (groupIds.isNotEmpty) {
-      List<Group> groups = [];
-      for (String groupId in groupIds) {
-        Group group = await _firebaseFirestore
-            .collection('groups')
-            .doc(groupId)
-            .get()
-            .then((value) => Group.fromSnapshot(value));
-        groups.add(group);
-      }
-      if (groups.any((group) => group.isSubscribed == true)) {
-        Group subscribedGroup =
-            groups.firstWhere((group) => group.isSubscribed == true);
-        return {subscribedGroup: true};
+      if (groupIds.isNotEmpty) {
+        List<Group> groups = [];
+        for (String groupId in groupIds) {
+          Group group = await _firebaseFirestore
+              .collection('groups')
+              .doc(groupId)
+              .get()
+              .then((value) => Group.fromSnapshot(value));
+          groups.add(group);
+        }
+        if (groups.any((group) => group.isSubscribed == true)) {
+          Group subscribedGroup =
+              groups.firstWhere((group) => group.isSubscribed == true);
+          return {subscribedGroup: true};
+        } else {
+          return null;
+        }
       } else {
         return null;
       }
-    } else {
+    } on FirebaseException catch (e) {
+      final SnackBar snackBar = SnackBar(
+        content: Text(e.message.toString()),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
       return null;
     }
   }
 
   Future<void> setGroupSubscriptionStatus(List<String> groupIds) async {
-    for (String groupId in groupIds) {
-      await _firebaseFirestore
-          .collection('groups')
-          .doc(groupId)
-          .set({'isSubscribed': true}, SetOptions(merge: true));
+    try {
+      for (String groupId in groupIds) {
+        await _firebaseFirestore
+            .collection('groups')
+            .doc(groupId)
+            .set({'isSubscribed': true}, SetOptions(merge: true));
+      }
+    } on FirebaseException catch (e) {
+      final SnackBar snackBar = SnackBar(
+        content: Text(e.message.toString()),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
+      throw Exception();
     }
   }
 
   Future<void> resetGroupSubscriptionStatus(String userId) async {
-    List<Group> groups = [];
-    await _firebaseFirestore
-        .collection('groups')
-        .where('groupOwnerId', isEqualTo: userId)
-        .get()
-        .then((value) {
-      for (QueryDocumentSnapshot<Map<String, dynamic>> doc in value.docs) {
-        groups.add(Group.fromSnapshot(doc));
-      }
-    });
-    for (Group group in groups) {
+    try {
+      List<Group> groups = [];
       await _firebaseFirestore
           .collection('groups')
-          .doc(group.groupId)
-          .set({'isSubscribed': false}, SetOptions(merge: true));
+          .where('groupOwnerId', isEqualTo: userId)
+          .get()
+          .then((value) {
+        for (QueryDocumentSnapshot<Map<String, dynamic>> doc in value.docs) {
+          groups.add(Group.fromSnapshot(doc));
+        }
+      });
+      for (Group group in groups) {
+        await _firebaseFirestore
+            .collection('groups')
+            .doc(group.groupId)
+            .set({'isSubscribed': false}, SetOptions(merge: true));
+      }
+    } on FirebaseException catch (e) {
+      final SnackBar snackBar = SnackBar(
+        content: Text(e.message.toString()),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
+      throw Exception();
     }
   }
 
   Future<void> submitResponse(
-      String categoryName, int cardNumber, String response) {
-    return _firebaseFirestore
-        .collection('users')
-        .doc(_firebaseAuth.currentUser!.uid)
-        .collection('responses')
-        .doc(categoryName)
-        .set({'${(cardNumber)}': response}, SetOptions(merge: true));
+      String categoryName, int cardNumber, String response) async {
+    try {
+      return await _firebaseFirestore
+          .collection('users')
+          .doc(_firebaseAuth.currentUser!.uid)
+          .collection('responses')
+          .doc(categoryName)
+          .set({'${(cardNumber)}': response}, SetOptions(merge: true));
+    } on FirebaseException catch (e) {
+      final SnackBar snackBar = SnackBar(
+        content: Text(e.message.toString()),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
+      throw Exception();
+    }
   }
 
   Stream<Response> viewResponse(User user, Category category, int cardNumber) {
-    return _firebaseFirestore
-        .collection('users')
-        .doc(user.id)
-        .collection('responses')
-        .doc(category.name)
-        .snapshots()
-        .map((event) => Response.fromSnapshot(event, cardNumber));
+    try {
+      return _firebaseFirestore
+          .collection('users')
+          .doc(user.id)
+          .collection('responses')
+          .doc(category.name)
+          .snapshots()
+          .map((event) => Response.fromSnapshot(event, cardNumber));
+    } on FirebaseException catch (e) {
+      final SnackBar snackBar = SnackBar(
+        content: Text(e.message.toString()),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
+      throw Exception();
+    }
   }
 
   void addNewGroup(Group group, User manager) async {
-    DocumentReference docRef = _firebaseFirestore.collection('groups').doc();
-    await docRef.set(group.toMap());
-    String docId = docRef.id;
-    await FirebaseFirestore.instance
-        .collection('groups')
-        .doc(docId)
-        .update({'groupId': docId});
-    await _firebaseFirestore.collection('users').doc(manager.id).update({
-      'groups': FieldValue.arrayUnion([docId]),
-    });
+    try {
+      DocumentReference docRef = _firebaseFirestore.collection('groups').doc();
+      await docRef.set(group.toMap());
+      String docId = docRef.id;
+      await FirebaseFirestore.instance
+          .collection('groups')
+          .doc(docId)
+          .update({'groupId': docId});
+      await _firebaseFirestore.collection('users').doc(manager.id).update({
+        'groups': FieldValue.arrayUnion([docId]),
+      });
+    } on FirebaseException catch (e) {
+      final SnackBar snackBar = SnackBar(
+        content: Text(e.message.toString()),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
+      throw Exception();
+    }
   }
 
   void deleteGroup(Group group, User manager) async {
@@ -221,74 +399,152 @@ class DatabaseRepository extends BaseDatabaseRepository {
         'groups': FieldValue.arrayRemove([group.groupId]),
       });
       await _firebaseFirestore.collection('groups').doc(group.groupId).delete();
-    } catch (e) {
+    } on FirebaseException catch (e) {
       final SnackBar snackBar = SnackBar(
-        content: Text(e.toString()),
+        content: Text(e.message.toString()),
         backgroundColor: Colors.redAccent,
       );
       snackbarKey.currentState?.showSnackBar(snackBar);
       (e, stack) =>
           FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
+      throw Exception();
     }
   }
 
   Stream<Group> getGroup(String groupId) {
-    return _firebaseFirestore
-        .collection('groups')
-        .doc(groupId)
-        .snapshots()
-        .map((event) => Group.fromSnapshot(event));
+    try {
+      return _firebaseFirestore
+          .collection('groups')
+          .doc(groupId)
+          .snapshots()
+          .map((event) => Group.fromSnapshot(event));
+    } on FirebaseException catch (e) {
+      final SnackBar snackBar = SnackBar(
+        content: Text(e.message.toString()),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
+      throw Exception();
+    }
   }
 
   Stream<Group> getGroupMembers(String groupId) {
-    return _firebaseFirestore
-        .collection('groups')
-        .doc(groupId)
-        .snapshots()
-        .map((event) => Group.fromSnapshot(event));
+    try {
+      return _firebaseFirestore
+          .collection('groups')
+          .doc(groupId)
+          .snapshots()
+          .map((event) => Group.fromSnapshot(event));
+    } on FirebaseException catch (e) {
+      final SnackBar snackBar = SnackBar(
+        content: Text(e.message.toString()),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
+      throw Exception();
+    }
   }
 
-  Future<int> getGroupCount(String userId) {
-    return _firebaseFirestore
-        .collection('users')
-        .doc(userId)
-        .get()
-        .then((value) => List.from(value.get('groups')).length);
+  Future<int> getGroupCount(String userId) async {
+    try {
+      return await _firebaseFirestore
+          .collection('users')
+          .doc(userId)
+          .get()
+          .then((value) => List.from(value.get('groups')).length);
+    } on FirebaseException catch (e) {
+      final SnackBar snackBar = SnackBar(
+        content: Text(e.message.toString()),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
+      throw Exception();
+    }
   }
 
-  Future<List<String>> getGroups() {
-    return _firebaseFirestore
-        .collection('users')
-        .doc(_firebaseAuth.currentUser!.uid)
-        .get()
-        .then((value) => List.from(value.get('groups')));
+  Future<List<String>> getGroups() async {
+    try {
+      return await _firebaseFirestore
+          .collection('users')
+          .doc(_firebaseAuth.currentUser!.uid)
+          .get()
+          .then((value) => List.from(value.get('groups')));
+    } on FirebaseException catch (e) {
+      final SnackBar snackBar = SnackBar(
+        content: Text(e.message.toString()),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
+      throw Exception();
+    }
   }
 
   Stream<List<Group>> getManagerGroups(String userId) {
-    return _firebaseFirestore
-        .collection('groups')
-        .where('groupManagerIds', arrayContains: userId)
-        .snapshots()
-        .map((snapshot) {
-      return snapshot.docs.map((doc) => Group.fromSnapshot(doc)).toList();
-    });
+    try {
+      return _firebaseFirestore
+          .collection('groups')
+          .where('groupManagerIds', arrayContains: userId)
+          .snapshots()
+          .map((snapshot) {
+        return snapshot.docs.map((doc) => Group.fromSnapshot(doc)).toList();
+      });
+    } on FirebaseException catch (e) {
+      final SnackBar snackBar = SnackBar(
+        content: Text(e.message.toString()),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
+      throw Exception();
+    }
   }
 
   Stream<List<Group>> getMemberGroups(String userId) {
-    return _firebaseFirestore
-        .collection('groups')
-        .where('groupMemberIds', arrayContains: userId)
-        .snapshots()
-        .map((snapshot) {
-      return snapshot.docs.map((doc) => Group.fromSnapshot(doc)).toList();
-    });
+    try {
+      return _firebaseFirestore
+          .collection('groups')
+          .where('groupMemberIds', arrayContains: userId)
+          .snapshots()
+          .map((snapshot) {
+        return snapshot.docs.map((doc) => Group.fromSnapshot(doc)).toList();
+      });
+    } on FirebaseException catch (e) {
+      final SnackBar snackBar = SnackBar(
+        content: Text(e.message.toString()),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
+      throw Exception();
+    }
   }
 
-  Future<void> updateGroup(Group group) {
-    return _firebaseFirestore
-        .collection('groups')
-        .doc(group.groupId)
-        .update(group.toMap());
+  Future<void> updateGroup(Group group) async {
+    try {
+      return await _firebaseFirestore
+          .collection('groups')
+          .doc(group.groupId)
+          .update(group.toMap());
+    } on FirebaseException catch (e) {
+      final SnackBar snackBar = SnackBar(
+        content: Text(e.message.toString()),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
+      throw Exception();
+    }
   }
 
   Future<void> addMemberToGroup(
@@ -301,14 +557,15 @@ class DatabaseRepository extends BaseDatabaseRepository {
       await _firebaseFirestore.collection('groups').doc(groupId).update({
         'groupMemberIds': FieldValue.arrayUnion([userId])
       });
-    } catch (e) {
+    } on FirebaseException catch (e) {
       final SnackBar snackBar = SnackBar(
-        content: Text(e.toString()),
+        content: Text(e.message.toString()),
         backgroundColor: Colors.redAccent,
       );
       snackbarKey.currentState?.showSnackBar(snackBar);
       (e, stack) =>
           FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
+      return;
     }
   }
 
@@ -320,14 +577,15 @@ class DatabaseRepository extends BaseDatabaseRepository {
       return await _firebaseFirestore.collection('groups').doc(groupId).update({
         'groupMemberIds': FieldValue.arrayUnion([userId])
       });
-    } catch (e) {
+    } on FirebaseException catch (e) {
       final SnackBar snackBar = SnackBar(
-        content: Text(e.toString()),
+        content: Text(e.message.toString()),
         backgroundColor: Colors.redAccent,
       );
       snackbarKey.currentState?.showSnackBar(snackBar);
       (e, stack) =>
           FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
+      return;
     }
   }
 
@@ -343,16 +601,16 @@ class DatabaseRepository extends BaseDatabaseRepository {
       DocumentSnapshot documentSnapshot = await docRef.get();
       var docId = documentSnapshot.reference.id;
       docRef.set({'inviteId': docId}, SetOptions(merge: true));
-    } catch (e) {
+    } on FirebaseException catch (e) {
       final SnackBar snackBar = SnackBar(
-        content: Text(e.toString()),
+        content: Text(e.message.toString()),
         backgroundColor: Colors.redAccent,
       );
       snackbarKey.currentState?.showSnackBar(snackBar);
       (e, stack) =>
           FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
+      return;
     }
-    return;
   }
 
   Future<void>? deleteInvite(Invite invite) async {
@@ -367,10 +625,15 @@ class DatabaseRepository extends BaseDatabaseRepository {
           await docRef.delete();
         }
       });
-    } catch (e) {
-      print(e);
+    } on FirebaseException catch (e) {
+      final SnackBar snackBar = SnackBar(
+        content: Text(e.message.toString()),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
     }
-    return;
   }
 
   Stream<List<Invite>?>? getInvites() {
@@ -388,17 +651,22 @@ class DatabaseRepository extends BaseDatabaseRepository {
           for (QueryDocumentSnapshot<Map<String, dynamic>> doc in docs) {
             Invite thisInvite = Invite.fromSnapshot(doc);
             invites.add(thisInvite);
-            print('Invite ${thisInvite.inviteId} Fetched***');
           }
           return invites;
         } else {
           return null;
         }
       }).asStream();
-    } catch (e) {
-      print(e);
+    } on FirebaseException catch (e) {
+      final SnackBar snackBar = SnackBar(
+        content: Text(e.message.toString()),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
+      return null;
     }
-    return null;
   }
 
   Stream<List<Invite>?>? listenForInvites() {
@@ -416,17 +684,22 @@ class DatabaseRepository extends BaseDatabaseRepository {
           for (QueryDocumentSnapshot<Map<String, dynamic>> doc in docs) {
             Invite thisInvite = Invite.fromSnapshot(doc);
             invites.add(thisInvite);
-            print('Invite ${thisInvite.inviteId} Fetched***');
           }
           return invites;
         } else {
           return null;
         }
       });
-    } catch (e) {
-      print(e);
+    } on FirebaseException catch (e) {
+      final SnackBar snackBar = SnackBar(
+        content: Text(e.message.toString()),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
+      return null;
     }
-    return null;
   }
 
   Future<void> removeMemberFromGroup(User user, Group group) async {
@@ -440,8 +713,14 @@ class DatabaseRepository extends BaseDatabaseRepository {
           .update({
         'groupMemberIds': FieldValue.arrayRemove([user.id]),
       });
-    } catch (e) {
-      print(e);
+    } on FirebaseException catch (e) {
+      final SnackBar snackBar = SnackBar(
+        content: Text(e.message.toString()),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
     }
   }
 
@@ -460,8 +739,14 @@ class DatabaseRepository extends BaseDatabaseRepository {
       return await _firebaseFirestore.collection('groups').doc(groupId).update({
         'groupManagerIds': FieldValue.arrayUnion([userId])
       });
-    } catch (e) {
-      print(e);
+    } on FirebaseException catch (e) {
+      final SnackBar snackBar = SnackBar(
+        content: Text(e.message.toString()),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
     }
   }
 
@@ -476,8 +761,14 @@ class DatabaseRepository extends BaseDatabaseRepository {
           .update({
         'groupManagerIds': FieldValue.arrayRemove([user.id]),
       });
-    } catch (e) {
-      print(e);
+    } on FirebaseException catch (e) {
+      final SnackBar snackBar = SnackBar(
+        content: Text(e.message.toString()),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
     }
   }
 
@@ -487,15 +778,31 @@ class DatabaseRepository extends BaseDatabaseRepository {
           .collection('bug-reports')
           .doc()
           .set(bugReport.toMap());
-    } catch (e) {
-      print(e);
+    } on FirebaseException catch (e) {
+      final SnackBar snackBar = SnackBar(
+        content: Text(e.message.toString()),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
     }
   }
 
   Future<void> updateProgress(
-      User user, String categoryName, int currentCardNumber) {
-    return _firebaseFirestore.collection('users').doc(user.id).set({
-      'progress': {categoryName: currentCardNumber}
-    }, SetOptions(merge: true));
+      User user, String categoryName, int currentCardNumber) async {
+    try {
+      await _firebaseFirestore.collection('users').doc(user.id).set({
+        'progress': {categoryName: currentCardNumber}
+      }, SetOptions(merge: true));
+    } on FirebaseException catch (e) {
+      final SnackBar snackBar = SnackBar(
+        content: Text(e.message.toString()),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
+    }
   }
 }

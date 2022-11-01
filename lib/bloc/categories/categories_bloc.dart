@@ -61,7 +61,6 @@ class CategoriesBloc extends Bloc<CategoriesEvent, CategoriesState> {
 
   @override
   Future<void> close() {
-    // TODO: implement close
     _profileStateSubscription?.cancel();
     return super.close();
   }

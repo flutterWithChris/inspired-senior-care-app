@@ -10,7 +10,6 @@ class Response {
   static Response fromSnapshot(
       DocumentSnapshot snap, final int responseNumber) {
     Response response = Response(response: snap.get(responseNumber.toString()));
-    print('${snap.get(responseNumber.toString())}: fetched');
     return response;
   }
 }

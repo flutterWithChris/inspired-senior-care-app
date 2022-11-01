@@ -4,9 +4,6 @@ enum Interaction { initial, liked, unliked, replied, failed, submitted, reset }
 
 @immutable
 class ResponseInteractionState extends Equatable {
-  @override
-  // TODO: implement props
-  List<Object?> get props => [interaction];
   final Interaction interaction;
   const ResponseInteractionState({required this.interaction});
 
@@ -19,4 +16,6 @@ class ResponseInteractionState extends Equatable {
   factory ResponseInteractionState.unliked() {
     return const ResponseInteractionState(interaction: Interaction.unliked);
   }
+  @override
+  List<Object?> get props => [interaction];
 }

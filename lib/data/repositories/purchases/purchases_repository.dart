@@ -1,15 +1,25 @@
 import 'dart:io';
 
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:inspired_senior_care_app/globals.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
 class PurchasesRepository {
+  final beforeCapitalLetter = RegExp(r"(?=[A-Z])");
+  String formatErrorMessage(String message) {
+    return message.splitMapJoin(
+      beforeCapitalLetter,
+      onMatch: (p0) {
+        return '${p0[0]} ';
+      },
+    ).replaceFirst(
+        message.characters.first, message.characters.first.capitalize());
+  }
+
   Future<void> initPlatformState() async {
-    // await Purchases.setDebugLogsEnabled(true);
-
     PurchasesConfiguration? configuration;
-
     if (Platform.isAndroid) {
       configuration =
           PurchasesConfiguration("goog_vNVZjWFgEqVtULzDAKrmLaSryIc");
@@ -17,12 +27,20 @@ class PurchasesRepository {
       configuration =
           PurchasesConfiguration("appl_lhPFnQjvipbdcvvGNKqqNlfiFle");
     }
-
     try {
       await Purchases.configure(configuration!);
-    } catch (e) {
+    } on PlatformException catch (e) {
+      var errorCode = PurchasesErrorHelper.getErrorCode(e);
+      String revCatErrorMessage = formatErrorMessage(errorCode.name);
+
+      final SnackBar snackBar = SnackBar(
+        content: Text(revCatErrorMessage),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
       (e, stack) =>
           FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
+      throw Exception();
     }
   }
 
@@ -35,23 +53,36 @@ class PurchasesRepository {
         return null;
       }
     } on PlatformException catch (e) {
-      print(e);
+      var errorCode = PurchasesErrorHelper.getErrorCode(e);
+      String revCatErrorMessage = formatErrorMessage(errorCode.name);
+
+      final SnackBar snackBar = SnackBar(
+        content: Text(revCatErrorMessage),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
       (e, stack) =>
           FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
+      return null;
     }
-    return null;
   }
 
-  Future<void> makePurchase(Package package) async {
+  Future<CustomerInfo?> makePurchase(Package package) async {
     try {
       CustomerInfo customerInfo = await Purchases.purchasePackage(package);
+      return customerInfo;
     } on PlatformException catch (e) {
       var errorCode = PurchasesErrorHelper.getErrorCode(e);
-      if (errorCode != PurchasesErrorCode.purchaseCancelledError) {
-        print(e);
-        (e, stack) =>
-            FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
-      }
+      String revCatErrorMessage = formatErrorMessage(errorCode.name);
+
+      final SnackBar snackBar = SnackBar(
+        content: Text(revCatErrorMessage),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
+      return null;
     }
   }
 
@@ -65,12 +96,18 @@ class PurchasesRepository {
         return false;
       }
     } on PlatformException catch (e) {
-      // Error fetching purchaser info
-      print(e);
+      var errorCode = PurchasesErrorHelper.getErrorCode(e);
+      String revCatErrorMessage = formatErrorMessage(errorCode.name);
+
+      final SnackBar snackBar = SnackBar(
+        content: Text(revCatErrorMessage),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
       (e, stack) =>
           FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
+      return null;
     }
-    return null;
   }
 
   Future<CustomerInfo?> restorePurchases() async {
@@ -85,11 +122,17 @@ class PurchasesRepository {
         return null;
       }
     } on PlatformException catch (e) {
-      // Error restoring purchases
+      var errorCode = PurchasesErrorHelper.getErrorCode(e);
+      String revCatErrorMessage = formatErrorMessage(errorCode.name);
+
+      final SnackBar snackBar = SnackBar(
+        content: Text(revCatErrorMessage),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
       (e, stack) =>
           FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
       return null;
-      print(e);
     }
   }
 
@@ -97,9 +140,17 @@ class PurchasesRepository {
     try {
       await Purchases.logOut();
     } on PlatformException catch (e) {
+      var errorCode = PurchasesErrorHelper.getErrorCode(e);
+      String revCatErrorMessage = formatErrorMessage(errorCode.name);
+
+      final SnackBar snackBar = SnackBar(
+        content: Text(revCatErrorMessage),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
       (e, stack) =>
           FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
-      print(e);
+      throw Exception();
     }
   }
 
@@ -111,9 +162,17 @@ class PurchasesRepository {
       // Purchases.setDisplayName(user.name!),
       // ]);
     } on PlatformException catch (e) {
+      var errorCode = PurchasesErrorHelper.getErrorCode(e);
+      String revCatErrorMessage = formatErrorMessage(errorCode.name);
+
+      final SnackBar snackBar = SnackBar(
+        content: Text(revCatErrorMessage),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
       (e, stack) =>
           FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
-      print(e);
+      throw Exception();
     }
   }
 
@@ -122,9 +181,16 @@ class PurchasesRepository {
       CustomerInfo customerInfo = await Purchases.getCustomerInfo();
       return customerInfo;
     } on PlatformException catch (e) {
+      var errorCode = PurchasesErrorHelper.getErrorCode(e);
+      String revCatErrorMessage = formatErrorMessage(errorCode.name);
+
+      final SnackBar snackBar = SnackBar(
+        content: Text(revCatErrorMessage),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
       (e, stack) =>
           FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
-      print(e);
       return null;
     }
   }
@@ -136,9 +202,16 @@ class PurchasesRepository {
           await Purchases.getProducts(productIdentifiers);
       return storeProducts;
     } on PlatformException catch (e) {
+      var errorCode = PurchasesErrorHelper.getErrorCode(e);
+      String revCatErrorMessage = formatErrorMessage(errorCode.name);
+
+      final SnackBar snackBar = SnackBar(
+        content: Text(revCatErrorMessage),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
       (e, stack) =>
           FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
-      print(e);
       return null;
     }
   }

@@ -52,11 +52,8 @@ class InviteBloc extends Bloc<InviteEvent, InviteState> {
           onData: (data) {
             if (data != null) {
               List<Invite> invites = data as List<Invite>;
-
-              print('Fetched ${invites.length} invites.');
               return InviteState.loaded(invites);
             } else {
-              print('No invites Fetched.');
               return InviteState.loaded(invites);
             }
           },
@@ -168,13 +165,10 @@ class InviteBloc extends Bloc<InviteEvent, InviteState> {
         await Future.delayed(const Duration(seconds: 2));
         add(LoadInvites());
       }
-
-      // TODO: implement event handler
     });
   }
   @override
   Future<void> close() {
-    // TODO: implement close
     authStream?.cancel();
     inviteStream?.cancel();
     return super.close();

@@ -136,7 +136,6 @@ class InviteList extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<InviteBloc, InviteState>(
       builder: (context, state) {
-        print(state.toString());
         if (state == InviteState.loading()) {
           return LoadingAnimationWidget.fourRotatingDots(
               color: Colors.blue, size: 20.0);
@@ -175,8 +174,6 @@ class InviteList extends StatelessWidget {
               itemCount: state.invites.isNotEmpty ? state.invites.length : 1,
               itemBuilder: (context, index) {
                 if (state.invites.isNotEmpty) {
-                  print('Invite 1: ${state.invites[0].inviteId}}');
-
                   Invite thisInvite = state.invites[index];
                   if (thisInvite.status == 'declined') {
                     return DeclinedGroupInvite(thisInvite: thisInvite);
@@ -187,8 +184,6 @@ class InviteList extends StatelessWidget {
                     return GroupInvite(thisInvite: thisInvite);
                   }
                 }
-
-                print('no invtites!!!');
                 return SizedBox(
                   height: 100,
                   child: Center(

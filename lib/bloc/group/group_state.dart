@@ -7,7 +7,6 @@ abstract class GroupState extends Equatable {
     this.group,
   });
   @override
-  // TODO: implement props
   List<Object?> get props => [group];
 }
 
@@ -37,7 +36,6 @@ class GroupCreated extends GroupState {
     required this.group,
   });
   @override
-  // TODO: implement props
   List<Object?> get props => [group];
 }
 

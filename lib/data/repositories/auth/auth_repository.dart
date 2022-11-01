@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart' as auth;
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:inspired_senior_care_app/data/models/user.dart';
 import 'package:inspired_senior_care_app/data/repositories/auth/base_auth_repository.dart';
@@ -26,6 +27,8 @@ class AuthRepository extends BaseAuthRepository {
       final auth.User? user = credential.user;
       return user;
     } on auth.FirebaseAuthException catch (e) {
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
       final SnackBar snackBar = SnackBar(
         content: Text(e.message!),
         backgroundColor: Colors.redAccent,
@@ -46,6 +49,8 @@ class AuthRepository extends BaseAuthRepository {
       final auth.User? user = credential.user;
       return user;
     } on auth.FirebaseAuthException catch (e) {
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
       final SnackBar snackBar = SnackBar(
         content: Text(e.message!),
         backgroundColor: Colors.redAccent,
@@ -68,6 +73,8 @@ class AuthRepository extends BaseAuthRepository {
       final auth.User? user = credential.user;
       return user;
     } on auth.FirebaseAuthException catch (e) {
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
       final SnackBar snackBar = SnackBar(
         content: Text(e.message!),
         backgroundColor: Colors.redAccent,
@@ -79,7 +86,17 @@ class AuthRepository extends BaseAuthRepository {
 
   @override
   Future<void> signOut() async {
-    await _firebaseAuth.signOut();
+    try {
+      await _firebaseAuth.signOut();
+    } on auth.FirebaseAuthException catch (e) {
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
+      final SnackBar snackBar = SnackBar(
+        content: Text(e.message!),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
+    }
   }
 
   @override
@@ -88,6 +105,8 @@ class AuthRepository extends BaseAuthRepository {
       await _firebaseAuth.sendPasswordResetEmail(email: email);
       // TODO: Confirm Password reset.
     } on auth.FirebaseAuthException catch (e) {
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
       final SnackBar snackBar = SnackBar(
         content: Text(e.message!),
         backgroundColor: Colors.redAccent,
@@ -105,6 +124,8 @@ class AuthRepository extends BaseAuthRepository {
       await _firebaseAuth.currentUser!.reauthenticateWithCredential(credential);
       await _firebaseAuth.currentUser!.updateEmail(newEmail);
     } on auth.FirebaseAuthException catch (e) {
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
       final SnackBar snackBar = SnackBar(
         content: Text(e.message!),
         backgroundColor: Colors.redAccent,
@@ -121,6 +142,8 @@ class AuthRepository extends BaseAuthRepository {
       await _firebaseAuth.currentUser!.reauthenticateWithCredential(credential);
       await _firebaseAuth.currentUser!.delete();
     } on auth.FirebaseAuthException catch (e) {
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
       final SnackBar snackBar = SnackBar(
         content: Text(e.message!),
         backgroundColor: Colors.redAccent,
