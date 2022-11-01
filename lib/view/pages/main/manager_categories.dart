@@ -188,7 +188,7 @@ class CategoryCard extends StatelessWidget {
                   BlocProvider.of<CardBloc>(context)
                       .add(LoadCards(category: category));
 
-                  context.goNamed('manager-deck-page');
+                  context.pushNamed('manager-deck-page');
                 },
                 child: Card(
                   shape: RoundedRectangleBorder(

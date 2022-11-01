@@ -514,7 +514,7 @@ class GroupMemberProgressCategory extends StatelessWidget {
                                 context.read<CardBloc>().add(LoadCards(
                                       category: category,
                                     ));
-                                context.goNamed('view-responses');
+                                context.pushNamed('view-responses');
                               }
                             : null,
                         child: const Text('View Responses >'))
