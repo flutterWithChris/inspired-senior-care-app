@@ -26,23 +26,19 @@ class _MyHomePageState extends State<MyHomePage> {
           preferredSize: Size.fromHeight(60),
           child: MainTopAppBar(),
         ),
-        body: SingleChildScrollView(
-          reverse: true,
-          physics: const NeverScrollableScrollPhysics(),
-          child: Center(
-            child: Column(
-              //   mainAxisAlignment: MainAxisAlignment.center,
-              children: const <Widget>[
-                Padding(
-                  padding: EdgeInsets.only(top: 24, bottom: 24.0),
-                  child: Text(
-                    'Monthly Category',
-                    style: TextStyle(fontSize: 30),
-                  ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: const <Widget>[
+              Padding(
+                padding: EdgeInsets.only(top: 16.0, bottom: 24.0),
+                child: Text(
+                  'Monthly Category',
+                  style: TextStyle(fontSize: 30),
                 ),
-                FeaturedCategory(),
-              ],
-            ),
+              ),
+              FeaturedCategory(),
+            ],
           ),
         ),
       ),
