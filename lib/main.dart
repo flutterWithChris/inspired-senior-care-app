@@ -307,7 +307,10 @@ class _MyAppState extends State<MyApp> {
     GoRoute(
         name: 'categories',
         path: '/categories',
-        builder: (context, state) => const Categories(),
+        builder: (context, state) {
+          Globals().index = 0;
+          return const Categories();
+        },
         routes: [
           GoRoute(
             name: 'deck-page',
@@ -320,7 +323,10 @@ class _MyAppState extends State<MyApp> {
     GoRoute(
         name: 'manager-categories',
         path: '/manager-categories',
-        builder: (context, state) => const ManagerCategories(),
+        builder: (context, state) {
+          Globals().index = 0;
+          return const ManagerCategories();
+        },
         routes: [
           GoRoute(
             name: 'manager-deck-page',
@@ -331,7 +337,10 @@ class _MyAppState extends State<MyApp> {
     GoRoute(
         name: 'manager-categories-share',
         path: '/manager-categories-share',
-        builder: (context, state) => const ManagerCategoriesShare(),
+        builder: (context, state) {
+          Globals().index = 0;
+          return const ManagerCategoriesShare();
+        },
         routes: [
           GoRoute(
             name: 'manager-share-deck-page',
@@ -344,7 +353,10 @@ class _MyAppState extends State<MyApp> {
     GoRoute(
       name: 'profile',
       path: '/profile',
-      builder: (context, state) => const Profile(),
+      builder: (context, state) {
+        Globals().index = 2;
+        return const Profile();
+      },
     ),
     GoRoute(
       name: 'subscriptions',
@@ -354,7 +366,10 @@ class _MyAppState extends State<MyApp> {
     GoRoute(
         name: 'dashboard',
         path: '/dashboard',
-        builder: (context, state) => const Dashboard(),
+        builder: (context, state) {
+          Globals().index = 2;
+          return const Dashboard();
+        },
         routes: [
           GoRoute(
               name: 'view-group-members',

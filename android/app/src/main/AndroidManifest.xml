@@ -4,7 +4,7 @@
    <application
         android:label="Inspired Senior Care"
         android:name="${applicationName}"
-        android:icon="@mipmap/purple_launcher_icon">
+        android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
             android:exported="true"

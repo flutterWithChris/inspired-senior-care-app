@@ -34,8 +34,11 @@ class _FeaturedCategoryState extends State<FeaturedCategory> {
           return Column(
             children: [
               InkWell(
+                borderRadius: BorderRadius.circular(12.0),
                 splashColor: Colors.lightBlueAccent,
                 child: Card(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.0)),
                   child: LayoutBuilder(
                     builder: (context, constraints) {
                       return ConstrainedBox(
@@ -48,43 +51,39 @@ class _FeaturedCategoryState extends State<FeaturedCategory> {
                           onComplete: (controller) {
                             controller.repeat();
                           },
-                          child: Container(
-                            color: Colors.white,
-                            child: Padding(
-                              padding: const EdgeInsets.all(12.0),
-                              child: Stack(
-                                clipBehavior: Clip.none,
-                                alignment: AlignmentDirectional.topEnd,
-                                children: [
-                                  SizedBox(
-                                      height: 400,
-                                      width: 350,
-                                      child: Container(
-                                        color: Colors.grey.shade300,
-                                        child: Center(
-                                            child:
-                                                LoadingAnimationWidget.inkDrop(
-                                                    color: Theme.of(context)
-                                                        .primaryColor,
-                                                    size: 30)),
-                                      )),
-                                  Visibility(
-                                    visible: currentUser.type == 'user',
-                                    child: const Positioned(
-                                      top: -35,
-                                      right: -25,
+                          child: Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: Stack(
+                              clipBehavior: Clip.none,
+                              alignment: AlignmentDirectional.topEnd,
+                              children: [
+                                SizedBox(
+                                    height: 400,
+                                    width: 350,
+                                    child: Container(
+                                      color: Colors.grey.shade300,
+                                      child: Center(
+                                          child: LoadingAnimationWidget.inkDrop(
+                                              color: Theme.of(context)
+                                                  .primaryColor,
+                                              size: 30)),
+                                    )),
+                                Visibility(
+                                  visible: currentUser.type == 'user',
+                                  child: const Positioned(
+                                    top: -35,
+                                    right: -25,
+                                    child: CircleAvatar(
+                                      radius: 35,
+                                      backgroundColor: Colors.white,
                                       child: CircleAvatar(
-                                        radius: 35,
-                                        backgroundColor: Colors.white,
-                                        child: CircleAvatar(
-                                          radius: 30,
-                                          backgroundColor: Colors.blueGrey,
-                                        ),
+                                        radius: 30,
+                                        backgroundColor: Colors.blueGrey,
                                       ),
                                     ),
-                                  )
-                                ],
-                              ),
+                                  ),
+                                )
+                              ],
                             ),
                           ),
                         ),
@@ -113,6 +112,7 @@ class _FeaturedCategoryState extends State<FeaturedCategory> {
           return Column(
             children: [
               InkWell(
+                borderRadius: BorderRadius.circular(12.0),
                 splashColor: Colors.lightBlueAccent,
                 onTap: (() {
                   BlocProvider.of<CardBloc>(context)
@@ -124,66 +124,65 @@ class _FeaturedCategoryState extends State<FeaturedCategory> {
                 child: Animate(
                   effects: const [ShimmerEffect()],
                   child: Card(
+                    elevation: 1.618,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12.0)),
                     child: LayoutBuilder(
                       builder: (context, constraints) {
                         return ConstrainedBox(
                           constraints: BoxConstraints(
-                              maxWidth: constraints.maxWidth > 700 ? 350 : 275),
-                          child: Container(
-                            color: Colors.white,
-                            child: Padding(
-                              padding: const EdgeInsets.all(12.0),
-                              child: Stack(
-                                clipBehavior: Clip.none,
-                                alignment: AlignmentDirectional.topEnd,
-                                children: [
-                                  SizedBox(
-                                    child: CachedNetworkImage(
-                                      imageUrl: featuredCategory.coverImageUrl,
-                                    ),
+                              maxWidth: constraints.maxWidth > 700 ? 350 : 260),
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Stack(
+                              clipBehavior: Clip.none,
+                              alignment: AlignmentDirectional.topEnd,
+                              children: [
+                                SizedBox(
+                                  child: CachedNetworkImage(
+                                    imageUrl: featuredCategory.coverImageUrl,
                                   ),
-                                  Visibility(
-                                    visible: currentUser.type == 'user',
-                                    child: Positioned(
-                                      top: -35,
-                                      right: -25,
-                                      child: Stack(
-                                        alignment: AlignmentDirectional.center,
-                                        children: [
-                                          CircleAvatar(
-                                            radius: 32,
+                                ),
+                                Visibility(
+                                  visible: currentUser.type == 'user',
+                                  child: Positioned(
+                                    top: -35,
+                                    right: -25,
+                                    child: Stack(
+                                      alignment: AlignmentDirectional.center,
+                                      children: [
+                                        CircleAvatar(
+                                          radius: 32,
+                                          backgroundColor: Colors.white,
+                                          child: CircleAvatar(
+                                            radius: 28,
                                             backgroundColor: Colors.white,
-                                            child: CircleAvatar(
-                                              radius: 28,
-                                              backgroundColor: Colors.white,
-                                              child: Text(
-                                                '${progress - 1}/${featuredCategory.totalCards}',
-                                                style: const TextStyle(
-                                                    fontSize: 18,
-                                                    fontWeight: FontWeight.bold,
-                                                    letterSpacing: 0.2),
-                                              ),
+                                            child: Text(
+                                              '${progress - 1}/${featuredCategory.totalCards}',
+                                              style: const TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.bold,
+                                                  letterSpacing: 0.2),
                                             ),
                                           ),
-                                          SizedBox(
-                                            height: 59,
-                                            width: 59,
-                                            child: CircularProgressIndicator(
-                                              color: featuredCategory
-                                                  .progressColor,
-                                              backgroundColor:
-                                                  Colors.grey.shade200,
-                                              value: (((progress - 1) /
-                                                  featuredCategory
-                                                      .totalCards!)),
-                                            ),
-                                          )
-                                        ],
-                                      ),
+                                        ),
+                                        SizedBox(
+                                          height: 59,
+                                          width: 59,
+                                          child: CircularProgressIndicator(
+                                            color:
+                                                featuredCategory.progressColor,
+                                            backgroundColor:
+                                                Colors.grey.shade200,
+                                            value: (((progress - 1) /
+                                                featuredCategory.totalCards!)),
+                                          ),
+                                        )
+                                      ],
                                     ),
-                                  )
-                                ],
-                              ),
+                                  ),
+                                )
+                              ],
                             ),
                           ),
                         );
@@ -215,7 +214,7 @@ class SeeMoreButton extends StatelessWidget {
   Widget build(BuildContext context) {
     User currentUser = context.watch<ProfileBloc>().state.user;
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12.0),
+      padding: const EdgeInsets.symmetric(vertical: 16.0),
       child: ElevatedButton(
         onPressed: (() {
           BlocProvider.of<CardBloc>(context)

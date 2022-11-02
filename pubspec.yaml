@@ -46,19 +46,15 @@ dependencies:
   flex_color_picker: ^2.5.0
   flutter_speed_dial: ^6.0.0
   infinite_carousel: ^1.0.2
-  screenshots: ^0.2.1
-  linked_scroll_controller: ^0.2.0
   firebase_core: ^2.1.1
   firebase_auth: ^4.1.0
   email_validator: ^2.1.17
   flutter_pw_validator: ^1.4.2
   firebase_storage: ^11.0.3
   cloud_firestore: ^4.0.3
-  progress_state_button: ^1.0.4
   cached_network_image: ^3.2.1
   loading_animation_widget: ^1.2.0+2
   rxdart: ^0.27.5
-  cron: ^0.5.0
   shared_preferences: ^2.0.15
   settings_ui: ^2.0.2
   change_app_package_name: ^1.1.0
@@ -70,7 +66,6 @@ dependencies:
   once: ^1.4.1
   purchases_flutter: ^4.3.0
   dotenv: ^2.0.0
-  zoom_widget: ^2.0.0
   intl: ^0.17.0
   upgrader: ^4.8.1
 
@@ -109,6 +104,7 @@ flutter:
     - lib/assets/Logo-01.png
     - lib/assets/Inspired-Senior-care.png
     - lib/assets/Inspired-Senior-care-purple-circle.png
+    - lib/assets/ios_icon.png
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
 

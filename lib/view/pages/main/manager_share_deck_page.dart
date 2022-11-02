@@ -179,69 +179,85 @@ class _ManagerShareDeckPageState extends State<ManagerShareDeckPage> {
                       children: [
                         Flexible(
                           flex: 6,
-                          child: SingleChildScrollView(
-                            physics: const BouncingScrollPhysics(),
-                            clipBehavior: Clip.antiAlias,
-                            padding: const EdgeInsets.only(top: 40),
-                            reverse: true,
-                            child: AnimatedSlide(
-                              curve: Curves.decelerate,
-                              duration: const Duration(milliseconds: 200),
-                              offset: isCardZoomed
-                                  ? const Offset(0, -0.1)
-                                  : const Offset(0, -0.0),
-                              child: AnimatedScale(
-                                duration: const Duration(milliseconds: 250),
-                                scale: isCardZoomed ? 1.1 : 1.0,
-                                child: Stack(
-                                  clipBehavior: Clip.none,
-                                  alignment: AlignmentDirectional.topEnd,
-                                  children: [
-                                    SizedBox(
-                                      height: 500,
-                                      //  width: 330,
-                                      child: IgnorePointer(
-                                        ignoring: isSwipeDisabled,
-                                        child:
-                                            BlocListener<DeckCubit, DeckState>(
-                                          listener: (context, state) {
-                                            // TODO: implement listener
-                                            if (state.status ==
-                                                DeckStatus.completed) {
-                                              setState(() {
-                                                isSwipeDisabled = false;
-                                              });
-                                            }
-                                            if (state.status ==
-                                                DeckStatus.zoomed) {
-                                              setState(() {
-                                                isCardZoomed = true;
-                                              });
-                                            } else if (state.status ==
-                                                DeckStatus.unzoomed) {
-                                              setState(() {
-                                                isCardZoomed = false;
-                                              });
-                                            }
-                                          },
-                                          child: Deck(
-                                              deckScrollController:
-                                                  deckScrollController),
+                          child: IgnorePointer(
+                            ignoring: isCardZoomed == false &&
+                                isCategoryComplete == false,
+                            child: SingleChildScrollView(
+                              physics: const BouncingScrollPhysics(),
+                              clipBehavior: Clip.antiAlias,
+                              padding: const EdgeInsets.only(top: 40),
+                              reverse: true,
+                              child: AnimatedSlide(
+                                curve: Curves.decelerate,
+                                duration: const Duration(milliseconds: 200),
+                                offset: isCardZoomed
+                                    ? const Offset(0, -0.1)
+                                    : const Offset(0, -0.0),
+                                child: AnimatedScale(
+                                  duration: const Duration(milliseconds: 250),
+                                  scale: isCardZoomed ? 1.1 : 1.0,
+                                  child: Stack(
+                                    clipBehavior: Clip.none,
+                                    alignment: AlignmentDirectional.topEnd,
+                                    children: [
+                                      SizedBox(
+                                        height: 500,
+                                        //  width: 330,
+                                        child: IgnorePointer(
+                                          ignoring: isSwipeDisabled,
+                                          child: BlocListener<DeckCubit,
+                                              DeckState>(
+                                            listener: (context, state) {
+                                              // TODO: implement listener
+                                              if (state.status ==
+                                                  DeckStatus.completed) {
+                                                setState(() {
+                                                  isSwipeDisabled = false;
+                                                });
+                                              }
+                                              if (state.status ==
+                                                  DeckStatus.zoomed) {
+                                                setState(() {
+                                                  isCardZoomed = true;
+                                                });
+                                              } else if (state.status ==
+                                                  DeckStatus.unzoomed) {
+                                                setState(() {
+                                                  isCardZoomed = false;
+                                                });
+                                              }
+                                            },
+                                            child: Deck(
+                                                deckScrollController:
+                                                    deckScrollController),
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    Visibility(
-                                      visible: isSwipeDisabled ? true : false,
-                                      child: Positioned(
-                                        right: 20,
-                                        top: -20,
-                                        child: CardCounter(
-                                            category: widget.category,
-                                            deckScrollController:
-                                                deckScrollController),
+                                      Visibility(
+                                        visible: isSwipeDisabled ? true : false,
+                                        child: Positioned(
+                                          right: 24,
+                                          top: -12,
+                                          child: Animate(
+                                            effects: const [
+                                              SlideEffect(
+                                                  delay: Duration(
+                                                      milliseconds: 600),
+                                                  duration: Duration(
+                                                      milliseconds: 250),
+                                                  curve: Curves.easeOutBack,
+                                                  begin: Offset(1.5, 0),
+                                                  end: Offset(0, 0))
+                                            ],
+                                            child: CardCounter(
+                                                category: widget.category,
+                                                deckScrollController:
+                                                    deckScrollController),
+                                          ),
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),

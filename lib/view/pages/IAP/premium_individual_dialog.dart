@@ -5,8 +5,6 @@ import 'package:inspired_senior_care_app/bloc/purchases/purchases_bloc.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:purchases_flutter/models/package_wrapper.dart';
 
-import '../../../bloc/profile/profile_bloc.dart';
-
 class PremiumIndividualOfferDialog extends StatefulWidget {
   const PremiumIndividualOfferDialog({
     Key? key,
@@ -51,27 +49,14 @@ class _PremiumOfferDialogState extends State<PremiumIndividualOfferDialog> {
                         color: Colors.blue, size: 30.0);
                   }
                   if (state is PurchasesLoaded) {
-                    if (context.watch<ProfileBloc>().state.user.type ==
-                        'user') {
-                      packages.addAll([
-                        state.offerings
-                            ?.getOffering('subscriptions')!
-                            .getPackage('Individual (Monthly)'),
-                        state.offerings
-                            ?.getOffering('subscriptions')!
-                            .getPackage('Individual (Yearly)'),
-                      ]);
-                    } else if (context.watch<ProfileBloc>().state.user.type ==
-                        'manager') {
-                      packages.addAll([
-                        state.offerings
-                            ?.getOffering('subscriptions')!
-                            .getPackage('Organization (Monthly)'),
-                        state.offerings
-                            ?.getOffering('subscriptions')!
-                            .getPackage('Organization (Annual)')
-                      ]);
-                    }
+                    packages.addAll([
+                      state.offerings
+                          ?.getOffering('subscriptions')!
+                          .getPackage('Individual (Monthly)'),
+                      state.offerings
+                          ?.getOffering('subscriptions')!
+                          .getPackage('Individual (Yearly)'),
+                    ]);
 
                     return Stack(
                       clipBehavior: Clip.none,
@@ -107,8 +92,6 @@ class _PremiumOfferDialogState extends State<PremiumIndividualOfferDialog> {
 
                                   context.read<PurchasesBloc>().add(AddPurchase(
                                       package: package ?? packages[0]!));
-
-                                  // Navigator.pop(context);
                                 },
                                 child: const Text('Subscribe')),
                           ),
@@ -127,15 +110,18 @@ class _PremiumOfferDialogState extends State<PremiumIndividualOfferDialog> {
                           right: 0,
                           child: Padding(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 6.0, vertical: 6.0),
-                            child: CircleAvatar(
-                              backgroundColor: Colors.black45,
-                              radius: 16,
-                              child: FittedBox(
-                                child: CloseButton(
-                                  onPressed: () {
-                                    context.pop();
-                                  },
+                                horizontal: 32.0, vertical: 8.0),
+                            child: SizedBox(
+                              height: 30,
+                              width: 30,
+                              child: InkWell(
+                                customBorder: const StadiumBorder(),
+                                radius: 30,
+                                onTap: () => Navigator.pop(context),
+                                child: const CircleAvatar(
+                                  backgroundColor: Colors.black45,
+                                  radius: 16,
+                                  child: Icon(Icons.close),
                                 ),
                               ),
                             ),

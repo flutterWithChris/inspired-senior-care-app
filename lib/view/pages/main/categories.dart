@@ -153,6 +153,7 @@ class CategoryCard extends StatelessWidget {
                   context.pushNamed('deck-page', extra: category);
                 },
                 child: Card(
+                  elevation: 1.618,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12.0)),
                   child: Stack(
