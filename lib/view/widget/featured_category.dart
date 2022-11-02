@@ -221,8 +221,8 @@ class SeeMoreButton extends StatelessWidget {
           BlocProvider.of<CardBloc>(context)
               .add(LoadCards(category: featuredCategory!));
           currentUser.type == 'user'
-              ? context.pushNamed('deck-page')
-              : context.pushNamed('manager-deck-page');
+              ? context.pushNamed('deck-page', extra: featuredCategory)
+              : context.pushNamed('manager-deck-page', extra: featuredCategory);
         }),
         style: ElevatedButton.styleFrom(fixedSize: const Size(200, 30)),
         child: const Text(
