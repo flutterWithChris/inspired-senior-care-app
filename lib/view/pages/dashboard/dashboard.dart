@@ -23,6 +23,7 @@ import 'package:inspired_senior_care_app/view/widget/main/main_app_drawer.dart';
 import 'package:inspired_senior_care_app/view/widget/main/top_app_bar.dart';
 import 'package:inspired_senior_care_app/view/widget/name_plate.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:showcaseview/showcaseview.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({Key? key}) : super(key: key);
@@ -35,203 +36,227 @@ class _DashboardState extends State<Dashboard> {
   TextEditingController inviteTextFieldController = TextEditingController();
   List<Group> myGroupList = [];
   User currentUser = User.empty;
+  final GlobalKey groupSectionShowcaseKey = GlobalKey();
+  BuildContext? showcaseBuildContext;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      ShowCaseWidget.of(showcaseBuildContext!)
+          .startShowCase([groupSectionShowcaseKey]);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      drawer: const MainAppDrawer(),
-      bottomNavigationBar: const MainBottomAppBar(),
-      appBar: const PreferredSize(
-        preferredSize: Size.fromHeight(60),
-        child: MainTopAppBar(),
-      ),
-      // * Main Content
-      body: BlocBuilder<ProfileBloc, ProfileState>(
-        builder: (context, state) {
-          if (state is ProfileLoading) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-          if (state is ProfileLoaded) {
-            currentUser = state.user;
-            return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10.0),
-              child: ListView(
-                shrinkWrap: true,
-                children: [
-                  // * Name Plate
-                  Padding(
-                    padding: const EdgeInsets.only(top: 12.0),
-                    child: NamePlate(
-                      user: currentUser,
-                      memberName: currentUser.name!,
-                      memberTitle: currentUser.title!,
-                      memberColorHex: currentUser.userColor!,
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                          top: 6.0, bottom: 24.0, left: 12.0, right: 12.0),
-                      child: Column(children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: const [],
+    return ShowCaseWidget(builder: Builder(
+      builder: (context) {
+        showcaseBuildContext = context;
+        return Scaffold(
+          drawer: const MainAppDrawer(),
+          bottomNavigationBar: const MainBottomAppBar(),
+          appBar: const PreferredSize(
+            preferredSize: Size.fromHeight(60),
+            child: MainTopAppBar(),
+          ),
+          // * Main Content
+          body: BlocBuilder<ProfileBloc, ProfileState>(
+            builder: (context, state) {
+              if (state is ProfileLoading) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+              if (state is ProfileLoaded) {
+                currentUser = state.user;
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                  child: ListView(
+                    shrinkWrap: true,
+                    children: [
+                      // * Name Plate
+                      Padding(
+                        padding: const EdgeInsets.only(top: 12.0),
+                        child: NamePlate(
+                          user: currentUser,
+                          memberName: currentUser.name!,
+                          memberTitle: currentUser.title!,
+                          memberColorHex: currentUser.userColor!,
                         ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 12.0, horizontal: 8.0),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Wrap(
-                                spacing: 12.0,
-                                runAlignment: WrapAlignment.center,
-                                alignment: WrapAlignment.center,
-                                crossAxisAlignment: WrapCrossAlignment.center,
-                                // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                              top: 6.0, bottom: 24.0, left: 12.0, right: 12.0),
+                          child: Column(children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: const [],
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 12.0, horizontal: 8.0),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  const Icon(
-                                    Icons.group,
-                                    color: Colors.black87,
-                                  ),
-                                  Text(
-                                    'My Groups',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .headlineSmall,
+                                  Wrap(
+                                    spacing: 12.0,
+                                    runAlignment: WrapAlignment.center,
+                                    alignment: WrapAlignment.center,
+                                    crossAxisAlignment:
+                                        WrapCrossAlignment.center,
+                                    // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      const Icon(
+                                        Icons.group,
+                                        color: Colors.black87,
+                                      ),
+                                      Text(
+                                        'My Groups',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .headlineSmall,
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),
-                            ],
-                          ),
-                        ),
-                        // * Groups Section
-                        BlocBuilder<GroupBloc, GroupState>(
-                          // * Rebuild when groups updated.
-                          builder: (context, state) {
-                            if (state is GroupLoading ||
-                                state is GroupUpdated ||
-                                state is GroupCreated ||
-                                state is GroupDeleted) {
-                              return Center(
-                                child: LoadingAnimationWidget.inkDrop(
-                                    color: Theme.of(context).primaryColor,
-                                    size: 25),
-                              );
-                            }
-                            if (state is GroupLoaded) {
-                              if (state.myGroups.isEmpty) {
-                                return Center(
-                                  child: Card(
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(33)),
-                                      child: SizedBox(
-                                          width: 325,
-                                          height: 150,
-                                          child: Center(
-                                              child: Wrap(
-                                            direction: Axis.vertical,
-                                            crossAxisAlignment:
-                                                WrapCrossAlignment.center,
-                                            spacing: 8.0,
-                                            children: [
-                                              Text(
-                                                'No Groups Yet!',
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .titleLarge!
-                                                    .copyWith(
-                                                        color: Colors.grey),
-                                              ),
-                                              ElevatedButton.icon(
-                                                  onPressed: () => showDialog(
-                                                      context: context,
-                                                      builder: (context) {
-                                                        return CreateGroupDialog(
-                                                          manager: currentUser,
-                                                        );
-                                                      }),
-                                                  style:
-                                                      ElevatedButton.styleFrom(
-                                                          fixedSize: const Size(
-                                                              140, 32)),
-                                                  icon: const Icon(
-                                                    Icons.add_circle,
-                                                    size: 18,
+                            ),
+                            // * Groups Section
+                            BlocBuilder<GroupBloc, GroupState>(
+                              // * Rebuild when groups updated.
+                              builder: (context, state) {
+                                if (state is GroupLoading ||
+                                    state is GroupUpdated ||
+                                    state is GroupCreated ||
+                                    state is GroupDeleted) {
+                                  return Center(
+                                    child: LoadingAnimationWidget.inkDrop(
+                                        color: Theme.of(context).primaryColor,
+                                        size: 25),
+                                  );
+                                }
+                                if (state is GroupLoaded) {
+                                  if (state.myGroups.isEmpty) {
+                                    return Center(
+                                      child: Card(
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(33)),
+                                          child: SizedBox(
+                                              width: 325,
+                                              height: 150,
+                                              child: Center(
+                                                  child: Wrap(
+                                                direction: Axis.vertical,
+                                                crossAxisAlignment:
+                                                    WrapCrossAlignment.center,
+                                                spacing: 8.0,
+                                                children: [
+                                                  Text(
+                                                    'No Groups Yet!',
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .titleLarge!
+                                                        .copyWith(
+                                                            color: Colors.grey),
                                                   ),
-                                                  label:
-                                                      const Text('New Group'))
-                                            ],
-                                          )))),
-                                );
-                              } else {
-                                return Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    // * Build groups
-                                    for (Group group in state.myGroups)
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 8.0),
-                                        child: GroupSection(
-                                            group: group,
-                                            manager: currentUser,
-                                            groupName: group.groupName!,
-                                            sampleGroupList: state.myGroups,
-                                            inviteTextFieldController:
-                                                inviteTextFieldController),
-                                      ),
-                                  ],
-                                );
-                              }
-                            } else {
-                              return const Center(
-                                child: Text('Something Went Wrong!'),
-                              );
-                            }
-                          },
+                                                  ElevatedButton.icon(
+                                                      onPressed: () =>
+                                                          showDialog(
+                                                              context: context,
+                                                              builder:
+                                                                  (context) {
+                                                                return CreateGroupDialog(
+                                                                  manager:
+                                                                      currentUser,
+                                                                );
+                                                              }),
+                                                      style: ElevatedButton
+                                                          .styleFrom(
+                                                              fixedSize:
+                                                                  const Size(
+                                                                      140, 32)),
+                                                      icon: const Icon(
+                                                        Icons.add_circle,
+                                                        size: 18,
+                                                      ),
+                                                      label: const Text(
+                                                          'New Group'))
+                                                ],
+                                              )))),
+                                    );
+                                  } else {
+                                    return Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        // * Build groups
+                                        for (Group group in state.myGroups)
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 8.0),
+                                            child: GroupSection(
+                                                group: group,
+                                                manager: currentUser,
+                                                groupName: group.groupName!,
+                                                sampleGroupList: state.myGroups,
+                                                inviteTextFieldController:
+                                                    inviteTextFieldController),
+                                          ),
+                                      ],
+                                    );
+                                  }
+                                } else {
+                                  return const Center(
+                                    child: Text('Something Went Wrong!'),
+                                  );
+                                }
+                              },
+                            ),
+                          ]),
                         ),
-                      ]),
-                    ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            );
-          }
-          return Container();
-        },
-      ),
-      // * FAB
-      floatingActionButton: SpeedDial(
-        overlayColor: Colors.black,
-        spacing: 12.0,
-        backgroundColor: Colors.lightGreen,
-        children: [
-          SpeedDialChild(
-            label: 'Create a Group',
-            child: const Icon(Icons.group_add),
-            onTap: () => showDialog(
-                context: context,
-                builder: (context) {
-                  return CreateGroupDialog(
-                    manager: currentUser,
-                  );
-                }),
+                );
+              }
+              return Container();
+            },
           ),
-        ],
-        child: const Icon(Icons.add),
-      ),
-    );
+          // * FAB
+          floatingActionButton: Showcase(
+            key: groupSectionShowcaseKey,
+            targetBorderRadius: const BorderRadius.all(Radius.circular(50.0)),
+            descriptionAlignment: TextAlign.center,
+            targetPadding: const EdgeInsets.all(12.0),
+            description:
+                'Create groups &  invite members to join using their email address. *Must sign up on app first.* \n\n See their progress and congratulate them when you see they have earned awards!',
+            child: SpeedDial(
+              overlayColor: Colors.black,
+              spacing: 12.0,
+              backgroundColor: Colors.lightGreen,
+              children: [
+                SpeedDialChild(
+                  label: 'Create a Group',
+                  child: const Icon(Icons.group_add),
+                  onTap: () => showDialog(
+                      context: context,
+                      builder: (context) {
+                        return CreateGroupDialog(
+                          manager: currentUser,
+                        );
+                      }),
+                ),
+              ],
+              child: const Icon(Icons.add),
+            ),
+          ),
+        );
+      },
+    ));
   }
 }
 

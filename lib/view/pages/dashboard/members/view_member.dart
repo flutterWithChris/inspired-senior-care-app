@@ -10,6 +10,7 @@ import 'package:inspired_senior_care_app/view/widget/main/top_app_bar.dart';
 import 'package:inspired_senior_care_app/view/widget/name_plate.dart';
 import 'package:inspired_senior_care_app/view/widget/progress_widgets.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:showcaseview/showcaseview.dart';
 
 class ViewMember extends StatefulWidget {
   const ViewMember({Key? key}) : super(key: key);
@@ -19,6 +20,19 @@ class ViewMember extends StatefulWidget {
 }
 
 class _ViewMemberState extends State<ViewMember> {
+  final GlobalKey viewResponsesShowcaseKey = GlobalKey();
+  BuildContext? showcaseBuildContext;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      ShowCaseWidget.of(showcaseBuildContext!)
+          .startShowCase([viewResponsesShowcaseKey]);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -65,27 +79,26 @@ class _ViewMemberState extends State<ViewMember> {
           if (state is MemberLoaded) {
             User thisUser = state.user;
             return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12.0),
-              child: ListView(
-                shrinkWrap: true,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(top: 12.0),
-                    child: NamePlate(
-                      user: thisUser,
-                      memberName: thisUser.name!,
-                      memberTitle: thisUser.title!,
-                      memberColorHex: thisUser.userColor!,
+                padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                child: ListView(
+                  shrinkWrap: true,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 12.0),
+                      child: NamePlate(
+                        user: thisUser,
+                        memberName: thisUser.name!,
+                        memberTitle: thisUser.title!,
+                        memberColorHex: thisUser.userColor!,
+                      ),
                     ),
-                  ),
-                  RemoveMemberButton(currentGroup: state.group),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 12.0),
-                    child: GroupMemberProgressSection(),
-                  ),
-                ],
-              ),
-            );
+                    RemoveMemberButton(currentGroup: state.group),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 12.0),
+                      child: GroupMemberProgressSection(),
+                    ),
+                  ],
+                ));
           }
           return const Text('Something Went Wrong!');
         },
@@ -176,7 +189,7 @@ class _RemoveMemberDialogState extends State<RemoveMemberDialog> {
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
                       'Remove Member?',
-                      style: Theme.of(context).textTheme.headline5,
+                      style: Theme.of(context).textTheme.headlineSmall,
                     ),
                   ),
                   const Padding(

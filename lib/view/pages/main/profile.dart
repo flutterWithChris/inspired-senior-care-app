@@ -10,9 +10,28 @@ import 'package:inspired_senior_care_app/view/widget/main/top_app_bar.dart';
 
 import 'package:inspired_senior_care_app/view/widget/name_plate.dart';
 import 'package:inspired_senior_care_app/view/widget/progress_widgets.dart';
+import 'package:showcaseview/showcaseview.dart';
 
-class Profile extends StatelessWidget {
+class Profile extends StatefulWidget {
   const Profile({Key? key}) : super(key: key);
+
+  @override
+  State<Profile> createState() => _ProfileState();
+}
+
+class _ProfileState extends State<Profile> {
+  final GlobalKey progressShowcaseKey = GlobalKey();
+  BuildContext? showcaseBuildContext;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      ShowCaseWidget.of(showcaseBuildContext!)
+          .startShowCase([progressShowcaseKey]);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,38 +44,53 @@ class Profile extends StatelessWidget {
           );
         }
         if (state is ProfileLoaded) {
-          return Scaffold(
-            drawer: const MainAppDrawer(),
-            bottomNavigationBar: const MainBottomAppBar(),
-            appBar: const PreferredSize(
-                preferredSize: Size.fromHeight(60), child: MainTopAppBar()),
-            body: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: ListView(
-                controller: pageScrollController,
-                //  shrinkWrap: true,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(top: 12.0),
-                    child: NamePlate(
-                      user: state.user,
-                      memberName: state.user.name!,
-                      memberTitle: state.user.title!,
-                      memberColorHex: state.user.userColor!,
-                    ),
+          return ShowCaseWidget(builder: Builder(
+            builder: (context) {
+              showcaseBuildContext = context;
+              return Scaffold(
+                drawer: const MainAppDrawer(),
+                bottomNavigationBar: const MainBottomAppBar(),
+                appBar: const PreferredSize(
+                    preferredSize: Size.fromHeight(60), child: MainTopAppBar()),
+                body: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: ListView(
+                    controller: pageScrollController,
+                    //  shrinkWrap: true,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(top: 12.0),
+                        child: NamePlate(
+                          user: state.user,
+                          memberName: state.user.name!,
+                          memberTitle: state.user.title!,
+                          memberColorHex: state.user.userColor!,
+                        ),
+                      ),
+                      const GroupChips(),
+                      //const Badges(),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 16.0),
+                        child: Showcase(
+                          targetBorderRadius:
+                              const BorderRadius.all(Radius.circular(20.0)),
+                          descriptionAlignment: TextAlign.center,
+                          targetPadding: const EdgeInsets.only(
+                              top: 4.0, left: 8.0, right: 8.0, bottom: -1220),
+                          key: progressShowcaseKey,
+                          description:
+                              'Here you can track your progress in each category!',
+                          child: ProgressSection(
+                            pageScrollController: pageScrollController,
+                          ),
+                        ),
+                      )
+                    ],
                   ),
-                  const GroupChips(),
-                  //const Badges(),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 16.0),
-                    child: ProgressSection(
-                      pageScrollController: pageScrollController,
-                    ),
-                  )
-                ],
-              ),
-            ),
-          );
+                ),
+              );
+            },
+          ));
         } else {
           return const Center(
             child: Text('Something Went Wrong!...'),
