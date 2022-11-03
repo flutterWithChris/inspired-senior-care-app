@@ -100,10 +100,10 @@ class AuthRepository extends BaseAuthRepository {
   }
 
   @override
-  Future<void> requestPasswordReset(String email) async {
+  Future<bool> requestPasswordReset(String email) async {
     try {
       await _firebaseAuth.sendPasswordResetEmail(email: email);
-      // TODO: Confirm Password reset.
+      return true;
     } on auth.FirebaseAuthException catch (e) {
       (e, stack) =>
           FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
@@ -112,6 +112,7 @@ class AuthRepository extends BaseAuthRepository {
         backgroundColor: Colors.redAccent,
       );
       snackbarKey.currentState?.showSnackBar(snackBar);
+      return false;
     }
   }
 

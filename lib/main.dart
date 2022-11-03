@@ -24,6 +24,7 @@ import 'package:inspired_senior_care_app/bloc/view_response/response_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/view_response/view_response_cubit.dart';
 import 'package:inspired_senior_care_app/cubits/groups/featured_category_cubit.dart';
 import 'package:inspired_senior_care_app/cubits/groups/group_featured_category_cubit.dart';
+import 'package:inspired_senior_care_app/cubits/login/forgot_password_cubit.dart';
 import 'package:inspired_senior_care_app/cubits/login/login_cubit.dart';
 import 'package:inspired_senior_care_app/cubits/response/response_deck_cubit.dart';
 import 'package:inspired_senior_care_app/cubits/settings/cubit/settings_cubit.dart';
@@ -188,6 +189,10 @@ class _MyAppState extends State<MyApp> {
           BlocProvider(
             create: (context) =>
                 SignupCubit(authRepository: context.read<AuthRepository>()),
+          ),
+          BlocProvider(
+            create: (context) => ForgotPasswordCubit(
+                authRepository: context.read<AuthRepository>()),
           ),
           BlocProvider(
             create: (context) => ResponseBloc(
