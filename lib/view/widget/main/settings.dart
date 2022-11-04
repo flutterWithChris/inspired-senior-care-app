@@ -140,11 +140,11 @@ class SettingsPage extends StatelessWidget {
                       child: Text('Organization'),
                     ),
                     value: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 180),
+                      constraints: const BoxConstraints(maxWidth: 140),
                       child: FittedBox(
                           alignment: Alignment.centerRight,
                           fit: BoxFit.scaleDown,
-                          child: Text(currentUser.organization ?? 'nope')),
+                          child: Text(currentUser.organization!)),
                     ),
                     leading: const Icon(Icons.work_rounded),
                     onPressed: (context) {
@@ -158,6 +158,7 @@ class SettingsPage extends StatelessWidget {
                   ));
             }
             return SettingsList(
+              platform: DevicePlatform.iOS,
               contentPadding:
                   const EdgeInsets.symmetric(horizontal: 6.0, vertical: 8.0),
               sections: [
