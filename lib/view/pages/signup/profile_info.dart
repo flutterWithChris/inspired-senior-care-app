@@ -83,7 +83,6 @@ class _ProfileInfoState extends State<ProfileInfo> {
                             if (state is OnboardingLoaded) {
                               return TextFormField(
                                 textCapitalization: TextCapitalization.words,
-                                keyboardType: TextInputType.name,
                                 controller: nameFieldController,
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {

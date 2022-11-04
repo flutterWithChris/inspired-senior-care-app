@@ -215,8 +215,7 @@ class _DeckPageState extends State<DeckPage> {
                                 flex: 6,
                                 child: IgnorePointer(
                                   ignoring: isCardZoomed == false &&
-                                          isCategoryComplete == false ||
-                                      isSwipeDisabled,
+                                      isCategoryComplete == false,
                                   child: SingleChildScrollView(
                                     physics: const BouncingScrollPhysics(),
                                     clipBehavior: Clip.antiAlias,

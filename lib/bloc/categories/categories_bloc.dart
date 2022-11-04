@@ -39,7 +39,7 @@ class CategoriesBloc extends Bloc<CategoriesEvent, CategoriesState> {
 
   void _onCategoriesLoaded(
       LoadCategories event, Emitter<CategoriesState> emit) async {
-    _databaseSubscription?.cancel();
+    //_databaseSubscription?.cancel();
     categoryList.clear();
     List<String> cardImages = await _storageRepository.getCategoryCovers();
     await emit.forEach(
@@ -60,8 +60,8 @@ class CategoriesBloc extends Bloc<CategoriesEvent, CategoriesState> {
   }
 
   @override
-  Future<void> close() {
-    _profileStateSubscription?.cancel();
+  Future<void> close() async {
+    await _profileStateSubscription?.cancel();
     return super.close();
   }
 }

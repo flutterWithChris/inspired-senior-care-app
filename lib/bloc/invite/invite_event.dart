@@ -17,7 +17,9 @@ abstract class InviteEvent extends Equatable {
 class LoadInvites extends InviteEvent {}
 
 class ManagerInviteSent extends InviteEvent {
+  @override
   final String emailAddress;
+  @override
   final Group group;
   const ManagerInviteSent({
     required this.emailAddress,
@@ -28,7 +30,9 @@ class ManagerInviteSent extends InviteEvent {
 }
 
 class MemberInviteSent extends InviteEvent {
+  @override
   final String emailAddress;
+  @override
   final Group group;
   const MemberInviteSent({
     required this.emailAddress,

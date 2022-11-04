@@ -33,8 +33,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> with ChangeNotifier {
   }
 
   @override
-  Future<void> close() {
-    _userSubscription?.cancel();
+  Future<void> close() async {
+    await _userSubscription?.cancel();
     return super.close();
   }
 
@@ -54,7 +54,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> with ChangeNotifier {
 
   void _onLogoutRequested(
       AppLogoutRequested event, Emitter<AuthState> emit) async {
-    unawaited(_authRepository.signOut());
     emit(const AuthState.unauthenticated());
+    unawaited(_authRepository.signOut());
   }
 }

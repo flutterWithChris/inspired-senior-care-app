@@ -8,6 +8,7 @@ abstract class ProfileEvent extends Equatable {
 }
 
 class LoadProfile extends ProfileEvent {
+  @override
   final String userId;
   LoadProfile({
     required this.userId,
@@ -17,6 +18,7 @@ class LoadProfile extends ProfileEvent {
 }
 
 class UpdateProfile extends ProfileEvent {
+  @override
   final User user;
   UpdateProfile({
     required this.user,

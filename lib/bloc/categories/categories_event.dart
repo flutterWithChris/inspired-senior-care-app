@@ -10,6 +10,7 @@ abstract class CategoriesEvent extends Equatable {
 class LoadCategories extends CategoriesEvent {}
 
 class UpdateCategories extends CategoriesEvent {
+  @override
   final List<dynamic> categoryImageUrls;
   UpdateCategories({
     required this.categoryImageUrls,

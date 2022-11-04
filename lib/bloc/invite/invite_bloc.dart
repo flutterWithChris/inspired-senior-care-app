@@ -34,12 +34,12 @@ class InviteBloc extends Bloc<InviteEvent, InviteState> {
         super(InviteState.loading()) {
     authStream = _authBloc.stream.listen((state) {
       if (state.authStatus == AuthStatus.authenticated) {
-        add(LoadInvites());
-      }
-    });
-    inviteStream = _databaseRepository.listenForInvites()!.listen((event) {
-      if (event != null) {
-        add(LoadInvites());
+        // add(LoadInvites());
+        inviteStream = _databaseRepository.listenForInvites()!.listen((event) {
+          if (event != null) {
+            add(LoadInvites());
+          }
+        });
       }
     });
 
@@ -168,9 +168,9 @@ class InviteBloc extends Bloc<InviteEvent, InviteState> {
     });
   }
   @override
-  Future<void> close() {
-    authStream?.cancel();
-    inviteStream?.cancel();
+  Future<void> close() async {
+    await authStream?.cancel();
+    await inviteStream?.cancel();
     return super.close();
   }
 }
