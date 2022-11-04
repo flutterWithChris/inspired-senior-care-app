@@ -82,7 +82,7 @@ class _CreateGroupDialogState extends State<CreateGroupDialog> {
                             onSchedule: true,
                             featuredCategory: '',
                             isSubscribed: context
-                                .watch<PurchasesBloc>()
+                                .read<PurchasesBloc>()
                                 .state
                                 .isSubscribed,
                             groupMemberIds: [],
