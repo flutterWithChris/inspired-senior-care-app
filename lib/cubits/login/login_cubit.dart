@@ -23,15 +23,21 @@ class LoginCubit extends Cubit<LoginState> {
   }
 
   Future<void> signInWithCredentials() async {
-    emit(state.copyWith(status: LoginStatus.submitting));
-    var user = await _authRepository.signInWithEmail(
-        email: state.email, password: state.password);
-    if (user != null) {
-      emit(state.copyWith(status: LoginStatus.success));
+    if (state.status == LoginStatus.submitting ||
+        state.status == LoginStatus.error) {
+      return;
     } else {
-      emit(state.copyWith(status: LoginStatus.error));
+      emit(state.copyWith(status: LoginStatus.submitting));
+      var user = await _authRepository.signInWithEmail(
+          email: state.email, password: state.password);
+      await Future.delayed(const Duration(milliseconds: 250));
+      if (user != null) {
+        emit(state.copyWith(status: LoginStatus.success));
+      } else {
+        emit(state.copyWith(status: LoginStatus.error));
+      }
+      await Future.delayed(const Duration(seconds: 1));
+      emit(state.copyWith(status: LoginStatus.initial));
     }
-    await Future.delayed(const Duration(seconds: 1));
-    emit(state.copyWith(status: LoginStatus.initial));
   }
 }

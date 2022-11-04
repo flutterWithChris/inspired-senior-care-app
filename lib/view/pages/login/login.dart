@@ -29,17 +29,6 @@ class _LoginScreenState extends State<LoginScreen> {
               )),
           BlocBuilder<LoginCubit, LoginState>(
             builder: (context, state) {
-              if (state.status == LoginStatus.submitting) {
-                return Center(
-                  child: LoadingAnimationWidget.inkDrop(
-                      color: Colors.blue, size: 30.0),
-                );
-              }
-              if (state.status == LoginStatus.error) {
-                return const Center(
-                  child: Text('Error Logging In!'),
-                );
-              }
               if (state.status == LoginStatus.success) {
                 return Center(
                   child: Wrap(
@@ -57,7 +46,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 );
               }
-              if (state.status == LoginStatus.initial) {
+              if (state.status == LoginStatus.initial ||
+                  state.status == LoginStatus.error ||
+                  state.status == LoginStatus.submitting) {
                 return Center(
                   child: Form(
                       key: _loginFormKey,
@@ -173,7 +164,18 @@ class _LoginScreenState extends State<LoginScreen> {
                                   fixedSize: MaterialStateProperty.all(
                                       const Size(200, 30)),
                                 ),
-                            child: const Text('Login'),
+                            child: BlocBuilder<LoginCubit, LoginState>(
+                              builder: (context, state) {
+                                if (state.status == LoginStatus.submitting) {
+                                  return LoadingAnimationWidget.discreteCircle(
+                                      color: Colors.white, size: 18);
+                                }
+                                if (state.status == LoginStatus.error) {
+                                  return const Text('Error Logging In!');
+                                }
+                                return const Text('Login');
+                              },
+                            ),
                           ),
                         ],
                       )),
