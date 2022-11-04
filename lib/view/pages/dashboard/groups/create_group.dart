@@ -76,7 +76,7 @@ class _CreateGroupDialogState extends State<CreateGroupDialog> {
                       onPressed: () {
                         // * Create a New Group
                         Group newGroup = Group(
-                            groupName: groupNameController.text,
+                            groupName: groupNameController.value.text,
                             groupId: '',
                             groupOwnerId: currentUser.id,
                             onSchedule: true,
@@ -86,8 +86,8 @@ class _CreateGroupDialogState extends State<CreateGroupDialog> {
                                 .state
                                 .isSubscribed,
                             groupMemberIds: [],
-                            groupManagerIds: [currentUser.id!]);
-                        BlocProvider.of<GroupBloc>(context).add(
+                            groupManagerIds: []);
+                        context.read<GroupBloc>().add(
                             CreateGroup(group: newGroup, manager: currentUser));
                         // * Add new group to list
                         //  sampleGroupList.add(newGroup);
