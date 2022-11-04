@@ -27,7 +27,7 @@ class UserTypePage extends StatelessWidget {
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
                   'What are you?',
-                  style: Theme.of(context).textTheme.headline5,
+                  style: Theme.of(context).textTheme.headlineSmall,
                 ),
               ),
               Card(
@@ -52,7 +52,7 @@ class UserTypePage extends StatelessWidget {
                             Icons.person,
                             size: 28,
                           ),
-                          title: const Text('Healthcare Worker'),
+                          title: const Text('Care Partner'),
                           subtitle: const Text('I just want to learn!'),
                           trailing: const Icon(Icons.chevron_right_rounded),
                         );
@@ -91,7 +91,7 @@ class UserTypePage extends StatelessWidget {
                           ),
                           title: const Text('I\'m a Manager'),
                           subtitle: const Text(
-                              'I\'d like to create groups & view others\' progress.'),
+                              'I\'d like to create groups & view others progress.'),
                           trailing: const Icon(Icons.chevron_right_rounded),
                         );
                       } else {
