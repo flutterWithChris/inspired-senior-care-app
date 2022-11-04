@@ -318,16 +318,16 @@ class _DeckPageState extends State<DeckPage> {
                                   ),
                                 ),
                               ),
-                              Showcase(
-                                targetBorderRadius: const BorderRadius.all(
-                                    Radius.circular(50.0)),
-                                descriptionAlignment: TextAlign.center,
-                                targetPadding: const EdgeInsets.fromLTRB(
-                                    16.0, 0.0, 16.0, -8.0),
-                                key: shareResponseButtonSpotlight,
-                                description:
-                                    'Click this button to submit a response!',
-                                child: Flexible(
+                              Flexible(
+                                child: Showcase(
+                                  targetBorderRadius: const BorderRadius.all(
+                                      Radius.circular(50.0)),
+                                  descriptionAlignment: TextAlign.center,
+                                  targetPadding: const EdgeInsets.fromLTRB(
+                                      16.0, 0.0, 16.0, -8.0),
+                                  key: shareResponseButtonSpotlight,
+                                  description:
+                                      'Click this button to submit a response!',
                                   child: AnimatedOpacity(
                                     duration: const Duration(milliseconds: 100),
                                     opacity: isCardZoomed ? 0 : 1.0,
