@@ -11,6 +11,7 @@ import 'package:inspired_senior_care_app/bloc/deck/deck_cubit.dart';
 import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/share_bloc/share_bloc.dart';
 import 'package:inspired_senior_care_app/data/models/category.dart';
+import 'package:inspired_senior_care_app/globals.dart';
 import 'package:inspired_senior_care_app/view/pages/IAP/upgrade_page.dart';
 import 'package:inspired_senior_care_app/view/widget/main/bottom_app_bar.dart';
 import 'package:inspired_senior_care_app/view/widget/main/main_app_drawer.dart';
@@ -36,154 +37,164 @@ class _ManagerCategoriesShareState extends State<ManagerCategoriesShare> {
   BuildContext? showcaseBuildContext;
 
   @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      ShowCaseWidget.of(showcaseBuildContext!)
-          .startShowCase([managerShareCategoryCardShowcaseKey]);
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return ShowCaseWidget(builder: Builder(
-      builder: (context) {
-        showcaseBuildContext = context;
-        return Scaffold(
-          drawer: const MainAppDrawer(),
-          bottomNavigationBar: const MainBottomAppBar(),
-          appBar: const PreferredSize(
-            preferredSize: Size.fromHeight(60),
-            child: MainTopAppBar(),
-          ),
-          body: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: BlocBuilder<CategoriesBloc, CategoriesState>(
-              builder: (context, state) {
-                if (state is CategoriesLoading) {
-                  return Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        LoadingAnimationWidget.inkDrop(
-                            color: Colors.blueAccent, size: 30.0),
-                        const SizedBox(
-                          height: 8.0,
-                        ),
-                        const Text('Loading Categories...')
-                      ],
-                    ),
-                  );
-                }
-                if (state is CategoriesLoaded) {
-                  List<Category> allCategories = state.categories;
-                  // Shuffle Categories Weekly
-                  Once.runWeekly(
-                    'shuffleCategories',
-                    callback: () {
-                      allCategories.shuffle();
-                    },
-                  );
-                  int categoryCount = state.categoryImageUrls.length;
-                  final List<CategoryCard> categoryCards = [
-                    for (Category category in allCategories)
-                      CategoryCard(category: category),
-                  ];
-
-                  return ListView(
-                    physics: const ScrollPhysics(),
-                    shrinkWrap: true,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 24.0, horizontal: 8.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'All Categories',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headlineMedium!
-                                  .copyWith(
-                                      color: Colors.black87, fontSize: 32),
-                            ),
-                            Showcase(
-                              targetBorderRadius:
-                                  const BorderRadius.all(Radius.circular(40.0)),
-                              descriptionAlignment: TextAlign.center,
-                              targetPadding:
-                                  const EdgeInsets.symmetric(vertical: 8.0),
-                              key: managerShareCategoryCardShowcaseKey,
-                              description:
-                                  'Share Mode provides opportunity to respond to cards the same way group members do.',
-                              child: SizedBox(
-                                height: 40,
-                                width: 130,
-                                child: FittedBox(
-                                  child: PopupMenuButton(
-                                    position: PopupMenuPosition.under,
-                                    itemBuilder: (context) {
-                                      return [
-                                        PopupMenuItem(
-                                          child: const Text('View Mode'),
-                                          onTap: () {
-                                            context
-                                                .goNamed('manager-categories');
-                                          },
-                                        )
-                                      ];
-                                    },
-                                    child: IgnorePointer(
-                                      child: ElevatedButton.icon(
-                                          style: ElevatedButton.styleFrom(
-                                              minimumSize: const Size(0, 0),
-                                              fixedSize: const Size(140, 42)),
-                                          onPressed: () {},
-                                          label: const Text('Share Mode'),
-                                          icon: const Icon(
-                                            FontAwesomeIcons.share,
-                                            size: 12.0,
-                                          )),
-                                    ),
-                                  ),
-                                ),
+    return FutureBuilder<bool?>(
+        future: checkSpotlightStatus('managerShareCategoriesSpotlightDone'),
+        builder: (context, snapshot) {
+          var data = snapshot.data;
+          if (snapshot.connectionState == ConnectionState.done &&
+              (data == null || data == false)) {
+            WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+              ShowCaseWidget.of(showcaseBuildContext!)
+                  .startShowCase([managerShareCategoryCardShowcaseKey]);
+            });
+          }
+          return ShowCaseWidget(onFinish: () async {
+            await setSpotlightStatusToComplete(
+                'managerShareCategoriesSpotlightDone');
+          }, builder: Builder(
+            builder: (context) {
+              showcaseBuildContext = context;
+              return Scaffold(
+                drawer: const MainAppDrawer(),
+                bottomNavigationBar: const MainBottomAppBar(),
+                appBar: const PreferredSize(
+                  preferredSize: Size.fromHeight(60),
+                  child: MainTopAppBar(),
+                ),
+                body: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: BlocBuilder<CategoriesBloc, CategoriesState>(
+                    builder: (context, state) {
+                      if (state is CategoriesLoading) {
+                        return Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              LoadingAnimationWidget.inkDrop(
+                                  color: Colors.blueAccent, size: 30.0),
+                              const SizedBox(
+                                height: 8.0,
                               ),
-                            )
-                          ],
-                        ),
-                      ),
-                      LayoutBuilder(builder: (context, constraints) {
-                        int crossAxisCount = constraints.maxWidth > 500 ? 4 : 2;
-                        return GridView.builder(
-                          physics: const ScrollPhysics(),
-                          itemCount: categoryCount,
-                          shrinkWrap: true,
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisSpacing: 6.0,
-                                  mainAxisExtent: 285,
-                                  mainAxisSpacing: 6.0,
-                                  crossAxisCount: crossAxisCount),
-                          itemBuilder: (context, index) {
-                            return categoryCards[index];
+                              const Text('Loading Categories...')
+                            ],
+                          ),
+                        );
+                      }
+                      if (state is CategoriesLoaded) {
+                        List<Category> allCategories = state.categories;
+                        // Shuffle Categories Weekly
+                        Once.runWeekly(
+                          'shuffleCategories',
+                          callback: () {
+                            allCategories.shuffle();
                           },
                         );
-                      }),
-                    ],
-                  );
-                } else {
-                  return const Center(
-                    child: Text('Something Went Wrong...'),
-                  );
-                }
-              },
-            ),
-          ),
-        );
-      },
-    ));
+                        int categoryCount = state.categoryImageUrls.length;
+                        final List<CategoryCard> categoryCards = [
+                          for (Category category in allCategories)
+                            CategoryCard(category: category),
+                        ];
+
+                        return ListView(
+                          physics: const ScrollPhysics(),
+                          shrinkWrap: true,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 24.0, horizontal: 8.0),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'All Categories',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headlineMedium!
+                                        .copyWith(
+                                            color: Colors.black87,
+                                            fontSize: 32),
+                                  ),
+                                  Showcase(
+                                    targetBorderRadius: const BorderRadius.all(
+                                        Radius.circular(40.0)),
+                                    descriptionAlignment: TextAlign.center,
+                                    targetPadding: const EdgeInsets.symmetric(
+                                        vertical: 8.0),
+                                    key: managerShareCategoryCardShowcaseKey,
+                                    description:
+                                        'Share Mode provides opportunity to respond to cards the same way group members do.',
+                                    child: SizedBox(
+                                      height: 40,
+                                      width: 130,
+                                      child: FittedBox(
+                                        child: PopupMenuButton(
+                                          position: PopupMenuPosition.under,
+                                          itemBuilder: (context) {
+                                            return [
+                                              PopupMenuItem(
+                                                child: const Text('View Mode'),
+                                                onTap: () {
+                                                  context.goNamed(
+                                                      'manager-categories');
+                                                },
+                                              )
+                                            ];
+                                          },
+                                          child: IgnorePointer(
+                                            child: ElevatedButton.icon(
+                                                style: ElevatedButton.styleFrom(
+                                                    minimumSize:
+                                                        const Size(0, 0),
+                                                    fixedSize:
+                                                        const Size(140, 42)),
+                                                onPressed: () {},
+                                                label: const Text('Share Mode'),
+                                                icon: const Icon(
+                                                  FontAwesomeIcons.share,
+                                                  size: 12.0,
+                                                )),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                            LayoutBuilder(builder: (context, constraints) {
+                              int crossAxisCount =
+                                  constraints.maxWidth > 500 ? 4 : 2;
+                              return GridView.builder(
+                                physics: const ScrollPhysics(),
+                                itemCount: categoryCount,
+                                shrinkWrap: true,
+                                gridDelegate:
+                                    SliverGridDelegateWithFixedCrossAxisCount(
+                                        crossAxisSpacing: 6.0,
+                                        mainAxisExtent: 285,
+                                        mainAxisSpacing: 6.0,
+                                        crossAxisCount: crossAxisCount),
+                                itemBuilder: (context, index) {
+                                  return categoryCards[index];
+                                },
+                              );
+                            }),
+                          ],
+                        );
+                      } else {
+                        return const Center(
+                          child: Text('Something Went Wrong...'),
+                        );
+                      }
+                    },
+                  ),
+                ),
+              );
+            },
+          ));
+        });
   }
 }
 

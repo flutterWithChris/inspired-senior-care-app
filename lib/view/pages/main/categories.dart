@@ -10,6 +10,7 @@ import 'package:inspired_senior_care_app/bloc/deck/deck_cubit.dart';
 import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/share_bloc/share_bloc.dart';
 import 'package:inspired_senior_care_app/data/models/category.dart';
+import 'package:inspired_senior_care_app/globals.dart';
 import 'package:inspired_senior_care_app/view/pages/IAP/upgrade_page.dart';
 
 import 'package:inspired_senior_care_app/view/widget/main/bottom_app_bar.dart';
@@ -39,10 +40,6 @@ class _CategoriesState extends State<Categories> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      ShowCaseWidget.of(showcaseBuildContext!)
-          .startShowCase([categoryCardShowcaseKey]);
-    });
   }
 
   @override
@@ -88,53 +85,72 @@ class _CategoriesState extends State<Categories> {
                   CategoryCard(category: category),
               ];
 
-              return ShowCaseWidget(builder: Builder(
-                builder: (context) {
-                  showcaseBuildContext = context;
-                  return ListView(
-                    physics: const ScrollPhysics(),
-                    shrinkWrap: true,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 18.0, horizontal: 8.0),
-                        child: Text(
-                          'All Categories',
-                          style: Theme.of(context).textTheme.headlineMedium,
-                        ),
-                      ),
-                      LayoutBuilder(builder: (context, constraints) {
-                        int crossAxisCount = constraints.maxWidth > 500 ? 4 : 2;
-                        return GridView.builder(
+              return FutureBuilder<bool?>(
+                  future: checkSpotlightStatus('categorypageSpotlightDone'),
+                  builder: (context, snapshot) {
+                    var data = snapshot.data;
+                    if (snapshot.connectionState == ConnectionState.done &&
+                        (data == null || data == false)) {
+                      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+                        ShowCaseWidget.of(showcaseBuildContext!)
+                            .startShowCase([categoryCardShowcaseKey]);
+                      });
+                    }
+                    return ShowCaseWidget(onFinish: () async {
+                      await setSpotlightStatusToComplete(
+                          'categorypageSpotlightDone');
+                    }, builder: Builder(
+                      builder: (context) {
+                        showcaseBuildContext = context;
+                        return ListView(
                           physics: const ScrollPhysics(),
-                          itemCount: categoryCount,
                           shrinkWrap: true,
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisSpacing: 6.0,
-                                  mainAxisExtent: 285,
-                                  mainAxisSpacing: 6.0,
-                                  crossAxisCount: crossAxisCount),
-                          itemBuilder: (context, index) {
-                            if (index == 0) {
-                              return Showcase(
-                                  targetBorderRadius: const BorderRadius.all(
-                                      Radius.circular(20.0)),
-                                  descriptionAlignment: TextAlign.center,
-                                  targetPadding: const EdgeInsets.all(4.0),
-                                  description:
-                                      'Take each lesson at your own pace.  One card a day or five a day – it’s up to you!',
-                                  key: categoryCardShowcaseKey,
-                                  child: categoryCards[index]);
-                            }
-                            return categoryCards[index];
-                          },
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 18.0, horizontal: 8.0),
+                              child: Text(
+                                'All Categories',
+                                style:
+                                    Theme.of(context).textTheme.headlineMedium,
+                              ),
+                            ),
+                            LayoutBuilder(builder: (context, constraints) {
+                              int crossAxisCount =
+                                  constraints.maxWidth > 500 ? 4 : 2;
+                              return GridView.builder(
+                                physics: const ScrollPhysics(),
+                                itemCount: categoryCount,
+                                shrinkWrap: true,
+                                gridDelegate:
+                                    SliverGridDelegateWithFixedCrossAxisCount(
+                                        crossAxisSpacing: 6.0,
+                                        mainAxisExtent: 285,
+                                        mainAxisSpacing: 6.0,
+                                        crossAxisCount: crossAxisCount),
+                                itemBuilder: (context, index) {
+                                  if (index == 0) {
+                                    return Showcase(
+                                        targetBorderRadius:
+                                            const BorderRadius.all(
+                                                Radius.circular(20.0)),
+                                        descriptionAlignment: TextAlign.center,
+                                        targetPadding:
+                                            const EdgeInsets.all(4.0),
+                                        description:
+                                            'Take each lesson at your own pace.  One card a day or five a day – it’s up to you!',
+                                        key: categoryCardShowcaseKey,
+                                        child: categoryCards[index]);
+                                  }
+                                  return categoryCards[index];
+                                },
+                              );
+                            }),
+                          ],
                         );
-                      }),
-                    ],
-                  );
-                },
-              ));
+                      },
+                    ));
+                  });
             } else {
               return const Center(
                 child: Text('Something Went Wrong...'),

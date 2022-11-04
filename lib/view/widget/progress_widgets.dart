@@ -9,6 +9,7 @@ import 'package:inspired_senior_care_app/bloc/member/bloc/member_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
 import 'package:inspired_senior_care_app/data/models/category.dart';
 import 'package:inspired_senior_care_app/data/models/user.dart';
+import 'package:inspired_senior_care_app/globals.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:showcaseview/showcaseview.dart';
 
@@ -23,9 +24,6 @@ class ProgressSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // CategoriesBloc categoriesState = context.read<CategoriesBloc>();
-
-    // List<Category> categoryList = state.categories;
     return BlocBuilder<CategoriesBloc, CategoriesState>(
         builder: (context, state) {
       if (state is CategoriesLoading) {
@@ -41,8 +39,6 @@ class ProgressSection extends StatelessWidget {
         List<Category> categories =
             context.watch<CategoriesBloc>().state.categories!;
         User currentUser = context.watch<ProfileBloc>().state.user;
-        bool categoryStarted = false;
-        double categoryProgress = 0.0;
         return SizedBox(
           height: 1720,
           child: Card(
@@ -63,14 +59,6 @@ class ProgressSection extends StatelessWidget {
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                   ),
-
-                  // if (currentUser.progress != null &&
-                  //     currentUser.progress!
-                  //         .containsKey(categories![index].name)) {
-                  //   categoryStarted = true;
-                  // }
-                  // print(
-                  //     'Progress is: ${currentUser.progress![categories![index]]}');
                   for (Category category in categories)
                     currentUser.currentCard?[category.name] == null
                         ? ProgressCategory(
@@ -341,10 +329,6 @@ class _GroupMemberProgressSectionState
   void initState() {
     // TODO: implement initState
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      ShowCaseWidget.of(showcaseBuildContext!)
-          .startShowCase([viewResponsesShowcaseKey]);
-    });
   }
 
   @override
@@ -354,99 +338,116 @@ class _GroupMemberProgressSectionState
       return progress;
     }
 
-    return ShowCaseWidget(builder: Builder(
-      builder: (context) {
-        showcaseBuildContext = context;
-        return BlocBuilder<MemberBloc, MemberState>(
-          builder: (context, state) {
-            if (state is MemberFailed) {
-              return const Center(
-                child: Text('Error Fetching Member!'),
-              );
-            }
-            if (state is MemberRemoved) {
-              return Container();
-            }
-            if (state is MemberLoading) {
-              return LoadingAnimationWidget.discreteCircle(
-                  color: Colors.blue, size: 30);
-            }
-            if (state is MemberLoaded) {
-              User groupMember = state.user;
-              return BlocBuilder<CategoriesBloc, CategoriesState>(
+    return FutureBuilder<bool?>(
+        future: checkSpotlightStatus('viewMemberSpotlightDone'),
+        builder: (context, snapshot) {
+          var data = snapshot.data;
+          if (snapshot.connectionState == ConnectionState.done &&
+              (data == null || data == false)) {
+            WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+              ShowCaseWidget.of(showcaseBuildContext!)
+                  .startShowCase([viewResponsesShowcaseKey]);
+            });
+          }
+          return ShowCaseWidget(onFinish: () async {
+            await setSpotlightStatusToComplete('viewMemberSpotlightDone');
+          }, builder: Builder(
+            builder: (context) {
+              showcaseBuildContext = context;
+              return BlocBuilder<MemberBloc, MemberState>(
                 builder: (context, state) {
-                  if (state is CategoriesLoading) {
-                    return LoadingAnimationWidget.threeRotatingDots(
+                  if (state is MemberFailed) {
+                    return const Center(
+                      child: Text('Error Fetching Member!'),
+                    );
+                  }
+                  if (state is MemberRemoved) {
+                    return Container();
+                  }
+                  if (state is MemberLoading) {
+                    return LoadingAnimationWidget.discreteCircle(
                         color: Colors.blue, size: 30);
                   }
-                  if (state is CategoriesLoaded) {
-                    List<Category> categoryList = state.categories;
+                  if (state is MemberLoaded) {
+                    User groupMember = state.user;
+                    return BlocBuilder<CategoriesBloc, CategoriesState>(
+                      builder: (context, state) {
+                        if (state is CategoriesLoading) {
+                          return LoadingAnimationWidget.threeRotatingDots(
+                              color: Colors.blue, size: 30);
+                        }
+                        if (state is CategoriesLoaded) {
+                          List<Category> categoryList = state.categories;
 
-                    return Showcase(
-                      targetBorderRadius:
-                          const BorderRadius.all(Radius.circular(20.0)),
-                      descriptionAlignment: TextAlign.center,
-                      targetPadding: const EdgeInsets.all(4.0),
-                      key: viewResponsesShowcaseKey,
-                      description:
-                          'Your Group Members will earn completion awards for each category they complete. \n\n Congratulate them when you see they have earned awards!',
-                      child: SizedBox(
-                        child: Card(
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(25)),
-                          color: Colors.white,
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 12.0, horizontal: 24.0),
-                            child: Column(
-                              children: [
-                                Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 8.0),
-                                  child: Text(
-                                    '${groupMember.name!.split(" ")[0]}\'s Progress',
-                                    textAlign: TextAlign.left,
-                                    style:
-                                        Theme.of(context).textTheme.titleLarge,
+                          return Showcase(
+                            targetBorderRadius:
+                                const BorderRadius.all(Radius.circular(20.0)),
+                            descriptionAlignment: TextAlign.center,
+                            targetPadding: const EdgeInsets.all(4.0),
+                            key: viewResponsesShowcaseKey,
+                            description:
+                                'Your Group Members will earn completion awards for each category they complete. \n\n Congratulate them when you see they have earned awards!',
+                            child: SizedBox(
+                              child: Card(
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(25)),
+                                color: Colors.white,
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 12.0, horizontal: 24.0),
+                                  child: Column(
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 8.0),
+                                        child: Text(
+                                          '${groupMember.name!.split(" ")[0]}\'s Progress',
+                                          textAlign: TextAlign.left,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleLarge,
+                                        ),
+                                      ),
+                                      for (Category category in categoryList)
+                                        GroupMemberProgressCategory(
+                                            category: category,
+                                            member: groupMember,
+                                            title: category.name,
+                                            progressColor:
+                                                category.categoryColor,
+                                            progress: groupMember.currentCard!
+                                                        .containsKey(
+                                                            category.name) ==
+                                                    true
+                                                ? calculateProgress(
+                                                    groupMember.currentCard![
+                                                        category.name]!,
+                                                    category.totalCards!)
+                                                : 0,
+                                            message: 'All Done. Good Job!'),
+                                    ],
                                   ),
                                 ),
-                                for (Category category in categoryList)
-                                  GroupMemberProgressCategory(
-                                      category: category,
-                                      member: groupMember,
-                                      title: category.name,
-                                      progressColor: category.categoryColor,
-                                      progress: groupMember.currentCard!
-                                                  .containsKey(category.name) ==
-                                              true
-                                          ? calculateProgress(
-                                              groupMember
-                                                  .currentCard![category.name]!,
-                                              category.totalCards!)
-                                          : 0,
-                                      message: 'All Done. Good Job!'),
-                              ],
+                              ),
                             ),
-                          ),
-                        ),
-                      ),
+                          );
+                        } else {
+                          return const Center(
+                            child: Text('Something Went Wrong..'),
+                          );
+                        }
+                      },
                     );
                   } else {
                     return const Center(
-                      child: Text('Something Went Wrong..'),
+                      child: Text('Error Fetching Member!'),
                     );
                   }
                 },
               );
-            } else {
-              return const Center(
-                child: Text('Error Fetching Member!'),
-              );
-            }
-          },
-        );
-      },
-    ));
+            },
+          ));
+        });
   }
 }
 

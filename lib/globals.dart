@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Globals {
   Globals._internal();
@@ -42,4 +43,15 @@ String capitalizeAllWord(String value) {
     }
   }
   return result;
+}
+
+Future<bool?> checkSpotlightStatus(String key) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  bool? featuredCardSpotlightDone = prefs.getBool(key);
+  return featuredCardSpotlightDone;
+}
+
+Future<void> setSpotlightStatusToComplete(String key) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.setBool(key, true);
 }
