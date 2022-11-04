@@ -158,7 +158,6 @@ class SettingsPage extends StatelessWidget {
                   ));
             }
             return SettingsList(
-              platform: DevicePlatform.iOS,
               contentPadding:
                   const EdgeInsets.symmetric(horizontal: 6.0, vertical: 8.0),
               sections: [
