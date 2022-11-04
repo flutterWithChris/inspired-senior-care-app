@@ -66,7 +66,7 @@ class SettingsCubit extends Cubit<SettingsState> {
     try {
       _profileBloc.add(
           UpdateProfile(user: _profileBloc.state.user.copyWith(name: name)));
-      await _authRepository.currentUser!.updateDisplayName(name);
+      // await _authRepository.currentUser!.updateDisplayName(name);
       emit(SettingsUpdated());
       await Future.delayed(const Duration(seconds: 2));
       loadSettings();
