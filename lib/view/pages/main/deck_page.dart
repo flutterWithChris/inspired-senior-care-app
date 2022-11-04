@@ -57,7 +57,6 @@ class _DeckPageState extends State<DeckPage> {
             .currentCard![widget.category.name] ??
         0;
     isSubscribed = context.read<PurchasesBloc>().state.isSubscribed;
-
     super.initState();
   }
 
@@ -264,26 +263,11 @@ class _DeckPageState extends State<DeckPage> {
                                                     });
                                                   }
                                                 },
-                                                child: Showcase(
-                                                  targetBorderRadius:
-                                                      const BorderRadius.all(
-                                                          Radius.circular(
-                                                              20.0)),
-                                                  descriptionAlignment:
-                                                      TextAlign.center,
-                                                  targetPadding:
-                                                      const EdgeInsets.only(
-                                                          top: 24.0,
-                                                          left: -16.0,
-                                                          right: -16.0,
-                                                          bottom: 16.0),
-                                                  description:
-                                                      'Each card asks for you to share your thoughts on the topic before moving to the next card. ',
-                                                  key: deckCardShowcaseKey,
-                                                  child: Deck(
-                                                      deckScrollController:
-                                                          deckScrollController),
-                                                ),
+                                                child: Deck(
+                                                    deckCardShowcaseKey:
+                                                        deckCardShowcaseKey,
+                                                    deckScrollController:
+                                                        deckScrollController),
                                               ),
                                             ),
                                             Visibility(
@@ -488,10 +472,12 @@ class _CardCounterState extends State<CardCounter> {
 }
 
 class Deck extends StatelessWidget {
+  final GlobalKey deckCardShowcaseKey;
   final InfiniteScrollController deckScrollController;
   const Deck({
     Key? key,
     required this.deckScrollController,
+    required this.deckCardShowcaseKey,
   }) : super(key: key);
 
   @override
@@ -522,6 +508,18 @@ class Deck extends StatelessWidget {
             itemCount: state.cardImageUrls.length,
             itemExtent: 330,
             itemBuilder: (context, itemIndex, realIndex) {
+              if (realIndex == 0) {
+                return Showcase(
+                    targetBorderRadius:
+                        const BorderRadius.all(Radius.circular(20.0)),
+                    descriptionAlignment: TextAlign.center,
+                    targetPadding: const EdgeInsets.only(
+                        top: 20.0, left: 16.0, right: 16.0, bottom: 16.0),
+                    description:
+                        'Each card asks for you to share your thoughts on the topic before moving to the next card. ',
+                    key: deckCardShowcaseKey,
+                    child: InfoCard(cardNumber: itemIndex + 1));
+              }
               return InfoCard(
                 cardNumber: itemIndex + 1,
               );
