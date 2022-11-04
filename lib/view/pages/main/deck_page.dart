@@ -145,10 +145,12 @@ class _DeckPageState extends State<DeckPage> {
                             color: Colors.blue, size: 30),
                       );
                     }
-                    if (state is PurchasesLoaded) {
+                    if (state is PurchasesLoaded || state is PurchasesFailed) {
                       bool? isSubscribed =
                           context.watch<PurchasesBloc>().state.isSubscribed;
-
+                      if (state is ProfileFailed) {
+                        isSubscribed = false;
+                      }
                       return BlocBuilder<CardBloc, CardState>(
                           builder: (context, state) {
                         if (state is CardsLoading) {
@@ -263,6 +265,8 @@ class _DeckPageState extends State<DeckPage> {
                                                   }
                                                 },
                                                 child: Deck(
+                                                    isCategoryComplete:
+                                                        isCategoryComplete,
                                                     deckCardShowcaseKey:
                                                         deckCardShowcaseKey,
                                                     deckScrollController:
@@ -473,8 +477,10 @@ class _CardCounterState extends State<CardCounter> {
 class Deck extends StatelessWidget {
   final GlobalKey deckCardShowcaseKey;
   final InfiniteScrollController deckScrollController;
+  final bool isCategoryComplete;
   const Deck({
     Key? key,
+    required this.isCategoryComplete,
     required this.deckScrollController,
     required this.deckCardShowcaseKey,
   }) : super(key: key);
@@ -500,29 +506,32 @@ class Deck extends StatelessWidget {
           );
         }
         if (state is CardsLoaded) {
-          return InfiniteCarousel.builder(
-            center: true,
-            loop: false,
-            controller: deckScrollController,
-            itemCount: state.cardImageUrls.length,
-            itemExtent: 330,
-            itemBuilder: (context, itemIndex, realIndex) {
-              if (realIndex == 0) {
-                return Showcase(
-                    targetBorderRadius:
-                        const BorderRadius.all(Radius.circular(20.0)),
-                    descriptionAlignment: TextAlign.center,
-                    targetPadding: const EdgeInsets.only(
-                        top: 20.0, left: 16.0, right: 16.0, bottom: 16.0),
-                    description:
-                        'Each card asks for you to share your thoughts on the topic before moving to the next card. ',
-                    key: deckCardShowcaseKey,
-                    child: InfoCard(cardNumber: itemIndex + 1));
-              }
-              return InfoCard(
-                cardNumber: itemIndex + 1,
-              );
-            },
+          return IgnorePointer(
+            ignoring: isCategoryComplete == false,
+            child: InfiniteCarousel.builder(
+              center: true,
+              loop: false,
+              controller: deckScrollController,
+              itemCount: state.cardImageUrls.length,
+              itemExtent: 330,
+              itemBuilder: (context, itemIndex, realIndex) {
+                if (realIndex == 0) {
+                  return Showcase(
+                      targetBorderRadius:
+                          const BorderRadius.all(Radius.circular(20.0)),
+                      descriptionAlignment: TextAlign.center,
+                      targetPadding: const EdgeInsets.only(
+                          top: 20.0, left: 16.0, right: 16.0, bottom: 16.0),
+                      description:
+                          'Each card asks for you to share your thoughts on the topic before moving to the next card. ',
+                      key: deckCardShowcaseKey,
+                      child: InfoCard(cardNumber: itemIndex + 1));
+                }
+                return InfoCard(
+                  cardNumber: itemIndex + 1,
+                );
+              },
+            ),
           );
         } else {
           return const Center(

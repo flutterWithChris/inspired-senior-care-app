@@ -62,7 +62,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               const BorderRadius.all(Radius.circular(20.0)),
                           descriptionAlignment: TextAlign.center,
                           targetPadding: const EdgeInsets.only(
-                              top: 12.0, left: 16.0, right: 16.0),
+                              top: 16.0, left: 16.0, right: 16.0, bottom: 16.0),
                           description:
                               'Each category provides a new topic to help support you as you support your clients.',
                           key: featuredCategoryShowcaseKey,

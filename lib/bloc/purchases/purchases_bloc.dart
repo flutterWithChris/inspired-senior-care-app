@@ -77,13 +77,17 @@ class PurchasesBloc extends Bloc<PurchasesEvent, PurchasesState> {
         products = await _purchasesRepository
             .getProducts(customerInfo.allPurchasedProductIdentifiers);
 
-        emit(PurchasesLoaded(
-            offerings: offerings,
-            isSubscribed: isSubscribed,
-            customerInfo: customerInfo,
-            subscribedGroup: subscribedGroup ?? subscribedGroup,
-            subscriptionType: subscriptionType,
-            products: products));
+        if (products == null || products.isEmpty) {
+          emit(PurchasesFailed());
+        } else {
+          emit(PurchasesLoaded(
+              offerings: offerings,
+              isSubscribed: isSubscribed,
+              customerInfo: customerInfo,
+              subscribedGroup: subscribedGroup ?? subscribedGroup,
+              subscriptionType: subscriptionType,
+              products: products));
+        }
       }
       if (event is AddPurchase) {
         emit(PurchasesLoading());
