@@ -29,6 +29,27 @@ class _PremiumOrganizationOfferDialogState
         if (state is PurchasesLoading) {
           return LoadingAnimationWidget.inkDrop(color: Colors.blue, size: 30.0);
         }
+        if (state is PurchasesFailed) {
+          return Dialog(
+            child: SizedBox(
+                height: 150,
+                child: Center(
+                    child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    const Icon(
+                      Icons.warning,
+                      color: Colors.red,
+                      size: 60.0,
+                    ),
+                    Text(
+                      'Error fetching subscription status!',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ],
+                ))),
+          );
+        }
         if (state is PurchasesLoaded) {
           List<Package?> packages = [];
           return Dialog(
