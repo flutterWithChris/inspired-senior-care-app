@@ -248,7 +248,7 @@ class Deck extends StatelessWidget {
               if ((p0) > (state.category.totalCards! / 2).round() &&
                   (isSubscribed == null || isSubscribed == false)) {
                 WidgetsBinding.instance.addPostFrameCallback((_) => showDialog(
-                      barrierDismissible: false,
+                      // barrierDismissible: false,
                       context: context,
                       builder: (context) {
                         return WillPopScope(

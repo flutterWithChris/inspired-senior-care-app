@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/purchases/purchases_bloc.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -67,74 +66,45 @@ class _PremiumOrganizationOfferDialogState
                             .getPackage('Organization (Annual)')
                       ]);
                     }
-                    return Stack(
-                      clipBehavior: Clip.none,
-                      alignment: AlignmentDirectional.topEnd,
-                      children: [
-                        Column(mainAxisSize: MainAxisSize.min, children: [
-                          Padding(
-                            padding:
-                                const EdgeInsets.only(top: 12.0, bottom: 8.0),
-                            child: Text(
-                              'Upgrade Organization!',
-                              style: Theme.of(context).textTheme.headlineSmall,
-                            ),
-                          ),
-                          SizedBox(
-                              width: 325,
-                              height: 160,
-                              child: Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 4.0),
-                                child: OrganizationOfferCard(
-                                  packages: packages,
-                                ),
-                              )),
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                left: 24.0, right: 24.0, bottom: 8.0),
-                            child: ElevatedButton(
-                                onPressed: () {
-                                  Package? package = context
-                                      .read<PurchasesBloc>()
-                                      .selectedPackage;
-                                  context.read<PurchasesBloc>().add(AddPurchase(
-                                      package: package ?? packages[0]!));
-                                  // Navigator.pop(context);
-                                },
-                                child: const Text('Subscribe')),
-                          ),
-                          Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 24.0),
-                            child: Text(
-                              'Subscribe & instantly gain access to the rest of the cards!',
-                              style: Theme.of(context).textTheme.titleMedium,
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ]),
-                        Positioned(
-                          top: -25,
-                          right: 0,
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 6.0, vertical: 6.0),
-                            child: CircleAvatar(
-                              backgroundColor: Colors.black45,
-                              radius: 16,
-                              child: FittedBox(
-                                child: CloseButton(
-                                  onPressed: () {
-                                    context.pop();
-                                  },
-                                ),
-                              ),
-                            ),
-                          ),
+                    return Column(mainAxisSize: MainAxisSize.min, children: [
+                      Padding(
+                        padding: const EdgeInsets.only(top: 12.0, bottom: 8.0),
+                        child: Text(
+                          'Upgrade Organization!',
+                          style: Theme.of(context).textTheme.headlineSmall,
                         ),
-                      ],
-                    );
+                      ),
+                      SizedBox(
+                          width: 325,
+                          height: 160,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 4.0),
+                            child: OrganizationOfferCard(
+                              packages: packages,
+                            ),
+                          )),
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            left: 24.0, right: 24.0, bottom: 8.0),
+                        child: ElevatedButton(
+                            onPressed: () {
+                              Package? package =
+                                  context.read<PurchasesBloc>().selectedPackage;
+                              context.read<PurchasesBloc>().add(AddPurchase(
+                                  package: package ?? packages[0]!));
+                              // Navigator.pop(context);
+                            },
+                            child: const Text('Subscribe')),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                        child: Text(
+                          'Subscribe & instantly gain access to the rest of the cards!',
+                          style: Theme.of(context).textTheme.titleMedium,
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ]);
                   } else {
                     return const Center(
                       child: Text('Something Went Wrong...'),

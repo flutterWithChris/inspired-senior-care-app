@@ -187,7 +187,7 @@ class _DeckPageState extends State<DeckPage> {
                               (isSubscribed == false || isSubscribed == null)) {
                             WidgetsBinding.instance.addPostFrameCallback(
                                 (_) async => await showDialog(
-                                      barrierDismissible: false,
+                                      //   barrierDismissible: false,
                                       context: context,
                                       builder: (context) {
                                         return WillPopScope(

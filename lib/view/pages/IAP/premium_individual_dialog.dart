@@ -58,77 +58,45 @@ class _PremiumOfferDialogState extends State<PremiumIndividualOfferDialog> {
                           .getPackage('Individual (Yearly)'),
                     ]);
 
-                    return Stack(
-                      clipBehavior: Clip.none,
-                      alignment: AlignmentDirectional.topEnd,
-                      children: [
-                        Column(mainAxisSize: MainAxisSize.min, children: [
-                          Padding(
-                            padding:
-                                const EdgeInsets.only(top: 12.0, bottom: 8.0),
-                            child: Text(
-                              'Upgrade To Keep Going!',
-                              style: Theme.of(context).textTheme.headlineSmall,
-                            ),
-                          ),
-                          SizedBox(
-                              width: 325,
-                              height: 160,
-                              child: Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 4.0),
-                                child: IndividualOfferCard(
-                                  packages: packages,
-                                ),
-                              )),
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                left: 24.0, right: 24.0, bottom: 8.0),
-                            child: ElevatedButton(
-                                onPressed: () {
-                                  Package? package = context
-                                      .read<PurchasesBloc>()
-                                      .selectedPackage;
-
-                                  context.read<PurchasesBloc>().add(AddPurchase(
-                                      package: package ?? packages[0]!));
-                                },
-                                child: const Text('Subscribe')),
-                          ),
-                          Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 24.0),
-                            child: Text(
-                              'Subscribe & instantly gain access to the rest of the cards!',
-                              style: Theme.of(context).textTheme.titleMedium,
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ]),
-                        Positioned(
-                          top: -25,
-                          right: 0,
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 32.0, vertical: 8.0),
-                            child: SizedBox(
-                              height: 30,
-                              width: 30,
-                              child: InkWell(
-                                customBorder: const StadiumBorder(),
-                                radius: 30,
-                                onTap: () => Navigator.pop(context),
-                                child: const CircleAvatar(
-                                  backgroundColor: Colors.black45,
-                                  radius: 16,
-                                  child: Icon(Icons.close),
-                                ),
-                              ),
-                            ),
-                          ),
+                    return Column(mainAxisSize: MainAxisSize.min, children: [
+                      Padding(
+                        padding: const EdgeInsets.only(top: 12.0, bottom: 8.0),
+                        child: Text(
+                          'Upgrade To Keep Going!',
+                          style: Theme.of(context).textTheme.headlineSmall,
                         ),
-                      ],
-                    );
+                      ),
+                      SizedBox(
+                          width: 325,
+                          height: 160,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 4.0),
+                            child: IndividualOfferCard(
+                              packages: packages,
+                            ),
+                          )),
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            left: 24.0, right: 24.0, bottom: 8.0),
+                        child: ElevatedButton(
+                            onPressed: () {
+                              Package? package =
+                                  context.read<PurchasesBloc>().selectedPackage;
+
+                              context.read<PurchasesBloc>().add(AddPurchase(
+                                  package: package ?? packages[0]!));
+                            },
+                            child: const Text('Subscribe')),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                        child: Text(
+                          'Subscribe & instantly gain access to the rest of the cards!',
+                          style: Theme.of(context).textTheme.titleMedium,
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ]);
                   } else {
                     return const Center(
                       child: Text('Something Went Wrong...'),

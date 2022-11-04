@@ -158,7 +158,7 @@ class _ManagerShareDeckPageState extends State<ManagerShareDeckPage> {
                         (isSubscribed == false || isSubscribed == null)) {
                       WidgetsBinding.instance
                           .addPostFrameCallback((_) => showDialog(
-                                barrierDismissible: false,
+                                // barrierDismissible: false,
                                 context: context,
                                 builder: (context) {
                                   return WillPopScope(
