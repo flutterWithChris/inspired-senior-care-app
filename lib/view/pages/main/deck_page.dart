@@ -392,7 +392,6 @@ class _CardCounterState extends State<CardCounter> {
         currentUser.currentCard!.containsKey(widget.category.name);
     if (categoryStarted) {
       currentCard = currentUser.currentCard![widget.category.name]!;
-      percentageComplete = (currentCard - 1) / widget.category.totalCards!;
       context.read<DeckCubit>().updateCardNumber(currentCard);
     } else {
       currentCard = 1;
@@ -402,6 +401,7 @@ class _CardCounterState extends State<CardCounter> {
 
   @override
   Widget build(BuildContext context) {
+    currentCard = context.watch<DeckCubit>().currentCardNumber;
     Category category = widget.category;
     return Stack(
       alignment: AlignmentDirectional.center,
@@ -419,8 +419,6 @@ class _CardCounterState extends State<CardCounter> {
                         (currentCard - 1) / widget.category.totalCards!;
                     // * Checking if Category has been started.
                     if (categoryStarted) {
-                      currentCard =
-                          context.watch<DeckCubit>().currentCardNumber;
                       context.read<DeckCubit>().updateCardNumber(currentCard);
                       if (currentCard < category.totalCards! + 1) {
                         Future.delayed(const Duration(milliseconds: 500),
