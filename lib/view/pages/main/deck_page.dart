@@ -458,8 +458,6 @@ class _CardCounterState extends State<CardCounter> {
           },
         ),
         BlocBuilder<DeckCubit, DeckState>(
-          buildWhen: (previous, current) =>
-              previous.currentCardNumber != current.currentCardNumber,
           builder: (context, state) {
             return SizedBox(
               height: 60,
@@ -468,9 +466,7 @@ class _CardCounterState extends State<CardCounter> {
                 backgroundColor: Colors.grey.shade300,
                 valueColor: AlwaysStoppedAnimation<Color>(
                     context.watch<CardBloc>().state.category!.progressColor),
-                value: percentageComplete == 0
-                    ? 0.0
-                    : ((currentCard - 1) / category.totalCards!),
+                value: ((currentCard - 1) / category.totalCards!),
               ),
             );
           },
