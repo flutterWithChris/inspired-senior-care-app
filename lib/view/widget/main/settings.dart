@@ -140,7 +140,7 @@ class SettingsPage extends StatelessWidget {
                       child: Text('Organization'),
                     ),
                     value: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 140),
+                      constraints: const BoxConstraints(maxWidth: 120),
                       child: FittedBox(
                           alignment: Alignment.centerRight,
                           fit: BoxFit.scaleDown,
