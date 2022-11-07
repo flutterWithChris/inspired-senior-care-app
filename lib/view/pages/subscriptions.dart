@@ -9,6 +9,7 @@ import 'package:inspired_senior_care_app/view/widget/main/top_app_bar.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:purchases_flutter/models/customer_info_wrapper.dart';
 import 'package:purchases_flutter/models/entitlement_info_wrapper.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../bloc/profile/profile_bloc.dart';
 
@@ -17,6 +18,10 @@ class SubscriptionsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Uri privacyPolicyUrl =
+        Uri.parse('https://inspiredseniorcare.org/privacy-policy');
+    final Uri termsAndConditionsUrl = Uri.parse(
+        'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/');
     return Scaffold(
       appBar: const PreferredSize(
           preferredSize: Size.fromHeight(60), child: MainTopAppBar()),
@@ -350,7 +355,21 @@ class SubscriptionsPage extends StatelessWidget {
                         ),
                       ),
                     )
-                  : const SizedBox()
+                  : const SizedBox(),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    TextButton(
+                        onPressed: () => _launchUrl(privacyPolicyUrl),
+                        child: const Text('Privacy Policy')),
+                    TextButton(
+                        onPressed: () => _launchUrl(termsAndConditionsUrl),
+                        child: const Text('Terms & Conditions')),
+                  ],
+                ),
+              )
             ]);
           } else {
             return const Center(
@@ -360,5 +379,11 @@ class SubscriptionsPage extends StatelessWidget {
         },
       ),
     );
+  }
+}
+
+Future<void> _launchUrl(Uri url) async {
+  if (!await launchUrl(url)) {
+    throw 'Could not launch URL!';
   }
 }
