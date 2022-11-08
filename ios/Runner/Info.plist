@@ -45,5 +45,9 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+	<string>telephony</string>
+	</array>
 </dict>
 </plist>
