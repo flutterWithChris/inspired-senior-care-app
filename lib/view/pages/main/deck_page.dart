@@ -210,113 +210,110 @@ class _DeckPageState extends State<DeckPage> {
                                       },
                                     ));
                           }
+                          if (deckScrollController.hasClients) {
+                            print(
+                                'Deck Item Is: ${deckScrollController.selectedItem}');
+                          }
 
                           return Flex(
                             direction: Axis.vertical,
                             children: [
                               Flexible(
                                 flex: 6,
-                                child: IgnorePointer(
-                                  ignoring: isCardZoomed == false &&
-                                      isCategoryComplete == false,
-                                  child: SingleChildScrollView(
-                                    physics: const BouncingScrollPhysics(),
-                                    clipBehavior: Clip.antiAlias,
-                                    padding: const EdgeInsets.only(top: 40),
-                                    reverse: true,
-                                    child: AnimatedSlide(
-                                      curve: Curves.decelerate,
+                                child: SingleChildScrollView(
+                                  physics: isCardZoomed == false &&
+                                          isCategoryComplete == false
+                                      ? const NeverScrollableScrollPhysics()
+                                      : const BouncingScrollPhysics(),
+                                  clipBehavior: Clip.antiAlias,
+                                  padding: const EdgeInsets.only(top: 40),
+                                  reverse: true,
+                                  child: AnimatedSlide(
+                                    curve: Curves.decelerate,
+                                    duration: const Duration(milliseconds: 200),
+                                    offset: isCardZoomed
+                                        ? const Offset(0, -0.1)
+                                        : const Offset(0, -0.0),
+                                    child: AnimatedScale(
                                       duration:
-                                          const Duration(milliseconds: 200),
-                                      offset: isCardZoomed
-                                          ? const Offset(0, -0.1)
-                                          : const Offset(0, -0.0),
-                                      child: AnimatedScale(
-                                        duration:
-                                            const Duration(milliseconds: 250),
-                                        scale: isCardZoomed ? 1.1 : 1.0,
-                                        child: Stack(
-                                          clipBehavior: Clip.none,
-                                          alignment:
-                                              AlignmentDirectional.topEnd,
-                                          children: [
-                                            SizedBox(
-                                              height: 500,
-                                              //  width: 330,
-                                              child: BlocListener<DeckCubit,
-                                                  DeckState>(
-                                                listener: (context, state) {
-                                                  // TODO: implement listener
-                                                  if (state.status ==
-                                                      DeckStatus.completed) {
-                                                    setState(() {
-                                                      isSwipeDisabled = false;
-                                                    });
-                                                  }
-                                                  if (state.status ==
-                                                      DeckStatus.zoomed) {
-                                                    setState(() {
-                                                      isCardZoomed = true;
-                                                    });
-                                                  } else if (state.status ==
-                                                      DeckStatus.unzoomed) {
-                                                    setState(() {
-                                                      isCardZoomed = false;
-                                                    });
-                                                  }
-                                                },
-                                                child: Deck(
-                                                    isCategoryComplete:
-                                                        isCategoryComplete,
-                                                    deckCardShowcaseKey:
-                                                        deckCardShowcaseKey,
-                                                    deckScrollController:
-                                                        deckScrollController),
-                                              ),
+                                          const Duration(milliseconds: 250),
+                                      scale: isCardZoomed ? 1.1 : 1.0,
+                                      child: Stack(
+                                        clipBehavior: Clip.none,
+                                        alignment: AlignmentDirectional.topEnd,
+                                        children: [
+                                          SizedBox(
+                                            height: 500,
+                                            //  width: 330,
+                                            child: BlocListener<DeckCubit,
+                                                DeckState>(
+                                              listener: (context, state) {
+                                                if (state.status ==
+                                                    DeckStatus.completed) {
+                                                  setState(() {
+                                                    isSwipeDisabled = false;
+                                                  });
+                                                }
+                                                if (state.status ==
+                                                    DeckStatus.zoomed) {
+                                                  setState(() {
+                                                    isCardZoomed = true;
+                                                  });
+                                                } else if (state.status ==
+                                                    DeckStatus.unzoomed) {
+                                                  setState(() {
+                                                    isCardZoomed = false;
+                                                  });
+                                                }
+                                              },
+                                              child: Deck(
+                                                  isCardZoomed: isCardZoomed,
+                                                  isCategoryComplete:
+                                                      isCategoryComplete,
+                                                  deckCardShowcaseKey:
+                                                      deckCardShowcaseKey,
+                                                  deckScrollController:
+                                                      deckScrollController),
                                             ),
-                                            Visibility(
-                                              visible: isSwipeDisabled
-                                                  ? true
-                                                  : false,
-                                              child: Positioned(
-                                                right: 24,
-                                                top: -12,
-                                                child: Animate(
-                                                  effects: const [
-                                                    SlideEffect(
-                                                        delay: Duration(
-                                                            milliseconds: 600),
-                                                        duration: Duration(
-                                                            milliseconds: 250),
-                                                        curve:
-                                                            Curves.easeOutBack,
-                                                        begin: Offset(1.5, 0),
-                                                        end: Offset(0, 0))
-                                                  ],
-                                                  child: Showcase(
-                                                    targetBorderRadius:
-                                                        const BorderRadius.all(
-                                                            Radius.circular(
-                                                                50.0)),
-                                                    descriptionAlignment:
-                                                        TextAlign.center,
-                                                    targetPadding:
-                                                        const EdgeInsets.all(
-                                                            4.0),
-                                                    description:
-                                                        'Once you’ve finished a category, all cards will be available for you to view again and refer to for support.',
-                                                    key: cardCounterShowcaseKey,
-                                                    child: CardCounter(
-                                                        category:
-                                                            widget.category,
-                                                        deckScrollController:
-                                                            deckScrollController),
-                                                  ),
+                                          ),
+                                          Visibility(
+                                            visible:
+                                                isSwipeDisabled ? true : false,
+                                            child: Positioned(
+                                              right: 24,
+                                              top: -12,
+                                              child: Animate(
+                                                effects: const [
+                                                  SlideEffect(
+                                                      delay: Duration(
+                                                          milliseconds: 600),
+                                                      duration: Duration(
+                                                          milliseconds: 250),
+                                                      curve: Curves.easeOutBack,
+                                                      begin: Offset(1.5, 0),
+                                                      end: Offset(0, 0))
+                                                ],
+                                                child: Showcase(
+                                                  targetBorderRadius:
+                                                      const BorderRadius.all(
+                                                          Radius.circular(
+                                                              50.0)),
+                                                  descriptionAlignment:
+                                                      TextAlign.center,
+                                                  targetPadding:
+                                                      const EdgeInsets.all(4.0),
+                                                  description:
+                                                      'Once you’ve finished a category, all cards will be available for you to view again and refer to for support.',
+                                                  key: cardCounterShowcaseKey,
+                                                  child: CardCounter(
+                                                      category: widget.category,
+                                                      deckScrollController:
+                                                          deckScrollController),
                                                 ),
                                               ),
                                             ),
-                                          ],
-                                        ),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ),
@@ -339,6 +336,8 @@ class _DeckPageState extends State<DeckPage> {
                                       padding: const EdgeInsets.only(
                                           top: 16.0, bottom: 24.0),
                                       child: ShareButton(
+                                          deckScrollController:
+                                              deckScrollController,
                                           currentCard: currentCard,
                                           category: state.category,
                                           formKey: shareFieldFormKey,
@@ -474,17 +473,24 @@ class _CardCounterState extends State<CardCounter> {
   }
 }
 
-class Deck extends StatelessWidget {
+class Deck extends StatefulWidget {
   final GlobalKey deckCardShowcaseKey;
   final InfiniteScrollController deckScrollController;
   final bool isCategoryComplete;
+  final bool isCardZoomed;
   const Deck({
     Key? key,
     required this.isCategoryComplete,
+    required this.isCardZoomed,
     required this.deckScrollController,
     required this.deckCardShowcaseKey,
   }) : super(key: key);
 
+  @override
+  State<Deck> createState() => _DeckState();
+}
+
+class _DeckState extends State<Deck> {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<CardBloc, CardState>(
@@ -506,32 +512,41 @@ class Deck extends StatelessWidget {
           );
         }
         if (state is CardsLoaded) {
-          return IgnorePointer(
-            ignoring: isCategoryComplete == false,
-            child: InfiniteCarousel.builder(
-              center: true,
-              loop: false,
-              controller: deckScrollController,
-              itemCount: state.cardImageUrls.length,
-              itemExtent: 330,
-              itemBuilder: (context, itemIndex, realIndex) {
-                if (realIndex == 0) {
-                  return Showcase(
-                      targetBorderRadius:
-                          const BorderRadius.all(Radius.circular(20.0)),
-                      descriptionAlignment: TextAlign.center,
-                      targetPadding: const EdgeInsets.only(
-                          top: 20.0, left: 16.0, right: 16.0, bottom: 16.0),
-                      description:
-                          'Each card asks for you to share your thoughts on the topic before moving to the next card. ',
-                      key: deckCardShowcaseKey,
-                      child: InfoCard(cardNumber: itemIndex + 1));
-                }
-                return InfoCard(
-                  cardNumber: itemIndex + 1,
-                );
-              },
-            ),
+          return InfiniteCarousel.builder(
+            center: true,
+            loop: false,
+            controller: widget.deckScrollController,
+            itemCount: state.cardImageUrls.length,
+            itemExtent: 330,
+            onIndexChanged: (p0) {
+              // * Prevent Scrolling ahead & Animate to current card on share button press.
+              if (p0 + 1 > context.read<DeckCubit>().currentCardNumber &&
+                  widget.isCategoryComplete == false) {
+                widget.deckScrollController.animateToItem(
+                    context.read<DeckCubit>().currentCardNumber - 1);
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                  content: Text('Submit a response to move forward!'),
+                  backgroundColor: Colors.red,
+                ));
+              }
+            },
+            itemBuilder: (context, itemIndex, realIndex) {
+              if (realIndex == 0) {
+                return Showcase(
+                    targetBorderRadius:
+                        const BorderRadius.all(Radius.circular(20.0)),
+                    descriptionAlignment: TextAlign.center,
+                    targetPadding: const EdgeInsets.only(
+                        top: 20.0, left: 16.0, right: 16.0, bottom: 16.0),
+                    description:
+                        'Each card asks for you to share your thoughts on the topic before moving to the next card.',
+                    key: widget.deckCardShowcaseKey,
+                    child: InfoCard(cardNumber: itemIndex + 1));
+              }
+              return InfoCard(
+                cardNumber: itemIndex + 1,
+              );
+            },
           );
         } else {
           return const Center(
@@ -617,9 +632,11 @@ class ShareButton extends StatelessWidget {
   final GlobalKey<FormState> formKey;
   final String categoryName;
   final TextEditingController shareFieldController = TextEditingController();
+  final InfiniteScrollController deckScrollController;
 
   ShareButton(
       {required this.category,
+      required this.deckScrollController,
       required this.currentCard,
       required this.categoryName,
       required this.formKey,
@@ -634,7 +651,12 @@ class ShareButton extends StatelessWidget {
         FontAwesomeIcons.solidMessage,
         size: 16,
       ),
-      onPressed: () {
+      onPressed: () async {
+        if (deckScrollController.hasClients &&
+            deckScrollController.selectedItem != currentCard) {
+          deckScrollController.animateToItem(currentCard - 1);
+          await Future.delayed(const Duration(seconds: 1));
+        }
         // * Zoom Deck on Press
         var deckCubit = context.read<DeckCubit>();
         deckCubit.zoomDeck();
