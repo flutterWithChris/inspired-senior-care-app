@@ -210,11 +210,6 @@ class _DeckPageState extends State<DeckPage> {
                                       },
                                     ));
                           }
-                          if (deckScrollController.hasClients) {
-                            print(
-                                'Deck Item Is: ${deckScrollController.selectedItem}');
-                          }
-
                           return Flex(
                             direction: Axis.vertical,
                             children: [
