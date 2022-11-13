@@ -621,21 +621,27 @@ class DeckCompleteDialog extends StatelessWidget {
   }
 }
 
-class ShareButton extends StatelessWidget {
+class ShareButton extends StatefulWidget {
   final int currentCard;
   final Category category;
   final GlobalKey<FormState> formKey;
   final String categoryName;
-  final TextEditingController shareFieldController = TextEditingController();
   final InfiniteScrollController deckScrollController;
 
-  ShareButton(
+  const ShareButton(
       {required this.category,
       required this.deckScrollController,
       required this.currentCard,
       required this.categoryName,
       required this.formKey,
       super.key});
+
+  @override
+  State<ShareButton> createState() => _ShareButtonState();
+}
+
+class _ShareButtonState extends State<ShareButton> {
+  final TextEditingController shareFieldController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -647,14 +653,15 @@ class ShareButton extends StatelessWidget {
         size: 16,
       ),
       onPressed: () async {
-        if (deckScrollController.hasClients &&
-            deckScrollController.selectedItem != currentCard) {
-          deckScrollController.animateToItem(currentCard - 1);
+        if (widget.deckScrollController.hasClients &&
+            widget.deckScrollController.selectedItem !=
+                widget.currentCard - 1) {
+          widget.deckScrollController.animateToItem(widget.currentCard - 1);
           await Future.delayed(const Duration(seconds: 1));
         }
         // * Zoom Deck on Press
-        var deckCubit = context.read<DeckCubit>();
-        deckCubit.zoomDeck();
+        if (!mounted) return;
+        context.read<DeckCubit>().zoomDeck();
         // * Shows Bottom Sheet for Response
         var bottomSheet = showBottomSheet(
           backgroundColor: Colors.transparent,
@@ -670,14 +677,14 @@ class ShareButton extends StatelessWidget {
                     mainAxisSize: MainAxisSize.max,
                     children: [
                       ShareTextField(
-                        formKey: formKey,
+                        formKey: widget.formKey,
                         shareFieldController: shareFieldController,
                       ),
                       SendButton(
-                        currentCard: currentCard,
-                        category: category,
-                        formKey: formKey,
-                        categoryName: categoryName,
+                        currentCard: widget.currentCard,
+                        category: widget.category,
+                        formKey: widget.formKey,
+                        categoryName: widget.categoryName,
                         shareFieldController: shareFieldController,
                       ),
                     ]),
@@ -687,7 +694,7 @@ class ShareButton extends StatelessWidget {
         );
         Container();
         bottomSheet.closed.then((value) {
-          deckCubit.unzoomDeck();
+          context.read<DeckCubit>().unzoomDeck();
         });
       },
     );
