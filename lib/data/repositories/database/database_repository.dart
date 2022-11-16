@@ -9,6 +9,7 @@ import 'package:inspired_senior_care_app/data/models/response.dart';
 import 'package:inspired_senior_care_app/data/models/user.dart';
 import 'package:inspired_senior_care_app/data/repositories/database/base_database_repository.dart';
 import 'package:inspired_senior_care_app/globals.dart';
+import 'package:rxdart/rxdart.dart';
 
 import '../../models/invite.dart';
 
@@ -489,11 +490,15 @@ class DatabaseRepository extends BaseDatabaseRepository {
 
   Stream<List<Group>> getManagerGroups(String userId) {
     try {
-      return _firebaseFirestore
+      final ownedGroups = _firebaseFirestore
+          .collection('groups')
+          .where('groupOwnerId', isEqualTo: userId)
+          .snapshots();
+      final sharedGroups = _firebaseFirestore
           .collection('groups')
           .where('groupManagerIds', arrayContains: userId)
-          .snapshots()
-          .map((snapshot) {
+          .snapshots();
+      return MergeStream([ownedGroups, sharedGroups]).map((snapshot) {
         return snapshot.docs.map((doc) => Group.fromSnapshot(doc)).toList();
       });
     } on FirebaseException catch (e) {

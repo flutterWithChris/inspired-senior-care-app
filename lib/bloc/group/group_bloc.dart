@@ -75,7 +75,6 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
         event.group.copyWith(featuredCategory: thisMonthsCategory);
     _databaseRepository.addNewGroup(groupWithCategory, event.manager);
     groups.add(groupWithCategory);
-    // event.manager.groups!.add(event.group.groupId!);
 
     emit(GroupCreated(group: groupWithCategory));
     await Future.delayed(const Duration(milliseconds: 500));
@@ -84,14 +83,12 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
   }
 
   void _onDeleteGroup(DeleteGroup event, Emitter<GroupState> emit) async {
-    try {
-      _databaseRepository.deleteGroup(event.group, event.manager);
-      groups.remove(event.group);
-      emit(GroupDeleted());
-      await Future.delayed(const Duration(seconds: 1));
-      emit(GroupLoading());
-      add(LoadGroups(userId: event.manager.id!));
-    } catch (e) {}
+    _databaseRepository.deleteGroup(event.group, event.manager);
+    groups.remove(event.group);
+    emit(GroupDeleted());
+    await Future.delayed(const Duration(seconds: 1));
+    emit(GroupLoading());
+    add(LoadGroups(userId: event.manager.id!));
   }
 
   void _onUpdateGroup(UpdateGroup event, Emitter<GroupState> emit) async {
@@ -102,16 +99,12 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
   }
 
   void _onGroupLoaded(LoadGroups event, Emitter<GroupState> emit) async {
-    // await emit.forEach(_databaseRepository.getGroup(groupId), onData:(group) {
-    //   groups.add(group);
-    // },)
     emit(GroupLoading());
     User currentUser = _profileBloc.state.user;
 
     int groupCount = await _databaseRepository.getGroupCount(currentUser.id!);
 
     groups.clear();
-    //int groupCount = event.currentUser.groups!.length ?? 0;
     if (groupCount > 0) {
       for (int i = 0; i < groupCount; i++) {
         currentUser.type == 'user'
@@ -127,7 +120,6 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
                   return GroupLoaded(myGroups: data);
                 },
               );
-
         await Future.delayed(const Duration(milliseconds: 500));
       }
     } else {
