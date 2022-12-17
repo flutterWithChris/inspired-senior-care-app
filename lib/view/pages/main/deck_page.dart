@@ -19,6 +19,8 @@ import 'package:inspired_senior_care_app/view/widget/main/bottom_app_bar.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:showcaseview/showcaseview.dart';
 
+import '../../../bloc/view_response/response_bloc.dart';
+
 class DeckPage extends StatefulWidget {
   final Category category;
   const DeckPage({super.key, required this.category});
@@ -391,6 +393,16 @@ class _CardCounterState extends State<CardCounter> {
       currentCard = 1;
       context.read<DeckCubit>().updateCardNumber(currentCard);
     }
+    if (categoryStarted) {
+      context.read<DeckCubit>().updateCardNumber(currentCard);
+      if (currentCard < widget.category.totalCards! + 1) {
+        Future.delayed(const Duration(milliseconds: 500), () async {
+          await widget.deckScrollController.animateToItem(currentCard - 1);
+        });
+      } else {
+        context.read<DeckCubit>().completeDeck();
+      }
+    }
   }
 
   @override
@@ -413,16 +425,6 @@ class _CardCounterState extends State<CardCounter> {
                         (currentCard - 1) / widget.category.totalCards!;
                     // * Checking if Category has been started.
                     if (categoryStarted) {
-                      context.read<DeckCubit>().updateCardNumber(currentCard);
-                      if (currentCard < category.totalCards! + 1) {
-                        Future.delayed(const Duration(milliseconds: 500),
-                            () async {
-                          await widget.deckScrollController
-                              .animateToItem(currentCard - 1);
-                        });
-                      } else {
-                        context.read<DeckCubit>().completeDeck();
-                      }
                       return CircleAvatar(
                         backgroundColor: Colors.white,
                         radius: 32,
@@ -653,12 +655,19 @@ class _ShareButtonState extends State<ShareButton> {
         size: 16,
       ),
       onPressed: () async {
+        // * Animate to Current Card
         if (widget.deckScrollController.hasClients &&
             widget.deckScrollController.selectedItem !=
                 widget.currentCard - 1) {
-          widget.deckScrollController.animateToItem(widget.currentCard - 1);
-          await Future.delayed(const Duration(seconds: 1));
+          print(widget.currentCard - 1);
+
+          //   widget.deckScrollController.animateToItem(widget.currentCard - 1);
+          //  await Future.delayed(const Duration(seconds: 1));
         }
+        context.read<ResponseBloc>().add(FetchResponse(
+            user: context.read<ProfileBloc>().state.user,
+            category: widget.category,
+            cardNumber: 2));
         // * Zoom Deck on Press
         if (!mounted) return;
         context.read<DeckCubit>().zoomDeck();
@@ -677,10 +686,12 @@ class _ShareButtonState extends State<ShareButton> {
                     mainAxisSize: MainAxisSize.max,
                     children: [
                       ShareTextField(
+                        deckScrollController: widget.deckScrollController,
                         formKey: widget.formKey,
                         shareFieldController: shareFieldController,
                       ),
                       SendButton(
+                        deckScrollController: widget.deckScrollController,
                         currentCard: widget.currentCard,
                         category: widget.category,
                         formKey: widget.formKey,
@@ -702,10 +713,12 @@ class _ShareButtonState extends State<ShareButton> {
 }
 
 class ViewResponsesButton extends StatelessWidget {
+  final InfiniteScrollController deckScrollController;
   final GlobalKey<FormState> formKey;
   final TextEditingController shareFieldController = TextEditingController();
 
-  ViewResponsesButton({super.key, required this.formKey});
+  ViewResponsesButton(
+      {super.key, required this.deckScrollController, required this.formKey});
 
   @override
   Widget build(BuildContext context) {
@@ -734,6 +747,7 @@ class ViewResponsesButton extends StatelessWidget {
                     mainAxisSize: MainAxisSize.max,
                     children: [
                       ShareTextField(
+                        deckScrollController: deckScrollController,
                         formKey: formKey,
                         shareFieldController: shareFieldController,
                       ),
@@ -756,10 +770,12 @@ class ViewResponsesButton extends StatelessWidget {
 }
 
 class ShareTextField extends StatelessWidget {
+  final InfiniteScrollController deckScrollController;
   final GlobalKey<FormState> formKey;
   final TextEditingController shareFieldController;
 
   const ShareTextField({
+    required this.deckScrollController,
     required this.formKey,
     required this.shareFieldController,
     Key? key,
@@ -785,26 +801,70 @@ class ShareTextField extends StatelessWidget {
           color: Colors.grey.shade300,
           borderRadius: BorderRadius.circular(10),
         ),
-        child: Form(
-          key: formKey,
-          child: TextFormField(
-            textCapitalization: TextCapitalization.sentences,
-            validator: (value) {
-              if (value!.isEmpty) {
-                return 'Enter a response!';
-              } else {
-                return null;
+        child: BlocBuilder<ResponseBloc, ResponseState>(
+          builder: (context, state) {
+            if (state is ResponseFailed) {
+              return const Center(child: Text('Error Fetching Response'));
+            }
+            if (state is ResponseLoaded) {
+              print('Deck Item : ${deckScrollController.selectedItem}');
+              print(context.read<DeckCubit>().currentCardNumber);
+              if (deckScrollController.selectedItem + 1 !=
+                  context.watch<DeckCubit>().currentCardNumber) {
+                deckScrollController.selectedItem == 0
+                    ? shareFieldController.text = state
+                        .responses![deckScrollController.selectedItem].response
+                    : shareFieldController.text = state
+                        .responses![deckScrollController.selectedItem].response;
+                return Form(
+                  key: formKey,
+                  child: TextFormField(
+                    readOnly: true,
+                    textCapitalization: TextCapitalization.sentences,
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Enter a response!';
+                      } else {
+                        return null;
+                      }
+                    },
+                    controller: shareFieldController,
+                    autofocus: true,
+                    textAlignVertical: TextAlignVertical.top,
+                    textAlign: TextAlign.start,
+                    minLines: 4,
+                    maxLines: 4,
+                    decoration: const InputDecoration.collapsed(
+                        hintText: 'Share your response..'),
+                  ),
+                );
               }
-            },
-            controller: shareFieldController,
-            autofocus: true,
-            textAlignVertical: TextAlignVertical.top,
-            textAlign: TextAlign.start,
-            minLines: 4,
-            maxLines: 4,
-            decoration: const InputDecoration.collapsed(
-                hintText: 'Share your response..'),
-          ),
+              shareFieldController.clear();
+              return Form(
+                key: formKey,
+                child: TextFormField(
+                  textCapitalization: TextCapitalization.sentences,
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return 'Enter a response!';
+                    } else {
+                      return null;
+                    }
+                  },
+                  controller: shareFieldController,
+                  autofocus: true,
+                  textAlignVertical: TextAlignVertical.top,
+                  textAlign: TextAlign.start,
+                  minLines: 4,
+                  maxLines: 4,
+                  decoration: const InputDecoration.collapsed(
+                      hintText: 'Share your response..'),
+                ),
+              );
+            }
+            return LoadingAnimationWidget.inkDrop(
+                color: Colors.blue, size: 20.0);
+          },
         ),
       ),
     );
@@ -817,12 +877,14 @@ class SendButton extends StatefulWidget {
   final GlobalKey<FormState> formKey;
   final String categoryName;
   final TextEditingController shareFieldController;
+  final InfiniteScrollController deckScrollController;
 
   const SendButton(
       {required this.category,
       required this.currentCard,
       required this.categoryName,
       required this.shareFieldController,
+      required this.deckScrollController,
       required this.formKey,
       Key? key})
       : super(key: key);
@@ -837,32 +899,36 @@ class _SendButtonState extends State<SendButton> {
     //int currentCard = context.watch<DeckCubit>().currentCardNumber;
     return ElevatedButton.icon(
       style: ElevatedButton.styleFrom(fixedSize: const Size(240, 42)),
-      onPressed: () async {
-        if (widget.formKey.currentState!.validate()) {
-          context.read<ShareBloc>().add(SubmitPressed(
-              categoryName: widget.categoryName,
-              cardNumber: widget.currentCard,
-              response: widget.shareFieldController.text));
+      onPressed: widget.deckScrollController.selectedItem + 1 !=
+              context.watch<DeckCubit>().currentCardNumber
+          ? null
+          : () async {
+              if (widget.formKey.currentState!.validate()) {
+                context.read<ShareBloc>().add(SubmitPressed(
+                    categoryName: widget.categoryName,
+                    cardNumber: widget.currentCard,
+                    response: widget.shareFieldController.text));
 
-          if (widget.currentCard == (widget.category.totalCards! + 1)) {
-            //context.read<DeckCubit>().resetDeck();
-            widget.shareFieldController.clear();
-            Navigator.pop(context);
-            context.read<DeckCubit>().completeDeck();
-          } else {
-            await Future.delayed(const Duration(seconds: 2));
-            if (!mounted) return;
+                if (widget.currentCard == (widget.category.totalCards! + 1)) {
+                  //context.read<DeckCubit>().resetDeck();
+                  widget.shareFieldController.clear();
+                  Navigator.pop(context);
+                  context.read<DeckCubit>().completeDeck();
+                } else {
+                  await Future.delayed(const Duration(seconds: 2));
+                  if (!mounted) return;
 
-            context.read<DeckCubit>().incrementCardNumber(
-                context.read<ProfileBloc>().state.user, widget.categoryName);
-            context.read<DeckCubit>().swipeDeck();
-            context.read<DeckCubit>().resetDeck();
-            widget.shareFieldController.clear();
+                  context.read<DeckCubit>().incrementCardNumber(
+                      context.read<ProfileBloc>().state.user,
+                      widget.categoryName);
+                  context.read<DeckCubit>().swipeDeck();
+                  context.read<DeckCubit>().resetDeck();
+                  widget.shareFieldController.clear();
 
-            Navigator.pop(context);
-          }
-        }
-      },
+                  Navigator.pop(context);
+                }
+              }
+            },
       icon: BlocBuilder<ShareBloc, ShareState>(
         builder: (context, state) {
           if (state.status == Status.failed) {
