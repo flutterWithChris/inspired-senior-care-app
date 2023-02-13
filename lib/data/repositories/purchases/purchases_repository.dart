@@ -20,7 +20,7 @@ class PurchasesRepository {
 
   Future<void> initPlatformState() async {
     /// Set this to true if you're debugging. This enables printing
-    Purchases.setDebugLogsEnabled(true);
+    Purchases.setDebugLogsEnabled(false);
 
     PurchasesConfiguration? configuration;
     if (Platform.isAndroid) {
