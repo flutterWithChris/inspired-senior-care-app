@@ -49,6 +49,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 body: Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
                       const Padding(
                         padding: EdgeInsets.only(top: 12.0, bottom: 24.0),

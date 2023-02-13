@@ -2,21 +2,27 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:go_router/go_router.dart';
 import 'package:infinite_carousel/infinite_carousel.dart';
 import 'package:inspired_senior_care_app/bloc/cards/card_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/manage/response_interaction_cubit.dart';
 import 'package:inspired_senior_care_app/bloc/manage/view_response_deck_cubit.dart';
+import 'package:inspired_senior_care_app/bloc/member/bloc/member_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
+import 'package:inspired_senior_care_app/bloc/purchases/purchases_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/share_bloc/share_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/view_response/response_bloc.dart';
 import 'package:inspired_senior_care_app/cubits/response/response_deck_cubit.dart';
 import 'package:inspired_senior_care_app/data/models/category.dart';
-import 'package:inspired_senior_care_app/data/models/response.dart';
 import 'package:inspired_senior_care_app/data/models/user.dart';
+import 'package:inspired_senior_care_app/view/pages/IAP/premium_individual_dialog.dart';
+import 'package:inspired_senior_care_app/view/pages/IAP/premium_org_dialog.dart';
 import 'package:inspired_senior_care_app/view/widget/main/bottom_app_bar.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class ViewResponses extends StatefulWidget {
+  const ViewResponses({super.key});
+
   @override
   State<ViewResponses> createState() => _ViewResponsesState();
 }
@@ -27,9 +33,6 @@ class _ViewResponsesState extends State<ViewResponses> {
   bool isCardZoomed = false;
 
   final InfiniteScrollController deckScrollController =
-      InfiniteScrollController();
-
-  final InfiniteScrollController textFieldScrollController =
       InfiniteScrollController();
 
   @override
@@ -45,7 +48,6 @@ class _ViewResponsesState extends State<ViewResponses> {
       },
       child: Scaffold(
         bottomSheet: ViewResponsesSheet(
-          textFieldScrollController: textFieldScrollController,
           deckScrollController: deckScrollController,
         ),
         backgroundColor: Colors.grey.shade200,
@@ -114,7 +116,7 @@ class _ViewResponsesState extends State<ViewResponses> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.only(top: 8.0),
+                        padding: const EdgeInsets.only(top: 24.0),
                         child: AnimatedSlide(
                           curve: Curves.easeInOut,
                           duration: const Duration(milliseconds: 200),
@@ -144,8 +146,6 @@ class _ViewResponsesState extends State<ViewResponses> {
                                       }
                                     },
                                     child: Deck(
-                                        textFieldScrollController:
-                                            textFieldScrollController,
                                         deckScrollController:
                                             deckScrollController),
                                   ),
@@ -155,17 +155,6 @@ class _ViewResponsesState extends State<ViewResponses> {
                           ),
                         ),
                       ),
-                      // Padding(
-                      //   padding: const EdgeInsets.symmetric(vertical: 30.0),
-                      //   child: Visibility(
-                      //     visible: isSwipeDisabled ? true : false,
-                      //     child: ViewResponsesButton(
-                      //       textFieldScrollController:
-                      //           textFieldScrollController,
-                      //       deckScrollController: deckScrollController,
-                      //     ),
-                      //   ),
-                      // ),
                     ],
                   ),
                 );
@@ -259,13 +248,8 @@ class CardCounter extends StatelessWidget {
 
 class Deck extends StatefulWidget {
   final InfiniteScrollController deckScrollController;
-  final InfiniteScrollController textFieldScrollController;
 
-  const Deck(
-      {Key? key,
-      required this.deckScrollController,
-      required this.textFieldScrollController})
-      : super(key: key);
+  const Deck({Key? key, required this.deckScrollController}) : super(key: key);
 
   @override
   State<Deck> createState() => _DeckState();
@@ -294,47 +278,58 @@ class _DeckState extends State<Deck> {
         }
         if (state is CardsLoaded) {
           List<String> cardImageUrls = state.cardImageUrls;
-          return BlocBuilder<ResponseBloc, ResponseState>(
-            builder: (context, state) {
-              if (state is ResponseLoading) {
-                return Center(
-                  child: LoadingAnimationWidget.fourRotatingDots(
-                      color: Colors.blue, size: 30),
-                );
+          bool? isSubscribed =
+              context.watch<PurchasesBloc>().state.isSubscribed;
+          return InfiniteCarousel.builder(
+            loop: false,
+            controller: widget.deckScrollController,
+            velocityFactor: 0.23,
+            itemCount: context.read<ProfileBloc>().state.user.currentCard?[
+                    context.read<CardBloc>().state.category?.name] ??
+                1,
+            itemExtent: 330,
+            onIndexChanged: (p0) {
+              /// Prevent user advancing to next card & show dialog if not subscribed
+              if (p0 + 1 >= (state.category.totalCards! / 2).round() &&
+                  (isSubscribed == false || isSubscribed == null) &&
+                  ModalRoute.of(context)!.isCurrent == true) {
+                widget.deckScrollController.previousItem();
+                WidgetsBinding.instance
+                    .addPostFrameCallback((_) async => await showDialog(
+                          //   barrierDismissible: false,
+                          context: context,
+                          builder: (context) {
+                            return WillPopScope(
+                                onWillPop: () {
+                                  context.pop();
+
+                                  return Future.value(false);
+                                },
+                                child: context
+                                            .watch<ProfileBloc>()
+                                            .state
+                                            .user
+                                            .type ==
+                                        'user'
+                                    ? const PremiumIndividualOfferDialog()
+                                    : const PremiumOrganizationOfferDialog());
+                          },
+                        ));
               }
-              if (state is ResponseLoaded) {
-                return InfiniteCarousel.builder(
-                  loop: false,
-                  controller: widget.deckScrollController,
-                  velocityFactor: 0.23,
-                  itemCount: state.responses?.length ?? 1,
-                  itemExtent: 330,
-                  onIndexChanged: (p0) {
-                    widget.textFieldScrollController.animateToItem(p0,
-                        curve: Curves.easeOutQuad,
-                        duration: const Duration(seconds: 1));
-                    context.read<ResponseDeckCubit>().scrollDeck(p0);
-                  },
-                  itemBuilder: (context, itemIndex, realIndex) {
-                    return BlocBuilder<ResponseDeckCubit, ResponseDeckState>(
-                      builder: (context, state) {
-                        if (state.status == ScrollStatus.scrolled ||
-                            state.status == ScrollStatus.stopped) {
-                          // widget.deckScrollController
-                          //     .animateToItem(state.index);
-                        }
-                        return InfoCard(
-                          cardNumber: itemIndex + 1,
-                        );
-                      },
-                    );
-                  },
-                );
-              } else {
-                return const Center(
-                  child: Text('Something Went Wrong...'),
-                );
-              }
+            },
+            itemBuilder: (context, itemIndex, realIndex) {
+              return BlocBuilder<ResponseDeckCubit, ResponseDeckState>(
+                builder: (context, state) {
+                  if (state.status == ScrollStatus.scrolled ||
+                      state.status == ScrollStatus.stopped) {
+                    // widget.deckScrollController
+                    //     .animateToItem(state.index);
+                  }
+                  return InfoCard(
+                    cardNumber: itemIndex + 1,
+                  );
+                },
+              );
             },
           );
         } else {
@@ -417,14 +412,13 @@ class DeckCompleteDialog extends StatelessWidget {
 
 class ShareButton extends StatelessWidget {
   final InfiniteScrollController deckScrollController;
-  final InfiniteScrollController textFieldScrollController;
+
   final String categoryName;
   final TextEditingController shareFieldController;
 
   const ShareButton(
       {required this.deckScrollController,
       required this.categoryName,
-      required this.textFieldScrollController,
       required this.shareFieldController,
       super.key});
 
@@ -462,15 +456,6 @@ class ShareButton extends StatelessWidget {
                           color: Colors.grey.shade400,
                         ),
                       ),
-                      // ShareTextField(
-                      //   textFieldScrollController: textFieldScrollController,
-                      //   deckScrollController: deckScrollController,
-                      //   shareFieldController: shareFieldController,
-                      // ),
-                      // SendButton(
-                      //   categoryName: categoryName,
-                      //   shareFieldController: shareFieldController,
-                      // ),
                     ]),
               ),
             );
@@ -487,12 +472,12 @@ class ShareButton extends StatelessWidget {
 
 class ViewResponsesButton extends StatelessWidget {
   final InfiniteScrollController deckScrollController;
-  final InfiniteScrollController textFieldScrollController;
-  final TextEditingController shareFieldController = TextEditingController();
 
-  ViewResponsesButton(
+  final TextEditingController shareFieldController;
+
+  const ViewResponsesButton(
       {required this.deckScrollController,
-      required this.textFieldScrollController,
+      required this.shareFieldController,
       super.key});
 
   @override
@@ -530,7 +515,6 @@ class ViewResponsesButton extends StatelessWidget {
                         ),
                       ),
                       ShareTextField(
-                        textFieldScrollController: textFieldScrollController,
                         deckScrollController: deckScrollController,
                       ),
                       BlocBuilder<ResponseInteractionCubit,
@@ -581,12 +565,8 @@ class ViewResponsesButton extends StatelessWidget {
 
 class ViewResponsesSheet extends StatelessWidget {
   final InfiniteScrollController deckScrollController;
-  final InfiniteScrollController textFieldScrollController;
 
-  const ViewResponsesSheet(
-      {required this.deckScrollController,
-      required this.textFieldScrollController,
-      super.key});
+  const ViewResponsesSheet({required this.deckScrollController, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -594,13 +574,12 @@ class ViewResponsesSheet extends StatelessWidget {
       borderRadius: BorderRadius.circular(25),
       child: Container(
         margin: const EdgeInsets.only(left: 15, right: 15),
-        height: 200,
+        height: 210,
         child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             mainAxisSize: MainAxisSize.max,
             children: [
               ShareTextField(
-                textFieldScrollController: textFieldScrollController,
                 deckScrollController: deckScrollController,
               ),
             ]),
@@ -611,11 +590,9 @@ class ViewResponsesSheet extends StatelessWidget {
 
 class ShareTextField extends StatefulWidget {
   final InfiniteScrollController deckScrollController;
-  final InfiniteScrollController textFieldScrollController;
 
   const ShareTextField({
     required this.deckScrollController,
-    required this.textFieldScrollController,
     Key? key,
   }) : super(key: key);
 
@@ -625,144 +602,93 @@ class ShareTextField extends StatefulWidget {
 
 class _ShareTextFieldState extends State<ShareTextField> {
   final TextEditingController shareFieldController = TextEditingController();
-  bool reachedCharacterLimit = false;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    widget.deckScrollController.addListener(() {
+      context.read<ResponseBloc>().add(FetchResponse(
+          user: context.read<MemberBloc>().state.user!,
+          category: context.read<CardBloc>().state.category!,
+          cardNumber: widget.deckScrollController.selectedItem + 1));
+    });
+
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<CardBloc, CardState>(
-      builder: (context, state) {
-        /* if(state is CardsFailed) {
-          return ErrorOutput(message: state.message);
-        }*/
-        if (state is CardsLoading) {
-          return Center(
-            child: LoadingAnimationWidget.fourRotatingDots(
-                color: Colors.blue, size: 30),
-          );
-        }
-        if (state is CardsLoaded) {
-          final ScrollController textFieldVerticalScrollController =
-              ScrollController();
-
-          return BlocBuilder<ResponseBloc, ResponseState>(
-            builder: (context, state) {
-              if (state is ResponseLoading) {
-                return LoadingAnimationWidget.fourRotatingDots(
-                    color: Colors.blue, size: 30);
-              }
-              if (state is ResponseFailed) {
-                return const Center(
-                  child: Text('Error Fetching Responses!'),
-                );
-              }
-              if (state is ResponseLoaded) {
-                List<Response> responses = state.responses!;
-                return SizedBox(
-                  height: 160,
-                  child: InfiniteCarousel.builder(
-                    velocityFactor: 0.23,
-                    controller: widget.textFieldScrollController,
-                    loop: false,
-                    itemCount: responses.length,
-                    itemExtent: 340,
-                    onIndexChanged: (p0) {
-                      widget.deckScrollController.animateToItem(p0,
-                          curve: Curves.easeOutQuad,
-                          duration: const Duration(seconds: 1));
-                      context.read<ResponseDeckCubit>().scrollDeck(p0);
-                    },
-                    itemBuilder: (context, itemIndex, realIndex) {
-                      return Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Container(
-                          height: 140,
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.all(Radius.circular(15)),
-                          ),
-                          child: Container(
-                            height: 50,
-                            alignment: Alignment.center,
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 10),
-                            margin: const EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 8),
-                            decoration: BoxDecoration(
-                              color: Colors.grey.shade300,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: BlocBuilder<ResponseDeckCubit,
-                                ResponseDeckState>(
-                              buildWhen: (previous, current) =>
-                                  current.status != previous.status,
-                              builder: (context, state) {
-                                String currentResponse = '';
-                                if (state.status == ScrollStatus.scrolled ||
-                                    state.status == ScrollStatus.stopped) {
-                                  if (realIndex - 1 > responses.length) {
-                                    shareFieldController.text =
-                                        'No Response Submitted Yet!';
-                                  } else {
-                                    currentResponse = responses
-                                        .elementAt((state.index))
-                                        .response;
-                                    shareFieldController.text = currentResponse;
-                                  }
-                                  return TextField(
-                                    controller: shareFieldController,
-                                    autofocus: false,
-                                    readOnly: true,
-                                    textAlignVertical: TextAlignVertical.top,
-                                    textAlign: TextAlign.start,
-                                    minLines: 4,
-                                    maxLines: 4,
-                                    decoration: const InputDecoration.collapsed(
-                                        hintText: 'Share your response..'),
-                                  );
-                                }
-                                shareFieldController.text =
-                                    responses[0].response;
-
-                                return Scrollbar(
-                                  radius: const Radius.circular(12.0),
-                                  controller: textFieldVerticalScrollController,
-                                  child: TextField(
-                                    scrollPhysics:
-                                        const BouncingScrollPhysics(),
-                                    style: const TextStyle(
-                                        overflow: TextOverflow.ellipsis),
-                                    scrollController:
-                                        textFieldVerticalScrollController,
-                                    controller: shareFieldController,
-                                    autofocus: false,
-                                    readOnly: true,
-                                    textAlignVertical: TextAlignVertical.top,
-                                    textAlign: TextAlign.start,
-                                    minLines: 4,
-                                    maxLines: 4,
-                                    decoration: const InputDecoration.collapsed(
-                                        hintText: 'Share your response..'),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                );
+    return Container(
+      constraints: const BoxConstraints(minHeight: 125, maxHeight: 150),
+      decoration: BoxDecoration(
+          // border: context.watch<ResponseBloc>().state == ResponseLoading() ||
+          //         context.watch<ShareBloc>().state == ShareState.submitting()
+          //     ? Border.all(
+          //         color: Colors.lightBlue.shade300.withOpacity(0.8),
+          //         width: 3,
+          //       )
+          //     : null,
+          color: Colors.white,
+          borderRadius: const BorderRadius.all(Radius.circular(15)),
+          boxShadow: [
+            BoxShadow(
+                blurRadius: 10, color: Colors.grey.shade300, spreadRadius: 5),
+          ]),
+      child: Container(
+        //  height: 50,
+        alignment: Alignment.center,
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+        margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+        decoration: BoxDecoration(
+          //   color: const Color.fromARGB(255, 202, 105, 105),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: BlocBuilder<ResponseBloc, ResponseState>(
+          builder: (context, state) {
+            if (state is ResponseFailed) {
+              return const Center(child: Text('Error Fetching Response'));
+            }
+            if (state is ResponseLoading ||
+                context.watch<ShareBloc>().state == ShareState.submitting()) {
+              return Center(
+                  child: LoadingAnimationWidget.fourRotatingDots(
+                      color: Colors.blue, size: 20));
+            }
+            if (state is ResponseLoaded) {
+              /// Set Share Field to Response if it exists
+              /// Else set it to empty string
+              if (state.response != null) {
+                shareFieldController.text = state.response!;
               } else {
-                return const Center(
-                  child: Text('Someting Went Wrong'),
-                );
+                shareFieldController.clear();
+                //    shareFieldController.text = 'No Response Submitted!';
               }
-            },
-          );
-        }
-        return const Center(
-          child: Text('Something Went Wrong...'),
-        );
-      },
+              return TextFormField(
+                readOnly: true,
+                textCapitalization: TextCapitalization.sentences,
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return 'Enter a response!';
+                  } else {
+                    return null;
+                  }
+                },
+                controller: shareFieldController,
+                autofocus: true,
+                textAlignVertical: TextAlignVertical.top,
+                textAlign: TextAlign.start,
+                minLines: 5,
+                maxLines: 5,
+                decoration: InputDecoration.collapsed(
+                    hintText:
+                        state.response == null ? 'No Response Submitted!' : ''),
+              );
+            }
+            return LoadingAnimationWidget.inkDrop(
+                color: Colors.blue, size: 20.0);
+          },
+        ),
+      ),
     );
   }
 }

@@ -13,25 +13,29 @@ part 'response_state.dart';
 
 class ResponseBloc extends Bloc<ResponseEvent, ResponseState> {
   StreamSubscription? _responseStream;
-  List<Response> responses = [];
+  List<Response>? responses;
   final DatabaseRepository _databaseRepository;
   ResponseBloc({required DatabaseRepository databaseRepository})
       : _databaseRepository = databaseRepository,
         super(ResponseLoading()) {
     on<FetchResponse>((event, emit) async {
-      responses.clear();
+      String? response;
+      emit(ResponseLoading());
       if (event.user.currentCard![event.category.name] != null) {
-        int responseCount = event.user.currentCard![event.category.name] ?? 0;
-        for (int i = 1; i < responseCount; i++) {
-          _responseStream = _databaseRepository
-              .viewResponse(event.user, event.category, i)
-              .listen((response) {
-            responses.add(response);
-          });
+        try {
+          response = await _databaseRepository.viewResponse(
+              event.user, event.category, event.cardNumber);
+        } catch (e) {
+          emit(ResponseFailed());
         }
       }
-      await Future.delayed(const Duration(seconds: 1));
-      emit(ResponseLoaded(responses: responses));
+      emit(
+        ResponseLoaded(
+          response: response,
+          responseCount: event.user.currentCard?[event.category.name] ?? 0,
+          cardNumber: event.cardNumber,
+        ),
+      );
     });
   }
 

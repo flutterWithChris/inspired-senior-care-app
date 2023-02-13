@@ -421,7 +421,8 @@ class _GroupMemberProgressSectionState
                                                     true
                                                 ? calculateProgress(
                                                     groupMember.currentCard![
-                                                        category.name]!,
+                                                            category.name]! -
+                                                        1,
                                                     category.totalCards!)
                                                 : 0,
                                             message: 'All Done. Good Job!'),
@@ -548,7 +549,7 @@ class GroupMemberProgressCategory extends StatelessWidget {
                                 context.read<ResponseBloc>().add(FetchResponse(
                                     user: member,
                                     category: category,
-                                    cardNumber: 2));
+                                    cardNumber: 1));
                                 context.read<CardBloc>().add(LoadCards(
                                       category: category,
                                     ));

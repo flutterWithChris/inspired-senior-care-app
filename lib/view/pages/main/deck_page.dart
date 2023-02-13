@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -68,6 +69,7 @@ class _DeckPageState extends State<DeckPage> {
     final GlobalKey<FormState> shareFieldFormKey = GlobalKey<FormState>();
 
     currentCard = context.watch<DeckCubit>().currentCardNumber;
+    bool isKeyboardShowing = MediaQuery.of(context).viewInsets.bottom != 0;
 
     return FutureBuilder<bool?>(
         future: checkSpotlightStatus('deckpageSpotlightDone'),
@@ -95,7 +97,12 @@ class _DeckPageState extends State<DeckPage> {
                     preferredSize: const Size.fromHeight(50),
                     child: BlocConsumer<DeckCubit, DeckState>(
                       listener: (context, state) {
-                        if (state.status == DeckStatus.zoomed) {}
+                        if (state.status == DeckStatus.completed) {
+                          setState(() {
+                            isCategoryComplete = true;
+                            isSwipeDisabled = false;
+                          });
+                        }
                       },
                       builder: (context, state) {
                         if (state.status == DeckStatus.zoomed) {
@@ -170,49 +177,8 @@ class _DeckPageState extends State<DeckPage> {
                           ));
                         }
                         if (state is CardsLoaded) {
-                          if (currentCard == state.category.totalCards) {
-                            //   isSwipeDisabled = false;
-                            // }
-                            if (context.read<DeckCubit>().state.status ==
-                                DeckStatus.completed) {
-                              isCategoryComplete = true;
-                              isSwipeDisabled = false;
-                              WidgetsBinding.instance.addPostFrameCallback(
-                                  (_) async => await showDialog(
-                                        context: context,
-                                        builder: (context) {
-                                          return const DeckCompleteDialog();
-                                        },
-                                      ));
-                            }
-                          }
-
-                          if (currentCard - 1 >=
-                                  (widget.category.totalCards! / 2).round() &&
-                              (isSubscribed == false || isSubscribed == null)) {
-                            WidgetsBinding.instance.addPostFrameCallback(
-                                (_) async => await showDialog(
-                                      //   barrierDismissible: false,
-                                      context: context,
-                                      builder: (context) {
-                                        return WillPopScope(
-                                            onWillPop: () {
-                                              context.pop();
-
-                                              return Future.value(false);
-                                            },
-                                            child: context
-                                                        .watch<ProfileBloc>()
-                                                        .state
-                                                        .user
-                                                        .type ==
-                                                    'user'
-                                                ? const PremiumIndividualOfferDialog()
-                                                : const PremiumOrganizationOfferDialog());
-                                      },
-                                    ));
-                          }
                           return Flex(
+                            mainAxisAlignment: MainAxisAlignment.center,
                             direction: Axis.vertical,
                             children: [
                               Flexible(
@@ -228,13 +194,17 @@ class _DeckPageState extends State<DeckPage> {
                                   child: AnimatedSlide(
                                     curve: Curves.decelerate,
                                     duration: const Duration(milliseconds: 200),
-                                    offset: isCardZoomed
+                                    offset: isCardZoomed && isKeyboardShowing
                                         ? const Offset(0, -0.1)
-                                        : const Offset(0, -0.0),
+                                        : isCardZoomed
+                                            ? const Offset(0, -0.1)
+                                            : const Offset(0, -0.0),
                                     child: AnimatedScale(
                                       duration:
                                           const Duration(milliseconds: 250),
-                                      scale: isCardZoomed ? 1.1 : 1.0,
+                                      scale: isCardZoomed && isKeyboardShowing
+                                          ? 1.1
+                                          : 1.0,
                                       child: Stack(
                                         clipBehavior: Clip.none,
                                         alignment: AlignmentDirectional.topEnd,
@@ -396,7 +366,7 @@ class _CardCounterState extends State<CardCounter> {
     if (categoryStarted) {
       context.read<DeckCubit>().updateCardNumber(currentCard);
       if (currentCard < widget.category.totalCards! + 1) {
-        Future.delayed(const Duration(milliseconds: 500), () async {
+        Future.delayed(const Duration(milliseconds: 300), () async {
           await widget.deckScrollController.animateToItem(currentCard - 1);
         });
       } else {
@@ -488,6 +458,7 @@ class Deck extends StatefulWidget {
 }
 
 class _DeckState extends State<Deck> {
+  bool _isPremiumDialogShowing = false;
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<CardBloc, CardState>(
@@ -509,14 +480,54 @@ class _DeckState extends State<Deck> {
           );
         }
         if (state is CardsLoaded) {
+          bool? isSubscribed = context.read<PurchasesBloc>().state.isSubscribed;
           return InfiniteCarousel.builder(
             center: true,
             loop: false,
             controller: widget.deckScrollController,
             itemCount: state.cardImageUrls.length,
-            itemExtent: 330,
+            itemExtent: MediaQuery.of(context).size.width * 0.8,
             onIndexChanged: (p0) {
               // * Prevent Scrolling ahead & Animate to current card on share button press.
+              // await Future.delayed(const Duration(seconds: 1));
+              if (p0 + 1 <=
+                      context
+                          .read<ProfileBloc>()
+                          .state
+                          .user
+                          .currentCard![state.category.name]! &&
+                  widget.isCardZoomed) {
+                context.read<ResponseBloc>().add(FetchResponse(
+                    user: context.read<ProfileBloc>().state.user,
+                    category: context.read<CardBloc>().state.category!,
+                    cardNumber: widget.deckScrollController.selectedItem + 1));
+              }
+              if (p0 + 1 >= (state.category.totalCards! / 2).round() &&
+                  (isSubscribed == false || isSubscribed == null) &&
+                  ModalRoute.of(context)!.isCurrent == true) {
+                WidgetsBinding.instance
+                    .addPostFrameCallback((_) async => await showDialog(
+                          //   barrierDismissible: false,
+                          context: context,
+                          builder: (context) {
+                            _isPremiumDialogShowing = true;
+                            return WillPopScope(
+                                onWillPop: () {
+                                  context.pop();
+                                  _isPremiumDialogShowing = false;
+                                  return Future.value(false);
+                                },
+                                child: context
+                                            .watch<ProfileBloc>()
+                                            .state
+                                            .user
+                                            .type ==
+                                        'user'
+                                    ? const PremiumIndividualOfferDialog()
+                                    : const PremiumOrganizationOfferDialog());
+                          },
+                        ));
+              }
               if (p0 + 1 > context.read<DeckCubit>().currentCardNumber &&
                   widget.isCategoryComplete == false) {
                 widget.deckScrollController.animateToItem(
@@ -555,71 +566,112 @@ class _DeckState extends State<Deck> {
   }
 }
 
-class DeckCompleteDialog extends StatelessWidget {
+class DeckCompleteDialog extends StatefulWidget {
   const DeckCompleteDialog({
     Key? key,
   }) : super(key: key);
 
   @override
+  State<DeckCompleteDialog> createState() => _DeckCompleteDialogState();
+}
+
+class _DeckCompleteDialogState extends State<DeckCompleteDialog> {
+  ConfettiController? _controllerCenter;
+  bool isConfettiPLaying = false;
+
+  @override
+  void initState() {
+    _controllerCenter =
+        ConfettiController(duration: const Duration(seconds: 3));
+    _controllerCenter!.play();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Dialog(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
-        child: Stack(
-          clipBehavior: Clip.none,
-          alignment: AlignmentDirectional.topEnd,
-          children: [
-            Column(mainAxisSize: MainAxisSize.min, children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 12.0),
-                child: Text(
-                  'All Done. Congrats!',
-                  style: Theme.of(context).textTheme.headlineSmall,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 12.0),
-                child: Wrap(
-                  spacing: 15,
-                  children: [
-                    for (int i = 0; i < 3; i++)
-                      const Icon(
-                        FontAwesomeIcons.rankingStar,
-                        color: Colors.yellow,
-                        size: 48,
-                      )
-                  ],
-                ),
-              ),
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16),
-                child: Text(
-                  'You\'ve completed this category. Be proud of yourself!',
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: const Text('Unlock Deck')),
-            ]),
-            Positioned(
-              top: -25,
-              right: -5,
-              child: SizedBox(
-                height: 40,
-                child: InkWell(
-                  onTap: () => Navigator.pop(context),
-                  child: const CircleAvatar(
-                      backgroundColor: Colors.black54, child: CloseButton()),
-                ),
-              ),
-            ),
-          ],
+    return Stack(
+      clipBehavior: Clip.none,
+      alignment: AlignmentDirectional.topCenter,
+      children: [
+        ConfettiWidget(
+          // displayTarget: true,
+          shouldLoop: true,
+          confettiController: _controllerCenter!,
+          blastDirectionality: BlastDirectionality.explosive,
+          canvas: Size(MediaQuery.of(context).size.width,
+              MediaQuery.of(context).size.height),
         ),
-      ),
+        Dialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
+          child: Padding(
+            padding:
+                const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
+            child: Stack(
+              clipBehavior: Clip.none,
+              alignment: AlignmentDirectional.topEnd,
+              children: [
+                Column(mainAxisSize: MainAxisSize.min, children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 12.0),
+                    child: Text(
+                      'All Done. Congrats!',
+                      style: Theme.of(context).textTheme.headlineSmall,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 12.0),
+                    child: Wrap(
+                      spacing: 15,
+                      children: [
+                        for (int i = 0; i < 3; i++)
+                          const Icon(
+                            FontAwesomeIcons.rankingStar,
+                            color: Colors.yellow,
+                            size: 48,
+                          )
+                      ],
+                    ),
+                  ),
+                  const Padding(
+                    padding:
+                        EdgeInsets.symmetric(vertical: 8.0, horizontal: 16),
+                    child: Text(
+                      'You\'ve completed this category. Be proud of yourself!',
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text('Unlock Deck')),
+                ]),
+                Positioned(
+                  top: -10,
+                  right: -5,
+                  child: SizedBox(
+                    height: 40,
+                    child: InkWell(
+                      onTap: () => Navigator.pop(context),
+                      child: const CircleAvatar(
+                          backgroundColor: Colors.black38,
+                          child: CloseButton()),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
+  }
+
+  @override
+  void dispose() {
+    _controllerCenter?.dispose();
+    super.dispose();
   }
 }
 
@@ -644,69 +696,135 @@ class ShareButton extends StatefulWidget {
 
 class _ShareButtonState extends State<ShareButton> {
   final TextEditingController shareFieldController = TextEditingController();
+  bool onCurrentCard = true;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.deckScrollController.addListener(() {
+      if (widget.deckScrollController.selectedItem >= widget.currentCard - 1) {
+        setState(() {
+          onCurrentCard = true;
+        });
+      } else {
+        setState(() {
+          onCurrentCard = false;
+        });
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    bool categoryComplete =
+        widget.currentCard == widget.category.totalCards! + 1;
+    bool isKeyboardShowing = MediaQuery.of(context).viewInsets.bottom != 0;
     return ElevatedButton.icon(
-      style: ElevatedButton.styleFrom(fixedSize: const Size(200, 36)),
-      label: const Text('Share Response'),
-      icon: const Icon(
-        FontAwesomeIcons.solidMessage,
-        size: 16,
+      style: ElevatedButton.styleFrom(
+        fixedSize: const Size(200, 36),
+        backgroundColor: onCurrentCard && categoryComplete == false
+            ? null
+            : Colors.orange[600],
       ),
+      label: onCurrentCard && categoryComplete == false
+          ? const Text('Share Response')
+          : const Text('View Response'),
+      icon: onCurrentCard && categoryComplete == false
+          ? const Icon(
+              FontAwesomeIcons.solidMessage,
+              size: 16,
+            )
+          : const Icon(
+              FontAwesomeIcons.solidEye,
+              size: 16,
+            ),
       onPressed: () async {
-        // * Animate to Current Card
-        if (widget.deckScrollController.hasClients &&
-            widget.deckScrollController.selectedItem !=
-                widget.currentCard - 1) {
-          print(widget.currentCard - 1);
-
-          //   widget.deckScrollController.animateToItem(widget.currentCard - 1);
-          //  await Future.delayed(const Duration(seconds: 1));
+        /// Fetch Response if it exists
+        if (context
+                .read<ProfileBloc>()
+                .state
+                .user
+                .currentCard![widget.categoryName]! >=
+            widget.deckScrollController.selectedItem + 1) {
+          context.read<ResponseBloc>().add(FetchResponse(
+              user: context.read<ProfileBloc>().state.user,
+              category: context.read<CardBloc>().state.category!,
+              cardNumber: widget.deckScrollController.selectedItem + 1));
         }
-        context.read<ResponseBloc>().add(FetchResponse(
-            user: context.read<ProfileBloc>().state.user,
-            category: widget.category,
-            cardNumber: 2));
-        // * Zoom Deck on Press
-        if (!mounted) return;
-        context.read<DeckCubit>().zoomDeck();
-        // * Shows Bottom Sheet for Response
-        var bottomSheet = showBottomSheet(
-          backgroundColor: Colors.transparent,
-          context: context,
-          builder: (context) {
-            return ClipRRect(
-              borderRadius: BorderRadius.circular(25),
-              child: Container(
-                margin: const EdgeInsets.only(left: 15, right: 15),
-                height: 240,
-                child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      ShareTextField(
-                        deckScrollController: widget.deckScrollController,
-                        formKey: widget.formKey,
-                        shareFieldController: shareFieldController,
-                      ),
-                      SendButton(
-                        deckScrollController: widget.deckScrollController,
-                        currentCard: widget.currentCard,
-                        category: widget.category,
-                        formKey: widget.formKey,
-                        categoryName: widget.categoryName,
-                        shareFieldController: shareFieldController,
-                      ),
-                    ]),
+
+        /// Show Premium Offer Dalog if user is not premium & reached 50% Mark
+        if (context.read<PurchasesBloc>().state.isSubscribed == false &&
+            widget.deckScrollController.selectedItem >=
+                (widget.category.totalCards! / 2).round() &&
+            ModalRoute.of(context)!.isCurrent == true) {
+          showDialog(
+              context: context,
+              builder: (context) => WillPopScope(
+                    onWillPop: () {
+                      context.pop();
+
+                      return Future.value(false);
+                    },
+                    child:
+                        context.watch<ProfileBloc>().state.user.type == 'user'
+                            ? const PremiumIndividualOfferDialog()
+                            : const PremiumOrganizationOfferDialog(),
+                  ));
+        } else {
+          // * Zoom Deck on Press
+          if (!mounted) return;
+          context.read<DeckCubit>().zoomDeck();
+          // * Shows Bottom Sheet for Response
+          var bottomSheet = showBottomSheet(
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(25),
+                topRight: Radius.circular(25),
               ),
-            );
-          },
-        );
-        Container();
-        bottomSheet.closed.then((value) {
-          context.read<DeckCubit>().unzoomDeck();
-        });
+            ),
+            backgroundColor: Colors.white70,
+            context: context,
+            builder: (context) {
+              return ClipRRect(
+                borderRadius: BorderRadius.circular(25),
+                child: Container(
+                  margin: const EdgeInsets.only(left: 15, right: 15),
+                  height: 240,
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        Container(
+                          height: 5,
+                          width: 60,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[300],
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        ShareTextField(
+                          deckScrollController: widget.deckScrollController,
+                          formKey: widget.formKey,
+                          shareFieldController: shareFieldController,
+                        ),
+                        SendButton(
+                          deckScrollController: widget.deckScrollController,
+                          currentCard: widget.currentCard,
+                          category: widget.category,
+                          formKey: widget.formKey,
+                          categoryName: widget.categoryName,
+                          shareFieldController: shareFieldController,
+                        ),
+                      ]),
+                ),
+              );
+            },
+          );
+          Container();
+          bottomSheet.closed.then((value) {
+            context.read<DeckCubit>().unzoomDeck();
+          });
+        }
       },
     );
   }
@@ -741,21 +859,11 @@ class ViewResponsesButton extends StatelessWidget {
               borderRadius: BorderRadius.circular(25),
               child: Container(
                 margin: const EdgeInsets.only(left: 15, right: 15),
-                height: 240,
-                child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      ShareTextField(
-                        deckScrollController: deckScrollController,
-                        formKey: formKey,
-                        shareFieldController: shareFieldController,
-                      ),
-                      /*   SendButton(
-                        categoryName: cat,
-                        shareFieldController: shareFieldController,
-                      ),*/
-                    ]),
+                child: ShareTextField(
+                  deckScrollController: deckScrollController,
+                  formKey: formKey,
+                  shareFieldController: shareFieldController,
+                ),
               ),
             );
           },
@@ -769,7 +877,7 @@ class ViewResponsesButton extends StatelessWidget {
   }
 }
 
-class ShareTextField extends StatelessWidget {
+class ShareTextField extends StatefulWidget {
   final InfiniteScrollController deckScrollController;
   final GlobalKey<FormState> formKey;
   final TextEditingController shareFieldController;
@@ -782,10 +890,22 @@ class ShareTextField extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<ShareTextField> createState() => _ShareTextFieldState();
+}
+
+class _ShareTextFieldState extends State<ShareTextField> {
+  @override
   Widget build(BuildContext context) {
     return Container(
-      height: 125,
+      constraints: const BoxConstraints(minHeight: 125, maxHeight: 150),
       decoration: BoxDecoration(
+          // border: context.watch<ResponseBloc>().state == ResponseLoading() ||
+          //         context.watch<ShareBloc>().state == ShareState.submitting()
+          //     ? Border.all(
+          //         color: Colors.lightBlue.shade300.withOpacity(0.8),
+          //         width: 3,
+          //       )
+          //     : null,
           color: Colors.white,
           borderRadius: const BorderRadius.all(Radius.circular(15)),
           boxShadow: [
@@ -793,12 +913,12 @@ class ShareTextField extends StatelessWidget {
                 blurRadius: 10, color: Colors.grey.shade300, spreadRadius: 5),
           ]),
       child: Container(
-        height: 50,
+        //  height: 50,
         alignment: Alignment.center,
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-        margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+        margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
         decoration: BoxDecoration(
-          color: Colors.grey.shade300,
+          //   color: const Color.fromARGB(255, 202, 105, 105),
           borderRadius: BorderRadius.circular(10),
         ),
         child: BlocBuilder<ResponseBloc, ResponseState>(
@@ -806,20 +926,32 @@ class ShareTextField extends StatelessWidget {
             if (state is ResponseFailed) {
               return const Center(child: Text('Error Fetching Response'));
             }
+            if (state is ResponseLoading ||
+                context.watch<ShareBloc>().state == ShareState.submitting()) {
+              return Center(
+                  child: LoadingAnimationWidget.fourRotatingDots(
+                      color: Colors.blue, size: 20));
+            }
             if (state is ResponseLoaded) {
-              print('Deck Item : ${deckScrollController.selectedItem}');
-              print(context.read<DeckCubit>().currentCardNumber);
-              if (deckScrollController.selectedItem + 1 !=
+              /// Set Share Field to Response if it exists
+              /// Else set it to empty string
+              if ((context.read<ResponseBloc>().state as ResponseLoaded)
+                      .response !=
+                  null) {
+                widget.shareFieldController.text =
+                    (context.read<ResponseBloc>().state as ResponseLoaded)
+                            .response ??
+                        '';
+              } else {
+                widget.shareFieldController.clear();
+              }
+              if (widget.deckScrollController.selectedItem + 1 <
                   context.watch<DeckCubit>().currentCardNumber) {
-                deckScrollController.selectedItem == 0
-                    ? shareFieldController.text = state
-                        .responses![deckScrollController.selectedItem].response
-                    : shareFieldController.text = state
-                        .responses![deckScrollController.selectedItem].response;
                 return Form(
-                  key: formKey,
+                  key: widget.formKey,
                   child: TextFormField(
-                    readOnly: true,
+                    //  readOnly: true,
+                    // expands: true,
                     textCapitalization: TextCapitalization.sentences,
                     validator: (value) {
                       if (value!.isEmpty) {
@@ -828,20 +960,23 @@ class ShareTextField extends StatelessWidget {
                         return null;
                       }
                     },
-                    controller: shareFieldController,
-                    autofocus: true,
+                    controller: widget.shareFieldController,
+                    autofocus: false,
                     textAlignVertical: TextAlignVertical.top,
                     textAlign: TextAlign.start,
-                    minLines: 4,
-                    maxLines: 4,
-                    decoration: const InputDecoration.collapsed(
+                    minLines: 5,
+                    maxLines: 5,
+
+                    decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        isCollapsed: true,
                         hintText: 'Share your response..'),
                   ),
                 );
               }
-              shareFieldController.clear();
+              widget.shareFieldController.clear();
               return Form(
-                key: formKey,
+                key: widget.formKey,
                 child: TextFormField(
                   textCapitalization: TextCapitalization.sentences,
                   validator: (value) {
@@ -851,7 +986,7 @@ class ShareTextField extends StatelessWidget {
                       return null;
                     }
                   },
-                  controller: shareFieldController,
+                  controller: widget.shareFieldController,
                   autofocus: true,
                   textAlignVertical: TextAlignVertical.top,
                   textAlign: TextAlign.start,
@@ -894,96 +1029,167 @@ class SendButton extends StatefulWidget {
 }
 
 class _SendButtonState extends State<SendButton> {
+  bool responseExists = false;
   @override
   Widget build(BuildContext context) {
     //int currentCard = context.watch<DeckCubit>().currentCardNumber;
-    return ElevatedButton.icon(
-      style: ElevatedButton.styleFrom(fixedSize: const Size(240, 42)),
-      onPressed: widget.deckScrollController.selectedItem + 1 !=
-              context.watch<DeckCubit>().currentCardNumber
-          ? null
-          : () async {
-              if (widget.formKey.currentState!.validate()) {
-                context.read<ShareBloc>().add(SubmitPressed(
-                    categoryName: widget.categoryName,
-                    cardNumber: widget.currentCard,
-                    response: widget.shareFieldController.text));
 
-                if (widget.currentCard == (widget.category.totalCards! + 1)) {
-                  //context.read<DeckCubit>().resetDeck();
-                  widget.shareFieldController.clear();
-                  Navigator.pop(context);
-                  context.read<DeckCubit>().completeDeck();
-                } else {
-                  await Future.delayed(const Duration(seconds: 2));
-                  if (!mounted) return;
+    return BlocBuilder<ResponseBloc, ResponseState>(
+      builder: (context, state) {
+        if (state is ResponseFailed) {
+          return const Center(child: Text('Error Fetching Response'));
+        }
+        if (state is ResponseLoading) {
+          return ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                  fixedSize: const Size(240, 42), backgroundColor: Colors.blue),
+              onPressed: () {},
+              icon: LoadingAnimationWidget.fourRotatingDots(
+                color: Colors.white,
+                size: 18.0,
+              ),
+              label: const Text('Loading Response...'));
+        }
+        if (state is ResponseLoaded) {
+          responseExists = state.response != null &&
+              widget.deckScrollController.selectedItem + 1 == state.cardNumber;
+          return ElevatedButton.icon(
+            style: ElevatedButton.styleFrom(
+                fixedSize: const Size(240, 42), backgroundColor: Colors.blue),
+            onPressed: context.read<ShareBloc>().state ==
+                    ShareState.submitting()
+                ? () {}
+                : () async {
+                    if (widget.formKey.currentState!.validate()) {
+                      context.read<ShareBloc>().add(SubmitPressed(
+                          categoryName: widget.categoryName,
+                          cardNumber:
+                              widget.deckScrollController.selectedItem + 1,
+                          response: widget.shareFieldController.text));
 
-                  context.read<DeckCubit>().incrementCardNumber(
-                      context.read<ProfileBloc>().state.user,
-                      widget.categoryName);
-                  context.read<DeckCubit>().swipeDeck();
-                  context.read<DeckCubit>().resetDeck();
-                  widget.shareFieldController.clear();
+                      /// Refresh response if it exists
+                      if (responseExists) {
+                        //    await Future.delayed(const Duration(milliseconds: 300));
+                        context.read<ResponseBloc>().add(FetchResponse(
+                            user: context.read<ProfileBloc>().state.user,
+                            category: widget.category,
+                            cardNumber:
+                                widget.deckScrollController.selectedItem + 1));
+                      }
 
-                  Navigator.pop(context);
+                      /// Increment card number if cards are left
+                      if (widget.currentCard <
+                              (widget.category.totalCards! + 1) &&
+                          context
+                                  .read<ProfileBloc>()
+                                  .state
+                                  .user
+                                  .currentCard?[widget.categoryName] !=
+                              (widget.category.totalCards! + 1)) {
+                        context.read<DeckCubit>().incrementCardNumber(
+                            context.read<ProfileBloc>().state.user,
+                            widget.categoryName);
+                      }
+
+                      /// Swipe deck if not last card
+                      if (widget.deckScrollController.selectedItem + 1 <
+                          (widget.category.totalCards!)) {
+                        context.read<DeckCubit>().swipeDeck();
+                      }
+
+                      /// Show complete dialog if user has seen all the cards
+                      if (widget.deckScrollController.selectedItem + 1 ==
+                          (widget.category.totalCards!)) {
+                        context.read<DeckCubit>().completeDeck();
+                        //widget.shareFieldController.clear();
+
+                        // await Future.delayed(const Duration(seconds: 2));
+                        WidgetsBinding.instance
+                            .addPostFrameCallback((_) async => await showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return const DeckCompleteDialog();
+                                  },
+                                ).then((value) => Navigator.pop(context)));
+                      } else {
+                        await Future.delayed(const Duration(seconds: 2));
+                        if (!mounted) return;
+                        context.read<DeckCubit>().resetDeck();
+                        widget.shareFieldController.clear();
+                        Navigator.pop(context);
+                      }
+                    }
+                  },
+            icon: BlocBuilder<ShareBloc, ShareState>(
+              builder: (context, state) {
+                if (state.status == Status.failed) {
+                  return const Dialog();
                 }
-              }
-            },
-      icon: BlocBuilder<ShareBloc, ShareState>(
-        builder: (context, state) {
-          if (state.status == Status.failed) {
-            return const Dialog();
-          }
-          if (state.status == Status.initial) {
-            return const Icon(
-              Icons.send_rounded,
-              size: 18,
-            );
-          }
-          if (state.status == Status.submitted) {
-            return const Icon(
-              Icons.check,
-              color: Colors.lime,
-            );
-          }
-          if (state.status == Status.submitting) {
-            return const SizedBox(
-              height: 18,
-              child: FittedBox(child: CircularProgressIndicator()),
-            );
-          }
-          return const Center(
-            child: Text('Something Went Wrong..'),
+                if (state.status == Status.initial) {
+                  return Icon(
+                    responseExists ? Icons.edit : Icons.send_rounded,
+                    size: 18,
+                  );
+                }
+                if (state.status == Status.submitted) {
+                  return const Icon(
+                    Icons.check,
+                    color: Colors.lime,
+                  );
+                }
+                if (state.status == Status.submitting) {
+                  return const SizedBox(
+                    height: 18,
+                    child: FittedBox(child: CircularProgressIndicator()),
+                  );
+                }
+                return const Center(
+                  child: Text('Something Went Wrong..'),
+                );
+              },
+            ),
+            label: BlocConsumer<ShareBloc, ShareState>(
+              listener: (context, state) async {
+                if (state.status == Status.submitted &&
+                    widget.deckScrollController.selectedItem + 1 <
+                        (widget.category.totalCards!)) {
+                  await Future.delayed(const Duration(seconds: 2));
+                  await widget.deckScrollController
+                      .nextItem(duration: const Duration(milliseconds: 300));
+                }
+              },
+              buildWhen: (previous, current) =>
+                  previous.status != current.status,
+              builder: (context, state) {
+                if (context.watch<ResponseBloc>().state == ResponseLoading()) {
+                  return const Text('Loading Response...');
+                }
+                if (state.status == Status.failed) {
+                  return const Dialog();
+                }
+                if (state.status == Status.initial) {
+                  return Text(
+                    responseExists ? 'Update Response' : 'Submit',
+                    //style: TextStyle(color: Colors.white),
+                  );
+                }
+
+                if (state.status == Status.submitted) {
+                  return const Text('Submitted!');
+                }
+                if (state.status == Status.submitting) {
+                  return const Text('Submitting...');
+                }
+                return const Center(
+                  child: Text('Something Went Wrong..'),
+                );
+              },
+            ),
           );
-        },
-      ),
-      label: BlocConsumer<ShareBloc, ShareState>(
-        listenWhen: (previous, current) => previous.status != current.status,
-        listener: (context, state) {
-          if (state.status == Status.initial) {}
-        },
-        buildWhen: (previous, current) => previous.status != current.status,
-        builder: (context, state) {
-          if (state.status == Status.failed) {
-            return const Dialog();
-          }
-          if (state.status == Status.initial) {
-            return const Text(
-              'Submit',
-              //style: TextStyle(color: Colors.white),
-            );
-          }
-          if (state.status == Status.submitted) {
-            return const Text('Submitted!');
-          }
-          if (state.status == Status.submitting) {
-            return const Text('Submitting...');
-          }
-          return const Center(
-            child: Text('Something Went Wrong..'),
-          );
-        },
-      ),
+        } else {
+          return const Center(child: Text('Something Went Wrong'));
+        }
+      },
     );
   }
 }

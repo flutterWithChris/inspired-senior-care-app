@@ -29,9 +29,10 @@ class DeckCubit extends Cubit<DeckState> {
   void swipeDeck() => emit(DeckState.swiped());
   void completeDeck() => emit(DeckState.completed());
   void updateCardNumber(int index) => currentCardNumber = index;
-  void incrementCardNumber(User user, String categoryName) {
+  void incrementCardNumber(User user, String categoryName) async {
     currentCardNumber++;
-    _databaseRepository.updateProgress(user, categoryName, currentCardNumber);
+    await _databaseRepository.updateProgress(
+        user, categoryName, currentCardNumber);
   }
 
   void derementCardNumber(User user, String categoryName) {

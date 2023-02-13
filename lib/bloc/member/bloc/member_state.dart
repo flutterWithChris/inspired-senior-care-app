@@ -2,9 +2,13 @@ part of 'member_bloc.dart';
 
 @immutable
 abstract class MemberState extends Equatable {
+  final User? user;
+  MemberState({
+    this.user,
+  });
   @override
   // TODO: implement props
-  List<Object?> get props => [];
+  List<Object?> get props => [user];
 }
 
 class MemberInitial extends MemberState {}

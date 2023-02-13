@@ -41,9 +41,8 @@ class _FeaturedCategoryState extends State<FeaturedCategory> {
                       borderRadius: BorderRadius.circular(12.0)),
                   child: LayoutBuilder(
                     builder: (context, constraints) {
-                      return ConstrainedBox(
-                        constraints: BoxConstraints(
-                            maxWidth: constraints.maxWidth > 700 ? 350 : 275),
+                      return FractionallySizedBox(
+                        widthFactor: 0.8,
                         child: Animate(
                           effects: const [
                             ShimmerEffect(duration: Duration(milliseconds: 800))
@@ -57,9 +56,10 @@ class _FeaturedCategoryState extends State<FeaturedCategory> {
                               clipBehavior: Clip.none,
                               alignment: AlignmentDirectional.topEnd,
                               children: [
-                                SizedBox(
-                                    height: 400,
-                                    width: 350,
+                                AspectRatio(
+                                    aspectRatio: 10 / 16,
+                                    //  height: 400,
+                                    // width: 350,
                                     child: Container(
                                       color: Colors.grey.shade300,
                                       child: Center(
@@ -129,9 +129,8 @@ class _FeaturedCategoryState extends State<FeaturedCategory> {
                         borderRadius: BorderRadius.circular(12.0)),
                     child: LayoutBuilder(
                       builder: (context, constraints) {
-                        return ConstrainedBox(
-                          constraints: BoxConstraints(
-                              maxWidth: constraints.maxWidth > 700 ? 350 : 260),
+                        return FractionallySizedBox(
+                          widthFactor: 0.8,
                           child: Padding(
                             padding: const EdgeInsets.all(16.0),
                             child: Stack(
