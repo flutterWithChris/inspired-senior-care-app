@@ -6,6 +6,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:inspired_senior_care_app/bloc/invite/invite_bloc.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
+import '../../../bloc/profile/profile_bloc.dart';
 import '../../../data/models/invite.dart';
 
 class MainTopAppBar extends StatelessWidget {
@@ -140,6 +141,20 @@ class InviteList extends StatelessWidget {
           return LoadingAnimationWidget.fourRotatingDots(
               color: Colors.blue, size: 20.0);
         }
+        if (state.inviteStatus == InviteStatus.sent) {
+          return Center(
+            child: Wrap(
+              spacing: 8.0,
+              children: [
+                Icon(
+                  Icons.check_circle_rounded,
+                  color: Colors.green.shade400,
+                ),
+                const Text('Invite Sent'),
+              ],
+            ),
+          );
+        }
         if (state.inviteStatus == InviteStatus.accepted) {
           return Center(
             child: Wrap(
@@ -180,6 +195,11 @@ class InviteList extends StatelessWidget {
                   }
                   if (thisInvite.status == 'accepted') {
                     return AcceptedGroupInvite(thisInvite: thisInvite);
+                  }
+                  if (thisInvite.status == 'sent' &&
+                      context.read<ProfileBloc>().state.user.type ==
+                          'manager') {
+                    return SentGroupInvite(thisInvite: thisInvite);
                   } else {
                     return GroupInvite(thisInvite: thisInvite);
                   }
@@ -224,88 +244,103 @@ class GroupInvite extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
       child: Padding(
         padding: const EdgeInsets.only(left: 16.0, top: 12.0, bottom: 16.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  '${thisInvite.inviterName.split(' ')[0]} ',
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleSmall!
-                      .copyWith(color: Colors.blue),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Text(
+                      '${thisInvite.inviterName.split(' ')[0]} ',
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleSmall!
+                          .copyWith(color: Colors.blue),
+                    ),
+                    Text(
+                      'invited you to:',
+                      style: Theme.of(context).textTheme.titleSmall,
+                    ),
+                  ],
                 ),
-                Text(
-                  'invited you to:',
-                  style: Theme.of(context).textTheme.titleSmall,
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      FittedBox(
+                        child: Text(
+                          thisInvite.groupName,
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Text(
+                      'As a',
+                      style: Theme.of(context).textTheme.titleSmall!,
+                    ),
+                    Text(
+                      ' ${thisInvite.inviteType}',
+                      style: Theme.of(context).textTheme.titleSmall!.copyWith(
+                            color: Colors.blue,
+                          ),
+                    ),
+                  ],
                 ),
               ],
             ),
             Padding(
-              padding: const EdgeInsets.only(left: 0.0, right: 0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  FittedBox(
-                    child: Text(
-                      thisInvite.groupName,
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(right: 1.0),
-                    child: Row(mainAxisSize: MainAxisSize.min, children: [
-                      IconButton(
-                        splashRadius: 18,
-                        iconSize: 18,
-                        visualDensity: VisualDensity.compact,
-                        padding: const EdgeInsets.all(0),
-                        onPressed: () {
+              padding: const EdgeInsets.only(right: 20.0),
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12.0),
+                  color: Colors.grey.shade100,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: Column(mainAxisSize: MainAxisSize.min, children: [
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 12.0),
+                      child: InkWell(
+                        onTap: () {
                           context
                               .read<InviteBloc>()
                               .add(InviteAccepted(invite: thisInvite));
                         },
-                        icon: Icon(
+                        child: Icon(
                           color: Colors.green.shade400,
                           Icons.check_circle_rounded,
+                          size: 20,
                         ),
                       ),
-                      IconButton(
-                        splashRadius: 18,
-                        iconSize: 18,
-                        visualDensity: VisualDensity.compact,
-                        padding: EdgeInsets.zero,
-                        onPressed: () {
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 12.0),
+                      child: InkWell(
+                        onTap: () {
                           context
                               .read<InviteBloc>()
                               .add(InviteDenied(invite: thisInvite));
                         },
-                        icon: const Icon(
+                        child: const Icon(
                           Icons.cancel_rounded,
                           color: Colors.redAccent,
+                          size: 20,
                         ),
                       ),
-                    ]),
-                  ),
-                ],
+                    ),
+                  ]),
+                ),
               ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Text(
-                  'As a',
-                  style: Theme.of(context).textTheme.titleSmall!,
-                ),
-                Text(
-                  ' ${thisInvite.inviteType}',
-                  style: Theme.of(context).textTheme.titleSmall!.copyWith(
-                        color: Colors.blue,
-                      ),
-                ),
-              ],
             ),
           ],
         ),
@@ -502,25 +537,99 @@ class AcceptedGroupInvite extends StatelessWidget {
                 ],
               ),
             ),
-            // Row(
-            //   mainAxisAlignment: MainAxisAlignment.start,
-            //   children: [
-            //     Text(
-            //       'As a',
-            //       style: Theme.of(context).textTheme.subtitle2!,
-            //     ),
-            //     Text(
-            //       ' ${thisInvite.inviteType}',
-            //       style: Theme.of(context).textTheme.subtitle2!.copyWith(
-            //             color: Colors.blue,
-            //           ),
-            //     ),
-            //   ],
-            // ),
-            // const Padding(
-            //   padding: EdgeInsets.all(8.0),
-            //   child: Divider(),
-            // )
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class SentGroupInvite extends StatelessWidget {
+  const SentGroupInvite({
+    Key? key,
+    required this.thisInvite,
+  }) : super(key: key);
+
+  final Invite thisInvite;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+      elevation: 0,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            FittedBox(
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Icon(
+                    Icons.check_circle_rounded,
+                    color: Colors.grey.shade400,
+                    size: 14,
+                  ),
+                  const SizedBox(
+                    width: 6.0,
+                  ),
+                  Text.rich(TextSpan(children: [
+                    TextSpan(
+                      text: '${thisInvite.invitedUserName.split(' ')[0]} ',
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleSmall!
+                          .copyWith(color: Colors.blue),
+                    ),
+                    TextSpan(
+                      text: 'has been invited to:',
+                      style: Theme.of(context).textTheme.titleSmall,
+                    ),
+                  ])),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  FittedBox(
+                    child: Text(
+                      thisInvite.groupName,
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(right: 1.0, top: 4.0),
+              child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          fixedSize: const Size(150, 30)),
+                      label: const Text('Cancel Invite'),
+                      onPressed: () {
+                        context
+                            .read<InviteBloc>()
+                            .add(InviteDeleted(invite: thisInvite));
+                      },
+                      icon: const Icon(
+                        Icons.close,
+                        size: 18,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ]),
+            ),
           ],
         ),
       ),

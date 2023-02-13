@@ -47,50 +47,52 @@ class InviteBloc extends Bloc<InviteEvent, InviteState> {
       List<Invite> invites = [];
       if (event is LoadInvites) {
         invites.clear();
-        await emit.forEach(
-          _databaseRepository.getInvites()!,
-          onData: (data) {
-            if (data != null) {
-              List<Invite> invites = data as List<Invite>;
-              return InviteState.loaded(invites);
-            } else {
-              return InviteState.loaded(invites);
-            }
-          },
-        );
+        _databaseRepository.getInvites()!.listen((event) {
+          if (event != null) {
+            invites.addAll(event);
+          }
+        });
+        _databaseRepository.getSentInvites()!.listen((event) {
+          if (event != null) {
+            invites.addAll(event);
+          }
+        });
+        emit(InviteState.loaded(invites));
       }
       if (event is MemberInviteSent) {
         emit(InviteState.sending());
         // Query User
         // If Users exists ? Add User to Group : Alert message.
-
-        await emit.forEach(
-          _databaseRepository.getUserByEmail(event.emailAddress),
-          onData: (User? user) {
+        User? invitedUser;
+        Invite? invite;
+        _databaseRepository
+            .getUserByEmail(event.emailAddress)
+            .listen((user) async {
+          if (user != null) {
+            invitedUser = user;
             var currentUser = _profileBloc.state.user;
-
-            Invite invite = Invite(
+            invite = Invite(
                 inviterName: currentUser.name!,
                 groupName: event.group.groupName!,
                 groupId: event.group.groupId!,
                 inviterId: currentUser.id!,
-                invitedUserId: user!.id!,
+                invitedUserId: user.id!,
                 invitedUserName: user.name!,
                 inviteType: 'member',
                 status: 'sent');
-            _databaseRepository.inviteMemberToGroup(invite);
-            if (user != null) {
-              return InviteState.sent();
-            } else {
-              return InviteState.failed();
-            }
-          },
-          onError: (error, stackTrace) {
-            return InviteState.failed();
-          },
-        );
-        await Future.delayed(const Duration(seconds: 3));
-        emit(InviteState.initial());
+          }
+        });
+        await Future.delayed(const Duration(seconds: 1));
+        if (invitedUser != null) {
+          await _databaseRepository.inviteMemberToGroup(invite!);
+          emit(InviteState.sent());
+          await Future.delayed(const Duration(seconds: 2));
+          add(LoadInvites());
+        } else {
+          emit(InviteState.failed());
+          await Future.delayed(const Duration(seconds: 2));
+          add(LoadInvites());
+        }
       }
       if (event is ManagerInviteSent) {
         emit(InviteState.sending());
@@ -131,14 +133,14 @@ class InviteBloc extends Bloc<InviteEvent, InviteState> {
             : _databaseRepository.addManagerToGroup(
                 event.invite.invitedUserId, event.invite.groupId, event.invite);
         emit(InviteState.accepted());
-        _databaseRepository.deleteInvite(event.invite);
+        await _databaseRepository.deleteInvite(event.invite);
         Invite acceptedInvite = event.invite.copyWith(
             status: 'accepted',
             inviterId: event.invite.invitedUserId,
             invitedUserId: event.invite.inviterId,
             inviterName: event.invite.invitedUserName,
             invitedUserName: event.invite.inviterName);
-        _databaseRepository.inviteMemberToGroup(acceptedInvite);
+        await _databaseRepository.inviteMemberToGroup(acceptedInvite);
         await Future.delayed(const Duration(seconds: 2));
         add(LoadInvites());
       }
@@ -149,11 +151,11 @@ class InviteBloc extends Bloc<InviteEvent, InviteState> {
         emit(InviteState.receieved());
       }
       if (event is InviteDeleted) {
-        _databaseRepository.deleteInvite(event.invite);
+        await _databaseRepository.deleteInvite(event.invite);
         add(LoadInvites());
       }
       if (event is InviteDenied) {
-        _databaseRepository.deleteInvite(event.invite);
+        await _databaseRepository.deleteInvite(event.invite);
         emit(InviteState.denied());
         Invite declinedInvite = event.invite.copyWith(
             status: 'declined',
@@ -161,7 +163,7 @@ class InviteBloc extends Bloc<InviteEvent, InviteState> {
             invitedUserId: event.invite.inviterId,
             inviterName: event.invite.invitedUserName,
             invitedUserName: event.invite.inviterName);
-        _databaseRepository.inviteMemberToGroup(declinedInvite);
+        await _databaseRepository.inviteMemberToGroup(declinedInvite);
         await Future.delayed(const Duration(seconds: 2));
         add(LoadInvites());
       }

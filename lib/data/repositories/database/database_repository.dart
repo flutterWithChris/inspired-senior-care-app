@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:inspired_senior_care_app/data/models/bug_report.dart';
 import 'package:inspired_senior_care_app/data/models/category.dart';
 import 'package:inspired_senior_care_app/data/models/group.dart';
-import 'package:inspired_senior_care_app/data/models/response.dart';
 import 'package:inspired_senior_care_app/data/models/user.dart';
 import 'package:inspired_senior_care_app/data/repositories/database/base_database_repository.dart';
 import 'package:inspired_senior_care_app/globals.dart';
@@ -349,15 +348,17 @@ class DatabaseRepository extends BaseDatabaseRepository {
     }
   }
 
-  Stream<Response> viewResponse(User user, Category category, int cardNumber) {
+  Future<String?> viewResponse(User user, Category category, int cardNumber) {
     try {
       return _firebaseFirestore
           .collection('users')
           .doc(user.id)
           .collection('responses')
           .doc(category.name)
-          .snapshots()
-          .map((event) => Response.fromSnapshot(event, cardNumber));
+          .get()
+          .then((value) => value.data()!['$cardNumber']);
+      // .snapshots()
+      // .map((event) => Response.fromSnapshot(event, cardNumber).response);
     } on FirebaseException catch (e) {
       final SnackBar snackBar = SnackBar(
         content: Text(e.message.toString()),
@@ -602,7 +603,16 @@ class DatabaseRepository extends BaseDatabaseRepository {
           .collection('invites')
           .doc();
 
-      docRef.set(invite.toMap());
+      await docRef.set(invite.toMap());
+
+      /// Create invite reference for inviter to see sent status
+      await _firebaseFirestore
+          .collection('users')
+          .doc(invite.inviterId)
+          .collection('sent-invites')
+          .doc(invite.invitedUserId)
+          .set(invite.toMap());
+
       DocumentSnapshot documentSnapshot = await docRef.get();
       var docId = documentSnapshot.reference.id;
       docRef.set({'inviteId': docId}, SetOptions(merge: true));
@@ -628,6 +638,14 @@ class DatabaseRepository extends BaseDatabaseRepository {
       docRef.collection('invites').get().then((value) async {
         if (value.size == 0) {
           await docRef.delete();
+
+          /// Delete invite reference for inviter.
+          await _firebaseFirestore
+              .collection('users')
+              .doc(invite.inviterId)
+              .collection('sent-invites')
+              .doc(invite.invitedUserId)
+              .delete();
         }
       });
     } on FirebaseException catch (e) {
@@ -648,6 +666,39 @@ class DatabaseRepository extends BaseDatabaseRepository {
           .collection('invites')
           .doc(user!.uid)
           .collection('invites')
+          .get()
+          .then((value) {
+        var docs = value.docs;
+        if (docs.isNotEmpty) {
+          List<Invite> invites = [];
+          for (QueryDocumentSnapshot<Map<String, dynamic>> doc in docs) {
+            Invite thisInvite = Invite.fromSnapshot(doc);
+            invites.add(thisInvite);
+          }
+          return invites;
+        } else {
+          return null;
+        }
+      }).asStream();
+    } on FirebaseException catch (e) {
+      final SnackBar snackBar = SnackBar(
+        content: Text(e.message.toString()),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
+      return null;
+    }
+  }
+
+  Stream<List<Invite>?>? getSentInvites() {
+    auth.User? user = _firebaseAuth.currentUser;
+    try {
+      return _firebaseFirestore
+          .collection('users')
+          .doc(user!.uid)
+          .collection('sent-invites')
           .get()
           .then((value) {
         var docs = value.docs;

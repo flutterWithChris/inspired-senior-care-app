@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:go_router/go_router.dart';
 import 'package:infinite_carousel/infinite_carousel.dart';
 import 'package:inspired_senior_care_app/bloc/cards/card_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/deck/deck_cubit.dart';
@@ -16,6 +17,8 @@ import 'package:inspired_senior_care_app/view/widget/main/bottom_app_bar.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class ManagerDeckPage extends StatefulWidget {
+  const ManagerDeckPage({super.key});
+
   @override
   State<ManagerDeckPage> createState() => _ManagerDeckPageState();
 }
@@ -106,33 +109,30 @@ class _ManagerDeckPageState extends State<ManagerDeckPage> {
               ));
             }
             if (state is CardsLoaded) {
-              return SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(top: 40.0),
-                      child: SizedBox(
-                        height: 525,
-                        child: BlocListener<DeckCubit, DeckState>(
-                          listener: (context, state) {
-                            // TODO: implement listener
-                            if (state.status == DeckStatus.completed) {}
-                            if (state.status == DeckStatus.zoomed) {
-                              isCardZoomed = true;
-                            } else if (state.status == DeckStatus.unzoomed) {
-                              isCardZoomed = false;
-                            }
-                          },
-                          child:
-                              Deck(deckScrollController: deckScrollController),
-                        ),
+              return Column(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 0.0),
+                    child: SizedBox(
+                      height: 550,
+                      child: BlocListener<DeckCubit, DeckState>(
+                        listener: (context, state) {
+                          // TODO: implement listener
+                          if (state.status == DeckStatus.completed) {}
+                          if (state.status == DeckStatus.zoomed) {
+                            isCardZoomed = true;
+                          } else if (state.status == DeckStatus.unzoomed) {
+                            isCardZoomed = false;
+                          }
+                        },
+                        child: Deck(deckScrollController: deckScrollController),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               );
             } else {
               return const Center(
@@ -243,18 +243,18 @@ class Deck extends StatelessWidget {
           return InfiniteCarousel.builder(
             controller: deckScrollController,
             itemCount: state.cardImageUrls.length,
-            itemExtent: 320,
+            itemExtent: MediaQuery.of(context).size.width * 0.8,
             onIndexChanged: (p0) {
-              if ((p0) > (state.category.totalCards! / 2).round() &&
+              if ((p0 + 1) > (state.category.totalCards! / 2).round() &&
                   (isSubscribed == null || isSubscribed == false)) {
+                deckScrollController.previousItem();
                 WidgetsBinding.instance.addPostFrameCallback((_) => showDialog(
                       // barrierDismissible: false,
                       context: context,
                       builder: (context) {
                         return WillPopScope(
                             onWillPop: () {
-                              Navigator.popUntil(context,
-                                  ModalRoute.withName('manager-categories'));
+                              context.pop();
                               return Future.value(false);
                             },
                             child: const PremiumOrganizationOfferDialog());
