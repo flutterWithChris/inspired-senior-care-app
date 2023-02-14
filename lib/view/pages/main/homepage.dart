@@ -52,7 +52,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
                       const Padding(
-                        padding: EdgeInsets.only(top: 12.0, bottom: 24.0),
+                        padding: EdgeInsets.only(top: 16.0, bottom: 16.0),
                         child: Text(
                           'Monthly Category',
                           style: TextStyle(fontSize: 30),

@@ -130,7 +130,7 @@ class _FeaturedCategoryState extends State<FeaturedCategory> {
                     child: LayoutBuilder(
                       builder: (context, constraints) {
                         return FractionallySizedBox(
-                          widthFactor: 0.8,
+                          widthFactor: 0.75,
                           child: Padding(
                             padding: const EdgeInsets.all(16.0),
                             child: Stack(
