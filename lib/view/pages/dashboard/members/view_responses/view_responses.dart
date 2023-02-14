@@ -130,8 +130,8 @@ class _ViewResponsesState extends State<ViewResponses> {
                               clipBehavior: Clip.none,
                               alignment: AlignmentDirectional.topEnd,
                               children: [
-                                SizedBox(
-                                  height: 500,
+                                AspectRatio(
+                                  aspectRatio: 12 / 16,
                                   child: BlocListener<ViewResponseDeckCubit,
                                       ViewResponseDeckState>(
                                     listener: (context, state) {
@@ -815,7 +815,8 @@ class InfoCard extends StatelessWidget {
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12.0)),
               child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                padding: const EdgeInsets.symmetric(
+                    vertical: 16.0, horizontal: 16.0),
                 child: CachedNetworkImage(
                   placeholder: (context, url) => Center(
                     child: LoadingAnimationWidget.discreteCircle(

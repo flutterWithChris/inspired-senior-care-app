@@ -209,8 +209,8 @@ class _DeckPageState extends State<DeckPage> {
                                         clipBehavior: Clip.none,
                                         alignment: AlignmentDirectional.topEnd,
                                         children: [
-                                          SizedBox(
-                                            height: 500,
+                                          AspectRatio(
+                                            aspectRatio: 12 / 16,
                                             //  width: 330,
                                             child: BlocListener<DeckCubit,
                                                 DeckState>(

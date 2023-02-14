@@ -116,8 +116,8 @@ class _ManagerDeckPageState extends State<ManagerDeckPage> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(top: 0.0),
-                    child: SizedBox(
-                      height: 550,
+                    child: AspectRatio(
+                      aspectRatio: 12 / 16,
                       child: BlocListener<DeckCubit, DeckState>(
                         listener: (context, state) {
                           // TODO: implement listener
