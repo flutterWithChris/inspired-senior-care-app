@@ -490,7 +490,13 @@ class _DeckState extends State<Deck> {
             onIndexChanged: (p0) {
               // * Prevent Scrolling ahead & Animate to current card on share button press.
               // await Future.delayed(const Duration(seconds: 1));
-              if (p0 + 1 <=
+              if (context
+                          .read<ProfileBloc>()
+                          .state
+                          .user
+                          .currentCard?[state.category.name] !=
+                      null &&
+                  p0 + 1 <=
                       context
                           .read<ProfileBloc>()
                           .state
@@ -741,11 +747,17 @@ class _ShareButtonState extends State<ShareButton> {
       onPressed: () async {
         /// Fetch Response if it exists
         if (context
-                .read<ProfileBloc>()
-                .state
-                .user
-                .currentCard![widget.categoryName]! >=
-            widget.deckScrollController.selectedItem + 1) {
+                    .read<ProfileBloc>()
+                    .state
+                    .user
+                    .currentCard?[widget.categoryName] !=
+                null &&
+            context
+                    .read<ProfileBloc>()
+                    .state
+                    .user
+                    .currentCard![widget.categoryName]! >=
+                widget.deckScrollController.selectedItem + 1) {
           context.read<ResponseBloc>().add(FetchResponse(
               user: context.read<ProfileBloc>().state.user,
               category: context.read<CardBloc>().state.category!,
@@ -932,16 +944,18 @@ class _ShareTextFieldState extends State<ShareTextField> {
                   child: LoadingAnimationWidget.fourRotatingDots(
                       color: Colors.blue, size: 20));
             }
-            if (state is ResponseLoaded) {
+            if (state is ResponseLoaded || state is ResponseInitial) {
               /// Set Share Field to Response if it exists
               /// Else set it to empty string
-              if ((context.read<ResponseBloc>().state as ResponseLoaded)
-                      .response !=
-                  null) {
-                widget.shareFieldController.text =
-                    (context.read<ResponseBloc>().state as ResponseLoaded)
-                            .response ??
-                        '';
+              if (state is ResponseLoaded) {
+                if ((context.read<ResponseBloc>().state as ResponseLoaded)
+                        .response !=
+                    null) {
+                  widget.shareFieldController.text =
+                      (context.read<ResponseBloc>().state as ResponseLoaded)
+                              .response ??
+                          '';
+                }
               } else {
                 widget.shareFieldController.clear();
               }
@@ -1050,7 +1064,7 @@ class _SendButtonState extends State<SendButton> {
               ),
               label: const Text('Loading Response...'));
         }
-        if (state is ResponseLoaded) {
+        if (state is ResponseLoaded || state is ResponseInitial) {
           responseExists = state.response != null &&
               widget.deckScrollController.selectedItem + 1 == state.cardNumber;
           return ElevatedButton.icon(

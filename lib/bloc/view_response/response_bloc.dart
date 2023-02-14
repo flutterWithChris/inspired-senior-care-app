@@ -17,7 +17,7 @@ class ResponseBloc extends Bloc<ResponseEvent, ResponseState> {
   final DatabaseRepository _databaseRepository;
   ResponseBloc({required DatabaseRepository databaseRepository})
       : _databaseRepository = databaseRepository,
-        super(ResponseLoading()) {
+        super(ResponseInitial()) {
     on<FetchResponse>((event, emit) async {
       String? response;
       emit(ResponseLoading());
