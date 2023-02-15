@@ -27,10 +27,12 @@ class _ViewMemberState extends State<ViewMember> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      ShowCaseWidget.of(showcaseBuildContext!)
-          .startShowCase([viewResponsesShowcaseKey]);
-    });
+    showcaseBuildContext != null
+        ? WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+            ShowCaseWidget.of(showcaseBuildContext!)
+                .startShowCase([viewResponsesShowcaseKey]);
+          })
+        : null;
   }
 
   @override

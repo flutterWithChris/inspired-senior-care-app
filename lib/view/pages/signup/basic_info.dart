@@ -138,7 +138,8 @@ class _BasicInfoPageState extends State<BasicInfoPage> {
                             User user = User(
                                 id: context.read<SignupCubit>().state.user!.uid,
                                 name: '',
-                                email: emailFieldController.text,
+                                email: emailFieldController.value.text
+                                    .toLowerCase(),
                                 type: '',
                                 title: '',
                                 userColor: '',

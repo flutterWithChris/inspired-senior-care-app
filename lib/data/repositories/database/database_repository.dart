@@ -44,7 +44,9 @@ class DatabaseRepository extends BaseDatabaseRepository {
           .where('email', isEqualTo: emailAddress)
           .limit(1)
           .snapshots()
-          .map((event) => User.fromSnapshot(event.docs.first));
+          .map((event) => event.docs.isNotEmpty
+              ? User.fromSnapshot(event.docs.first)
+              : null);
     } on FirebaseException catch (e) {
       final SnackBar snackBar = SnackBar(
         content: Text(e.message.toString()),

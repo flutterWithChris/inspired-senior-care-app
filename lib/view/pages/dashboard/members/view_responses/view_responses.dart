@@ -278,15 +278,18 @@ class _DeckState extends State<Deck> {
         }
         if (state is CardsLoaded) {
           List<String> cardImageUrls = state.cardImageUrls;
+          int? completedCards = context
+              .read<MemberBloc>()
+              .state
+              .user
+              ?.currentCard?[context.read<CardBloc>().state.category?.name];
           bool? isSubscribed =
               context.watch<PurchasesBloc>().state.isSubscribed;
           return InfiniteCarousel.builder(
             loop: false,
             controller: widget.deckScrollController,
             velocityFactor: 0.23,
-            itemCount: context.read<ProfileBloc>().state.user.currentCard?[
-                    context.read<CardBloc>().state.category?.name] ??
-                1,
+            itemCount: completedCards != null ? completedCards - 1 : 1,
             itemExtent: 330,
             onIndexChanged: (p0) {
               /// Prevent user advancing to next card & show dialog if not subscribed
