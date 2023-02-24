@@ -10,10 +10,12 @@ import 'package:inspired_senior_care_app/bloc/manage/view_response_deck_cubit.da
 import 'package:inspired_senior_care_app/bloc/member/bloc/member_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/purchases/purchases_bloc.dart';
+import 'package:inspired_senior_care_app/bloc/response_comment/response_comment_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/share_bloc/share_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/view_response/response_bloc.dart';
 import 'package:inspired_senior_care_app/cubits/response/response_deck_cubit.dart';
 import 'package:inspired_senior_care_app/data/models/category.dart';
+import 'package:inspired_senior_care_app/data/models/response_comment.dart';
 import 'package:inspired_senior_care_app/data/models/user.dart';
 import 'package:inspired_senior_care_app/view/pages/IAP/premium_individual_dialog.dart';
 import 'package:inspired_senior_care_app/view/pages/IAP/premium_org_dialog.dart';
@@ -47,6 +49,32 @@ class _ViewResponsesState extends State<ViewResponses> {
         if (state is CardsLoaded) {}
       },
       child: Scaffold(
+        //floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
+        floatingActionButton: Padding(
+          padding: const EdgeInsets.only(bottom: 20.0),
+          child: FloatingActionButton(
+            backgroundColor: Colors.lightBlue,
+            child: const Icon(
+              FontAwesomeIcons.solidMessage,
+              size: 18,
+            ),
+            onPressed: () {
+              context.read<ResponseCommentBloc>().add(LoadResponseComment(
+                  userId: context.read<MemberBloc>().state.user!.id!,
+                  categoryName: context.read<CardBloc>().state.category!.name,
+                  cardNumber: deckScrollController.selectedItem + 1));
+              // Show dialog to comment on response.
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return ResponseCommentDialog(
+                    currentCardIndex: deckScrollController.selectedItem + 1,
+                  );
+                },
+              );
+            },
+          ),
+        ),
         bottomSheet: ViewResponsesSheet(
           deckScrollController: deckScrollController,
         ),
@@ -167,6 +195,205 @@ class _ViewResponsesState extends State<ViewResponses> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class ResponseCommentDialog extends StatelessWidget {
+  final int currentCardIndex;
+  ResponseCommentDialog({required this.currentCardIndex, super.key});
+
+  final TextEditingController commentFieldController = TextEditingController();
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+      ),
+      title: BlocBuilder<ResponseCommentBloc, ResponseCommentState>(
+        builder: (context, state) {
+          if (state is ResponseCommentSent) {
+            return Text('Comment Sent!',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.headlineSmall);
+          }
+          return Text(
+            'Comment on Response',
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.headlineSmall,
+          );
+        },
+      ),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text(
+            'Let them know your thoughts on their response!',
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(
+            height: 16,
+          ),
+          BlocBuilder<ResponseCommentBloc, ResponseCommentState>(
+            builder: (context, state) {
+              if (state is ResponseCommentLoading ||
+                  state is ResponseCommentSending) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+              if (state is ResponseCommentSent) {
+                return const SizedBox(
+                  child: Icon(
+                    Icons.check_circle,
+                    color: Colors.green,
+                    size: 60,
+                  ),
+                );
+              }
+              if (state is ResponseCommentLoaded) {
+                if (state.responseComment != null) {
+                  commentFieldController.text = state.responseComment!.comment!;
+                } else {
+                  commentFieldController.text = '';
+                }
+                return TextFormField(
+                  textCapitalization: TextCapitalization.sentences,
+                  controller: commentFieldController,
+                  maxLines: 3,
+                  minLines: 3,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(12),
+                      ),
+                    ),
+                    labelText: 'Comment',
+                  ),
+                );
+              }
+              if (state is ResponseCommentError) {
+                return const Center(
+                  child: Text('Something went wrong!'),
+                );
+              }
+              if (state is ResponseCommentInitial) {
+                return TextFormField(
+                  textCapitalization: TextCapitalization.sentences,
+                  controller: commentFieldController,
+                  maxLines: 3,
+                  minLines: 3,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(12),
+                      ),
+                    ),
+                    labelText: 'Comment',
+                  ),
+                );
+              } else {
+                return const Center(
+                  child: Text('Something went wrong!'),
+                );
+              }
+            },
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: const Text('Cancel'),
+        ),
+        BlocConsumer<ResponseCommentBloc, ResponseCommentState>(
+          listener: (context, state) async {
+            if (state is ResponseCommentSent &&
+                ModalRoute.of(context)!.isCurrent) {
+              await Future.delayed(const Duration(seconds: 2));
+              Navigator.of(context).pop();
+            }
+          },
+          builder: (context, state) {
+            if (state is ResponseCommentSending) {
+              return const SizedBox();
+            }
+            if (state is ResponseCommentSent) {
+              return TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('Sent!'),
+              );
+            }
+            if (state is ResponseCommentError) {
+              return TextButton(
+                onPressed: () {
+                  context.read<ResponseCommentBloc>().add(CreateResponseComment(
+                      ResponseComment(
+                          commentTime: DateTime.now().toIso8601String(),
+                          commenterId:
+                              context.read<ProfileBloc>().state.user.id,
+                          commenterName:
+                              context.read<ProfileBloc>().state.user.name,
+                          comment: commentFieldController.value.text.trim(),
+                          userId: context.read<MemberBloc>().state.user!.id,
+                          categoryName:
+                              context.read<CardBloc>().state.category!.name,
+                          cardNumber: currentCardIndex)));
+                },
+                child: const Text('Retry'),
+              );
+            }
+            if (state is ResponseCommentLoaded ||
+                state is ResponseCommentInitial) {
+              if (state.responseComment != null) {
+                return TextButton(
+                  onPressed: () {
+                    context.read<ResponseCommentBloc>().add(
+                        UpdateResponseComment(ResponseComment(
+                            commentTime: DateTime.now().toIso8601String(),
+                            commenterId:
+                                context.read<ProfileBloc>().state.user.id,
+                            commenterName:
+                                context.read<ProfileBloc>().state.user.name,
+                            comment: commentFieldController.value.text.trim(),
+                            userId: context.read<MemberBloc>().state.user!.id,
+                            categoryName:
+                                context.read<CardBloc>().state.category!.name,
+                            cardNumber: currentCardIndex)));
+                  },
+                  child: const Text('Update Comment'),
+                );
+              } else {
+                return TextButton(
+                  onPressed: () {
+                    context.read<ResponseCommentBloc>().add(
+                        CreateResponseComment(ResponseComment(
+                            commentTime: DateTime.now().toIso8601String(),
+                            commenterId:
+                                context.read<ProfileBloc>().state.user.id,
+                            commenterName:
+                                context.read<ProfileBloc>().state.user.name,
+                            comment: commentFieldController.value.text.trim(),
+                            userId: context.read<MemberBloc>().state.user!.id,
+                            categoryName:
+                                context.read<CardBloc>().state.category!.name,
+                            cardNumber: currentCardIndex)));
+                  },
+                  child: const Text('Submit'),
+                );
+              }
+            } else {
+              return const Center(
+                child: Text('Something Went Wrong...'),
+              );
+            }
+          },
+        ),
+      ],
     );
   }
 }
@@ -580,11 +807,21 @@ class ViewResponsesSheet extends StatelessWidget {
         height: 210,
         child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: CrossAxisAlignment.end,
             mainAxisSize: MainAxisSize.max,
             children: [
               ShareTextField(
                 deckScrollController: deckScrollController,
               ),
+              // IconButton(
+              //   onPressed: () {},
+              //   icon: const CircleAvatar(
+              //     child: Icon(
+              //       FontAwesomeIcons.reply,
+              //       size: 16,
+              //     ),
+              //   ),
+              // )
             ]),
       ),
     );

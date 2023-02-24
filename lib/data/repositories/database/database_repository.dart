@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:inspired_senior_care_app/data/models/bug_report.dart';
 import 'package:inspired_senior_care_app/data/models/category.dart';
 import 'package:inspired_senior_care_app/data/models/group.dart';
+import 'package:inspired_senior_care_app/data/models/response_comment.dart';
 import 'package:inspired_senior_care_app/data/models/user.dart';
 import 'package:inspired_senior_care_app/data/repositories/database/base_database_repository.dart';
 import 'package:inspired_senior_care_app/globals.dart';
@@ -853,6 +854,113 @@ class DatabaseRepository extends BaseDatabaseRepository {
       await _firebaseFirestore.collection('users').doc(user.id).set({
         'progress': {categoryName: currentCardNumber}
       }, SetOptions(merge: true));
+    } on FirebaseException catch (e) {
+      final SnackBar snackBar = SnackBar(
+        content: Text(e.message.toString()),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
+    }
+  }
+
+  // Send response comments to the database
+  Future<void> sendResponseComment(ResponseComment responseComment) async {
+    try {
+      await _firebaseFirestore
+          .collection('users')
+          .doc(responseComment.userId)
+          .collection('responses')
+          .doc(responseComment.categoryName!)
+          .collection('response-comments')
+          .doc(
+              '${responseComment.cardNumber.toString()}:${responseComment.commenterId}')
+          .set(responseComment.toDocument());
+    } on FirebaseException catch (e) {
+      final SnackBar snackBar = SnackBar(
+        content: Text(e.message.toString()),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
+    }
+  }
+
+  // Check if response comment exists & fetch it
+  Future<ResponseComment?> fetchResponseComment(
+      String userId, String categoryName, int cardNumber) async {
+    try {
+      var responseComment = await _firebaseFirestore
+          .collection('users')
+          .doc(userId)
+          .collection('responses')
+          .doc(categoryName)
+          .collection('response-comments')
+          .doc('$cardNumber:${_firebaseAuth.currentUser!.uid}')
+          .get();
+      if (responseComment.exists) {
+        return ResponseComment.fromSnapshot(responseComment);
+      } else {
+        return null;
+      }
+    } on FirebaseException catch (e) {
+      final SnackBar snackBar = SnackBar(
+        content: Text(e.message.toString()),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
+      rethrow;
+    }
+  }
+
+  // Fetch all response documents for a specific card
+  Future<List<ResponseComment>> fetchAllResponseComments(
+      String userId, String categoryName, int cardNumber) async {
+    try {
+      // Get all doauments from the response-comments collection
+
+      var responseComments = await _firebaseFirestore
+          .collection('users')
+          .doc(userId)
+          .collection('responses')
+          .doc(categoryName)
+          .collection('response-comments')
+          .where('cardNumber', isEqualTo: cardNumber)
+          .get()
+          .then((value) => value.docs);
+      return responseComments
+          .map((responseComment) =>
+              ResponseComment.fromSnapshot(responseComment))
+          .toList();
+    } on FirebaseException catch (e) {
+      final SnackBar snackBar = SnackBar(
+        content: Text(e.message.toString()),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
+      rethrow;
+    }
+  }
+
+  // Delete response comment
+  Future<void> deleteResponseComment(ResponseComment responseComment) async {
+    try {
+      await _firebaseFirestore
+          .collection('users')
+          .doc(responseComment.userId)
+          .collection('responses')
+          .doc(responseComment.categoryName!)
+          .collection('response-comments')
+          .doc(responseComment.commenterId)
+          .collection(responseComment.cardNumber.toString())
+          .doc(responseComment.commenterId)
+          .delete();
     } on FirebaseException catch (e) {
       final SnackBar snackBar = SnackBar(
         content: Text(e.message.toString()),
