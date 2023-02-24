@@ -100,7 +100,6 @@ class _DeckPageState extends State<DeckPage> {
                       }
                       if (state is ResponseCommentsLoaded &&
                           state.responseComments != null) {
-                        print('Response Comment Loaded');
                         return Padding(
                           padding: const EdgeInsets.only(top: 24),
                           child: AnimatedOpacity(
@@ -447,13 +446,16 @@ class ViewResponseCommentsDialog extends StatelessWidget {
               child: ListView.builder(
                   itemCount: state.responseComments!.length,
                   itemBuilder: (context, index) {
-                    return ListTile(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(24.0)),
-                      tileColor: Colors.grey[200],
-                      title: Text(state.responseComments![index].comment!),
-                      subtitle:
-                          Text(state.responseComments![index].commenterName!),
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 8.0),
+                      child: ListTile(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(24.0)),
+                        tileColor: Colors.grey[200],
+                        title: Text(state.responseComments![index].comment!),
+                        subtitle:
+                            Text(state.responseComments![index].commenterName!),
+                      ),
                     );
                   }),
             );
