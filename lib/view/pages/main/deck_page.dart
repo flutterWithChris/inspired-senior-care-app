@@ -20,6 +20,7 @@ import 'package:inspired_senior_care_app/view/widget/main/bottom_app_bar.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:showcaseview/showcaseview.dart';
 
+import '../../../bloc/response_comment/response_comment_bloc.dart';
 import '../../../bloc/view_response/response_bloc.dart';
 
 class DeckPage extends StatefulWidget {
@@ -91,6 +92,95 @@ class _DeckPageState extends State<DeckPage> {
             builder: (context) {
               showcaseBuildContext = context;
               return Scaffold(
+                  floatingActionButton:
+                      BlocBuilder<ResponseCommentBloc, ResponseCommentState>(
+                    builder: (context, state) {
+                      if (state is ResponseCommentLoading) {
+                        return const SizedBox();
+                      }
+                      if (state is ResponseCommentsLoaded &&
+                          state.responseComments != null) {
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 24),
+                          child: AnimatedOpacity(
+                            duration: const Duration(milliseconds: 300),
+                            opacity: isCardZoomed ? 1 : 0,
+                            child: Stack(
+                                clipBehavior: Clip.none,
+                                alignment: Alignment.topRight,
+                                children: [
+                                  FloatingActionButton(
+                                    backgroundColor: Colors.lightBlue,
+                                    onPressed: () {
+                                      // Show comments in a dialog
+                                      showDialog(
+                                          context: context,
+                                          builder: (context) {
+                                            return const ViewResponseCommentsDialog();
+                                          });
+                                    },
+                                    child: const Icon(Icons.comment),
+                                  ),
+                                  state.responseComments != null &&
+                                          state.responseComments!.isNotEmpty
+                                      ? Positioned(
+                                          right: -10,
+                                          top: -4,
+                                          child: CircleAvatar(
+                                            radius: 14,
+                                            backgroundColor: Colors.red,
+                                            child: Text(
+                                              state.responseComments!.length
+                                                  .toString(),
+                                              style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                        )
+                                      : Container(),
+                                ]),
+                          ),
+                        );
+                      }
+                      return AnimatedOpacity(
+                        duration: const Duration(milliseconds: 400),
+                        opacity: 0,
+                        child: Stack(
+                            clipBehavior: Clip.none,
+                            alignment: Alignment.topRight,
+                            children: [
+                              FloatingActionButton(
+                                onPressed: () {
+                                  // Show comments in a dialog
+                                  showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return const ViewResponseCommentsDialog();
+                                      });
+                                },
+                                child: const Icon(Icons.comment),
+                              ),
+                              const Positioned(
+                                right: -10,
+                                top: -4,
+                                child: CircleAvatar(
+                                  radius: 14,
+                                  backgroundColor: Colors.red,
+                                  child: Text(
+                                    '0',
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              )
+                            ]),
+                      );
+                    },
+                  ),
                   backgroundColor: Colors.grey.shade200,
                   resizeToAvoidBottomInset: true,
                   appBar: PreferredSize(
@@ -333,6 +423,53 @@ class _DeckPageState extends State<DeckPage> {
   }
 }
 
+class ViewResponseCommentsDialog extends StatelessWidget {
+  const ViewResponseCommentsDialog({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24.0)),
+      title: const Text('Comments'),
+      content: BlocBuilder<ResponseCommentBloc, ResponseCommentState>(
+        builder: (context, state) {
+          if (state is ResponseCommentLoading) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          } else if (state is ResponseCommentsLoaded) {
+            return SizedBox(
+              height: 300,
+              width: 300,
+              child: ListView.builder(
+                  itemCount: state.responseComments!.length,
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 8.0),
+                      child: ListTile(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(24.0)),
+                        tileColor: Colors.grey[200],
+                        title: Text(state.responseComments![index].comment!),
+                        subtitle:
+                            Text(state.responseComments![index].commenterName!),
+                      ),
+                    );
+                  }),
+            );
+          } else {
+            return const Center(
+              child: Text('Something Went Wrong!'),
+            );
+          }
+        },
+      ),
+    );
+  }
+}
+
 class CardCounter extends StatefulWidget {
   final InfiniteScrollController deckScrollController;
   final Category category;
@@ -506,6 +643,10 @@ class _DeckState extends State<Deck> {
                 context.read<ResponseBloc>().add(FetchResponse(
                     user: context.read<ProfileBloc>().state.user,
                     category: context.read<CardBloc>().state.category!,
+                    cardNumber: widget.deckScrollController.selectedItem + 1));
+                context.read<ResponseCommentBloc>().add(LoadResponseComments(
+                    userId: context.read<ProfileBloc>().state.user.id!,
+                    categoryName: context.read<CardBloc>().state.category!.name,
                     cardNumber: widget.deckScrollController.selectedItem + 1));
               }
               if (p0 + 1 >= (state.category.totalCards! / 2).round() &&
@@ -761,6 +902,10 @@ class _ShareButtonState extends State<ShareButton> {
           context.read<ResponseBloc>().add(FetchResponse(
               user: context.read<ProfileBloc>().state.user,
               category: context.read<CardBloc>().state.category!,
+              cardNumber: widget.deckScrollController.selectedItem + 1));
+          context.read<ResponseCommentBloc>().add(LoadResponseComments(
+              userId: context.read<ProfileBloc>().state.user.id!,
+              categoryName: context.read<CardBloc>().state.category!.name,
               cardNumber: widget.deckScrollController.selectedItem + 1));
         }
 

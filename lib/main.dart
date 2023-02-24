@@ -19,6 +19,7 @@ import 'package:inspired_senior_care_app/bloc/member/bloc/member_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/onboarding/onboarding_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/purchases/purchases_bloc.dart';
+import 'package:inspired_senior_care_app/bloc/response_comment/response_comment_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/share_bloc/share_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/view_response/response_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/view_response/view_response_cubit.dart';
@@ -199,6 +200,10 @@ class _MyAppState extends State<MyApp> {
                 databaseRepository: context.read<DatabaseRepository>()),
           ),
           BlocProvider(
+            create: (context) => ResponseCommentBloc(
+                databaseRepository: context.read<DatabaseRepository>()),
+          ),
+          BlocProvider(
             create: (context) => DeckCubit(
                 profileBloc: context.read<ProfileBloc>(),
                 databaseRepository: context.read<DatabaseRepository>()),
@@ -336,7 +341,7 @@ class _MyAppState extends State<MyApp> {
           GoRoute(
             name: 'manager-deck-page',
             path: 'manager-deck-page',
-            builder: (context, state) => ManagerDeckPage(),
+            builder: (context, state) => const ManagerDeckPage(),
           ),
         ]),
     GoRoute(
@@ -405,7 +410,7 @@ class _MyAppState extends State<MyApp> {
                                       ResponseInteractionCubit(),
                                 ),
                               ],
-                              child: ViewResponses(),
+                              child: const ViewResponses(),
                             )),
                   ],
                 ),
