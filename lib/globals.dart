@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jiffy/jiffy.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Globals {
@@ -55,3 +56,20 @@ Future<void> setSpotlightStatusToComplete(String key) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   prefs.setBool(key, true);
 }
+
+Map<int, String> monthlyCategories = {
+  1: 'Genuine Relationships',
+  2: 'Brain Change',
+  3: 'What If',
+  4: 'Supportive Environment',
+  5: 'Language Matters',
+  6: 'Well Being',
+  7: 'Meaningful Engagement',
+  8: 'Communication',
+  9: 'Damaging Interactions',
+  10: 'Positive Interactions',
+  11: 'Wildly Curious',
+  12: 'Strengths Based'
+};
+int month = Jiffy(DateTime.now()).month;
+String thisMonthsCategory = monthlyCategories[month]!;

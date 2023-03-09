@@ -92,7 +92,7 @@ class _FeaturedCategoryState extends State<FeaturedCategory> {
                   ),
                 ),
               ),
-              const SeeMoreButton(),
+              //  const SeeMoreButton(),
             ],
           );
         }

@@ -61,10 +61,13 @@ void main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   SharedPreferences prefs = await SharedPreferences.getInstance();
   var initScreen = prefs.getInt("initScreen");
+
   // await prefs.remove('initScreen');
   // print('initScreen $initScreen');
   // Pass all uncaught errors from the framework to Crashlytics.
+  // TODO: Uncomment this line to enable Crashlytics in your application.
   FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+
   runApp(const MyApp());
 }
 
@@ -138,8 +141,7 @@ class _MyAppState extends State<MyApp> {
                 authBloc: context.read<AuthBloc>(),
                 profileBloc: context.read<ProfileBloc>(),
                 authRepository: context.read<AuthRepository>(),
-                databaseRepository: context.read<DatabaseRepository>())
-              ..add(LoadInvites()),
+                databaseRepository: context.read<DatabaseRepository>()),
           ),
           BlocProvider(
             create: (context) => GroupBloc(
@@ -164,6 +166,7 @@ class _MyAppState extends State<MyApp> {
                 groupFeaturedCategoryCubit:
                     context.read<GroupFeaturedCategoryCubit>(),
                 authBloc: context.read<AuthBloc>(),
+                profileBloc: context.read<ProfileBloc>(),
                 categoriesBloc: context.read<CategoriesBloc>(),
                 databaseRepository: context.read<DatabaseRepository>())
               ..loadUserFeaturedCategory(),

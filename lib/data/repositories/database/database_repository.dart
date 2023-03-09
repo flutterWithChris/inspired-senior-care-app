@@ -240,6 +240,45 @@ class DatabaseRepository extends BaseDatabaseRepository {
     }
   }
 
+  Future<bool> getGroupScheduleStatus(String groupId) async {
+    try {
+      return await _firebaseFirestore
+          .collection('groups')
+          .doc(groupId)
+          .get()
+          .then((value) => value.data()!['onSchedule']);
+    } on FirebaseException catch (e) {
+      final SnackBar snackBar = SnackBar(
+        content: Text(e.message.toString()),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
+      throw Exception();
+    }
+  }
+
+  // Get group featured category as a stream
+  Stream<String> getGroupFeaturedCategoryStream(String groupId) {
+    try {
+      return _firebaseFirestore
+          .collection('groups')
+          .doc(groupId)
+          .snapshots()
+          .map((snap) => snap.data()!['featuredCategory']);
+    } on FirebaseException catch (e) {
+      final SnackBar snackBar = SnackBar(
+        content: Text(e.message.toString()),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
+      throw Exception();
+    }
+  }
+
   Future<Map<Group?, bool?>?> getGroupSubscriptionStatus(String userId) async {
     try {
       List<dynamic> groupIds = await _firebaseFirestore
@@ -517,6 +556,34 @@ class DatabaseRepository extends BaseDatabaseRepository {
     }
   }
 
+  // Get manager groups as future
+  Future<List<Group>> getManagerGroupsAsFuture(String userId) async {
+    try {
+      final ownedGroups = await _firebaseFirestore
+          .collection('groups')
+          .where('groupOwnerId', isEqualTo: userId)
+          .get();
+      final sharedGroups = await _firebaseFirestore
+          .collection('groups')
+          .where('groupManagerIds', arrayContains: userId)
+          .get();
+      return ownedGroups.docs
+          .map((doc) => Group.fromSnapshot(doc))
+          .toList()
+          .followedBy(sharedGroups.docs.map((doc) => Group.fromSnapshot(doc)))
+          .toList();
+    } on FirebaseException catch (e) {
+      final SnackBar snackBar = SnackBar(
+        content: Text(e.message.toString()),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
+      throw Exception();
+    }
+  }
+
   Stream<List<Group>> getMemberGroups(String userId) {
     try {
       return _firebaseFirestore
@@ -526,6 +593,26 @@ class DatabaseRepository extends BaseDatabaseRepository {
           .map((snapshot) {
         return snapshot.docs.map((doc) => Group.fromSnapshot(doc)).toList();
       });
+    } on FirebaseException catch (e) {
+      final SnackBar snackBar = SnackBar(
+        content: Text(e.message.toString()),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
+      throw Exception();
+    }
+  }
+
+// Get Member groups as future
+  Future<List<Group>> getMemberGroupsAsFuture(String userId) async {
+    try {
+      final memberGroups = await _firebaseFirestore
+          .collection('groups')
+          .where('groupMemberIds', arrayContains: userId)
+          .get();
+      return memberGroups.docs.map((doc) => Group.fromSnapshot(doc)).toList();
     } on FirebaseException catch (e) {
       final SnackBar snackBar = SnackBar(
         content: Text(e.message.toString()),
@@ -600,25 +687,27 @@ class DatabaseRepository extends BaseDatabaseRepository {
 
   Future<void>? inviteMemberToGroup(Invite invite) async {
     try {
+      String inviteId =
+          DateTime.now().millisecondsSinceEpoch.toString().substring(0, 13);
       var docRef = _firebaseFirestore
           .collection('invites')
           .doc(invite.invitedUserId)
           .collection('invites')
-          .doc();
+          .doc(inviteId);
 
-      await docRef.set(invite.toMap());
+      await docRef.set(invite.copyWith(inviteId: inviteId).toMap());
 
       /// Create invite reference for inviter to see sent status
       await _firebaseFirestore
           .collection('users')
           .doc(invite.inviterId)
           .collection('sent-invites')
-          .doc(invite.invitedUserId)
-          .set(invite.toMap());
+          .doc(inviteId)
+          .set(invite.copyWith(inviteId: inviteId).toMap());
 
       DocumentSnapshot documentSnapshot = await docRef.get();
-      var docId = documentSnapshot.reference.id;
-      docRef.set({'inviteId': docId}, SetOptions(merge: true));
+      //   var docId = documentSnapshot.reference.id;
+      // docRef.set({'inviteId': docId}, SetOptions(merge: true));
     } on FirebaseException catch (e) {
       final SnackBar snackBar = SnackBar(
         content: Text(e.message.toString()),
@@ -638,19 +727,85 @@ class DatabaseRepository extends BaseDatabaseRepository {
       // Delete this invite
       docRef.collection('invites').doc(invite.inviteId).delete();
       // Delete user invite collection if empty
-      docRef.collection('invites').get().then((value) async {
-        if (value.size == 0) {
-          await docRef.delete();
 
-          /// Delete invite reference for inviter.
-          await _firebaseFirestore
-              .collection('users')
-              .doc(invite.inviterId)
-              .collection('sent-invites')
-              .doc(invite.invitedUserId)
-              .delete();
-        }
-      });
+      /// Delete invite reference for inviter.
+      await _firebaseFirestore
+          .collection('users')
+          .doc(invite.inviterId)
+          .collection('sent-invites')
+          .doc(invite.inviteId)
+          .delete();
+    } on FirebaseException catch (e) {
+      final SnackBar snackBar = SnackBar(
+        content: Text(e.message.toString()),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
+    }
+  }
+
+  Future<void>? declineInvite(Invite invite) async {
+    String inviteId =
+        DateTime.now().millisecondsSinceEpoch.toString().substring(0, 13);
+    try {
+      var docRef =
+          _firebaseFirestore.collection('invites').doc(invite.invitedUserId);
+      // Delete this invite
+      await docRef.collection('invites').doc(invite.inviteId).delete();
+
+      /// Delete invite reference for inviter.
+      await _firebaseFirestore
+          .collection('users')
+          .doc(invite.inviterId)
+          .collection('sent-invites')
+          .doc(invite.inviteId)
+          .delete();
+
+      // Create copy of invite with status declined
+      await _firebaseFirestore
+          .collection('users')
+          .doc(invite.inviterId)
+          .collection('sent-invites')
+          .doc(inviteId)
+          .set(invite.copyWith(status: 'declined').toMap());
+    } on FirebaseException catch (e) {
+      final SnackBar snackBar = SnackBar(
+        content: Text(e.message.toString()),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
+    }
+  }
+
+  Future<void>? acceptInvite(Invite invite) async {
+    String inviteId =
+        DateTime.now().millisecondsSinceEpoch.toString().substring(0, 13);
+    try {
+      var docRef =
+          _firebaseFirestore.collection('invites').doc(invite.invitedUserId);
+      // Delete this invite
+      await docRef.collection('invites').doc(invite.inviteId).delete();
+      // Delete user invite collection if empty
+
+      /// Delete invite reference for inviter.
+      await _firebaseFirestore
+          .collection('users')
+          .doc(invite.inviterId)
+          .collection('sent-invites')
+          .doc(invite.inviteId)
+          .delete();
+
+      // Create copy of invite with status accepted
+      await _firebaseFirestore
+          .collection('users')
+          .doc(invite.inviterId)
+          .collection('sent-invites')
+          .doc(inviteId)
+          .set(invite.copyWith(status: 'accepted').toMap());
     } on FirebaseException catch (e) {
       final SnackBar snackBar = SnackBar(
         content: Text(e.message.toString()),
@@ -728,26 +883,33 @@ class DatabaseRepository extends BaseDatabaseRepository {
     }
   }
 
-  Stream<List<Invite>?>? listenForInvites() {
+  Stream<List<Invite>?> listenForInvites() {
     auth.User? user = _firebaseAuth.currentUser;
     try {
+      List<Invite> invites = [];
       return _firebaseFirestore
           .collection('invites')
           .doc(user!.uid)
           .collection('invites')
           .snapshots()
           .map((value) {
-        var docs = value.docs;
-        if (docs.isNotEmpty) {
-          List<Invite> invites = [];
-          for (QueryDocumentSnapshot<Map<String, dynamic>> doc in docs) {
-            Invite thisInvite = Invite.fromSnapshot(doc);
+        for (var change in value.docChanges) {
+          if (change.type == DocumentChangeType.added) {
+            Invite thisInvite = Invite.fromSnapshot(change.doc);
             invites.add(thisInvite);
           }
-          return invites;
-        } else {
-          return null;
+          if (change.type == DocumentChangeType.removed) {
+            Invite thisInvite = Invite.fromSnapshot(change.doc);
+            invites.remove(thisInvite);
+          }
+          if (change.type == DocumentChangeType.modified) {
+            Invite thisInvite = Invite.fromSnapshot(change.doc);
+            invites.remove(thisInvite);
+            invites.add(thisInvite);
+          }
         }
+
+        return invites;
       });
     } on FirebaseException catch (e) {
       final SnackBar snackBar = SnackBar(
@@ -757,7 +919,47 @@ class DatabaseRepository extends BaseDatabaseRepository {
       snackbarKey.currentState?.showSnackBar(snackBar);
       (e, stack) =>
           FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
-      return null;
+      rethrow;
+    }
+  }
+
+  Stream<List<Invite>?> listenForSentInvites() {
+    auth.User? user = _firebaseAuth.currentUser;
+    try {
+      List<Invite> invites = [];
+      return _firebaseFirestore
+          .collection('users')
+          .doc(user!.uid)
+          .collection('sent-invites')
+          .snapshots()
+          .map((value) {
+        for (var change in value.docChanges) {
+          if (change.type == DocumentChangeType.added) {
+            Invite thisInvite = Invite.fromSnapshot(change.doc);
+            invites.add(thisInvite);
+          }
+          if (change.type == DocumentChangeType.removed) {
+            Invite thisInvite = Invite.fromSnapshot(change.doc);
+            invites.remove(thisInvite);
+          }
+          if (change.type == DocumentChangeType.modified) {
+            Invite thisInvite = Invite.fromSnapshot(change.doc);
+            invites.remove(thisInvite);
+            invites.add(thisInvite);
+          }
+        }
+
+        return invites;
+      });
+    } on FirebaseException catch (e) {
+      final SnackBar snackBar = SnackBar(
+        content: Text(e.message.toString()),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
+      rethrow;
     }
   }
 
