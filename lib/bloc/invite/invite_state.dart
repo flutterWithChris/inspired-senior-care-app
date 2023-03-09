@@ -16,52 +16,55 @@ enum InviteStatus {
 @immutable
 class InviteState extends Equatable {
   InviteStatus inviteStatus;
-  List<Invite> invites;
+  List<Invite>? invites;
+
+  Stream<List<Invite>?>? inviteStream;
 
   InviteState({
     required this.inviteStatus,
-    required this.invites,
+    this.inviteStream,
+    this.invites,
   });
 
   factory InviteState.initial() {
-    return InviteState(inviteStatus: InviteStatus.initial, invites: const []);
+    return InviteState(inviteStatus: InviteStatus.initial);
   }
   factory InviteState.loading() {
-    return InviteState(inviteStatus: InviteStatus.loading, invites: const []);
+    return InviteState(inviteStatus: InviteStatus.loading);
   }
-  factory InviteState.loaded(List<Invite> invites) {
+  factory InviteState.loaded({required List<Invite> invites}) {
     return InviteState(inviteStatus: InviteStatus.loaded, invites: invites);
   }
 
   factory InviteState.sending() {
-    return InviteState(inviteStatus: InviteStatus.sending, invites: const []);
+    return InviteState(inviteStatus: InviteStatus.sending);
   }
 
   factory InviteState.sent() {
-    return InviteState(inviteStatus: InviteStatus.sent, invites: const []);
+    return InviteState(inviteStatus: InviteStatus.sent);
   }
 
   factory InviteState.cancelled() {
-    return InviteState(inviteStatus: InviteStatus.cancelled, invites: const []);
+    return InviteState(inviteStatus: InviteStatus.cancelled);
   }
 
   factory InviteState.receieved() {
-    return InviteState(inviteStatus: InviteStatus.received, invites: const []);
+    return InviteState(inviteStatus: InviteStatus.received);
   }
 
   factory InviteState.accepted() {
-    return InviteState(inviteStatus: InviteStatus.accepted, invites: const []);
+    return InviteState(inviteStatus: InviteStatus.accepted);
   }
 
   factory InviteState.denied() {
-    return InviteState(inviteStatus: InviteStatus.denied, invites: const []);
+    return InviteState(inviteStatus: InviteStatus.denied);
   }
 
   factory InviteState.failed() {
-    return InviteState(inviteStatus: InviteStatus.failed, invites: const []);
+    return InviteState(inviteStatus: InviteStatus.failed);
   }
 
   @override
   // TODO: implement props
-  List<Object?> get props => [inviteStatus, invites];
+  List<Object?> get props => [inviteStatus, inviteStream];
 }

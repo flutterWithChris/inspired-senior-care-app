@@ -378,7 +378,7 @@ class _GroupSectionState extends State<GroupSection> {
                             Flexible(
                               child: Wrap(
                                 crossAxisAlignment: WrapCrossAlignment.center,
-                                spacing: 2.0,
+                                spacing: 8.0,
                                 children: [
                                   Showcase(
                                     targetPadding: const EdgeInsets.all(4.0),
@@ -448,6 +448,7 @@ class _GroupSectionState extends State<GroupSection> {
                                       ],
                                       child: const Icon(
                                         Icons.add_circle_rounded,
+                                        size: 26,
                                         color: Colors.lightGreen,
                                       ),
                                     ),
@@ -645,7 +646,9 @@ class CurrentCategoryCard extends StatelessWidget {
         }
         if (state is CategoriesLoaded) {
           Category currentCategory = state.categories.singleWhere(
-            (category) => category.name == group.featuredCategory,
+            (category) => group.onSchedule == true
+                ? category.name == thisMonthsCategory
+                : category.name == group.featuredCategory,
           );
           return BlocBuilder<FeaturedCategoryCubit, FeaturedCategoryState>(
             builder: (context, state) {
@@ -714,7 +717,7 @@ class CurrentCategoryCard extends StatelessWidget {
                                       children: [
                                         FittedBox(
                                           child: Text(
-                                            group.featuredCategory!,
+                                            currentCategory.name,
                                             style: Theme.of(context)
                                                 .textTheme
                                                 .titleMedium!

@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/invite/invite_bloc.dart';
 import 'package:inspired_senior_care_app/data/models/group.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
+
+import '../../../../bloc/profile/profile_bloc.dart';
 
 class AddMemberDialog extends StatefulWidget {
   final Group group;
@@ -33,12 +36,34 @@ class _AddMemberDialogState extends State<AddMemberDialog> {
         textAlign: TextAlign.center,
         style: Theme.of(context)
             .textTheme
-            .headline4!
+            .headlineMedium!
             .copyWith(color: Theme.of(context).textTheme.bodyMedium!.color),
       ),
-      content: const Text(
-        'Enter a member\'s email!',
-        textAlign: TextAlign.center,
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text(
+            'Send an invite to join your group!',
+            textAlign: TextAlign.center,
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: Wrap(
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 6.0,
+              children: [
+                const Icon(
+                  Icons.info,
+                  size: 12.0,
+                  color: Colors.blue,
+                ),
+                Text('User must first create an account.',
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.bodySmall),
+              ],
+            ),
+          ),
+        ],
       ),
 
       actions: [
@@ -74,11 +99,13 @@ class _AddMemberDialogState extends State<AddMemberDialog> {
                     suffixIcon: BlocBuilder<InviteBloc, InviteState>(
                       builder: (context, state) {
                         if (state.inviteStatus == InviteStatus.sending) {
-                          return const SizedBox(
+                          return SizedBox(
                               height: 8,
                               width: 8,
-                              child:
-                                  Center(child: CircularProgressIndicator()));
+                              child: Center(
+                                  child: LoadingAnimationWidget.inkDrop(
+                                      color: Theme.of(context).primaryColor,
+                                      size: 20.0)));
                         }
                         if (state.inviteStatus == InviteStatus.sent) {
                           return const Icon(
@@ -106,11 +133,16 @@ class _AddMemberDialogState extends State<AddMemberDialog> {
                 style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,
                     // foregroundColor: Colors.white,
-                    backgroundColor: Colors.lightGreen,
+                    backgroundColor:
+                        context.watch<InviteBloc>().state.inviteStatus ==
+                                InviteStatus.sent
+                            ? Colors.lightGreen
+                            : null,
                     fixedSize: const Size(175, 40)),
                 onPressed: () {
                   if (addMemberFormKey.currentState!.validate()) {
                     context.read<InviteBloc>().add(MemberInviteSent(
+                        user: context.read<ProfileBloc>().state.user,
                         emailAddress:
                             widget.inviteTextFieldController.value.text,
                         group: widget.group));
@@ -126,7 +158,7 @@ class _AddMemberDialogState extends State<AddMemberDialog> {
                       previous.inviteStatus != current.inviteStatus,
                   listener: (context, state) async {
                     if (state.inviteStatus == InviteStatus.sent) {
-                      await Future.delayed(const Duration(seconds: 3));
+                      await Future.delayed(const Duration(seconds: 2));
                       widget.inviteTextFieldController.clear();
                       if (!mounted) return;
                       Navigator.of(context, rootNavigator: true).pop();
@@ -141,9 +173,7 @@ class _AddMemberDialogState extends State<AddMemberDialog> {
                       );
                     }
                     if (state.inviteStatus == InviteStatus.sending) {
-                      return const SizedBox(
-                          height: 18,
-                          child: FittedBox(child: CircularProgressIndicator()));
+                      return const SizedBox();
                     }
                     if (state.inviteStatus == InviteStatus.sent) {
                       return const Icon(
@@ -167,7 +197,7 @@ class _AddMemberDialogState extends State<AddMemberDialog> {
                       return const Text('Sending...');
                     }
                     if (state.inviteStatus == InviteStatus.sent) {
-                      return const Text('Member Invited!');
+                      return const Text('Invite Sent!');
                     } else {
                       return const Text('Add Member');
                     }

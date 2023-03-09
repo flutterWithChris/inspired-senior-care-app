@@ -5,6 +5,7 @@ import 'package:inspired_senior_care_app/bloc/group/group_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/invite/invite_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
 import 'package:inspired_senior_care_app/data/models/group.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class AddManagerDialog extends StatefulWidget {
   final Group group;
@@ -35,7 +36,7 @@ class _AddMemberDialogState extends State<AddManagerDialog> {
         textAlign: TextAlign.center,
         style: Theme.of(context)
             .textTheme
-            .headline4!
+            .headlineMedium!
             .copyWith(color: Theme.of(context).textTheme.bodyMedium!.color),
       ),
       content: const Text(
@@ -72,11 +73,13 @@ class _AddMemberDialogState extends State<AddManagerDialog> {
                       child: BlocBuilder<InviteBloc, InviteState>(
                         builder: (context, state) {
                           if (state.inviteStatus == InviteStatus.sending) {
-                            return const SizedBox(
+                            return SizedBox(
                                 height: 8,
                                 width: 8,
-                                child:
-                                    Center(child: CircularProgressIndicator()));
+                                child: Center(
+                                    child: LoadingAnimationWidget.inkDrop(
+                                        color: Theme.of(context).primaryColor,
+                                        size: 18.0)));
                           }
                           if (state.inviteStatus == InviteStatus.sent) {
                             return const Icon(
@@ -110,11 +113,16 @@ class _AddMemberDialogState extends State<AddManagerDialog> {
             child: ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,
-                    backgroundColor: Colors.lightGreen,
+                    backgroundColor:
+                        context.watch<InviteBloc>().state.inviteStatus ==
+                                InviteStatus.sent
+                            ? Colors.lightGreen
+                            : null,
                     fixedSize: const Size(175, 40)),
                 onPressed: () {
                   if (addMemberFormKey.currentState!.validate()) {
                     context.read<InviteBloc>().add(ManagerInviteSent(
+                        user: context.read<ProfileBloc>().state.user,
                         emailAddress:
                             widget.inviteTextFieldController.value.text,
                         group: widget.group));
@@ -146,8 +154,8 @@ class _AddMemberDialogState extends State<AddManagerDialog> {
                     }
                     if (state.inviteStatus == InviteStatus.sending) {
                       return const SizedBox(
-                          height: 18,
-                          child: FittedBox(child: CircularProgressIndicator()));
+                        height: 18,
+                      );
                     }
                     if (state.inviteStatus == InviteStatus.sent) {
                       return const Icon(
@@ -168,10 +176,10 @@ class _AddMemberDialogState extends State<AddManagerDialog> {
                       return const Text('Try Again!');
                     }
                     if (state.inviteStatus == InviteStatus.sending) {
-                      return const Text('Adding Manager...');
+                      return const Text('Sending Invite...');
                     }
                     if (state.inviteStatus == InviteStatus.sent) {
-                      return const Text('Manager Invited!');
+                      return const Text('Invite Sent!');
                     } else {
                       return const Text('Add Manager');
                     }

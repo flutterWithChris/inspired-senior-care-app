@@ -104,27 +104,16 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
 
     int groupCount = await _databaseRepository.getGroupCount(currentUser.id!);
 
-    groups.clear();
-    if (groupCount > 0) {
-      for (int i = 0; i < groupCount; i++) {
-        currentUser.type == 'user'
-            ? await emit.forEach(
-                _databaseRepository.getMemberGroups(currentUser.id!),
-                onData: (List<Group> data) {
-                  return GroupLoaded(myGroups: data);
-                },
-              )
-            : await emit.forEach(
-                _databaseRepository.getManagerGroups(currentUser.id!),
-                onData: (List<Group> data) {
-                  return GroupLoaded(myGroups: data);
-                },
-              );
-        await Future.delayed(const Duration(milliseconds: 500));
-      }
-    } else {
-      emit(const GroupLoaded(myGroups: []));
-    }
+    // groups.clear();
+    currentUser.type == 'user'
+        ? groups =
+            await _databaseRepository.getMemberGroupsAsFuture(currentUser.id!)
+        : groups =
+            await _databaseRepository.getManagerGroupsAsFuture(currentUser.id!);
+
+    groups.isEmpty
+        ? emit(const GroupLoaded(myGroups: []))
+        : emit(GroupLoaded(myGroups: groups));
   }
 
   @override
