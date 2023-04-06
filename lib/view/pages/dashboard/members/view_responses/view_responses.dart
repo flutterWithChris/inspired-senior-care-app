@@ -42,38 +42,30 @@ class _ViewResponsesState extends State<ViewResponses> {
     int currentCardIndex =
         context.watch<ViewResponseDeckCubit>().currentCardNumber;
 
-    return BlocListener<CardBloc, CardState>(
-      listener: (context, state) {
-        // TODO: implement listener
-        if (state is CardsLoading) {}
-        if (state is CardsLoaded) {}
-      },
-      child: Scaffold(
-        //floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
-        floatingActionButton: Padding(
-          padding: const EdgeInsets.only(bottom: 20.0),
-          child: FloatingActionButton(
-            backgroundColor: Colors.lightBlue,
-            child: const Icon(
-              FontAwesomeIcons.solidMessage,
-              size: 18,
-            ),
-            onPressed: () {
-              context.read<ResponseCommentBloc>().add(LoadResponseComment(
-                  userId: context.read<MemberBloc>().state.user!.id!,
-                  categoryName: context.read<CardBloc>().state.category!.name,
-                  cardNumber: deckScrollController.selectedItem + 1));
-              // Show dialog to comment on response.
-              showDialog(
-                context: context,
-                builder: (context) {
-                  return ResponseCommentDialog(
-                    currentCardIndex: deckScrollController.selectedItem + 1,
-                  );
-                },
-              );
-            },
+    return BlocBuilder<CardBloc, CardState>(builder: (context, state) {
+      return Scaffold(
+        // floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
+        floatingActionButton: FloatingActionButton(
+          backgroundColor: Colors.lightBlue,
+          child: const Icon(
+            FontAwesomeIcons.solidMessage,
+            size: 18,
           ),
+          onPressed: () {
+            context.read<ResponseCommentBloc>().add(LoadResponseComment(
+                userId: context.read<MemberBloc>().state.user!.id!,
+                categoryName: context.read<CardBloc>().state.category!.name,
+                cardNumber: deckScrollController.selectedItem + 1));
+            // Show dialog to comment on response.
+            showDialog(
+              context: context,
+              builder: (context) {
+                return ResponseCommentDialog(
+                  currentCardIndex: deckScrollController.selectedItem + 1,
+                );
+              },
+            );
+          },
         ),
         bottomSheet: ViewResponsesSheet(
           deckScrollController: deckScrollController,
@@ -98,7 +90,7 @@ class _ViewResponsesState extends State<ViewResponses> {
                 child: BlocBuilder<CardBloc, CardState>(
                   builder: (context, state) {
                     if (state is CardsLoaded) {
-                      //context.loaderOverlay.hide();
+                      // context.loaderOverlay.hide();
                       return AppBar(
                         toolbarHeight: 50,
                         centerTitle: true,
@@ -164,7 +156,6 @@ class _ViewResponsesState extends State<ViewResponses> {
                                       ViewResponseDeckState>(
                                     listener: (context, state) {
                                       // TODO: implement listener
-
                                       if (state.status ==
                                           ViewResponseDeckStatus.zoomed) {
                                         isCardZoomed = true;
@@ -178,6 +169,23 @@ class _ViewResponsesState extends State<ViewResponses> {
                                             deckScrollController),
                                   ),
                                 ),
+                                // Positioned(
+                                //   right: 24,
+                                //   top: -12,
+                                //   child: Animate(
+                                //     effects: const [
+                                //       SlideEffect(
+                                //           delay: Duration(milliseconds: 600),
+                                //           duration: Duration(milliseconds: 250),
+                                //           curve: Curves.easeOutBack,
+                                //           begin: Offset(1.5, 0),
+                                //           end: Offset(0, 0))
+                                //     ],
+                                //     child: CardCounter(
+                                //         deckScrollController:
+                                //             deckScrollController),
+                                //   ),
+                                // ),
                               ],
                             ),
                           ),
@@ -194,8 +202,8 @@ class _ViewResponsesState extends State<ViewResponses> {
             },
           ),
         ),
-      ),
-    );
+      );
+    });
   }
 }
 
@@ -407,9 +415,6 @@ class CardCounter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    int currentCardIndex =
-        context.watch<ViewResponseDeckCubit>().currentCardNumber;
-
     return Stack(
       alignment: AlignmentDirectional.center,
       children: [
@@ -422,22 +427,24 @@ class CardCounter extends StatelessWidget {
                   if (state is CardsLoaded) {
                     Category currentCategory = state.category;
                     String category = state.category.name;
-
+                    int currentCardIndex = context
+                        .watch<ViewResponseDeckCubit>()
+                        .currentCardNumber;
                     bool categoryStarted =
                         user.currentCard!.containsKey(currentCategory.name);
-                    if (!categoryStarted) {}
-                    if (categoryStarted) {
-                      Map<String, int> progressList = user.currentCard!;
-                      int currentCardIndex =
-                          progressList[currentCategory.name]!;
+                    // if (!categoryStarted) {}
+                    // if (categoryStarted) {
+                    //   Map<String, int> progressList = user.currentCard!;
+                    //   // int currentCardIndex =
+                    //   //     progressList[currentCategory.name]!;
 
-                      deckScrollController.animateToItem(currentCardIndex - 1);
-                    }
+                    //   deckScrollController.animateToItem(currentCardIndex - 1);
+                    // }
                     return CircleAvatar(
                       backgroundColor: Colors.white,
                       radius: 32,
                       child: Text(
-                        '$currentCardIndex/${currentCategory.totalCards}',
+                        currentCardIndex.toString(),
                         style: const TextStyle(fontSize: 20),
                       ),
                     );
@@ -449,25 +456,6 @@ class CardCounter extends StatelessWidget {
             return const Text('?');
           },
         ),
-        BlocBuilder<CardBloc, CardState>(
-          builder: (context, state) {
-            if (state is CardsLoaded) {
-              double percentageComplete =
-                  currentCardIndex / state.category.totalCards!;
-              return SizedBox(
-                height: 64,
-                width: 64,
-                child: CircularProgressIndicator(
-                  backgroundColor: Colors.grey.shade300,
-                  valueColor: AlwaysStoppedAnimation<Color>(
-                      state.category.progressColor),
-                  value: percentageComplete,
-                ),
-              );
-            }
-            return const Text('Something Went Wrong..');
-          },
-        )
       ],
     );
   }
@@ -517,8 +505,10 @@ class _DeckState extends State<Deck> {
             controller: widget.deckScrollController,
             velocityFactor: 0.23,
             itemCount: completedCards != null ? completedCards - 1 : 1,
-            itemExtent: 330,
+            itemExtent: MediaQuery.of(context).size.width * 0.8,
             onIndexChanged: (p0) {
+              context.read<ViewResponseDeckCubit>().currentCardNumber = p0 + 1;
+
               /// Prevent user advancing to next card & show dialog if not subscribed
               if (p0 + 1 >= (state.category.totalCards! / 2).round() &&
                   (isSubscribed == false || isSubscribed == null) &&
@@ -804,7 +794,7 @@ class ViewResponsesSheet extends StatelessWidget {
       borderRadius: BorderRadius.circular(25),
       child: Container(
         margin: const EdgeInsets.only(left: 15, right: 15),
-        height: 210,
+        height: 164,
         child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             crossAxisAlignment: CrossAxisAlignment.end,
