@@ -619,6 +619,9 @@ class _DeckState extends State<Deck> {
         if (state is CardsLoaded) {
           bool? isSubscribed = context.read<PurchasesBloc>().state.isSubscribed;
           return InfiniteCarousel.builder(
+            physics: widget.isCardZoomed
+                ? const NeverScrollableScrollPhysics()
+                : const BouncingScrollPhysics(),
             center: true,
             loop: false,
             controller: widget.deckScrollController,
