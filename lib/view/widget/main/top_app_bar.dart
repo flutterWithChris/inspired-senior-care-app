@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:inspired_senior_care_app/bloc/invite/invite_bloc.dart';
@@ -72,7 +71,7 @@ class InboxButton extends StatelessWidget {
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Text(
-                            'Group Invites',
+                            'Notifications',
                             textAlign: TextAlign.center,
                             style: Theme.of(context).textTheme.titleLarge,
                           ),
@@ -163,7 +162,7 @@ class InboxButton extends StatelessWidget {
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Text(
-                            'Group Invites',
+                            'Notifications',
                             textAlign: TextAlign.center,
                             style: Theme.of(context).textTheme.titleLarge,
                           ),
