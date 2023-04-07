@@ -8,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:inspired_senior_care_app/bloc/auth/auth_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/cards/card_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/categories/categories_bloc.dart';
+import 'package:inspired_senior_care_app/bloc/comment_notifications/comment_notification_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/deck/deck_cubit.dart';
 import 'package:inspired_senior_care_app/bloc/group/group_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/invite/invite_bloc.dart';
@@ -32,6 +33,7 @@ import 'package:inspired_senior_care_app/cubits/signup/signup_cubit.dart';
 import 'package:inspired_senior_care_app/data/models/category.dart';
 import 'package:inspired_senior_care_app/data/repositories/auth/auth_repository.dart';
 import 'package:inspired_senior_care_app/data/repositories/database/database_repository.dart';
+import 'package:inspired_senior_care_app/data/repositories/notifications/comment_notification_repository.dart';
 import 'package:inspired_senior_care_app/data/repositories/purchases/purchases_repository.dart';
 import 'package:inspired_senior_care_app/data/repositories/storage/storage_repository.dart';
 import 'package:inspired_senior_care_app/firebase_options.dart';
@@ -97,6 +99,9 @@ class _MyAppState extends State<MyApp> {
         ),
         RepositoryProvider(
           create: (context) => StorageRepository(),
+        ),
+        RepositoryProvider(
+          create: (context) => CommentNotificationRepository(),
         ),
       ],
       child: MultiBlocProvider(
@@ -203,12 +208,25 @@ class _MyAppState extends State<MyApp> {
           ),
           BlocProvider(
             create: (context) => ResponseCommentBloc(
+                commentNotificationRepository:
+                    context.read<CommentNotificationRepository>(),
                 databaseRepository: context.read<DatabaseRepository>()),
           ),
           BlocProvider(
             create: (context) => DeckCubit(
                 profileBloc: context.read<ProfileBloc>(),
                 databaseRepository: context.read<DatabaseRepository>()),
+          ),
+          BlocProvider(
+            create: (context) => CommentNotificationBloc(
+                profileBloc: context.read<ProfileBloc>(),
+                cardBloc: context.read<CardBloc>(),
+                deckCubit: context.read<DeckCubit>(),
+                databaseRepository: context.read<DatabaseRepository>(),
+                commentNotificationRepository:
+                    context.read<CommentNotificationRepository>())
+              ..add(LoadCommentNotifications(
+                  userId: context.read<AuthBloc>().state.user!.uid)),
           ),
         ],
         child: BlocBuilder<AuthBloc, AuthState>(
@@ -325,12 +343,13 @@ class _MyAppState extends State<MyApp> {
         },
         routes: [
           GoRoute(
-            name: 'deck-page',
-            path: 'deck-page',
-            builder: (context, state) => DeckPage(
-              category: state.extra as Category,
-            ),
-          ),
+              name: 'deck-page',
+              path: 'deck-page',
+              builder: (context, state) {
+                return DeckPage(
+                  category: state.extra as Category,
+                );
+              }),
         ]),
     GoRoute(
         name: 'manager-categories',

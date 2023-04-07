@@ -48,6 +48,8 @@ class InviteBloc extends Bloc<InviteEvent, InviteState> {
         super(InviteState.loading()) {
     _profileStream = _profileBloc.stream.listen((state) async {
       if (state is ProfileLoaded && state.user.type == 'user') {
+        await _inviteStreamSubscription?.cancel();
+        invites.clear();
         _inviteStreamSubscription =
             _databaseRepository.listenForInvites().listen((event) async {
           newInvites.clear();

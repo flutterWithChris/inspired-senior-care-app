@@ -96,10 +96,12 @@ class _DeckPageState extends State<DeckPage> {
                       BlocBuilder<ResponseCommentBloc, ResponseCommentState>(
                     builder: (context, state) {
                       if (state is ResponseCommentLoading) {
+                        print('ResponseCommentLoading');
                         return const SizedBox();
                       }
                       if (state is ResponseCommentsLoaded &&
                           state.responseComments != null) {
+                        print('ResponseCommentsLoaded & not null');
                         return Padding(
                           padding: const EdgeInsets.only(top: 24),
                           child: AnimatedOpacity(
@@ -493,19 +495,96 @@ class _CardCounterState extends State<CardCounter> {
     User currentUser = context.read<ProfileBloc>().state.user;
     bool categoryStarted =
         currentUser.currentCard!.containsKey(widget.category.name);
-    if (categoryStarted) {
-      currentCard = currentUser.currentCard![widget.category.name]!;
-      context.read<DeckCubit>().updateCardNumber(currentCard);
-    } else {
-      currentCard = 1;
-      context.read<DeckCubit>().updateCardNumber(currentCard);
-    }
-    if (categoryStarted) {
-      context.read<DeckCubit>().updateCardNumber(currentCard);
-      if (currentCard < widget.category.totalCards! + 1) {
-        Future.delayed(const Duration(milliseconds: 300), () async {
-          await widget.deckScrollController.animateToItem(currentCard - 1);
+    bool cardProvided = context.read<DeckCubit>().currentCardNumber != 0;
+    if (context.read<DeckCubit>().state.providedCardNumber != null) {
+      print(
+          'Animating to provided card: ${context.read<DeckCubit>().state.providedCardNumber}');
+      Future.delayed(const Duration(milliseconds: 300), () async {
+        await widget.deckScrollController.animateToItem(
+            context.read<DeckCubit>().state.providedCardNumber! - 1);
+      });
+      GlobalKey<FormState> formKey = GlobalKey<FormState>();
+      TextEditingController shareFieldController = TextEditingController();
+      int providedCard = context.read<DeckCubit>().state.providedCardNumber!;
+
+      context.read<DeckCubit>().zoomDeck();
+
+      context.read<ResponseCommentBloc>().add(LoadResponseComments(
+          userId: context.read<ProfileBloc>().state.user.id!,
+          categoryName: widget.category.name,
+          cardNumber: providedCard));
+
+      context.read<ResponseBloc>().add(FetchResponse(
+          user: context.read<ProfileBloc>().state.user,
+          category: widget.category,
+          cardNumber: providedCard));
+
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+        var bottomSheet = showBottomSheet(
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(25),
+              topRight: Radius.circular(25),
+            ),
+          ),
+          backgroundColor: Colors.white70,
+          context: context,
+          builder: (context) {
+            return ClipRRect(
+              borderRadius: BorderRadius.circular(25),
+              child: Container(
+                margin: const EdgeInsets.only(left: 15, right: 15),
+                height: 240,
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      Container(
+                        height: 5,
+                        width: 60,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      ShareTextField(
+                        deckScrollController: widget.deckScrollController,
+                        formKey: formKey,
+                        shareFieldController: shareFieldController,
+                      ),
+                      SendButton(
+                        deckScrollController: widget.deckScrollController,
+                        currentCard: currentCard,
+                        category: widget.category,
+                        formKey: formKey,
+                        categoryName: widget.category.name,
+                        shareFieldController: shareFieldController,
+                      ),
+                    ]),
+              ),
+            );
+          },
+        );
+        bottomSheet.closed.then((value) {
+          context.read<DeckCubit>().unzoomDeck();
         });
+      });
+    } else {
+      if (categoryStarted) {
+        currentCard = currentUser.currentCard![widget.category.name]!;
+        context.read<DeckCubit>().updateCardNumber(currentCard);
+      } else {
+        currentCard = 1;
+        context.read<DeckCubit>().updateCardNumber(currentCard);
+      }
+      if (categoryStarted) {
+        context.read<DeckCubit>().updateCardNumber(currentCard);
+        if (currentCard < widget.category.totalCards! + 1) {
+          print('Animating to card $currentCard');
+          Future.delayed(const Duration(milliseconds: 300), () async {
+            await widget.deckScrollController.animateToItem(currentCard - 1);
+          });
+        }
       } else {
         context.read<DeckCubit>().completeDeck();
       }
