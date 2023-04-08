@@ -19,7 +19,6 @@ class DeckCubit extends Cubit<DeckState> {
         super(DeckState.initial());
   void loadDeck(Category category, int? cardNumber) {
     User currentUser = _profileBloc.state.user;
-    print('Loadine deck with card number: $cardNumber');
     currentCardNumber = currentUser.currentCard![category.name] ?? 1;
     emit(DeckState.loaded(currentCardNumber, cardNumber));
   }

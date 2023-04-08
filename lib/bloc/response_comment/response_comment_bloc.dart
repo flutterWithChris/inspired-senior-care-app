@@ -25,7 +25,6 @@ class ResponseCommentBloc
       try {
         final responseComment = await _databaseRepository.fetchResponseComment(
             event.userId, event.categoryName, event.cardNumber);
-        print('responseComment: $responseComment');
         emit(ResponseCommentLoaded(responseComment: responseComment));
       } catch (_) {
         emit(ResponseCommentError());
@@ -81,12 +80,10 @@ class ResponseCommentBloc
     });
     on<LoadResponseComments>((event, emit) async {
       emit(ResponseCommentLoading());
-      print('Loading response comments');
       try {
         final responseComments =
             await _databaseRepository.fetchAllResponseComments(
                 event.userId, event.categoryName, event.cardNumber);
-        print('responseComments: $responseComments');
         emit(ResponseCommentsLoaded(responseComments: responseComments));
       } catch (_) {
         emit(ResponseCommentError());
