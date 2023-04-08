@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:flutter/cupertino.dart';
 import 'package:inspired_senior_care_app/data/repositories/auth/auth_repository.dart';
 import 'package:inspired_senior_care_app/data/repositories/purchases/purchases_repository.dart';
+import 'package:inspired_senior_care_app/router/router.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';
@@ -50,6 +51,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> with ChangeNotifier {
         ? AuthState.authenticated(user: event.user!)
         : const AuthState.unauthenticated());
     notifyListeners();
+    router.refresh();
   }
 
   void _onLogoutRequested(

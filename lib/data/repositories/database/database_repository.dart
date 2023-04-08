@@ -202,6 +202,15 @@ class DatabaseRepository extends BaseDatabaseRepository {
     }
   }
 
+  // Get category as future
+  Future<Category> getCategoryFuture(String categoryName) async {
+    return await _firebaseFirestore
+        .collection('categories')
+        .doc(categoryName)
+        .get()
+        .then((value) => Category.fromSnapshot(value));
+  }
+
   Future<void> setGroupFeaturedCategory(
       String groupId, String categoryName) async {
     try {
@@ -871,6 +880,64 @@ class DatabaseRepository extends BaseDatabaseRepository {
           return null;
         }
       }).asStream();
+    } on FirebaseException catch (e) {
+      final SnackBar snackBar = SnackBar(
+        content: Text(e.message.toString()),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
+      return null;
+    }
+  }
+
+  // Get count of invites as future
+  Future<int>? getInviteCount() {
+    auth.User? user = _firebaseAuth.currentUser;
+    try {
+      return _firebaseFirestore
+          .collection('invites')
+          .doc(user!.uid)
+          .collection('invites')
+          .get()
+          .then((value) {
+        var docs = value.docs;
+        if (docs.isNotEmpty) {
+          return docs.length;
+        } else {
+          return 0;
+        }
+      });
+    } on FirebaseException catch (e) {
+      final SnackBar snackBar = SnackBar(
+        content: Text(e.message.toString()),
+        backgroundColor: Colors.redAccent,
+      );
+      snackbarKey.currentState?.showSnackBar(snackBar);
+      (e, stack) =>
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: true);
+      return null;
+    }
+  }
+
+  // Get count of invites & comment notifications as future
+  Future<int>? getNotificationCount() {
+    auth.User? user = _firebaseAuth.currentUser;
+    try {
+      return _firebaseFirestore
+          .collection('users')
+          .doc(user!.uid)
+          .collection('comment-notifications')
+          .get()
+          .then((value) {
+        var docs = value.docs;
+        if (docs.isNotEmpty) {
+          return docs.length;
+        } else {
+          return 0;
+        }
+      });
     } on FirebaseException catch (e) {
       final SnackBar snackBar = SnackBar(
         content: Text(e.message.toString()),

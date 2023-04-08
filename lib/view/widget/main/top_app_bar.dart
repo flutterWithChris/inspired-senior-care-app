@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:inspired_senior_care_app/bloc/comment_notifications/comment_notification_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/invite/invite_bloc.dart';
+import 'package:inspired_senior_care_app/data/models/comment_notification.dart';
+import 'package:inspired_senior_care_app/data/repositories/database/database_repository.dart';
+import 'package:inspired_senior_care_app/view/widget/notifications/comment_notification_widget.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 import '../../../bloc/profile/profile_bloc.dart';
@@ -184,46 +188,69 @@ class InboxButton extends StatelessWidget {
                       )),
                 ),
               ),
-              BlocBuilder<InviteBloc, InviteState>(
-                builder: (context, state) {
-                  //  var data = snapshot.data;
-                  // if (data == null || (data is List<Invite> && data.isEmpty)) {
-                  //   print('data is null');
-                  //   return const SizedBox();
-                  // }
-                  if (state.inviteStatus == InviteStatus.loaded) {
-                    print('data is not null');
-                    if (state.invites == null || state.invites!.isEmpty) {
-                      return const SizedBox();
-                    }
+              FutureBuilder<int>(
+                future: context.read<DatabaseRepository>().getInviteCount(),
+                builder: (context, snapshot) {
+                  var data = snapshot.data;
+                  if (data == null) {
+                    return const SizedBox();
+                  }
+                  if (snapshot.hasData) {
+                    // if (state.invites == null || state.invites!.isEmpty) {
+                    //   return const SizedBox();
+                    // }
+                    int invitesCount = data;
 
-                    return Animate(
-                      effects: const [
-                        ShakeEffect(
-                            duration: Duration(seconds: 1),
-                            hz: 2,
-                            offset: Offset(-0.1, 1.0),
-                            rotation: 1),
-                        // ScaleEffect(),
-                        // SlideEffect(
-                        //   begin: Offset(0.5, 0.5),
-                        //   end: Offset(0, 0),
-                        // )
-                      ],
-                      child: Positioned(
-                        top: 8,
-                        left: 4,
-                        child: CircleAvatar(
-                          radius: 10.0,
-                          backgroundColor: Colors.blueAccent,
-                          child: Text(
-                            '${state.invites?.length}',
-                            style: const TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 12),
-                          ),
-                        ),
-                      ),
-                    );
+                    return FutureBuilder<int>(
+                        future: context
+                            .read<DatabaseRepository>()
+                            .getNotificationCount(),
+                        builder: (context, snapshot) {
+                          var count = snapshot.data;
+                          if (count == null) {
+                            return const SizedBox();
+                          }
+                          if (snapshot.hasData) {
+                            int commentCount = count;
+                            int totalNotifications =
+                                invitesCount + commentCount;
+                            return Animate(
+                              effects: const [
+                                ShakeEffect(
+                                    duration: Duration(seconds: 1),
+                                    hz: 2,
+                                    offset: Offset(-0.1, 1.0),
+                                    rotation: 1),
+                                // ScaleEffect(),
+                                // SlideEffect(
+                                //   begin: Offset(0.5, 0.5),
+                                //   end: Offset(0, 0),
+                                // )
+                              ],
+                              child: Positioned(
+                                top: 8,
+                                left: 4,
+                                child: AnimatedOpacity(
+                                  opacity: totalNotifications > 0 ? 1 : 0,
+                                  duration: const Duration(milliseconds: 400),
+                                  curve: Curves.easeOutSine,
+                                  child: CircleAvatar(
+                                    radius: 10.0,
+                                    backgroundColor: Colors.blueAccent,
+                                    child: Text(
+                                      '$totalNotifications',
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 12),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            );
+                          } else {
+                            return const SizedBox();
+                          }
+                        });
                   }
                   if (state.inviteStatus == InviteStatus.failed) {
                     return Animate(
@@ -400,70 +427,100 @@ class _InviteListState extends State<InviteList> {
         }
 
         if (state.inviteStatus == InviteStatus.loaded) {
-          print('Trying to render invites');
           // List<Invite> invites = [];
           //  print('invites: $invites');
 
           List<Invite> invites = state.invites!;
-          return ListView.builder(
-              padding: const EdgeInsets.only(bottom: 0),
-              shrinkWrap: true,
-              itemCount: invites.isNotEmpty ? invites.length : 1,
-              itemBuilder: (context, index) {
-                if (invites.isNotEmpty) {
-                  Invite thisInvite = invites[index];
-                  if (thisInvite.status == 'declined') {
-                    return DeclinedGroupInvite(thisInvite: thisInvite);
+          List<Widget> inviteWidgets = [];
+          List<Widget> commentNotificationWidgets = [];
+
+          for (var invite in invites) {
+            if (invite.status == 'declined') {
+              inviteWidgets.add(DeclinedGroupInvite(thisInvite: invite));
+            }
+            if (invite.status == 'accepted') {
+              inviteWidgets.add(AcceptedGroupInvite(thisInvite: invite));
+            }
+            if (invite.status == 'sent' &&
+                context.read<ProfileBloc>().state.user.type == 'manager') {
+              inviteWidgets.add(SentGroupInvite(thisInvite: invite));
+            } else {
+              inviteWidgets.add(GroupInvite(thisInvite: invite));
+            }
+          }
+          return BlocBuilder<CommentNotificationBloc, CommentNotificationState>(
+              builder: (context, state) {
+            if (state is CommentNotificationLoading) {
+              commentNotificationWidgets.clear();
+              return SizedBox(
+                height: 120,
+                child: Center(
+                  child: LoadingAnimationWidget.inkDrop(
+                      color: Theme.of(context).primaryColor, size: 30.0),
+                ),
+              );
+            }
+            if (state is CommentNotificationLoaded) {
+              List<CommentNotification> commentNotifications =
+                  state.commentNotifications;
+
+              for (var commentNotification in commentNotifications) {
+                commentNotificationWidgets.add(CommentNotificationWidget(
+                    commentNotification: commentNotification));
+              }
+            }
+            // Combine inviteWidgets and commentNotificationWidgets
+            List<Widget> combinedWidgets = [];
+            combinedWidgets.addAll(inviteWidgets);
+            combinedWidgets.addAll(commentNotificationWidgets);
+            return ListView.builder(
+                padding: const EdgeInsets.only(bottom: 0),
+                shrinkWrap: true,
+                itemCount:
+                    combinedWidgets.isNotEmpty ? combinedWidgets.length : 1,
+                itemBuilder: (context, index) {
+                  if (combinedWidgets.isNotEmpty) {
+                    return combinedWidgets[index];
                   }
-                  if (thisInvite.status == 'accepted') {
-                    return AcceptedGroupInvite(thisInvite: thisInvite);
-                  }
-                  if (thisInvite.status == 'sent' &&
-                      context.read<ProfileBloc>().state.user.type ==
-                          'manager') {
-                    return SentGroupInvite(thisInvite: thisInvite);
-                  } else {
-                    return GroupInvite(thisInvite: thisInvite);
-                  }
-                }
-                return SizedBox(
-                  height: 100,
-                  child: Center(
-                    child: Padding(
-                      padding: const EdgeInsets.only(bottom: 36.0),
-                      child: Text(
-                        'No Invites!',
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleSmall!
-                            .copyWith(color: Colors.grey.shade600),
+                  return SizedBox(
+                    height: 100,
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 36.0),
+                        child: Text(
+                          'No Notifications!',
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleSmall!
+                              .copyWith(color: Colors.grey.shade600),
+                        ),
                       ),
                     ),
-                  ),
-                );
-              });
-
-          SizedBox(
-            height: 100,
-            child: Center(
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 36.0),
-                child: Text(
-                  'No Invites!',
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleSmall!
-                      .copyWith(color: Colors.grey.shade600),
-                ),
-              ),
-            ),
-          );
+                  );
+                });
+          });
         } else {
           return const Center(
             child: Text('Something Went Wrong..'),
           );
         }
       },
+    );
+
+    SizedBox(
+      height: 100,
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 36.0),
+          child: Text(
+            'No Invites!',
+            style: Theme.of(context)
+                .textTheme
+                .titleSmall!
+                .copyWith(color: Colors.grey.shade600),
+          ),
+        ),
+      ),
     );
   }
 }

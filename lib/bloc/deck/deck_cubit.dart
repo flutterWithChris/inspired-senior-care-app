@@ -17,13 +17,13 @@ class DeckCubit extends Cubit<DeckState> {
       : _databaseRepository = databaseRepository,
         _profileBloc = profileBloc,
         super(DeckState.initial());
-  void loadDeck(Category category) {
+  void loadDeck(Category category, int? cardNumber) {
     User currentUser = _profileBloc.state.user;
     currentCardNumber = currentUser.currentCard![category.name] ?? 1;
-    emit(DeckState.loaded(currentCardNumber));
+    emit(DeckState.loaded(currentCardNumber, cardNumber));
   }
 
-  void resetDeck() => emit(DeckState.loaded(1));
+  void resetDeck() => emit(DeckState.loaded(1, null));
   void zoomDeck() => emit(DeckState.zoomed());
   void unzoomDeck() => emit(DeckState.unzoomed());
   void swipeDeck() => emit(DeckState.swiped());

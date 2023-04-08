@@ -201,7 +201,7 @@ class CategoryCard extends StatelessWidget {
                 onTap: () {
                   BlocProvider.of<CardBloc>(context)
                       .add(LoadCards(category: category));
-                  context.read<DeckCubit>().loadDeck(category);
+                  context.read<DeckCubit>().loadDeck(category, null);
                   context.pushNamed('deck-page', extra: category);
                 },
                 child: Card(

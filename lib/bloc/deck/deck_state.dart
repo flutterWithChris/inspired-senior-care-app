@@ -13,10 +13,12 @@ enum DeckStatus {
 
 class DeckState extends Equatable {
   int? currentCardNumber;
+  int? providedCardNumber;
   final DeckStatus? status;
 
   DeckState({
     this.currentCardNumber,
+    this.providedCardNumber,
     this.status,
   });
 
@@ -28,8 +30,11 @@ class DeckState extends Equatable {
     return DeckState(status: DeckStatus.loading);
   }
 
-  factory DeckState.loaded(int currentCard) {
-    return DeckState(status: DeckStatus.loaded, currentCardNumber: currentCard);
+  factory DeckState.loaded(int currentCard, int? providedCard) {
+    return DeckState(
+        status: DeckStatus.loaded,
+        currentCardNumber: currentCard,
+        providedCardNumber: providedCard);
   }
 
   factory DeckState.zoomed() {
