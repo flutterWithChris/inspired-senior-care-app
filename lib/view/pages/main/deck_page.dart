@@ -96,12 +96,10 @@ class _DeckPageState extends State<DeckPage> {
                       BlocBuilder<ResponseCommentBloc, ResponseCommentState>(
                     builder: (context, state) {
                       if (state is ResponseCommentLoading) {
-                        print('ResponseCommentLoading');
                         return const SizedBox();
                       }
                       if (state is ResponseCommentsLoaded &&
                           state.responseComments != null) {
-                        print('ResponseCommentsLoaded & not null');
                         return Padding(
                           padding: const EdgeInsets.only(top: 24),
                           child: AnimatedOpacity(
@@ -488,6 +486,7 @@ class CardCounter extends StatefulWidget {
 class _CardCounterState extends State<CardCounter> {
   double percentageComplete = 0.0;
   int currentCard = 1;
+  int? providedCard;
 
   @override
   void initState() {
@@ -495,29 +494,22 @@ class _CardCounterState extends State<CardCounter> {
     User currentUser = context.read<ProfileBloc>().state.user;
     bool categoryStarted =
         currentUser.currentCard!.containsKey(widget.category.name);
-    bool cardProvided = context.read<DeckCubit>().currentCardNumber != 0;
-    if (context.read<DeckCubit>().state.providedCardNumber != null) {
+    providedCard = context.read<DeckCubit>().state.providedCardNumber;
+    if (providedCard != null) {
       print(
           'Animating to provided card: ${context.read<DeckCubit>().state.providedCardNumber}');
       Future.delayed(const Duration(milliseconds: 300), () async {
-        await widget.deckScrollController.animateToItem(
-            context.read<DeckCubit>().state.providedCardNumber! - 1);
+        await widget.deckScrollController.animateToItem(providedCard! - 1);
       });
       GlobalKey<FormState> formKey = GlobalKey<FormState>();
       TextEditingController shareFieldController = TextEditingController();
-      int providedCard = context.read<DeckCubit>().state.providedCardNumber!;
 
       context.read<DeckCubit>().zoomDeck();
 
       context.read<ResponseCommentBloc>().add(LoadResponseComments(
           userId: context.read<ProfileBloc>().state.user.id!,
           categoryName: widget.category.name,
-          cardNumber: providedCard));
-
-      context.read<ResponseBloc>().add(FetchResponse(
-          user: context.read<ProfileBloc>().state.user,
-          category: widget.category,
-          cardNumber: providedCard));
+          cardNumber: providedCard!));
 
       WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
         var bottomSheet = showBottomSheet(
@@ -530,6 +522,19 @@ class _CardCounterState extends State<CardCounter> {
           backgroundColor: Colors.white70,
           context: context,
           builder: (context) {
+            if (ModalRoute.of(context)!.isCurrent) {
+              WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+                await Future.delayed(
+                  const Duration(seconds: 1),
+                  () => showDialog(
+                      context: context,
+                      builder: (context) {
+                        return const ViewResponseCommentsDialog();
+                      }),
+                );
+              });
+            }
+
             return ClipRRect(
               borderRadius: BorderRadius.circular(25),
               child: Container(
@@ -580,7 +585,6 @@ class _CardCounterState extends State<CardCounter> {
       if (categoryStarted) {
         context.read<DeckCubit>().updateCardNumber(currentCard);
         if (currentCard < widget.category.totalCards! + 1) {
-          print('Animating to card $currentCard');
           Future.delayed(const Duration(milliseconds: 300), () async {
             await widget.deckScrollController.animateToItem(currentCard - 1);
           });

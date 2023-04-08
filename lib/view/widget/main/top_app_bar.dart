@@ -193,11 +193,9 @@ class InboxButton extends StatelessWidget {
                 builder: (context, snapshot) {
                   var data = snapshot.data;
                   if (data == null) {
-                    print('data is null');
                     return const SizedBox();
                   }
                   if (snapshot.hasData) {
-                    print('data is not null');
                     // if (state.invites == null || state.invites!.isEmpty) {
                     //   return const SizedBox();
                     // }
@@ -232,14 +230,19 @@ class InboxButton extends StatelessWidget {
                               child: Positioned(
                                 top: 8,
                                 left: 4,
-                                child: CircleAvatar(
-                                  radius: 10.0,
-                                  backgroundColor: Colors.blueAccent,
-                                  child: Text(
-                                    '$totalNotifications',
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 12),
+                                child: AnimatedOpacity(
+                                  opacity: totalNotifications > 0 ? 1 : 0,
+                                  duration: const Duration(milliseconds: 400),
+                                  curve: Curves.easeOutSine,
+                                  child: CircleAvatar(
+                                    radius: 10.0,
+                                    backgroundColor: Colors.blueAccent,
+                                    child: Text(
+                                      '$totalNotifications',
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 12),
+                                    ),
                                   ),
                                 ),
                               ),
@@ -424,7 +427,6 @@ class _InviteListState extends State<InviteList> {
         }
 
         if (state.inviteStatus == InviteStatus.loaded) {
-          print('Trying to render invites');
           // List<Invite> invites = [];
           //  print('invites: $invites');
 
@@ -450,15 +452,17 @@ class _InviteListState extends State<InviteList> {
               builder: (context, state) {
             if (state is CommentNotificationLoading) {
               commentNotificationWidgets.clear();
-              return Center(
-                child: LoadingAnimationWidget.inkDrop(
-                    color: Theme.of(context).primaryColor, size: 30.0),
+              return SizedBox(
+                height: 120,
+                child: Center(
+                  child: LoadingAnimationWidget.inkDrop(
+                      color: Theme.of(context).primaryColor, size: 30.0),
+                ),
               );
             }
             if (state is CommentNotificationLoaded) {
               List<CommentNotification> commentNotifications =
                   state.commentNotifications;
-              print('commentNotifications Not Null: $commentNotifications');
 
               for (var commentNotification in commentNotifications) {
                 commentNotificationWidgets.add(CommentNotificationWidget(

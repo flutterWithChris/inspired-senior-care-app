@@ -5,6 +5,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart' hide Category;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:inspired_senior_care_app/bloc/auth/auth_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/cards/card_bloc.dart';
 import 'package:inspired_senior_care_app/bloc/deck/deck_cubit.dart';
 import 'package:inspired_senior_care_app/bloc/profile/profile_bloc.dart';
@@ -21,6 +22,7 @@ class CommentNotificationBloc
   final CommentNotificationRepository _commentNotificationRepository;
   final DatabaseRepository _databaseRepository;
   final ProfileBloc _profileBloc;
+  final AuthBloc _authBloc;
   StreamSubscription? _profileBlocStream;
   final CardBloc _cardBloc;
   final DeckCubit _deckCubit;
@@ -32,31 +34,18 @@ class CommentNotificationBloc
       required DatabaseRepository databaseRepository,
       required CardBloc cardBloc,
       required ProfileBloc profileBloc,
+      required AuthBloc authBloc,
       required DeckCubit deckCubit})
       : _commentNotificationRepository = commentNotificationRepository,
         _databaseRepository = databaseRepository,
         _cardBloc = cardBloc,
         _deckCubit = deckCubit,
         _profileBloc = profileBloc,
+        _authBloc = authBloc,
         super(CommentNotificationInitial()) {
-    _profileBlocStream = _profileBloc.stream.listen((state) {
-      if (state is ProfileLoaded) {
-        commentNotificationsList = [];
-        commentNotificationsStream = commentNotificationRepository
-            .getCommentNotifications(state.user.id!)
-            .listen((event) {
-          print('Getting comment notifications...');
-
-          if (!listEquals(commentNotificationsList, event)) {
-            print('List not equal, adding to list');
-            for (final CommentNotification commentNotification in event) {
-              if (!commentNotificationsList.contains(commentNotification)) {
-                commentNotificationsList.add(commentNotification);
-              }
-            }
-          }
-          add(LoadCommentNotifications(userId: state.user.id!));
-        });
+    _authBloc.stream.listen((state) {
+      if (state.authStatus == AuthStatus.authenticated && state.user != null) {
+        add(LoadCommentNotifications(userId: state.user!.uid));
       } else if (state is ProfileFailed) {
         commentNotificationsStream?.cancel();
       }
@@ -68,10 +57,7 @@ class CommentNotificationBloc
       commentNotificationsStream = commentNotificationRepository
           .getCommentNotifications(event.userId)
           .listen((event) {
-        print('Getting comment notifications...');
-
         if (!listEquals(commentNotificationsList, event)) {
-          print('List not equal, adding to list');
           for (final CommentNotification commentNotification in event) {
             if (!commentNotificationsList.contains(commentNotification)) {
               commentNotificationsList.add(commentNotification);
@@ -80,8 +66,7 @@ class CommentNotificationBloc
         }
       });
 
-      print('Loading comment notifications...');
-      Future.delayed(const Duration(seconds: 2));
+      await Future.delayed(const Duration(seconds: 1));
       emit(CommentNotificationLoaded(
           commentNotifications: commentNotificationsList));
     });
@@ -89,9 +74,10 @@ class CommentNotificationBloc
       Category category = await _databaseRepository
           .getCategoryFuture(event.commentNotification.categoryName);
       emit(CommentNotificationClicked());
-      print('category: ${category.name}');
       _cardBloc.add(LoadCards(category: category));
       _deckCubit.loadDeck(category, event.commentNotification.cardNumber);
+      await _commentNotificationRepository
+          .deleteComment(event.commentNotification);
       event.context.go('/categories/deck-page', extra: category);
       await Future.delayed(const Duration(seconds: 2));
       add(LoadCommentNotifications(userId: event.userId));
